@@ -39,3 +39,6 @@ gen-external-apklibs
 
 # Android Studio captures folder
 captures/
+
+# Ignore whole folder. If something goes wrong, than ignore specific files. 
+.idea/
