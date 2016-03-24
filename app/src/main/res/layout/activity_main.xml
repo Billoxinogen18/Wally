@@ -23,12 +23,31 @@
 
     <include layout="@layout/content_main" />
 
+    <android.support.v7.widget.CardView
+        android:id="@+id/btn_map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|start"
+        android:layout_margin="@dimen/fab_margin"
+        android:foreground="?attr/selectableItemBackground"
+        android:stateListAnimator="@animator/raise"
+        app:layout_behavior="com.wally.wally.components.MoveUpwardBehavior"
+        tools:targetApi="lollipop">
+
+        <ImageView
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_margin="2dp"
+            android:clickable="false"
+            android:src="@drawable/ic_btn_map_75dp" />
+    </android.support.v7.widget.CardView>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_black_24dp" />
+        android:src="@drawable/ic_add_white_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>
