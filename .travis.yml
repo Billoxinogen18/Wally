@@ -10,5 +10,5 @@ android:
 before_install:
  - chmod +x gradlew
 after_failure:
- - cat file:///home/travis/build/Meravici/Wally/app/build/outputs/lint-results.html
+ - cat /home/travis/build/Meravici/Wally/app/build/outputs/lint-results.html
  
