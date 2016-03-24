@@ -8,10 +8,27 @@
 5. Image Preview
 
 
-# Coding standards 
+# Coding styles & standards 
 
 Please refer to official Android [coding standards](https://source.android.com/source/code-style.html).
 
+See how variable declaration differes 
+```
+public class MyClass {
+    public static final int SOME_CONSTANT = 42;
+    public int publicField;
+    private static MyClass sSingleton;
+    int mPackagePrivate;
+    private int mPrivate;
+    protected int mProtected;
+}
+```
+
+Also see [Annotation guide](http://developer.android.com/tools/debugging/annotations.html). and [Full Annotation list] (http://developer.android.com/reference/android/support/annotation/package-summary.html)
+
+Annotations like `@NonNull` , `@UiThread` , `@CallSuper` Will be very handfull. 
+
+If you are eager to read further, see [full coding styles & standards] (https://github.com/ribot/android-guidelines/blob/master/project_and_code_guidelines.md). 
 # Honor rules. 
 
 Before pushing your code: 
