@@ -42,12 +42,35 @@
             android:src="@drawable/ic_btn_map_75dp" />
     </android.support.v7.widget.CardView>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+    <com.wally.wally.components.FloatingActionMenu
+        android:id="@+id/fam"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_add_white_24dp" />
+        android:layout_gravity="end|bottom"
+        app:fabMenuCloseIconAngle="135"
+        app:fabMenuLabelStyle="@style/label_style_dark">
 
+        <android.support.design.widget.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_add_white_24dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/action_first"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="label 1"
+            app:backgroundTint="@color/colorAccent"
+            app:fabSize="mini" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/action_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="label 1"
+            app:backgroundTint="@color/colorAccent"
+            app:fabSize="mini" />
+
+    </com.wally.wally.components.FloatingActionMenu>
 </android.support.design.widget.CoordinatorLayout>

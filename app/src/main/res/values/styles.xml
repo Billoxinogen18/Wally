@@ -17,4 +17,13 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="label_style_dark">
+        <item name="android:background">@drawable/fab_label_background_dark</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="label_style_light">
+        <item name="android:background">@drawable/fab_label_background_light</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
 </resources>
