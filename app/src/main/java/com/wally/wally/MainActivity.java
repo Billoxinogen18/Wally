@@ -2,12 +2,15 @@ package com.wally.wally;
 
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import com.wally.wally.components.FloatingActionMenu;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,6 +20,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        FloatingActionMenu floatingActionMenu = (FloatingActionMenu) findViewById(R.id.fam);
+        floatingActionMenu.setupWithDimmingView(findViewById(R.id.dimming_view),
+                ContextCompat.getColor(this, R.color.fam_dim_color));
 
         findViewById(R.id.action_first).setOnClickListener(new View.OnClickListener() {
             @Override

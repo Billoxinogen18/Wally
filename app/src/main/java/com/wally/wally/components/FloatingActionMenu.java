@@ -32,14 +32,13 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.KeyEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -58,7 +57,6 @@ import com.wally.wally.R;
 
 @SuppressWarnings("unused")
 @SuppressLint("NewApi")
-@CoordinatorLayout.DefaultBehavior(FloatingActionMenu.Behavior.class)
 public class FloatingActionMenu extends ViewGroup {
     public static final int EXPAND_UP = 0;
     public static final int EXPAND_DOWN = 1;
@@ -404,6 +402,9 @@ public class FloatingActionMenu extends ViewGroup {
                     button.getTag(R.id.fab_label) != null) continue;
 
             TextView label = new TextView(context);
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
+                label.setStateListAnimator(button.getStateListAnimator());
+            }
             //noinspection deprecation
             label.setTextAppearance(getContext(), mLabelsStyle);
             label.setText(title);
@@ -727,36 +728,6 @@ public class FloatingActionMenu extends ViewGroup {
         public void writeToParcel(@NonNull Parcel out, int flags) {
             super.writeToParcel(out, flags);
             out.writeInt(mExpanded ? 1 : 0);
-        }
-    }
-
-    /**
-     * Behavior designed for use with {@link FloatingActionMenu} instances. It's main function
-     * is to move all {@link FloatingActionButton}s views inside {@link FloatingActionMenu} so
-     * that any displayed {@link Snackbar}s do not cover them.
-     */
-    public static class Behavior extends CoordinatorLayout.Behavior<FloatingActionMenu> {
-
-        /**
-         * Default constructor for instantiating Behaviors.
-         */
-        public Behavior() {
-        }
-
-        public Behavior(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        @Override
-        public boolean layoutDependsOn(CoordinatorLayout parent, FloatingActionMenu child, View dependency) {
-            return dependency instanceof Snackbar.SnackbarLayout;
-        }
-
-        @Override
-        public boolean onDependentViewChanged(CoordinatorLayout parent, FloatingActionMenu child, View dependency) {
-            float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight());
-            child.setTranslationY(translationY);
-            return true;
         }
     }
 

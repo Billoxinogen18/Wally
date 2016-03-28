@@ -12,8 +12,8 @@ import android.view.View;
  * Created by ioane5 on 3/24/16.
  */
 public class MoveUpwardBehavior extends CoordinatorLayout.Behavior<View> {
-    private float mInitialY = 0;
-    private float mMaxYTranslation = 0;
+    // it must be member fields, to avoid creating same variables multiple times.
+    private int[] mBoundCheckerXY, mDependencyXY;
 
     public MoveUpwardBehavior() {
         super();
@@ -24,6 +24,8 @@ public class MoveUpwardBehavior extends CoordinatorLayout.Behavior<View> {
     }
 
     public boolean layoutDependsOn(CoordinatorLayout parent, View child, View dependency) {
+        mBoundCheckerXY = new int[2];
+        mDependencyXY = new int[2];
         return dependency instanceof Snackbar.SnackbarLayout;
     }
 
@@ -38,6 +40,20 @@ public class MoveUpwardBehavior extends CoordinatorLayout.Behavior<View> {
     }
 
     public boolean onDependentViewChanged(CoordinatorLayout parent, View child, View dependency) {
+        View boundChecker = child;
+        // this is special case of floatingActionMenu, because is larger than it appears.
+        // we only need to check floatingActionButton overlap inside this FAM.
+        if (boundChecker instanceof FloatingActionMenu) {
+            boundChecker = ((FloatingActionMenu) child).getChildAt(0);
+        }
+        // get absolute position on screen.
+        boundChecker.getLocationOnScreen(mBoundCheckerXY);
+        dependency.getLocationOnScreen(mDependencyXY);
+        // if view doesn't overlap dependant view do not animate.
+        if (mBoundCheckerXY[0] > mDependencyXY[0] + dependency.getWidth() ||
+                mDependencyXY[0] > mBoundCheckerXY[0] + boundChecker.getWidth()) {
+            return false;
+        }
         float translationY = Math.min(0, dependency.getTranslationY() - dependency.getHeight());
         child.setTranslationY(translationY);
         return true;

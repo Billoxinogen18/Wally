@@ -23,6 +23,8 @@
 
     <include layout="@layout/content_main" />
 
+
+    <!-- Map button -->
     <android.support.v7.widget.CardView
         android:id="@+id/btn_map"
         android:layout_width="wrap_content"
@@ -35,6 +37,7 @@
         tools:targetApi="lollipop">
 
         <ImageView
+            android:id="@+id/map_background_image"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:layout_margin="2dp"
@@ -42,13 +45,20 @@
             android:src="@drawable/ic_btn_map_75dp" />
     </android.support.v7.widget.CardView>
 
+    <View
+        android:id="@+id/dimming_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true" />
+
     <com.wally.wally.components.FloatingActionMenu
         android:id="@+id/fam"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         app:fabMenuCloseIconAngle="135"
-        app:fabMenuLabelStyle="@style/label_style_dark">
+        app:fabMenuLabelStyle="@style/label_style_dark"
+        app:layout_behavior="com.wally.wally.components.MoveUpwardBehavior">
 
         <android.support.design.widget.FloatingActionButton
             android:layout_width="wrap_content"
@@ -57,15 +67,15 @@
             android:src="@drawable/ic_add_white_24dp" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/action_first"
+            android:id="@+id/action_second"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:contentDescription="label 1"
+            android:contentDescription="label 2"
             app:backgroundTint="@color/colorAccent"
             app:fabSize="mini" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/action_second"
+            android:id="@+id/action_first"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="label 1"
