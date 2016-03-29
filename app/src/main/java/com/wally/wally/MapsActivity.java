@@ -6,21 +6,23 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.view.View;
+import android.util.Log;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
+    public static final String TAG = MapsActivity.class.getSimpleName();
+
     private static final int MY_LOCATION_REQUEST_CODE = 22;
-    private static final float MAP_ZOOM = 8;
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
 
@@ -37,15 +39,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[],
-                                           int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
         if (requestCode == MY_LOCATION_REQUEST_CODE) {
             if (permissions.length == 1 &&
                     permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 centerMapOnMyLocation();
             } else {
-                // Permission was denied. Display an error message.
+                // TODO Permission was denied. Maybe error msg here?
             }
         }
     }
@@ -62,31 +64,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+        if (Utils.checkLocationPermission(this)) {
             centerMapOnMyLocation();
         } else {
-            // Should we show an explanation?
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-//                    Manifest.permission.READ_CONTACTS)) {
-//
-//                // Show an expanation to the user *asynchronously* -- don't block
-//                // this thread waiting for the user's response! After the user
-//                // sees the explanation, try again to request the permission.
-//
-//            } else {
-
-            // No explanation needed, we can request the permission.
-
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_LOCATION_REQUEST_CODE);
-//            }
         }
     }
-
 
     private void centerMapOnMyLocation() {
         try {
@@ -95,25 +80,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     getSystemService(Context.LOCATION_SERVICE);
             Criteria criteria = new Criteria();
 
-            Location location = locationManager.getLastKnownLocation(locationManager
+            Location myLocation = locationManager.getLastKnownLocation(locationManager
                     .getBestProvider(criteria, false));
-            LatLng myLocation = new LatLng(0,0);
-            if (location != null) {
-                myLocation = new LatLng(location.getLatitude(),
-                        location.getLongitude());
+
+            if (myLocation == null) {
+                Log.e(TAG, "centerMapOnMyLocation: couldn't get user location");
+                return;
             }
-            if (location != null) {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation, MAP_ZOOM));
-            }
-//            View myLocationButton = ((View) mapFragment.getView().findViewById(Integer.parseInt("1")).getParent())
-//                    .findViewById(Integer.parseInt("2"));
-//
-//            myLocationButton.performClick();
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(myLocation.getLatitude(), myLocation.getLongitude()), 18), 2000, null);
 
-
-
-        }catch (SecurityException e){
-
+        } catch (SecurityException e) {
+            e.printStackTrace();
         }
     }
 }
