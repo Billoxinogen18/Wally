@@ -13,7 +13,7 @@
 Please refer to official Android [coding standards](https://source.android.com/source/code-style.html).
 
 See how variable declaration differes 
-```
+``` Java
 public class MyClass {
     public static final int SOME_CONSTANT = 42;
     public int publicField;
