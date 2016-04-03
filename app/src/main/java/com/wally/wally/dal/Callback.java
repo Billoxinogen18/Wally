@@ -1,9 +1,12 @@
 package com.wally.wally.dal;
 
+import android.support.annotation.MainThread;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 public interface Callback<T> {
 
-    void call(T result, @Nullable Exception e);
+    @MainThread
+    void call(@NonNull T result, @Nullable Exception e);
 
 }

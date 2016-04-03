@@ -1,5 +1,6 @@
 package com.wally.wally.dal;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.List;
 public class FirebaseDAL implements DataAccessLayer {
     private List<Content> db;
 
-    public FirebaseDAL() {
+    public FirebaseDAL(Context context) {
         this.db = new ArrayList<Content>();
     }
 
