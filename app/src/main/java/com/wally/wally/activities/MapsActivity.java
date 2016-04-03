@@ -1,4 +1,4 @@
-package com.wally.wally;
+package com.wally.wally.activities;
 
 import android.Manifest;
 import android.content.Context;
@@ -17,6 +17,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.R;
+import com.wally.wally.Utils;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 

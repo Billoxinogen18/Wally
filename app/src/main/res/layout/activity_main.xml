@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.wally.wally.MainActivity">
+    tools:context=".activities.MainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -67,18 +67,22 @@
             android:src="@drawable/ic_add_white_24dp" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/action_second"
+            android:id="@+id/action_new_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="label 2"
+            android:onClick="newNote"
+            android:src="@drawable/ic_insert_photo_white_24dp"
             app:backgroundTint="@color/colorAccent"
             app:fabSize="mini" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/action_first"
+            android:id="@+id/action_new_photo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="label 1"
+            android:onClick="newPhoto"
+            android:src="@drawable/ic_note_add_white_24dp"
             app:backgroundTint="@color/colorAccent"
             app:fabSize="mini" />
 
