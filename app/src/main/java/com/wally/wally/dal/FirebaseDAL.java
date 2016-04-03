@@ -3,6 +3,7 @@ package com.wally.wally.dal;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class FirebaseDAL implements DataAccessLayer {
@@ -31,5 +32,10 @@ public class FirebaseDAL implements DataAccessLayer {
     @Override
     public void deleteEventually(@NonNull Content c) {
 
+    }
+
+    @Override
+    public void fetch(@NonNull Query query, @NonNull Callback<Collection<Content>> resultCallback) {
+        resultCallback.call(new ArrayList<Content>(db), null);
     }
 }

@@ -38,5 +38,5 @@ public interface DataAccessLayer {
     /**
      * Fetch Objects by ...
      */
-    // void fetchByLocation(@NonNull Object query, @NonNull Callback<Collection<Content>> resultCallback);
+    void fetch(@NonNull Query query, @NonNull Callback<Collection<Content>> resultCallback);
 }
