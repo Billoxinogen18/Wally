@@ -31,6 +31,14 @@ public final class Utils {
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * @return true if we have External storage access permission.
+     */
+    public static boolean checkExternalStorageReadPermission(Context context) {
+        return ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
     public static float getScreenWidthDpi(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return displayMetrics.widthPixels / displayMetrics.density;

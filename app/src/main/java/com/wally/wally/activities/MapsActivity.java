@@ -77,6 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void centerMapOnMyLocation() {
         try {
+            mMap.getMyLocation();
             mMap.setMyLocationEnabled(true);
             LocationManager locationManager = (LocationManager)
                     getSystemService(Context.LOCATION_SERVICE);

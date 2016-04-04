@@ -1,13 +1,17 @@
 package com.wally.wally.activities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.wally.wally.R;
@@ -27,14 +32,71 @@ public class ChoosePhotoActivity extends AppCompatActivity {
 
     @SuppressWarnings("unused")
     public static final String TAG = ChoosePhotoActivity.class.getSimpleName();
+    private static final int REQUEST_READ_PERMISSION = 121;
+    private static final int ACTION_REQUEST_EXTERNAL_GALLERY = 102;
     private RecyclerView mRecyclerView;
     private ImagesRecyclerViewAdapter mAdapter;
-    private AsyncTask<Void, Void, List<ImageData>> mLoadImages = new AsyncTask<Void, Void, List<ImageData>>() {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            // TODO show progress.
+
+    public static Intent newIntent(Activity from) {
+        return new Intent(from, ChoosePhotoActivity.class);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_choose_photo);
+
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_images);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, getGridColumnCount()));
+        mAdapter = new ImagesRecyclerViewAdapter();
+        mRecyclerView.setAdapter(mAdapter);
+
+        if (!Utils.checkExternalStorageReadPermission(getBaseContext())) {
+            ActivityCompat.requestPermissions(ChoosePhotoActivity.this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_PERMISSION);
+        } else {
+            mLoadImageData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
+    }
+
+    private int getGridColumnCount() {
+        // This is optimal quantity based on rotation.
+        return (int) (Utils.getScreenWidthDpi(this) / 170);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ACTION_REQUEST_EXTERNAL_GALLERY) {
+            if (resultCode == Activity.RESULT_OK) {
+                // TODO set data and return.
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_READ_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                mLoadImageData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            } else {
+                finish();
+                Toast.makeText(this, R.string.error_gallery_storage_denied, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void startExternalGallery() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+
+        Intent chooser = Intent.createChooser(intent, "Choose a Picture");
+        startActivityForResult(chooser, ACTION_REQUEST_EXTERNAL_GALLERY);
+
+    }
+
+    private AsyncTask<Void, Void, List<ImageData>> mLoadImageData = new AsyncTask<Void, Void, List<ImageData>>() {
 
         @Override
         protected List<ImageData> doInBackground(Void... params) {
@@ -65,35 +127,76 @@ public class ChoosePhotoActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<ImageData> imageList) {
             super.onPostExecute(imageList);
-            // TODO stop progress.
             if (imageList == null || imageList.size() == 0) {
-                // TODO show empty view
+                startExternalGallery();
             } else {
                 mAdapter.setData(imageList);
             }
         }
     };
 
-    public static Intent newIntent(Activity from) {
-        return new Intent(from, ChoosePhotoActivity.class);
-    }
+    public class ImagesRecyclerViewAdapter extends RecyclerView.Adapter<ImagesRecyclerViewAdapter.VH> {
+        private List<ImageData> mData;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_choose_photo);
+        public class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
+            ImageView imageView;
+            TextView dateView;
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_images);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, getGridColumnCount()));
-        mAdapter = new ImagesRecyclerViewAdapter();
-        mRecyclerView.setAdapter(mAdapter);
+            public VH(View itemView) {
+                super(itemView);
+                imageView = (ImageView) itemView.findViewById(R.id.image_view);
+                dateView = (TextView) itemView.findViewById(R.id.date_view);
+                itemView.setOnClickListener(this);
+            }
 
-        mLoadImages.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
+            @Override
+            public void onClick(View v) {
+                if (getAdapterPosition() == 0) {
+                    startExternalGallery();
+                } else {
+                    // TODO set data end return.
+                }
+            }
+        }
 
-    private int getGridColumnCount() {
-        // This is optimal quantity based on rotation.
-        return (int) (Utils.getScreenWidthDpi(this) / 170);
+        @SuppressLint("InflateParams")
+        @Override
+        public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = getLayoutInflater().inflate(R.layout.gallery_item, null);
+            return new VH(v);
+        }
+
+        @Override
+        public void onBindViewHolder(VH holder, int position) {
+            holder.imageView.setImageDrawable(null);
+            holder.imageView.setBackground(null);
+            if (position == 0) {
+                holder.imageView.setBackgroundResource(R.drawable.background_frame);
+                holder.imageView.setImageResource(R.drawable.ic_external_gallery);
+                holder.dateView.setVisibility(View.INVISIBLE);
+            } else {
+                position -= 1;
+                ImageData data = mData.get(position);
+                Glide.with(getBaseContext())
+                        .load(data.path)
+                        .centerCrop()
+                        .into(holder.imageView);
+
+                holder.dateView.setText(Utils.formatDateSmart(getBaseContext(), data.date));
+                holder.dateView.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            // +1 for first external library item
+            return mData == null ? 0 : mData.size() + 1;
+        }
+
+        public void setData(List<ImageData> newData) {
+            mData = newData;
+            notifyDataSetChanged();
+        }
     }
 
     public static class ImageData {
@@ -111,56 +214,6 @@ public class ChoosePhotoActivity extends AppCompatActivity {
                     "path='" + path + '\'' +
                     ", date=" + date +
                     '}';
-        }
-    }
-
-    public class ImagesRecyclerViewAdapter extends RecyclerView.Adapter<ImagesRecyclerViewAdapter.VH> {
-        private List<ImageData> mData;
-
-        public ImagesRecyclerViewAdapter() {
-
-        }
-
-        @SuppressLint("InflateParams")
-        @Override
-        public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = getLayoutInflater().inflate(R.layout.gallery_item, null);
-            return new VH(v);
-        }
-
-        @Override
-        public void onBindViewHolder(VH holder, int position) {
-            ImageData data = mData.get(position);
-
-            holder.imageView.setImageDrawable(null);
-            Glide.with(getBaseContext())
-                    .load(data.path)
-                    .centerCrop()
-                    .into(holder.imageView);
-
-            holder.dateView.setText(Utils.formatDateSmart(getBaseContext(), data.date));
-        }
-
-        @Override
-        public int getItemCount() {
-            return mData == null ? 0 : mData.size();
-        }
-
-        public void setData(List<ImageData> newData) {
-            mData = newData;
-            notifyDataSetChanged();
-            // TODO maybe better notifyItemInserted();
-        }
-
-        public class VH extends RecyclerView.ViewHolder {
-            ImageView imageView;
-            TextView dateView;
-
-            public VH(View itemView) {
-                super(itemView);
-                imageView = (ImageView) itemView.findViewById(R.id.image_view);
-                dateView = (TextView) itemView.findViewById(R.id.date_view);
-            }
         }
     }
 }
