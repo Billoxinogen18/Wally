@@ -2,6 +2,6 @@
     <!-- TODO this is debug key and won't work. Change with generated key after release Keystore is created.
     -->
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
-        AIzaSyCIyUbnBOt6nbT3511-qdCLVSuKS8Dwu24
+       AIzaSyB7QLO1rIZeKIGYOh_pO0UdGVTuugyAHao
     </string>
 </resources>
