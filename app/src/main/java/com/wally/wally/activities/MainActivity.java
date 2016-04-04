@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "onActivityResult() called with: " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
             } else {
                 // TODO user canceled or error happened.
+                Log.i(TAG, "onActivityResult: canceled");
             }
         }
     }

@@ -34,7 +34,6 @@ public class ChoosePhotoActivity extends AppCompatActivity {
     public static final String TAG = ChoosePhotoActivity.class.getSimpleName();
     private static final int REQUEST_READ_PERMISSION = 121;
     private static final int ACTION_REQUEST_EXTERNAL_GALLERY = 102;
-    private RecyclerView mRecyclerView;
     private ImagesRecyclerViewAdapter mAdapter;
 
     public static Intent newIntent(Activity from) {
@@ -46,10 +45,10 @@ public class ChoosePhotoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_photo);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view_images);
-        mRecyclerView.setLayoutManager(new GridLayoutManager(this, getGridColumnCount()));
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view_images);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, getGridColumnCount()));
         mAdapter = new ImagesRecyclerViewAdapter();
-        mRecyclerView.setAdapter(mAdapter);
+        recyclerView.setAdapter(mAdapter);
 
         if (!Utils.checkExternalStorageReadPermission(getBaseContext())) {
             ActivityCompat.requestPermissions(ChoosePhotoActivity.this,
@@ -69,7 +68,8 @@ public class ChoosePhotoActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ACTION_REQUEST_EXTERNAL_GALLERY) {
             if (resultCode == Activity.RESULT_OK) {
-                // TODO set data and return.
+                setResult(RESULT_OK, data);
+                finish();
             }
         }
     }
@@ -93,7 +93,6 @@ public class ChoosePhotoActivity extends AppCompatActivity {
 
         Intent chooser = Intent.createChooser(intent, "Choose a Picture");
         startActivityForResult(chooser, ACTION_REQUEST_EXTERNAL_GALLERY);
-
     }
 
     private AsyncTask<Void, Void, List<ImageData>> mLoadImageData = new AsyncTask<Void, Void, List<ImageData>>() {
@@ -101,7 +100,7 @@ public class ChoosePhotoActivity extends AppCompatActivity {
         @Override
         protected List<ImageData> doInBackground(Void... params) {
             List<ImageData> allImages = new ArrayList<>();
-            allImages.addAll(getImagePaths(MediaStore.Images.Media.INTERNAL_CONTENT_URI));
+//            allImages.addAll(getImagePaths(MediaStore.Images.Media.INTERNAL_CONTENT_URI));
             allImages.addAll(getImagePaths(MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
             return allImages;
         }
@@ -154,7 +153,11 @@ public class ChoosePhotoActivity extends AppCompatActivity {
                 if (getAdapterPosition() == 0) {
                     startExternalGallery();
                 } else {
-                    // TODO set data end return.
+                    ImageData imageData = mData.get(getAdapterPosition() - 1);
+                    Intent result = new Intent();
+                    result.setData(Uri.parse(imageData.path));
+                    setResult(RESULT_OK, result);
+                    finish();
                 }
             }
         }

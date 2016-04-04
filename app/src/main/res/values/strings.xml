@@ -4,4 +4,6 @@
     <string name="title_activity_maps">Map</string>
     <string name="error_gallery_storage_denied">Gallery needs storage access</string>
     <string name="google_app_id">unified-cortex-126421</string>
+    <string name="action_new_note">Note</string>
+    <string name="action_new_photo">Photo</string>
 </resources>
