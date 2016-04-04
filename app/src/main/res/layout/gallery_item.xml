@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.wally.wally.components.SquareRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/gallery_image_padding">
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/date_view"
+        style="?android:attr/textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/background_gallery_item_textview"
+        android:gravity="bottom"
+        android:padding="8dp"
+        android:textColor="#a0ffffff"
+        tools:text="15 march" />
+</com.wally.wally.components.SquareRelativeLayout>

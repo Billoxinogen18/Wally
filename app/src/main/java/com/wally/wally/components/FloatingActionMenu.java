@@ -42,7 +42,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.KeyEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -194,7 +193,6 @@ public class FloatingActionMenu extends ViewGroup {
         }
 
         LayoutParams mainButtonParams = (LayoutParams) mMainButton.getLayoutParams();
-        Log.i("FAB Menu", "Main Button Params: " + mainButtonParams.topMargin);
         if (!expandsHorizontally()) {
             width = mMaxButtonWidth + (maxLabelWidth > 0 ? maxLabelWidth + mLabelsMargin : 0);
             width += mainButtonParams.leftMargin + mainButtonParams.rightMargin;

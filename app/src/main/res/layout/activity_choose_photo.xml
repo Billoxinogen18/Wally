@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.ChoosePhotoActivity">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_images"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/gallery_image_padding"
+        android:scrollbarSize="100dp"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+        android:scrollbars="vertical" />
+</RelativeLayout>
