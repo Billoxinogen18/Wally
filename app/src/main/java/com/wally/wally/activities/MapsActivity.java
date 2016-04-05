@@ -175,7 +175,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void showContents() {
         mMap.clear();
         for (Content content : mContents) {
-            LatLng location = content.getLatLngLocation();
+            LatLng location = content.getLatlng();
             if (!mMarkers.keySet().contains(content)) {
                 Marker m = mMap.addMarker(new MarkerOptions().position(location).title("Hello World"));
                 mMarkers.put(content, m);
@@ -201,7 +201,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (e == null) {
                         mContents.clear();
                         mContents.addAll(result);
-
                         showContents();
                     } else {
                         Log.e(TAG, e.getMessage(), e);

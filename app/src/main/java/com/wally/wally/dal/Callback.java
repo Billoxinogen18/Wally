@@ -7,6 +7,6 @@ import android.support.annotation.Nullable;
 public interface Callback<T> {
 
     @MainThread
-    void call(@NonNull T result, @Nullable Exception e);
+    void call(@Nullable T result, @Nullable Exception e);
 
 }
