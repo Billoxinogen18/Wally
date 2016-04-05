@@ -18,19 +18,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     private static final int REQUEST_CODE_CHOOSE_PHOTO = 129;
-    private FloatingActionMenu mFloatingActionMenu;
 
     @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        mFloatingActionMenu = (FloatingActionMenu) findViewById(R.id.fam);
-        mFloatingActionMenu.setupWithDimmingView(findViewById(R.id.dimming_view),
-                ContextCompat.getColor(this, R.color.fam_dim_color));
 
         View btnMap = findViewById(R.id.btn_map);
         assert btnMap != null;
@@ -43,14 +36,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
-    public void newNote(View v) {
-        mFloatingActionMenu.collapse(true);
-        Toast.makeText(this, "not implemented yet", Toast.LENGTH_SHORT).show();
-    }
-
-    public void newPhoto(View v) {
-        mFloatingActionMenu.collapse(false);
+    public void newContent(View v) {
         startActivityForResult(ChoosePhotoActivity.newIntent(this), REQUEST_CODE_CHOOSE_PHOTO);
     }
 
