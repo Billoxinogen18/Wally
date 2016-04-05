@@ -15,6 +15,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -35,6 +37,44 @@ public class ChoosePhotoActivity extends AppCompatActivity {
     private static final int REQUEST_READ_PERMISSION = 121;
     private static final int ACTION_REQUEST_EXTERNAL_GALLERY = 102;
     private ImagesRecyclerViewAdapter mAdapter;
+    private AsyncTask<Void, Void, List<ImageData>> mLoadImageData = new AsyncTask<Void, Void, List<ImageData>>() {
+
+        @Override
+        protected List<ImageData> doInBackground(Void... params) {
+            List<ImageData> allImages = new ArrayList<>();
+//            allImages.addAll(getImagePaths(MediaStore.Images.Media.INTERNAL_CONTENT_URI));
+            allImages.addAll(getImagePaths(MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+            return allImages;
+        }
+
+        private ArrayList<ImageData> getImagePaths(Uri uri) {
+            final String[] projection = new String[]{
+                    MediaStore.Images.ImageColumns.DATE_MODIFIED,
+                    MediaStore.Images.ImageColumns.DATA};
+
+            ArrayList<ImageData> images = new ArrayList<>();
+            Cursor c = MediaStore.Images.Media.query(getContentResolver(),
+                    uri, projection, null, MediaStore.Images.ImageColumns.DATE_MODIFIED + " DESC");
+            if (c != null) {
+                while (c.moveToNext()) {
+                    // convert unix style date to java.
+                    images.add(new ImageData("file://" + c.getString(1), c.getLong(0) * 1000));
+                }
+                c.close();
+            }
+            return images;
+        }
+
+        @Override
+        protected void onPostExecute(List<ImageData> imageList) {
+            super.onPostExecute(imageList);
+            if (imageList == null || imageList.size() == 0) {
+                startExternalGallery();
+            } else {
+                mAdapter.setData(imageList);
+            }
+        }
+    };
 
     public static Intent newIntent(Activity from) {
         return new Intent(from, ChoosePhotoActivity.class);
@@ -44,6 +84,10 @@ public class ChoosePhotoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_photo);
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view_images);
         recyclerView.setLayoutManager(new GridLayoutManager(this, getGridColumnCount()));
@@ -90,77 +134,39 @@ public class ChoosePhotoActivity extends AppCompatActivity {
     private void startExternalGallery() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
-
-        Intent chooser = Intent.createChooser(intent, "Choose a Picture");
+        Intent chooser = Intent.createChooser(intent, getString(R.string.title_activity_choose_photo));
         startActivityForResult(chooser, ACTION_REQUEST_EXTERNAL_GALLERY);
     }
 
-    private AsyncTask<Void, Void, List<ImageData>> mLoadImageData = new AsyncTask<Void, Void, List<ImageData>>() {
-
-        @Override
-        protected List<ImageData> doInBackground(Void... params) {
-            List<ImageData> allImages = new ArrayList<>();
-//            allImages.addAll(getImagePaths(MediaStore.Images.Media.INTERNAL_CONTENT_URI));
-            allImages.addAll(getImagePaths(MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
-            return allImages;
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
+    }
 
-        private ArrayList<ImageData> getImagePaths(Uri uri) {
-            final String[] projection = new String[]{
-                    MediaStore.Images.ImageColumns.DATE_MODIFIED,
-                    MediaStore.Images.ImageColumns.DATA};
+    public static class ImageData {
+        public String path;
+        public long date;
 
-            ArrayList<ImageData> images = new ArrayList<>();
-            Cursor c = MediaStore.Images.Media.query(getContentResolver(),
-                    uri, projection, null, MediaStore.Images.ImageColumns.DATE_MODIFIED + " DESC");
-            if (c != null) {
-                while (c.moveToNext()) {
-                    // convert unix style date to java.
-                    images.add(new ImageData("file://" + c.getString(1), c.getLong(0) * 1000));
-                }
-                c.close();
-            }
-            return images;
+        public ImageData(String path, long date) {
+            this.path = path;
+            this.date = date;
         }
 
         @Override
-        protected void onPostExecute(List<ImageData> imageList) {
-            super.onPostExecute(imageList);
-            if (imageList == null || imageList.size() == 0) {
-                startExternalGallery();
-            } else {
-                mAdapter.setData(imageList);
-            }
+        public String toString() {
+            return "ImageData{" +
+                    "path='" + path + '\'' +
+                    ", date=" + date +
+                    '}';
         }
-    };
+    }
 
     public class ImagesRecyclerViewAdapter extends RecyclerView.Adapter<ImagesRecyclerViewAdapter.VH> {
         private List<ImageData> mData;
-
-        public class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
-            ImageView imageView;
-            TextView dateView;
-
-            public VH(View itemView) {
-                super(itemView);
-                imageView = (ImageView) itemView.findViewById(R.id.image_view);
-                dateView = (TextView) itemView.findViewById(R.id.date_view);
-                itemView.setOnClickListener(this);
-            }
-
-            @Override
-            public void onClick(View v) {
-                if (getAdapterPosition() == 0) {
-                    startExternalGallery();
-                } else {
-                    ImageData imageData = mData.get(getAdapterPosition() - 1);
-                    Intent result = new Intent();
-                    result.setData(Uri.parse(imageData.path));
-                    setResult(RESULT_OK, result);
-                    finish();
-                }
-            }
-        }
 
         @SuppressLint("InflateParams")
         @Override
@@ -200,23 +206,30 @@ public class ChoosePhotoActivity extends AppCompatActivity {
             mData = newData;
             notifyDataSetChanged();
         }
-    }
 
-    public static class ImageData {
-        public String path;
-        public long date;
+        public class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
+            ImageView imageView;
+            TextView dateView;
 
-        public ImageData(String path, long date) {
-            this.path = path;
-            this.date = date;
-        }
+            public VH(View itemView) {
+                super(itemView);
+                imageView = (ImageView) itemView.findViewById(R.id.image_view);
+                dateView = (TextView) itemView.findViewById(R.id.date_view);
+                itemView.setOnClickListener(this);
+            }
 
-        @Override
-        public String toString() {
-            return "ImageData{" +
-                    "path='" + path + '\'' +
-                    ", date=" + date +
-                    '}';
+            @Override
+            public void onClick(View v) {
+                if (getAdapterPosition() == 0) {
+                    startExternalGallery();
+                } else {
+                    ImageData imageData = mData.get(getAdapterPosition() - 1);
+                    Intent result = new Intent();
+                    result.setData(Uri.parse(imageData.path));
+                    setResult(RESULT_OK, result);
+                    finish();
+                }
+            }
         }
     }
 }
