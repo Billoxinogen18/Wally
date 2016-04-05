@@ -23,6 +23,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.wally.wally.App;
 import com.wally.wally.R;
@@ -33,6 +34,10 @@ import com.wally.wally.dal.DataAccessLayer;
 import com.wally.wally.dal.LatLngBoundsQuery;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -45,12 +50,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private SupportMapFragment mapFragment;
     private GoogleApiClient mGoogleApiClient;
-    private Content[] mContents;
+    private Set<Content> mContents;
+    private Map<Content, Marker> mMarkers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        mContents = new HashSet<>();
+        mMarkers = new HashMap<>();
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -167,7 +176,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.clear();
         for (Content content : mContents) {
             LatLng location = content.getLatLngLocation();
-            mMap.addMarker(new MarkerOptions().position(location).title("Hello World"));
+            if (!mMarkers.keySet().contains(content)) {
+                Marker m = mMap.addMarker(new MarkerOptions().position(location).title("Hello World"));
+                mMarkers.put(content, m);
+            }
+        }
+
+        for (Content cur : mMarkers.keySet()) {
+            if (!mContents.contains(cur)) {
+                mMarkers.remove(cur);
+            }
         }
     }
 
@@ -181,11 +199,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void call(@NonNull Collection<Content> result, @Nullable Exception e) {
                     if (e == null) {
-                        mContents = new Content[result.size()];
-                        int i = 0;
-                        for (Content content : result) {
-                            mContents[i++] = content;
-                        }
+                        mContents.clear();
+                        mContents.addAll(result);
+
                         showContents();
                     } else {
                         Log.e(TAG, e.getMessage(), e);
