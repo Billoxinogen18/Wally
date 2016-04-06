@@ -173,7 +173,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void showContents() {
-        mMap.clear();
+
+
+        for (Content cur : mMarkers.keySet()) {
+            if (!mContents.contains(cur)) {
+                mMarkers.remove(cur);
+            }
+        }
+
         for (Content content : mContents) {
             LatLng location = content.getLatlng();
             if (!mMarkers.keySet().contains(content)) {
@@ -182,11 +189,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
 
-        for (Content cur : mMarkers.keySet()) {
-            if (!mContents.contains(cur)) {
-                mMarkers.remove(cur);
-            }
-        }
+
     }
 
     @Override

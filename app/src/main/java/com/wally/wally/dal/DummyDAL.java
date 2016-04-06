@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class DummyDAL implements DataAccessLayer {
     private Set<Content> db;
-
+    private Content mGiosLocation = new Content(new LatLng(41.71196838230613,44.75304298102856));
     public DummyDAL(int nContents) {
         db = new HashSet<>();
         for (int i = 0; i < nContents; i++) {
@@ -54,6 +54,8 @@ public class DummyDAL implements DataAccessLayer {
 
     @Override
     public void fetch(@NonNull Query query, @NonNull Callback<Collection<Content>> resultCallback) {
+        if(!db.contains(mGiosLocation))
+            db.add(mGiosLocation);
         resultCallback.call(new HashSet<Content>(db), null);
     }
 }
