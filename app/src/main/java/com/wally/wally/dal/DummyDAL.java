@@ -12,24 +12,27 @@ import java.util.Set;
 
 public class DummyDAL implements DataAccessLayer<Content> {
     private Set<Content> db;
-    private Content mGiosLocation = new Content();
+    private Location baseLocation;
 
     public DummyDAL(int nContents) {
         db = new HashSet<>();
         for (int i = 0; i < nContents; i++) {
             generateDummyContent();
         }
+        baseLocation = new Location(41.71196838230613, 44.75304298102856);
+        Content baseContent = new Content();
+        baseContent.setLocation(baseLocation);
+        db.add(baseContent);
     }
 
     public DummyDAL() {
-        this(100);
-        mGiosLocation.setLocation(new Location(41.71196838230613,44.75304298102856));
+        this(1000);
     }
 
     private void generateDummyContent(){
         Random rand = new Random();
-        double lat = 41.7151 + rand.nextDouble()/100;
-        double lng = 44.8271 + rand.nextDouble()/100;
+        double lat = baseLocation.getLatitude() + rand.nextDouble()/100;
+        double lng = baseLocation.getLongitude() + rand.nextDouble()/100;
         Content content = new Content();
         content.setLocation(new Location(lat, lng));
         save(content);
@@ -59,8 +62,6 @@ public class DummyDAL implements DataAccessLayer<Content> {
 
     @Override
     public void fetch(@NonNull Query query, @NonNull Callback<Collection<Content>> resultCallback) {
-        if(!db.contains(mGiosLocation))
-            db.add(mGiosLocation);
-        resultCallback.call(new HashSet<Content>(db), null);
+        resultCallback.call(new HashSet<>(db), null);
     }
 }

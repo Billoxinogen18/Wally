@@ -6,7 +6,7 @@ public class DALFactory {
     private static final boolean DEBUG = false;
     public static DataAccessLayer create(Context context) {
         if (!DEBUG) {
-            return new DummyDAL(1000);
+            return new DummyDAL();
         }
         return new FirebaseDAL(context);
     }

@@ -23,7 +23,6 @@ public class FirebaseDAL implements DataAccessLayer<Content> {
     public FirebaseDAL(Context context) {
         Firebase.setAndroidContext(context);
         fb = new Firebase("https://burning-inferno-2566.firebaseio.com/").child("Contents");
-        save(new Content());
     }
 
     @Override
