@@ -22,7 +22,7 @@ public interface DataAccessLayer {
      *
      * @see {#save(Content c, StatusCallback callback)}
      */
-    void saveEventually(@NonNull Content c);
+    void save(@NonNull Content c);
 
     /**
      * Deletes object with this Id.
@@ -30,10 +30,10 @@ public interface DataAccessLayer {
     void delete(@NonNull Content c, @NonNull Callback<Boolean> statusCallback);
 
     /**
-     * Same as saveEventually. @see{#saveEventually(Content c)}
+     * Same as save. @see{#save(Content c)}
      * Other that that @see {#delete(Content c, StatusCallback callback)}
      */
-    void deleteEventually(@NonNull Content c);
+    void delete(@NonNull Content c);
 
     /**
      * Fetch Objects by ...

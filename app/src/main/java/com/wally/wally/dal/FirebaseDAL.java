@@ -27,7 +27,7 @@ public class FirebaseDAL implements DataAccessLayer {
     }
 
     @Override
-    public void saveEventually(@NonNull Content c) {
+    public void save(@NonNull Content c) {
         fb.push().setValue(c);
     }
 
@@ -38,7 +38,7 @@ public class FirebaseDAL implements DataAccessLayer {
     }
 
     @Override
-    public void deleteEventually(@NonNull Content c) {
+    public void delete(@NonNull Content c) {
         // TODO
     }
 
