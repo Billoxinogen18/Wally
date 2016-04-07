@@ -2,7 +2,6 @@ package com.wally.wally.dal;
 
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.dal.content.Content;
 import com.wally.wally.dal.content.Location;
 
@@ -11,9 +10,10 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class DummyDAL implements DataAccessLayer {
+public class DummyDAL implements DataAccessLayer<Content> {
     private Set<Content> db;
     private Content mGiosLocation = new Content();
+
     public DummyDAL(int nContents) {
         db = new HashSet<>();
         for (int i = 0; i < nContents; i++) {
@@ -32,7 +32,7 @@ public class DummyDAL implements DataAccessLayer {
         double lng = 44.8271 + rand.nextDouble()/100;
         Content content = new Content();
         content.setLocation(new Location(lat, lng));
-        saveEventually(content);
+        save(content);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class DummyDAL implements DataAccessLayer {
     }
 
     @Override
-    public void saveEventually(@NonNull Content c) {
+    public void save(@NonNull Content c) {
         db.add(c);
     }
 
@@ -53,7 +53,7 @@ public class DummyDAL implements DataAccessLayer {
     }
 
     @Override
-    public void deleteEventually(@NonNull Content c) {
+    public void delete(@NonNull Content c) {
         db.remove(c);
     }
 

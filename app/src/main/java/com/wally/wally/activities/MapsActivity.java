@@ -124,8 +124,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         for (Content content : mContents) {
             if (!mMarkers.keySet().contains(content)) {
                 Marker m = mMap.addMarker(new MarkerOptions()
-                        .position(content.getLatlng())
-                        .title("Hello World")
+                        .position(content.getLocation().getLatLng())
+                        .title(content.getTitle())
                 );
                 mMarkers.put(content, m);
             }

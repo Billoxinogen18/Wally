@@ -1,5 +1,8 @@
 package com.wally.wally.dal.content;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by Xato on 4/7/2016.
  */
@@ -29,5 +32,10 @@ public class Location {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    @JsonIgnore
+    public LatLng getLatLng(){
+        return new LatLng(latitude, longitude);
     }
 }
