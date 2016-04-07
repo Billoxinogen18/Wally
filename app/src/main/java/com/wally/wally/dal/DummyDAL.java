@@ -10,9 +10,10 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class DummyDAL implements DataAccessLayer {
+public class DummyDAL implements DataAccessLayer<Content> {
     private Set<Content> db;
     private Content mGiosLocation = new Content(new LatLng(41.71196838230613,44.75304298102856));
+
     public DummyDAL(int nContents) {
         db = new HashSet<>();
         for (int i = 0; i < nContents; i++) {

@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FirebaseDAL implements DataAccessLayer {
+public class FirebaseDAL implements DataAccessLayer<Content> {
     private Firebase fb;
 
     public FirebaseDAL(Context context) {

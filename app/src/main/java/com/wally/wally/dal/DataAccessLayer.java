@@ -4,39 +4,35 @@ import android.support.annotation.NonNull;
 
 import java.util.Collection;
 
-public interface DataAccessLayer {
+public interface DataAccessLayer<T> {
 
     /**
-     * Save or update object if possible and return status with this callback.
-     * If object with this Id is in database already, the method will update that object.
-     * Otherwise if Id is null create new entry.
-     * If Id is not null and isn't in database, undefined behaviour.
+     * Save (update if exists) given object.
+     * Even if connection fails, save it next time network is available.
      */
-    void save(@NonNull Content c, @NonNull Callback<Boolean> statusCallback);
+    void save(@NonNull T c);
 
     /**
-     * Save Object even if connection fails.
-     * This means that object will be saved eventually when
-     * network is available.
-     * Other than that, behaviour is the same as save method.
-     *
-     * @see {#save(Content c, StatusCallback callback)}
+     * Save (update if exists) given object.
+     * Call statusCallback with status of the operation and/or error reason
      */
-    void save(@NonNull Content c);
+    void save(@NonNull T c, @NonNull Callback<Boolean> statusCallback);
 
     /**
-     * Deletes object with this Id.
+     * Delete given object.
+     * Even if connection fails, delete it next time network is available.
      */
-    void delete(@NonNull Content c, @NonNull Callback<Boolean> statusCallback);
+    void delete(@NonNull T c);
 
     /**
-     * Same as save. @see{#save(Content c)}
-     * Other that that @see {#delete(Content c, StatusCallback callback)}
+     * Delete given object.
+     * Call statusCallback with status of the operation and/or error reason
      */
-    void delete(@NonNull Content c);
+    void delete(@NonNull T c, @NonNull Callback<Boolean> statusCallback);
 
     /**
-     * Fetch Objects by ...
+     * Fetch objects satisfying given query
+     * Call resultCallback with result of the operation and/or error reason
      */
-    void fetch(@NonNull Query query, @NonNull Callback<Collection<Content>> resultCallback);
+    void fetch(@NonNull Query query, @NonNull Callback<Collection<T>> resultCallback);
 }
