@@ -2,6 +2,8 @@ package com.wally.wally.dal;
 
 import android.support.annotation.NonNull;
 
+import com.wally.wally.dal.content.Content;
+
 import java.util.Collection;
 
 public interface DataAccessLayer {

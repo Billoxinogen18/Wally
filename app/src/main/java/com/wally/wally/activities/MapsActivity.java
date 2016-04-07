@@ -28,7 +28,7 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.dal.Callback;
-import com.wally.wally.dal.Content;
+import com.wally.wally.dal.content.Content;
 import com.wally.wally.dal.DataAccessLayer;
 import com.wally.wally.dal.LatLngBoundsQuery;
 
@@ -67,11 +67,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .addApi(LocationServices.API)
                     .build();
         }
-        
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        mapFragment.setRetainInstance(true);
     }
 
     public void onMyLocationClick(View v) {

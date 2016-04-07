@@ -3,6 +3,8 @@ package com.wally.wally.dal;
 import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.dal.content.Content;
+import com.wally.wally.dal.content.Location;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,7 +13,7 @@ import java.util.Set;
 
 public class DummyDAL implements DataAccessLayer {
     private Set<Content> db;
-    private Content mGiosLocation = new Content(new LatLng(41.71196838230613,44.75304298102856));
+    private Content mGiosLocation = new Content();
     public DummyDAL(int nContents) {
         db = new HashSet<>();
         for (int i = 0; i < nContents; i++) {
@@ -21,13 +23,16 @@ public class DummyDAL implements DataAccessLayer {
 
     public DummyDAL() {
         this(100);
+        mGiosLocation.setLocation(new Location(41.71196838230613,44.75304298102856));
     }
 
     private void generateDummyContent(){
         Random rand = new Random();
         double lat = 41.7151 + rand.nextDouble()/100;
         double lng = 44.8271 + rand.nextDouble()/100;
-        saveEventually(new Content(new LatLng(lat, lng)));
+        Content content = new Content();
+        content.setLocation(new Location(lat, lng));
+        saveEventually(content);
     }
 
     @Override
