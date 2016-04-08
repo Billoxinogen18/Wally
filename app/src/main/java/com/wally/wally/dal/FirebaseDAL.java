@@ -3,14 +3,12 @@ package com.wally.wally.dal;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-import com.wally.wally.dal.content.Content;
-import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.dal.content.Location;
 
 
 import java.util.Collection;
@@ -20,18 +18,22 @@ import java.util.Set;
 public class FirebaseDAL implements DataAccessLayer<Content> {
     private Firebase fb;
 
-    public FirebaseDAL(Context context) {
+    public FirebaseDAL(Context context, String dbAddr) {
         Firebase.setAndroidContext(context);
-        fb = new Firebase("https://burning-inferno-2566.firebaseio.com/").child("Contents");
+        fb = new Firebase(dbAddr).child("Contents");
     }
 
     @Override
-    public void save(@NonNull Content c, @NonNull final Callback<Boolean> statusCallback) {
+    public void save(@NonNull final Content c, @NonNull final Callback<Boolean> statusCallback) {
         fb.push().setValue(c, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                boolean status = firebaseError == null;
-                statusCallback.call(status, status ? null : firebaseError.toException());
+                if (firebaseError == null) {
+                    c.setId(firebase.getKey());
+                    statusCallback.call(true, null);
+                } else {
+                    statusCallback.call(false, firebaseError.toException());
+                }
             }
         });
     }
@@ -42,14 +44,23 @@ public class FirebaseDAL implements DataAccessLayer<Content> {
     }
 
     @Override
-    public void delete(@NonNull Content c, @NonNull Callback<Boolean> statusCallback) {
-        // TODO
-        statusCallback.call(false, new UnsupportedOperationException("Not implemented"));
+    public void delete(@NonNull Content c, @NonNull final Callback<Boolean> statusCallback) {
+        fb.child(c.getId()).removeValue(new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError == null) {
+                    statusCallback.call(true, null);
+                } else {
+                    statusCallback.call(false, firebaseError.toException());
+                }
+            }
+        });
+
     }
 
     @Override
     public void delete(@NonNull Content c) {
-        // TODO
+        fb.child(c.getId()).removeValue();
     }
 
     @Override

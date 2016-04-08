@@ -2,7 +2,6 @@ package com.wally.wally.dal;
 
 import android.support.annotation.NonNull;
 
-import com.wally.wally.dal.content.Content;
 import com.wally.wally.dal.content.Location;
 
 import java.util.Collection;
@@ -20,9 +19,7 @@ public class DummyDAL implements DataAccessLayer<Content> {
             generateDummyContent();
         }
         baseLocation = new Location(41.71196838230613, 44.75304298102856);
-        Content baseContent = new Content();
-        baseContent.setLocation(baseLocation);
-        db.add(baseContent);
+        db.add(new Content().withLocation(baseLocation));
     }
 
     public DummyDAL() {
@@ -33,9 +30,7 @@ public class DummyDAL implements DataAccessLayer<Content> {
         Random rand = new Random();
         double lat = baseLocation.getLatitude() + rand.nextDouble()/100;
         double lng = baseLocation.getLongitude() + rand.nextDouble()/100;
-        Content content = new Content();
-        content.setLocation(new Location(lat, lng));
-        save(content);
+        save(new Content().withLocation(new Location(lat, lng)));
     }
 
     @Override

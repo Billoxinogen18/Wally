@@ -28,7 +28,7 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.dal.Callback;
-import com.wally.wally.dal.content.Content;
+import com.wally.wally.dal.Content;
 import com.wally.wally.dal.DataAccessLayer;
 import com.wally.wally.dal.LatLngBoundsQuery;
 
