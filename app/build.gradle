@@ -32,6 +32,7 @@ android {
     android {
         lintOptions {
             abortOnError false
+            disable 'RtlHardcoded'
         }
     }
 }

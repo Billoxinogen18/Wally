@@ -21,13 +21,12 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="label_style_dark">
-        <item name="android:background">@drawable/fab_label_background_dark</item>
-        <item name="android:textColor">@android:color/white</item>
-    </style>
 
-    <style name="label_style_light">
-        <item name="android:background">@drawable/fab_label_background_light</item>
-        <item name="android:textColor">@android:color/black</item>
+    <style name="AppTheme.PositiveButton">
+        <!--<item name="colorControlNormal">#7b2727</item>-->
+        <!--<item name="colorControlActivated">#cc4343</item>-->
+        <!--<item name="colorControlHighlight">#532727</item>-->
+        <item name="colorButtonNormal">#1E88E5</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 </resources>

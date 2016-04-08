@@ -43,9 +43,6 @@ public class MoveUpwardBehavior extends CoordinatorLayout.Behavior<View> {
         View boundChecker = child;
         // this is special case of floatingActionMenu, because is larger than it appears.
         // we only need to check floatingActionButton overlap inside this FAM.
-        if (boundChecker instanceof FloatingActionMenu) {
-            boundChecker = ((FloatingActionMenu) child).getChildAt(0);
-        }
         // get absolute position on screen.
         boundChecker.getLocationOnScreen(mBoundCheckerXY);
         dependency.getLocationOnScreen(mDependencyXY);
