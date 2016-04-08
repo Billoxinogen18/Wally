@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.firebase.client.annotations.NotNull;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -27,8 +28,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.dal.Callback;
 import com.wally.wally.dal.Content;
+import com.wally.wally.dal.EnumCallback;
 import com.wally.wally.dal.DataAccessLayer;
 import com.wally.wally.dal.LatLngBoundsQuery;
 
@@ -50,6 +51,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleApiClient mGoogleApiClient;
     private Set<Content> mContents;
     private Map<Content, Marker> mMarkers;
+
+    private long mLastRequestId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,18 +99,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
             markersSetVisible(true);
+            mLastRequestId = System.currentTimeMillis();
+            dal.fetch(new LatLngBoundsQuery(bounds), new EnumCallback(mLastRequestId){
 
-            dal.fetch(new LatLngBoundsQuery(bounds), new Callback<Collection<Content>>() {
                 @Override
-                public void call(Collection<Content> result, @Nullable Exception e) {
-                    if (e == null) {
-                        mContents.clear();
-                        mContents.addAll(result);
-                        showContents();
-                    } else {
-                        Log.e(TAG, e.getMessage(), e);
-                        Toast.makeText(getApplicationContext(), getString(R.string.error_fetch_failed),
-                                Toast.LENGTH_LONG).show();
+                public void call(@NotNull Collection<Content> result, @Nullable Exception e) {
+                    if(mLastRequestId == getId()) {
+                        if (e == null) {
+                            mContents.clear();
+                            mContents.addAll(result);
+                            showContents();
+                        } else {
+                            Log.e(TAG, e.getMessage(), e);
+                            Toast.makeText(getApplicationContext(), getString(R.string.error_fetch_failed),
+                                    Toast.LENGTH_LONG).show();
+                        }
                     }
                 }
             });
@@ -117,9 +123,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void showContents() {
-        for (Content cur : mMarkers.keySet())
-            if (!mContents.contains(cur))
-                mMarkers.remove(cur);
+//        for (Content cur : mMarkers.keySet())
+//            if (!mContents.contains(cur))
+//                mMarkers.remove(cur);
 
         for (Content content : mContents) {
             if (!mMarkers.keySet().contains(content)) {
