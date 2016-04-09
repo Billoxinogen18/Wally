@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +14,6 @@ import com.wally.wally.R;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
-    private static final int REQUEST_CODE_CHOOSE_PHOTO = 129;
 
     @SuppressWarnings("ConstantConditions")
     @Override
@@ -38,19 +36,6 @@ public class MainActivity extends AppCompatActivity {
     public void newContent(View v) {
         NewPostDialogFragment dialog = new NewPostDialogFragment();
         dialog.show(getSupportFragmentManager(), "NewPostDialogFragment");
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_CHOOSE_PHOTO) {
-            if (resultCode == RESULT_OK) {
-                Log.d(TAG, "onActivityResult() called with: " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-            } else {
-                // TODO user canceled or error happened.
-                Log.i(TAG, "onActivityResult: canceled");
-            }
-        }
     }
 
     @Override

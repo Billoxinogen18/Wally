@@ -29,4 +29,10 @@
         <item name="colorButtonNormal">#1E88E5</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="RemoveButtonStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlHighlight">#000</item>
+        <item name="colorControlActivated">#000</item>
+
+    </style>
 </resources>

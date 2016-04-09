@@ -3,6 +3,7 @@ package com.wally.wally.activities;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -76,8 +77,8 @@ public class ChoosePhotoActivity extends AppCompatActivity {
         }
     };
 
-    public static Intent newIntent(Activity from) {
-        return new Intent(from, ChoosePhotoActivity.class);
+    public static Intent newIntent(Context context) {
+        return new Intent(context, ChoosePhotoActivity.class);
     }
 
     @Override
