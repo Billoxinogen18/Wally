@@ -95,12 +95,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d(TAG, cameraPosition.toString());
         if (cameraPosition.zoom > 15) {
             App app = (App) getApplicationContext();
-            DataAccessLayer dal = app.getDal();
-
             LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
             markersSetVisible(true);
             mLastRequestId = System.currentTimeMillis();
-            dal.fetch(new LatLngBoundsQuery(bounds), new EnumCallback(mLastRequestId){
+            app.getDataController().fetch(new EnumCallback(mLastRequestId){
 
                 @Override
                 public void call(@NotNull Collection<Content> result, @Nullable Exception e) {

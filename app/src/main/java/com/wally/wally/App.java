@@ -4,8 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
 
-import com.wally.wally.dal.DALFactory;
-import com.wally.wally.dal.DataAccessLayer;
+import com.wally.wally.datacontroller.DataController;
 
 /**
  * Application class for Application wide feature initializations.
@@ -13,16 +12,16 @@ import com.wally.wally.dal.DataAccessLayer;
  * Created by ioane5 on 3/31/16.
  */
 public class App extends Application {
-    private DataAccessLayer dal;
+    private DataController dataController;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        dal = DALFactory.create(this);
+        dataController = DataController.create(this);
     }
 
-    public DataAccessLayer getDal() {
-        return dal;
+    public DataController getDataController() {
+        return dataController;
     }
 
     // support multi-dex.
