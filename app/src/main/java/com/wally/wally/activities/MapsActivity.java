@@ -29,9 +29,6 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.dal.Content;
-import com.wally.wally.dal.EnumCallback;
-import com.wally.wally.dal.DataAccessLayer;
-import com.wally.wally.dal.LatLngBoundsQuery;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -96,6 +93,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (cameraPosition.zoom > 15) {
             App app = (App) getApplicationContext();
             LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+            Log.d(TAG, bounds.toString());
             markersSetVisible(true);
             mLastRequestId = System.currentTimeMillis();
             app.getDataController().fetch(new EnumCallback(mLastRequestId){

@@ -1,7 +1,10 @@
-package com.wally.wally.dal;
+package com.wally.wally.activities;
 
 import android.support.annotation.Nullable;
 
+
+import com.wally.wally.dal.Callback;
+import com.wally.wally.dal.Content;
 
 import java.util.Collection;
 
