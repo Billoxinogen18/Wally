@@ -10,13 +10,14 @@ public class Content {
     private String id;
     private String title;
     private String note;
-    private String image;
+    private String imageUri;
     private Location location;
     private SocialVisibility visibility;
     private Range range;
     private long timestamp;
 
-    public Content() {}
+    public Content() {
+    }
 
     public Content(String id) {
         this.id = id;
@@ -35,8 +36,8 @@ public class Content {
         return title;
     }
 
-    Content withTitle(String title) {
-        if(title.length() > MAX_TITLE_LENGTH)
+    public Content withTitle(String title) {
+        if (title.length() > MAX_TITLE_LENGTH)
             throw new IllegalArgumentException("Title exceeded length limit");
         this.title = title;
         return this;
@@ -46,17 +47,17 @@ public class Content {
         return note;
     }
 
-    Content withNote(String note) {
+    public Content withNote(String note) {
         this.note = note;
         return this;
     }
 
-    public String getImage() {
-        return image;
+    public String getImageUri() {
+        return imageUri;
     }
 
-    Content withImage(String image) {
-        this.image = image;
+    public Content withImageUri(String image) {
+        this.imageUri = image;
         return this;
     }
 
@@ -73,7 +74,7 @@ public class Content {
         return visibility;
     }
 
-    Content withVisibility(SocialVisibility visibility) {
+    public Content withVisibility(SocialVisibility visibility) {
         this.visibility = visibility;
         return this;
     }
@@ -82,7 +83,7 @@ public class Content {
         return range;
     }
 
-    Content withRange(Range range) {
+    public Content withRange(Range range) {
         this.range = range;
         return this;
     }
@@ -91,9 +92,22 @@ public class Content {
         return timestamp;
     }
 
-    Content withTimestamp(long timestamp) {
+    public Content withTimestamp(long timestamp) {
         this.timestamp = timestamp;
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "Content{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", note='" + note + '\'' +
+                ", imageUri='" + imageUri + '\'' +
+                ", location=" + location +
+                ", visibility=" + visibility +
+                ", range=" + range +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }
