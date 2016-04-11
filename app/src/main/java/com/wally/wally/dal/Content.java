@@ -5,7 +5,9 @@ import com.wally.wally.dal.content.Location;
 import com.wally.wally.dal.content.Range;
 import com.wally.wally.dal.content.SocialVisibility;
 
-public class Content {
+import java.io.Serializable;
+
+public class Content implements Serializable{
     private static final int MAX_TITLE_LENGTH = 150;
     private String id;
     private String title;

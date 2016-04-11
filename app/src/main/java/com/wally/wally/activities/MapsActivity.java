@@ -26,6 +26,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.wally.wally.App;
+import com.wally.wally.Fragments.PreviewContentDialogFragment;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.dal.Content;
@@ -39,7 +40,7 @@ import java.util.Set;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        GoogleMap.OnCameraChangeListener {
+        GoogleMap.OnCameraChangeListener, GoogleMap.OnMarkerClickListener {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final int MY_LOCATION_REQUEST_CODE = 22;
@@ -84,7 +85,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnCameraChangeListener(this);
+        mMap.setOnMarkerClickListener(this);
         centerMapOnMyLocation();
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Content content = null;
+        for (Content curr:mMarkers.keySet()) {
+            if(mMarkers.get(curr).equals(marker)){
+                content = curr;
+                break;
+            }
+        }
+        if(content != null) {
+            PreviewContentDialogFragment dialog = PreviewContentDialogFragment.newInstance(content);
+            dialog.show(getSupportFragmentManager(), "PreviewContentDialogFragment");
+        }
+
+        return true;
     }
 
     @Override

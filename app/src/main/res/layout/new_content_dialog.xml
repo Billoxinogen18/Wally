@@ -4,7 +4,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="fill"
-    android:maxHeight="@dimen/post_dialog_max_height"
+    android:maxHeight="@dimen/new_content_dialog_max_height"
     android:minWidth="@dimen/content_dialog_min_width"
     android:orientation="vertical">
 
