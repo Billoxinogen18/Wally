@@ -27,6 +27,10 @@ public class DataController {
         return instance;
     }
 
+    public void save(Content c) {
+        dal.save(c);
+    }
+
     public void fetch(Callback<Collection<Content>> resultCallback) {
         dal.fetch(null, resultCallback);
     }
