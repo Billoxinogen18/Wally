@@ -4,14 +4,16 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.wally.wally.NewPostDialogFragment;
+import com.wally.wally.Fragments.NewContentDialogFragment;
 import com.wally.wally.R;
+import com.wally.wally.dal.Content;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NewContentDialogFragment.NewContentDialogListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
 
@@ -34,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("InflateParams")
     public void newContent(View v) {
-        NewPostDialogFragment dialog = new NewPostDialogFragment();
-        dialog.show(getSupportFragmentManager(), "NewPostDialogFragment");
+        NewContentDialogFragment dialog = new NewContentDialogFragment();
+        dialog.show(getSupportFragmentManager(), "NewContentDialogFragment");
     }
 
     @Override
@@ -53,5 +55,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onContentCreated(Content content) {
+        Log.d(TAG, "onContentCreated() called with: " + "content = [" + content + "]");
     }
 }

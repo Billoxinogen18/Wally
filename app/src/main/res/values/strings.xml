@@ -12,4 +12,7 @@
     <string name="discard">Discard</string>
     <string name="note_hint">Note</string>
     <string name="content_title_hint">Title</string>
+    <string name="dialog_message_discard_post_doublecheck">Do you really want to discard this post?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>
