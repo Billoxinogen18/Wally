@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.atap.tangoservice.Tango;
 import com.wally.wally.Fragments.NewContentDialogFragment;
 import com.wally.wally.R;
 import com.wally.wally.dal.Content;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
                 startActivity(mapIntent);
             }
         });
+        Tango t = new Tango(this);
     }
 
     @SuppressLint("InflateParams")

@@ -39,6 +39,9 @@ android {
 
 repositories {
     mavenCentral()
+    flatDir {
+        dirs '/libs/aar'
+    }
 }
 
 dependencies {
