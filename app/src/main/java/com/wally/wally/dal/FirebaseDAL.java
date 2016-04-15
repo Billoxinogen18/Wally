@@ -1,16 +1,15 @@
 package com.wally.wally.dal;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-import com.wally.wally.dal.content.Location;
 
-
+import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,13 +17,12 @@ import java.util.Set;
 public class FirebaseDAL implements DataAccessLayer<Content> {
     private Firebase fb;
 
-    public FirebaseDAL(Context context, String dbAddr) {
-        Firebase.setAndroidContext(context);
-        fb = new Firebase(dbAddr).child("Contents");
+    public FirebaseDAL(Firebase inner) {
+        this.fb = inner;
     }
 
     @Override
-    public void save(@NonNull final Content c, @NonNull final Callback<Boolean> statusCallback) {
+    public void save(final Content c, final Callback<Boolean> statusCallback) {
         fb.push().setValue(c, new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
@@ -39,12 +37,12 @@ public class FirebaseDAL implements DataAccessLayer<Content> {
     }
 
     @Override
-    public void save(@NonNull Content c) {
+    public void save(Content c) {
         fb.push().setValue(c);
     }
 
     @Override
-    public void delete(@NonNull Content c, @NonNull final Callback<Boolean> statusCallback) {
+    public void delete(Content c, final Callback<Boolean> statusCallback) {
         fb.child(c.getId()).removeValue(new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
@@ -59,12 +57,12 @@ public class FirebaseDAL implements DataAccessLayer<Content> {
     }
 
     @Override
-    public void delete(@NonNull Content c) {
+    public void delete(Content c) {
         fb.child(c.getId()).removeValue();
     }
 
     @Override
-    public void fetch(@NonNull Query query, @NonNull final Callback<Collection<Content>> resultCallback) {
+    public void fetch(Query query, final Callback<Collection<Content>> resultCallback) {
         fb.addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
