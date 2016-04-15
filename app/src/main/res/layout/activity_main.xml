@@ -28,7 +28,8 @@
         android:foreground="?attr/selectableItemBackground"
         android:stateListAnimator="@animator/raise"
         app:layout_behavior="com.wally.wally.components.MoveUpwardBehavior"
-        tools:targetApi="lollipop">
+        tools:targetApi="lollipop"
+        android:onClick="onBtnMapClick">
 
         <ImageView
             android:id="@+id/map_background_image"
@@ -44,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:onClick="newContent"
+        android:onClick="onNewContentClick"
         android:src="@drawable/ic_add_white_24dp" />
 
 </android.support.design.widget.CoordinatorLayout>
