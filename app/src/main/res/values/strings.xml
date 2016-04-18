@@ -15,4 +15,5 @@
     <string name="dialog_message_discard_post_doublecheck">Do you really want to discard this post?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="exception_out_of_date">Tango service outdated!</string>
 </resources>
