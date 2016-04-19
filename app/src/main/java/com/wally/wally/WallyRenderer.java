@@ -31,6 +31,7 @@ import org.rajawali3d.materials.textures.StreamingTexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.math.vector.Vector3;
+import org.rajawali3d.primitives.Plane;
 import org.rajawali3d.primitives.ScreenQuad;
 import org.rajawali3d.primitives.Sphere;
 import org.rajawali3d.renderer.RajawaliRenderer;
@@ -51,7 +52,7 @@ public class WallyRenderer extends RajawaliRenderer {
 
     private static final String TAG = WallyRenderer.class.getSimpleName();
     private Object3D earth;
-    private Vector3 mPoint;
+    private Pose mPoint;
     private boolean mLineUpdated = false;
 
     // Augmented reality related fields
@@ -109,9 +110,11 @@ public class WallyRenderer extends RajawaliRenderer {
                     material.setColorInfluence(0);
                     material.enableLighting(true);
                     material.setDiffuseMethod(new DiffuseMethod.Lambert());
-                    earth = new Sphere(0.5f, 20, 20);
+//                    earth = new Sphere(0.5f, 20, 20);
+                    earth = new Plane(1f,1.6f, 1, 1);
                     earth.setMaterial(material);
-                    earth.setPosition(mPoint);
+                    earth.setPosition(mPoint.getPosition());
+                    earth.setRotation(mPoint.getOrientation());
                     getCurrentScene().addChild(earth);
                 } else {
                     earth = null;
@@ -124,8 +127,8 @@ public class WallyRenderer extends RajawaliRenderer {
         super.onRender(elapsedRealTime, deltaTime);
     }
 
-    public synchronized void setLine(Vector3 point) {
-        mPoint = point;
+    public synchronized void setLine(TangoPoseData point) {
+        mPoint = ScenePoseCalculator.toOpenGLPose(point);
         mLineUpdated = true;
     }
 

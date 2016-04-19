@@ -27,21 +27,26 @@ import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.transition.Scene;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.rajawali3d.math.Matrix4;
+import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import java.util.ArrayList;
-import java.util.Stack;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.projecttango.rajawali.DeviceExtrinsics;
@@ -57,11 +62,11 @@ import com.wally.wally.WallyRenderer;
  * the PointCloud data. Whenever the user clicks on the camera display, a point
  * is recorded from the PointCloud data closest to the point of the touch.
  * consecutive touches are used as the two points for a distance measurement.
- *
+ * <p/>
  * Note that it is important to include the KEY_BOOLEAN_LOWLATENCYIMUINTEGRATION
  * configuration parameter in order to achieve best results synchronizing the
  * Rajawali virtual world with the RGB camera.
- *
+ * <p/>
  * For more details on the augmented reality effects, including color camera texture rendering,
  * see java_augmented_reality_example or java_hello_video_example.
  */
@@ -73,8 +78,13 @@ public class MainActivity extends Activity implements View.OnTouchListener {
     private static final int UPDATE_UI_INTERVAL_MS = 100;
 
     public static final TangoCoordinateFramePair FRAME_PAIR = new TangoCoordinateFramePair(
-            TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE,
+            TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
             TangoPoseData.COORDINATE_FRAME_DEVICE);
+
+//    public static final TangoCoordinateFramePair FRAME_PAIR_2 = new TangoCoordinateFramePair(
+//            TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
+//            TangoPoseData.COORDINATE_FRAME_DEVICE);
+
     private static final int INVALID_TEXTURE_ID = -1;
 
     private RajawaliSurfaceView mSurfaceView;
@@ -92,19 +102,48 @@ public class MainActivity extends Activity implements View.OnTouchListener {
     private AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
     private double mRgbTimestampGlThread;
 
+    private TextView mDistanceMeasure;
+    private TextView mIsValid;
+    private TextView mIsLocalized;
+    private TextView mExtraData;
+
+    private boolean mIsPoseValid;
+    private boolean mIsPoseLocalized;
+    private TangoPoseData mLastPose;
+
     // Handles the debug text UI update loop.
     private Handler mHandler = new Handler();
+    private Matrix4 mTangoPosition;
+    private double mPoseTimestamp;
+    private Matrix4 mDeviceTMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mDistanceMeasure = (TextView) findViewById(R.id.distance_textview);
+        mIsValid = (TextView) findViewById(R.id.is_valid_textview);
+        mIsLocalized = (TextView) findViewById(R.id.is_localized_textview);
+        mExtraData = (TextView) findViewById(R.id.extra_data_textview);
+
         mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         mRenderer = new WallyRenderer(this);
         mSurfaceView.setSurfaceRenderer(mRenderer);
         mSurfaceView.setOnTouchListener(this);
         mTango = new Tango(this);
         mPointCloudManager = new TangoPointCloudManager();
+
+        if (!hasADFPermissions()) {
+            Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
+            startActivityForResult(
+                    Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
+                    Tango.TANGO_INTENT_ACTIVITYCODE);
+        }
+    }
+
+    private boolean hasADFPermissions() {
+        return Tango.hasPermission(getBaseContext(), Tango.PERMISSIONTYPE_ADF_LOAD_SAVE);
     }
 
     @Override
@@ -133,10 +172,13 @@ public class MainActivity extends Activity implements View.OnTouchListener {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         synchronized (this) {
+            if (!hasADFPermissions()) {
+                Log.i(TAG, "onResume: Didn't have ADF permission returning.");
+                return;
+            }
             if (mIsConnected.compareAndSet(false, true)) {
                 try {
                     connectTango();
-                    connectRenderer();
                 } catch (TangoOutOfDateException e) {
                     Toast.makeText(getApplicationContext(),
                             R.string.exception_out_of_date,
@@ -144,6 +186,7 @@ public class MainActivity extends Activity implements View.OnTouchListener {
                 }
             }
         }
+        mHandler.post(mUpdateUiLoopRunnable);
     }
 
     /**
@@ -152,25 +195,59 @@ public class MainActivity extends Activity implements View.OnTouchListener {
     private void connectTango() {
         // Use default configuration for Tango Service, plus low latency
         // IMU integration.
+
+
         TangoConfig config = mTango.getConfig(
                 TangoConfig.CONFIG_TYPE_DEFAULT);
         // NOTE: Low latency integration is necessary to achieve a
         // precise alignment of virtual objects with the RBG image and
         // produce a good AR effect.
-        config.putBoolean(
-                TangoConfig.KEY_BOOLEAN_LOWLATENCYIMUINTEGRATION, true);
+
+        ArrayList<String> fullUUIDList = mTango.listAreaDescriptions();
+
+        // Load the latest ADF if ADFs are found.
+        if (fullUUIDList.size() > 0) {
+//            Log.i(TAG, "Load ADF: " + fullUUIDList.get(fullUUIDList.size() - 1));
+            config.putString(TangoConfig.KEY_STRING_AREADESCRIPTION,
+                    fullUUIDList.get(fullUUIDList.size() - 1));
+        }
+        config.putBoolean(TangoConfig.KEY_BOOLEAN_LOWLATENCYIMUINTEGRATION, true);
         config.putBoolean(TangoConfig.KEY_BOOLEAN_DEPTH, true);
         config.putBoolean(TangoConfig.KEY_BOOLEAN_COLORCAMERA, true);
+        config.putBoolean(TangoConfig.KEY_BOOLEAN_AUTORECOVERY, true);
+        //config.putBoolean(TangoConfig.KEY_BOOLEAN_LEARNINGMODE, true);
+
         mTango.connect(config);
 
         // No need to add any coordinate frame pairs since we are not
         // using pose data. So just initialize.
-        ArrayList<TangoCoordinateFramePair> framePairs =
-                new ArrayList<TangoCoordinateFramePair>();
+        ArrayList<TangoCoordinateFramePair> framePairs = new ArrayList<>();
+        framePairs.add(new TangoCoordinateFramePair(TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
+                TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE));
         mTango.connectListener(framePairs, new OnTangoUpdateListener() {
             @Override
             public void onPoseAvailable(TangoPoseData pose) {
-                // We are not using OnPoseAvailable for this app.
+                if (pose.baseFrame == TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION &&
+                        pose.targetFrame == TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE &&
+                        pose.statusCode == TangoPoseData.POSE_VALID) {
+                    mIsPoseLocalized = true;
+                    mLastPose = pose;
+                    connectRenderer();
+
+//                    // Construct matrix for the start of service with respect to device from the pose.
+//                    Matrix4 ssTd = ScenePoseCalculator.tangoPoseToMatrix(pose);
+//
+//                    // Calculate matrix for the camera in the Unity world, taking into account offsets.
+//                    mTangoPosition = ScenePoseCalculator.OPENGL_T_TANGO_WORLD.multiply(ssTd).multiply(ScenePoseCalculator.DEPTH_CAMERA_T_OPENGL_CAMERA);
+//
+//                    // Extract final position, rotation.
+//
+//                    // Other pose data -- Pose time.
+//                    mPoseTimestamp = mCameraPoseTimestamp;
+//
+//                    loadEarth();
+                }
+                mHandler.post(mUpdateUiLoopRunnable);
             }
 
             @Override
@@ -248,8 +325,7 @@ public class MainActivity extends Activity implements View.OnTouchListener {
                     // If a new RGB frame has been rendered, update the camera pose to match.
                     if (mRgbTimestampGlThread > mCameraPoseTimestamp) {
                         // Calculate the device pose at the camera frame update time.
-                        TangoPoseData lastFramePose = mTango.getPoseAtTime(mRgbTimestampGlThread,
-                                FRAME_PAIR);
+                        TangoPoseData lastFramePose = mTango.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR);
                         if (lastFramePose.statusCode == TangoPoseData.POSE_VALID) {
                             // Update the camera pose from the renderer
                             mRenderer.updateRenderCameraPose(lastFramePose, mExtrinsics);
@@ -311,14 +387,56 @@ public class MainActivity extends Activity implements View.OnTouchListener {
                 // Place point near the clicked point using the latest point cloud data
                 // Synchronize against concurrent access to the RGB timestamp in the OpenGL thread
                 // and a possible service disconnection due to an onPause event.
-                Vector3 rgbPoint;
+                TangoPoseData newPose;
                 synchronized (this) {
-                    rgbPoint = getDepthAtTouchPosition(u, v, mRgbTimestampGlThread);
+                    newPose = doFitPlane(u, v, mRgbTimestampGlThread);
                 }
-                if (rgbPoint != null) {
+                if (newPose != null) {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                    SharedPreferences.Editor editor = prefs.edit();
+
+                    if (!prefs.contains("x_")) {
+                        editor.putFloat("x_", (float) newPose.translation[0]);
+                        editor.putFloat("y_", (float) newPose.translation[1]);
+                        editor.putFloat("z_", (float) newPose.translation[2]);
+
+                        editor.putFloat("0_", (float) newPose.rotation[0]);
+                        editor.putFloat("1_", (float) newPose.rotation[1]);
+                        editor.putFloat("2_", (float) newPose.rotation[2]);
+                        editor.putFloat("3_", (float) newPose.rotation[3]);
+                    } else {
+                        newPose.translation[0] = prefs.getFloat("x_", 0);
+                        newPose.translation[1] = prefs.getFloat("y_", 0);
+                        newPose.translation[2] = prefs.getFloat("z_", 0);
+
+                        newPose.rotation[0] = prefs.getFloat("0_", 0);
+                        newPose.rotation[1] = prefs.getFloat("1_", 0);
+                        newPose.rotation[2] = prefs.getFloat("2_", 0);
+                        newPose.rotation[3] = prefs.getFloat("3_", 0);
+
+                        editor.remove("x_");
+                        editor.remove("y_");
+                        editor.remove("z_");
+
+                        editor.remove("0_");
+                        editor.remove("1_");
+                        editor.remove("2_");
+                        editor.remove("3_");
+                    }
+                    editor.apply();
                     // Update a line endpoint to the touch location.
                     // This update is made thread safe by the renderer
-                    mRenderer.setLine(rgbPoint);
+                    mRenderer.setLine(newPose);
+
+
+//                    Matrix4 uwTDevice = mTangoPosition;
+//                    Matrix4 uwTMarker = new Matrix4().
+//                            translate(rgbPoint).
+//                            rotate(Quaternion.getIdentity()).
+//                            scale(Vector3.ONE);
+//                    mDeviceTMarker = uwTDevice.inverse().multiply(uwTMarker);
+
+
                 } else {
                     Log.w(TAG, "Point was null.");
                 }
@@ -336,6 +454,43 @@ public class MainActivity extends Activity implements View.OnTouchListener {
             }
         }
         return true;
+    }
+
+
+    /**
+     * Use the TangoSupport library with point cloud data to calculate the plane
+     * of the world feature pointed at the location the camera is looking.
+     * It returns the pose of the fitted plane in a TangoPoseData structure.
+     */
+    private TangoPoseData doFitPlane(float u, float v, double rgbTimestamp) {
+        TangoXyzIjData xyzIj = mPointCloudManager.getLatestXyzIj();
+
+        if (xyzIj == null) {
+            return null;
+        }
+
+        // We need to calculate the transform between the color camera at the
+        // time the user clicked and the depth camera at the time the depth
+        // cloud was acquired.
+        TangoPoseData colorTdepthPose = TangoSupport.calculateRelativePose(
+                rgbTimestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR,
+                xyzIj.timestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH);
+
+        // Perform plane fitting with the latest available point cloud data.
+        TangoSupport.IntersectionPointPlaneModelPair intersectionPointPlaneModelPair =
+                TangoSupport.fitPlaneModelNearClick(xyzIj, mIntrinsics,
+                        colorTdepthPose, u, v);
+
+        // Get the device pose at the time the plane data was acquired.
+        TangoPoseData devicePose =
+                mTango.getPoseAtTime(xyzIj.timestamp, FRAME_PAIR);
+
+        // Update the AR object location.
+        TangoPoseData planeFitPose = ScenePoseCalculator.planeFitToTangoWorldPose(
+                intersectionPointPlaneModelPair.intersectionPoint,
+                intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
+
+        return planeFitPose;
     }
 
     /**
@@ -362,11 +517,39 @@ public class MainActivity extends Activity implements View.OnTouchListener {
             return null;
         }
 
+        TangoPoseData myPose = mTango.getPoseAtTime(rgbTimestamp, new TangoCoordinateFramePair(TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE, TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION));
+        Log.d("SHIT", myPose.toString());
+
         return ScenePoseCalculator.getPointInEngineFrame(
                 new Vector3(point[0], point[1], point[2]),
                 ScenePoseCalculator.matrixToTangoPose(mExtrinsics.getDeviceTDepthCamera()),
                 mTango.getPoseAtTime(rgbTimestamp, FRAME_PAIR));
     }
 
+
+    private void loadEarth() {
+
+    }
+
+
+    // Debug text UI update loop, updating at 10Hz.
+    private Runnable mUpdateUiLoopRunnable = new Runnable() {
+        public void run() {
+            updateUi();
+            mHandler.postDelayed(this, UPDATE_UI_INTERVAL_MS);
+        }
+    };
+
+    @SuppressLint("SetTextI18n")
+    private synchronized void updateUi() {
+        try {
+            mDistanceMeasure.setText("Not yet ready");
+            mIsValid.setText(mIsPoseValid ? "valid pose" : "invalid pose");
+            mIsLocalized.setText(mIsPoseLocalized ? "localized" : "Not localized!");
+            mExtraData.setText(mLastPose != null ? mLastPose.toString() : "NULL");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }
