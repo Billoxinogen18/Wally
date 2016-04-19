@@ -19,15 +19,10 @@ import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoPoseData;
 
 import android.content.Context;
-
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.animation.LinearInterpolator;
 
 import org.rajawali3d.Object3D;
-import org.rajawali3d.animation.Animation;
-import org.rajawali3d.animation.Animation3D;
-import org.rajawali3d.animation.RotateOnAxisAnimation;
 import org.rajawali3d.lights.DirectionalLight;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
@@ -40,6 +35,7 @@ import org.rajawali3d.primitives.ScreenQuad;
 import org.rajawali3d.primitives.Sphere;
 import org.rajawali3d.renderer.RajawaliRenderer;
 
+
 import javax.microedition.khronos.opengles.GL10;
 
 import com.projecttango.rajawali.DeviceExtrinsics;
@@ -47,18 +43,19 @@ import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 
 /**
- * Renderer that implements a basic augmented reality scene using Rajawali.
- * It creates a scene with a background quad taking the whole screen, where the color camera is
- * rendered, and a sphere with the texture of the earth floating ahead of the start position of
- * the Tango device.
+ * Very simple example point to point renderer which displays a line fixed in place.
+ * Whenever the user clicks on the screen, the line is re-rendered with an endpoint
+ * placed at the point corresponding to the depth at the point of the click.
  */
 public class WallyRenderer extends RajawaliRenderer {
+
     private static final String TAG = WallyRenderer.class.getSimpleName();
+    private Object3D earth;
+    private Vector3 mPoint;
+    private boolean mLineUpdated = false;
 
-    // Rajawali texture used to render the Tango color camera
+    // Augmented reality related fields
     private ATexture mTangoCameraTexture;
-
-    // Keeps track of whether the scene camera has been configured
     private boolean mSceneCameraConfigured;
 
     public WallyRenderer(Context context) {
@@ -90,37 +87,53 @@ public class WallyRenderer extends RajawaliRenderer {
         light.setPower(0.8f);
         light.setPosition(3, 2, 4);
         getCurrentScene().addLight(light);
+    }
 
-        // Create sphere with earth texture and place it in space 3m forward from the origin
-        Material material = new Material();
-        try {
-            Texture t = new Texture("earth", R.drawable.earth_diffuse);
-            material.addTexture(t);
-        } catch (ATexture.TextureException e) {
-            Log.e(TAG, "Exception generating earth texture", e);
+    @Override
+    protected void onRender(long elapsedRealTime, double deltaTime) {
+        // Update the AR object if necessary
+        // Synchronize against concurrent access with the setter below.
+        synchronized (this) {
+            if (mLineUpdated) {
+                if (earth != null) {
+                    getCurrentScene().removeChild(earth);
+                }
+                if (mPoint != null) {
+                    Material material = new Material();
+                    try {
+                        Texture t = new Texture("earth", R.drawable.earth_diffuse);
+                        material.addTexture(t);
+                    } catch (ATexture.TextureException e) {
+                        Log.e(TAG, "Exception generating earth texture", e);
+                    }
+                    material.setColorInfluence(0);
+                    material.enableLighting(true);
+                    material.setDiffuseMethod(new DiffuseMethod.Lambert());
+                    earth = new Sphere(0.5f, 20, 20);
+                    earth.setMaterial(material);
+                    earth.setPosition(mPoint);
+                    getCurrentScene().addChild(earth);
+                } else {
+                    earth = null;
+                }
+                mLineUpdated = false;
+            }
+
         }
-        material.setColorInfluence(0);
-        material.enableLighting(true);
-        material.setDiffuseMethod(new DiffuseMethod.Lambert());
-        Object3D earth = new Sphere(0.5f, 20, 20);
-        earth.setMaterial(material);
-        earth.setPosition(0, 0, -3);
-        getCurrentScene().addChild(earth);
 
-        // Rotate around the Y axis
-        Animation3D anim = new RotateOnAxisAnimation(Vector3.Axis.Y, 0, -360);
-        anim.setInterpolator(new LinearInterpolator());
-        anim.setDurationMilliseconds(60000);
-        anim.setRepeatMode(Animation.RepeatMode.INFINITE);
-        anim.setTransformable3D(earth);
-        getCurrentScene().registerAnimation(anim);
-        anim.play();
+        super.onRender(elapsedRealTime, deltaTime);
+    }
+
+    public synchronized void setLine(Vector3 point) {
+        mPoint = point;
+        mLineUpdated = true;
     }
 
     /**
      * Update the scene camera based on the provided pose in Tango start of service frame.
      * The device pose should match the pose of the device at the time the last rendered RGB
      * frame, which can be retrieved with this.getTimestamp();
+     * <p/>
      * NOTE: This must be called from the OpenGL render thread - it is not thread safe.
      */
     public void updateRenderCameraPose(TangoPoseData devicePose, DeviceExtrinsics extrinsics) {
