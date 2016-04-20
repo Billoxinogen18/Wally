@@ -41,7 +41,7 @@ repositories {
     mavenCentral()
     jcenter()
     flatDir {
-        dirs '/libs/aar'
+        dirs 'libs/aar'
     }
 }
 
