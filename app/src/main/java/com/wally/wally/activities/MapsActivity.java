@@ -18,15 +18,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.wally.wally.App;
-import com.wally.wally.Fragments.PreviewContentDialogFragment;
+import com.wally.wally.fragments.PreviewContentDialogFragment;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.dal.Content;
@@ -70,7 +70,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mapFragment.setRetainInstance(true);
@@ -92,15 +92,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onMarkerClick(Marker marker) {
         Content content = null;
-        for (Content curr:mMarkers.keySet()) {
-            if(mMarkers.get(curr).equals(marker)){
+        for (Content curr : mMarkers.keySet()) {
+            if (mMarkers.get(curr).equals(marker)) {
                 content = curr;
                 break;
             }
         }
-        if(content != null) {
+        if (content != null) {
             PreviewContentDialogFragment dialog = PreviewContentDialogFragment.newInstance(content);
-            dialog.show(getSupportFragmentManager(), "PreviewContentDialogFragment");
+            dialog.show(getFragmentManager(), "PreviewContentDialogFragment");
         }
 
         return true;
@@ -115,11 +115,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Log.d(TAG, bounds.toString());
             markersSetVisible(true);
             mLastRequestId = System.currentTimeMillis();
-            app.getDataController().fetch(new EnumCallback(mLastRequestId){
+            app.getDataController().fetch(new EnumCallback(mLastRequestId) {
 
                 @Override
                 public void call(@NotNull Collection<Content> result, @Nullable Exception e) {
-                    if(mLastRequestId == getId()) {
+                    if (mLastRequestId == getId()) {
                         if (e == null) {
                             mContents.clear();
                             mContents.addAll(result);

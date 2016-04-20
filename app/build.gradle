@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "com.wally.wally"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -39,18 +39,23 @@ android {
 
 repositories {
     mavenCentral()
+    jcenter()
+    flatDir {
+        dirs 'libs/aar'
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
+    compile (name: 'TangoSupport_Kajam_Java', ext: 'aar')
+    compile (name: 'TangoUX_Kajam_Java', ext: 'aar')
+//    testCompile 'junit:junit:4.12'
     compile 'com.android.support:multidex:1.0.1'
-    compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:design:23.3.0'
     compile 'com.android.support:cardview-v7:23.3.0'
     compile 'com.google.android.gms:play-services:8.4.0'
     compile 'com.firebase:firebase-client-android:2.5.2+'
-    compile 'com.android.support:percent:23.3.0'
+//    compile 'com.android.support:percent:23.3.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
-
+    compile 'org.rajawali3d:rajawali:1.0.294-SNAPSHOT@aar'
 }

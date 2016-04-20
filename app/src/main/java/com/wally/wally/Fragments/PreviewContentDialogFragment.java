@@ -1,16 +1,14 @@
-package com.wally.wally.Fragments;
+package com.wally.wally.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.text.TextUtilsCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatDialogFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,12 +16,8 @@ import com.bumptech.glide.Glide;
 import com.wally.wally.R;
 import com.wally.wally.dal.Content;
 
-/**
- * New Post dialog, that manages adding new content.
- * <p/>
- * Created by ioane5 on 4/7/16.
- */
-public class PreviewContentDialogFragment extends AppCompatDialogFragment {
+
+public class PreviewContentDialogFragment extends DialogFragment {
 
     public static final String TAG = PreviewContentDialogFragment.class.getSimpleName();
 
@@ -45,8 +39,8 @@ public class PreviewContentDialogFragment extends AppCompatDialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Content content = (Content)getArguments().getSerializable("content");
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.preview_content_dialog, null, false);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.preview_content_dialog, null, false);
 
         ImageView mImageView = (ImageView) dialogView.findViewById(R.id.image);
 
@@ -61,7 +55,7 @@ public class PreviewContentDialogFragment extends AppCompatDialogFragment {
 
 
         if(!TextUtils.isEmpty(content.getImageUri())){
-            Glide.with(getContext())
+            Glide.with(getActivity())
                     .load(content.getImageUri())
                     .fitCenter()
                     .into(mImageView);

@@ -15,4 +15,9 @@
     <string name="dialog_message_discard_post_doublecheck">Do you really want to discard this post?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="exception_out_of_date">Tango service outdated!</string>
+    <string name="app_name_long">Java Point To Point Measurement Example</string>
+    <string name="failed_measurement">Failed to place point</string>
+    <string name="failed_permissions">Permissions required!</string>
+    <string name="measurement">DISTANCE: </string>
 </resources>
