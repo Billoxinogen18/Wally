@@ -1,13 +1,13 @@
 package com.wally.wally.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class MapsActivity extends Activity implements OnMapReadyCallback,
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         GoogleMap.OnCameraChangeListener, GoogleMap.OnMarkerClickListener {
@@ -92,13 +92,13 @@ public class MapsActivity extends Activity implements OnMapReadyCallback,
     @Override
     public boolean onMarkerClick(Marker marker) {
         Content content = null;
-        for (Content curr:mMarkers.keySet()) {
-            if(mMarkers.get(curr).equals(marker)){
+        for (Content curr : mMarkers.keySet()) {
+            if (mMarkers.get(curr).equals(marker)) {
                 content = curr;
                 break;
             }
         }
-        if(content != null) {
+        if (content != null) {
             PreviewContentDialogFragment dialog = PreviewContentDialogFragment.newInstance(content);
             dialog.show(getFragmentManager(), "PreviewContentDialogFragment");
         }
@@ -115,11 +115,11 @@ public class MapsActivity extends Activity implements OnMapReadyCallback,
             Log.d(TAG, bounds.toString());
             markersSetVisible(true);
             mLastRequestId = System.currentTimeMillis();
-            app.getDataController().fetch(new EnumCallback(mLastRequestId){
+            app.getDataController().fetch(new EnumCallback(mLastRequestId) {
 
                 @Override
                 public void call(@NotNull Collection<Content> result, @Nullable Exception e) {
-                    if(mLastRequestId == getId()) {
+                    if (mLastRequestId == getId()) {
                         if (e == null) {
                             mContents.clear();
                             mContents.addAll(result);

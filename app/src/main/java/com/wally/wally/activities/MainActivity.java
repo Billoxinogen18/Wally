@@ -28,20 +28,17 @@ import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.transition.Scene;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.rajawali3d.math.Matrix4;
-import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -70,7 +67,7 @@ import com.wally.wally.WallyRenderer;
  * For more details on the augmented reality effects, including color camera texture rendering,
  * see java_augmented_reality_example or java_hello_video_example.
  */
-public class MainActivity extends Activity implements View.OnTouchListener {
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     // The interval at which we'll update our UI debug text in milliseconds.
@@ -80,10 +77,6 @@ public class MainActivity extends Activity implements View.OnTouchListener {
     public static final TangoCoordinateFramePair FRAME_PAIR = new TangoCoordinateFramePair(
             TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
             TangoPoseData.COORDINATE_FRAME_DEVICE);
-
-//    public static final TangoCoordinateFramePair FRAME_PAIR_2 = new TangoCoordinateFramePair(
-//            TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
-//            TangoPoseData.COORDINATE_FRAME_DEVICE);
 
     private static final int INVALID_TEXTURE_ID = -1;
 
@@ -113,9 +106,6 @@ public class MainActivity extends Activity implements View.OnTouchListener {
 
     // Handles the debug text UI update loop.
     private Handler mHandler = new Handler();
-    private Matrix4 mTangoPosition;
-    private double mPoseTimestamp;
-    private Matrix4 mDeviceTMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
