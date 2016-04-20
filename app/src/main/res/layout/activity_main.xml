@@ -8,6 +8,7 @@
     android:fitsSystemWindows="true"
     tools:context=".activities.MainActivity">
 
+
     <org.rajawali3d.surface.RajawaliSurfaceView
         android:id="@+id/rajawali_surface"
         android:layout_width="match_parent"
@@ -101,5 +102,11 @@
         android:layout_margin="@dimen/fab_margin"
         android:onClick="onNewContentClick"
         android:src="@drawable/ic_add_white_24dp" />
+
+    <com.google.atap.tango.ux.TangoUxLayout
+        android:id="@+id/layout_tango_ux"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 
 </android.support.design.widget.CoordinatorLayout>
