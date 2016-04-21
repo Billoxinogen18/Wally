@@ -2,13 +2,13 @@ package com.wally.wally.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,7 +25,7 @@ import com.wally.wally.dal.Content;
 
 /**
  * New Post dialog, that manages adding new content.
- * <p/>
+ * <p>
  * Created by ioane5 on 4/7/16.
  */
 public class NewContentDialogFragment extends DialogFragment implements View.OnClickListener {
@@ -39,6 +39,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     private String mImageUri;
     private EditText mTitleEt;
     private EditText mNoteEt;
+
     // Empty constructor required for DialogFragment
     public NewContentDialogFragment() {
     }
