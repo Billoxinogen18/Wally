@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tango.ux.UxExceptionEvent;
@@ -40,6 +41,7 @@ import com.wally.wally.R;
 import com.wally.wally.WallyRenderer;
 import com.wally.wally.dal.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
+import com.wally.wally.fragments.PreviewContentDialogFragment;
 
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -47,7 +49,9 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity implements UxExceptionEventListener, OnTangoUpdateListener, NewContentDialogFragment.NewContentDialogListener {
+public class MainActivity extends AppCompatActivity implements UxExceptionEventListener,
+        OnTangoUpdateListener,
+        NewContentDialogFragment.NewContentDialogListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     public static final TangoCoordinateFramePair FRAME_PAIR = new TangoCoordinateFramePair(
@@ -183,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements UxExceptionEventL
 
     @Override
     public void onUxExceptionEvent(UxExceptionEvent uxExceptionEvent) {
-        switch (uxExceptionEvent.getType()){
+        switch (uxExceptionEvent.getType()) {
             case UxExceptionEvent.TYPE_OVER_EXPOSED:
                 break;
             case UxExceptionEvent.TYPE_UNDER_EXPOSED:
@@ -218,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements UxExceptionEventL
     @Override
     public void onContentCreated(Content content) {
         Log.d(TAG, "onContentCreated() called with: " + "content = [" + content + "]");
+        PreviewContentDialogFragment.newInstance(content).show(getFragmentManager(), "content_preview");
     }
 
     /**
@@ -329,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements UxExceptionEventL
         });
     }
 
-    private void requestADFPermission(){
+    private void requestADFPermission() {
         startActivityForResult(
                 Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
                 Tango.TANGO_INTENT_ACTIVITYCODE);
