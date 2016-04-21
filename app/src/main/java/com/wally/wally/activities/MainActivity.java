@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements UxExceptionEventL
 
     public void onNewContentClick(View v) {
         NewContentDialogFragment dialog = new NewContentDialogFragment();
-        dialog.show(getFragmentManager(), "NewContentDialogFragment");
+        dialog.show(getSupportFragmentManager(), "NewContentDialogFragment");
     }
 
     public void onBtnMapClick(View v) {
@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements UxExceptionEventL
     @Override
     public void onContentCreated(Content content) {
         Log.d(TAG, "onContentCreated() called with: " + "content = [" + content + "]");
-        PreviewContentDialogFragment.newInstance(content).show(getFragmentManager(), "content_preview");
+        PreviewContentDialogFragment.newInstance(content).show(getSupportFragmentManager(), "content_preview");
     }
 
     /**
