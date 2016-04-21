@@ -51,9 +51,9 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private double mRgbTimestampGlThread;
 
 
-    public TangoManager(Context context, Context appContext, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout){
+    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout){
         mSurfaceView = rajawaliSurfaceView;
-        mRenderer = new WallyRenderer(appContext);
+        mRenderer = new WallyRenderer(context.getApplicationContext());
         mSurfaceView.setSurfaceRenderer(mRenderer);
         mTango = new Tango(context);
         mTangoUx = new TangoUx(context);
