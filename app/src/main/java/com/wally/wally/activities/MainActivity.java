@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
 
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
-        mTangoManager = new TangoManager(this, mSurfaceView, mTangoUxLayout);
-
         String adfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
+        mTangoManager = new TangoManager(this, mSurfaceView, mTangoUxLayout, adfUuid);
+
 
         if (!hasADFPermissions()) {
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");

@@ -41,6 +41,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private TangoPointCloudManager mPointCloudManager;
     private Tango mTango;
     private TangoUx mTangoUx;
+    private String adfUuid;
     private double mCameraPoseTimestamp = 0;
     private boolean mIsConnected;
 
@@ -51,12 +52,13 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private double mRgbTimestampGlThread;
 
 
-    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout){
+    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid){
         mSurfaceView = rajawaliSurfaceView;
         mRenderer = new WallyRenderer(context.getApplicationContext());
         mSurfaceView.setSurfaceRenderer(mRenderer);
         mTango = new Tango(context);
         mTangoUx = new TangoUx(context);
+        this.adfUuid = adfUuid;
 
         TangoUxLayout mTangoUxLayout = tangoUxLayout;
         mTangoUx.setLayout(mTangoUxLayout);
@@ -111,12 +113,15 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
                 TangoConfig.CONFIG_TYPE_DEFAULT);
 
         ArrayList<String> fullUUIDList = mTango.listAreaDescriptions();
-
+        String tempAdfUuid = adfUuid;
         // Load the latest ADF if ADFs are found.
         if (fullUUIDList.size() > 0) {
-            config.putString(TangoConfig.KEY_STRING_AREADESCRIPTION,
-                    fullUUIDList.get(fullUUIDList.size() - 1));
+            if (adfUuid == null || adfUuid.equals("")) {
+                tempAdfUuid = fullUUIDList.get(fullUUIDList.size() - 1);
+            }
+            config.putString(TangoConfig.KEY_STRING_AREADESCRIPTION, tempAdfUuid);
         }
+
         config.putBoolean(TangoConfig.KEY_BOOLEAN_LOWLATENCYIMUINTEGRATION, true);
         config.putBoolean(TangoConfig.KEY_BOOLEAN_DEPTH, true);
         config.putBoolean(TangoConfig.KEY_BOOLEAN_COLORCAMERA, true);
