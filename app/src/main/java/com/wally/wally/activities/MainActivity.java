@@ -16,8 +16,10 @@
 
 package com.wally.wally.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -31,10 +33,9 @@ import com.wally.wally.fragments.PreviewContentDialogFragment;
 import com.wally.wally.tango.TangoManager;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
-
-
 public class MainActivity extends AppCompatActivity implements NewContentDialogFragment.NewContentDialogListener {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String ARG_ADF_UUID = "ARG_ADF_UUID";
 
     private TangoManager mTangoManager;
 
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         mTangoManager = new TangoManager(this, mSurfaceView, mTangoUxLayout);
+
+        String adfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
 
         if (!hasADFPermissions()) {
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
         if (!hasADFPermissions()) {
             Log.i(TAG, "onResume: Didn't have ADF permission returning.");
             return;
+
         }
         mTangoManager.onResume();
     }
@@ -88,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
         PreviewContentDialogFragment.newInstance(content).show(getSupportFragmentManager(), "content_preview");
     }
 
+
     private void requestADFPermission() {
         startActivityForResult(
                 Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
@@ -98,4 +103,15 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
         return Tango.hasPermission(getBaseContext(), Tango.PERMISSIONTYPE_ADF_LOAD_SAVE);
     }
 
+    /**
+     * Returns intent to start main activity.
+     *
+     * @param uuid can be null, if we want to start with learning mode.
+     */
+    public static Intent newIntent(Context context, @Nullable String uuid) {
+        Intent i = new Intent(context, MainActivity.class);
+        i.putExtra(ARG_ADF_UUID, uuid);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        return i;
+    }
 }

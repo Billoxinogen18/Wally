@@ -21,9 +21,16 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="AppTheme.AccentButton">
+        <item name="colorControlNormal">@color/colorAccent</item>
+        <!--<item name="colorControlActivated">#cc4343</item>-->
+        <!--<item name="colorControlHighlight">#532727</item>-->
+        <item name="colorButtonNormal">@color/colorAccent</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
 
     <style name="AppTheme.PositiveButton">
-        <!--<item name="colorControlNormal">#7b2727</item>-->
+        <item name="colorControlNormal">#1E88E5</item>
         <!--<item name="colorControlActivated">#cc4343</item>-->
         <!--<item name="colorControlHighlight">#532727</item>-->
         <item name="colorButtonNormal">#1E88E5</item>
@@ -33,6 +40,5 @@
     <style name="RemoveButtonStyle" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorControlHighlight">#000</item>
         <item name="colorControlActivated">#000</item>
-
     </style>
 </resources>

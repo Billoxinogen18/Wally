@@ -20,4 +20,10 @@
     <string name="failed_measurement">Failed to place point</string>
     <string name="failed_permissions">Permissions required!</string>
     <string name="measurement">DISTANCE: </string>
+    <string name="title_activity_adfchooser">Start Wally with</string>
+
+    <string name="tango_error">"Tango Exception! Try again!"</string>
+    <string name="no_adfs_tango_error">No ADF UUIDs</string>
+    <string name="no_uuid_tango_error">"No ADF with that UUID!"</string>
+
 </resources>

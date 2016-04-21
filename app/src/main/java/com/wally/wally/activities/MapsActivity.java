@@ -100,7 +100,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
         if (content != null) {
             PreviewContentDialogFragment dialog = PreviewContentDialogFragment.newInstance(content);
-            dialog.show(getFragmentManager(), "PreviewContentDialogFragment");
+            dialog.show(getSupportFragmentManager(), "PreviewContentDialogFragment");
         }
 
         return true;
