@@ -1,6 +1,7 @@
 package com.wally.wally.tango;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.atap.tango.ux.TangoUx;
@@ -14,8 +15,12 @@ import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
+import com.projecttango.rajawali.Pose;
+import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
+import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.WallyRenderer;
+import com.wally.wally.dal.Content;
 
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -51,7 +56,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private double mRgbTimestampGlThread;
 
 
-    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout){
+    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout) {
         mSurfaceView = rajawaliSurfaceView;
         mRenderer = new WallyRenderer(context.getApplicationContext());
         mSurfaceView.setSurfaceRenderer(mRenderer);
@@ -65,7 +70,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     }
 
 
-    public synchronized void onPause(){
+    public synchronized void onPause() {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         // NOTE: DO NOT lock against this same object in the Tango callback thread. Tango.disconnect
@@ -84,7 +89,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
 
     }
 
-    public synchronized void onResume(){
+    public synchronized void onResume() {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         if (!mIsConnected) {
@@ -176,7 +181,41 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         }
     }
 
+    public void startContentFitting(final Content content) {
+        new AsyncTask<Void, TangoPoseData, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                mRenderer.setContent(doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread), content);
+                while (true) {
+                    if (isCancelled()) {
+                        break;
+                    }
+                    try {
+                        Thread.sleep(1000);
+                        publishProgress(doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                return null;
+            }
 
+            @Override
+            protected void onProgressUpdate(TangoPoseData... newPose) {
+                super.onProgressUpdate(newPose);
+                if (newPose != null) {
+                    Log.d(TAG, "onProgressUpdate() called with: " + "newPose = [" + newPose[0].toString() + "]");
+                    mRenderer.updateContentPosition(newPose[0]);
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                mRenderer.setContent(null, null);
+            }
+        }.execute();
+    }
 
     /**
      * Connects the view and renderer to the color camara and callbacks.
@@ -254,6 +293,41 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         });
     }
 
+    /**
+     * Use the TangoSupport library with point cloud data to calculate the plane
+     * of the world feature pointed at the location the camera is looking.
+     * It returns the pose of the fitted plane in a TangoPoseData structure.
+     */
+    private TangoPoseData doFitPlane(float u, float v, double rgbTimestamp) {
+        TangoXyzIjData xyzIj = mPointCloudManager.getLatestXyzIj();
+
+        if (xyzIj == null) {
+            return null;
+        }
+
+        // We need to calculate the transform between the color camera at the
+        // time the user clicked and the depth camera at the time the depth
+        // cloud was acquired.
+        TangoPoseData colorTdepthPose = TangoSupport.calculateRelativePose(
+                rgbTimestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR,
+                xyzIj.timestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH);
+
+        // Perform plane fitting with the latest available point cloud data.
+        TangoSupport.IntersectionPointPlaneModelPair intersectionPointPlaneModelPair =
+                TangoSupport.fitPlaneModelNearClick(xyzIj, mIntrinsics,
+                        colorTdepthPose, u, v);
+
+        // Get the device pose at the time the plane data was acquired.
+        TangoPoseData devicePose =
+                mTango.getPoseAtTime(xyzIj.timestamp, FRAME_PAIR);
+
+        // Update the AR object location.
+        TangoPoseData planeFitPose = ScenePoseCalculator.planeFitToTangoWorldPose(
+                intersectionPointPlaneModelPair.intersectionPoint,
+                intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
+
+        return planeFitPose;
+    }
 
     /**
      * Calculates and stores the fixed transformations between the device and

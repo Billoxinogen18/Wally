@@ -29,8 +29,8 @@ import com.wally.wally.dal.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.fragments.PreviewContentDialogFragment;
 import com.wally.wally.tango.TangoManager;
-import org.rajawali3d.surface.RajawaliSurfaceView;
 
+import org.rajawali3d.surface.RajawaliSurfaceView;
 
 
 public class MainActivity extends AppCompatActivity implements NewContentDialogFragment.NewContentDialogListener {
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
     @Override
     public void onContentCreated(Content content) {
         Log.d(TAG, "onContentCreated() called with: " + "content = [" + content + "]");
-        PreviewContentDialogFragment.newInstance(content).show(getSupportFragmentManager(), "content_preview");
+        mTangoManager.startContentFitting(content);
     }
 
     private void requestADFPermission() {

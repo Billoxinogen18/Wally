@@ -21,19 +21,20 @@ import com.google.atap.tangoservice.TangoPoseData;
 import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import org.rajawali3d.Object3D;
-import org.rajawali3d.lights.DirectionalLight;
+import org.rajawali3d.animation.Animation3D;
+import org.rajawali3d.animation.TranslateAnimation3D;
+import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.StreamingTexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.Matrix4;
-import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.Plane;
 import org.rajawali3d.primitives.ScreenQuad;
-import org.rajawali3d.primitives.Sphere;
 import org.rajawali3d.renderer.RajawaliRenderer;
 
 
@@ -42,6 +43,7 @@ import javax.microedition.khronos.opengles.GL10;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
+import com.wally.wally.dal.Content;
 
 /**
  * Very simple example point to point renderer which displays a line fixed in place.
@@ -51,9 +53,13 @@ import com.projecttango.rajawali.ScenePoseCalculator;
 public class WallyRenderer extends RajawaliRenderer {
 
     private static final String TAG = WallyRenderer.class.getSimpleName();
-    private Object3D earth;
-    private Pose mPoint;
-    private boolean mLineUpdated = false;
+
+    private Animation3D mContentMoveAnim;
+    private Object3D mContent3D;
+    private Content mContentData;
+    private Pose mContentPose;
+    private Pose mContentNewPose;
+    private boolean mContentUpdated = false;
 
     // Augmented reality related fields
     private ATexture mTangoCameraTexture;
@@ -82,11 +88,10 @@ public class WallyRenderer extends RajawaliRenderer {
         }
         getCurrentScene().addChildAt(backgroundQuad, 0);
 
-        // Add a directional light in an arbitrary direction.
-        DirectionalLight light = new DirectionalLight(1, 0.2, -1);
+        PointLight light = new PointLight();
+        light.setPosition(0, 0, 0);
         light.setColor(1, 1, 1);
         light.setPower(0.8f);
-        light.setPosition(3, 2, 4);
         getCurrentScene().addLight(light);
     }
 
@@ -95,41 +100,67 @@ public class WallyRenderer extends RajawaliRenderer {
         // Update the AR object if necessary
         // Synchronize against concurrent access with the setter below.
         synchronized (this) {
-            if (mLineUpdated) {
-                if (earth != null) {
-                    getCurrentScene().removeChild(earth);
+            if (mContentUpdated) {
+                if (mContent3D != null) {
+                    getCurrentScene().removeChild(mContent3D);
                 }
-                if (mPoint != null) {
+                if (mContentPose != null) {
                     Material material = new Material();
                     try {
-                        Texture t = new Texture("earth", R.drawable.earth_diffuse);
+                        Texture t = new Texture("mContent3D", R.drawable.earth_diffuse);
                         material.addTexture(t);
                     } catch (ATexture.TextureException e) {
-                        Log.e(TAG, "Exception generating earth texture", e);
+                        Log.e(TAG, "Exception generating mContent3D texture", e);
                     }
                     material.setColorInfluence(0);
                     material.enableLighting(true);
                     material.setDiffuseMethod(new DiffuseMethod.Lambert());
-//                    earth = new Sphere(0.5f, 20, 20);
-                    earth = new Plane(1f,1.6f, 1, 1);
-                    earth.setMaterial(material);
-                    earth.setPosition(mPoint.getPosition());
-                    earth.setRotation(mPoint.getOrientation());
-                    getCurrentScene().addChild(earth);
+
+                    mContent3D = new Plane(1f, 1.6f, 1, 1);
+                    mContent3D.setMaterial(material);
+                    mContent3D.setPosition(mContentPose.getPosition());
+                    mContent3D.setRotation(mContentPose.getOrientation());
+                    getCurrentScene().addChild(mContent3D);
                 } else {
-                    earth = null;
+                    mContent3D = null;
                 }
-                mLineUpdated = false;
+                mContentUpdated = false;
+            } else if (mContentNewPose != null) {
+                Log.d(TAG, "onRender() called with: " + "elapsedRealTime = [" + elapsedRealTime + "], deltaTime = [" + deltaTime + "]");
+                // Remove old animation
+
+                if (mContentMoveAnim != null) {
+                    mContentMoveAnim.pause();
+                    getCurrentScene().unregisterAnimation(mContentMoveAnim);
+                    mContentMoveAnim = null;
+                }
+
+                mContentMoveAnim = new TranslateAnimation3D(mContentNewPose.getPosition());
+                mContentMoveAnim.setTransformable3D(mContent3D);
+                mContentMoveAnim.setDurationMilliseconds(500);
+                mContentMoveAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+                getCurrentScene().registerAnimation(mContentMoveAnim);
+                mContentMoveAnim.play();
+
+//                // TODO make this with animation too
+                mContent3D.setOrientation(mContentNewPose.getOrientation());
+
+                mContentPose = mContentNewPose;
+                mContentNewPose = null;
             }
 
         }
-
         super.onRender(elapsedRealTime, deltaTime);
     }
 
-    public synchronized void setLine(TangoPoseData point) {
-        mPoint = ScenePoseCalculator.toOpenGLPose(point);
-        mLineUpdated = true;
+    public synchronized void setContent(TangoPoseData point, Content content) {
+        mContentPose = ScenePoseCalculator.toOpenGLPose(point);
+        mContentUpdated = true;
+        mContentData = content;
+    }
+
+    public synchronized void updateContentPosition(TangoPoseData newPoint) {
+        mContentNewPose = ScenePoseCalculator.toOpenGLPose(newPoint);
     }
 
     /**
