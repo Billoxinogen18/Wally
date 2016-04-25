@@ -3,8 +3,6 @@ package com.wally.wally.datacontroller;
 import android.content.Context;
 
 import com.firebase.client.Firebase;
-import com.wally.wally.datacontroller.dal.Callback;
-import com.wally.wally.datacontroller.dal.DataAccessLayer;
 
 import java.util.Collection;
 

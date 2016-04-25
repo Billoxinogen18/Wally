@@ -1,4 +1,4 @@
-package com.wally.wally.datacontroller.dal;
+package com.wally.wally.datacontroller;
 
 import java.util.Collection;
 

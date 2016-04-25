@@ -4,7 +4,6 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-import com.wally.wally.datacontroller.dal.*;
 
 import java.util.Collection;
 import java.util.HashSet;
