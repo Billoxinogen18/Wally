@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
+import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.Content;
@@ -42,6 +43,10 @@ public class VisualContentManager {
     public void activeContentAdded(){
         addStaticContent(activeContent);
         activeContent = null;
+    }
+
+    public boolean hasStaticContent(){
+        return staticContent != null && staticContent.size() > 0;
     }
 
     public void addStaticContent(VisualContent visualContent) {
@@ -83,7 +88,7 @@ public class VisualContentManager {
             material.enableLighting(true);
             material.setDiffuseMethod(new DiffuseMethod.Lambert());
 
-            mContent3D = new Plane(1f, 1.6f, 1, 1);
+            mContent3D = new ContentPlane(1f, 1.6f, 1, 1);
             mContent3D.setMaterial(material);
             mContent3D.setPosition(mContentPose.getPosition());
             mContent3D.setRotation(mContentPose.getOrientation());

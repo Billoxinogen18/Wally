@@ -129,7 +129,7 @@ public class ADFChooser extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(ADFViewHolder holder, int position) {
-            Pair<String, TangoAreaDescriptionMetaData> data = mData.get(0);
+            Pair<String, TangoAreaDescriptionMetaData> data = mData.get(position);
 
             byte[] nameBytes = data.second.get(TangoAreaDescriptionMetaData.KEY_NAME);
             if (nameBytes == null) {
