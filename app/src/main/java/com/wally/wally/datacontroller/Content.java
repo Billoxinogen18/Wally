@@ -14,10 +14,9 @@ public class Content implements Serializable{
     private Location location;
 //    private SocialVisibility visibility;
 //    private Range range;
-    private long timestamp;
+//    private long timestamp;
 
-    public Content() {
-    }
+    public Content() {}
 
     public Content(String id) {
         this.id = id;
@@ -107,7 +106,7 @@ public class Content implements Serializable{
                 ", location=" + location +
 //                ", visibility=" + visibility +
 //                ", range=" + range +
-                ", timestamp=" + timestamp +
+//                ", timestamp=" + timestamp +
                 '}';
     }
 }
