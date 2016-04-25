@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_gravity="fill"
     android:minWidth="@dimen/content_dialog_min_width"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:theme="@style/Theme.AppCompat">
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/middle_panel"
@@ -32,7 +33,7 @@
                 android:padding="8dp"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:visibility="gone"/>
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tv_note"

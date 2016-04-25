@@ -24,10 +24,10 @@ public class App extends Application {
         return dataController;
     }
 
-    // support multi-dex.
     @Override
-    protected void attachBaseContext(Context base) {
+    protected void attachBaseContext(Context base){
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
+
 }

@@ -1,14 +1,16 @@
 package com.wally.wally;
 
 import android.Manifest;
-import android.content.ClipData;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
+import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -20,8 +22,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.wally.wally.dal.Content;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.DateFormat;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by ioane5 on 3/29/16.
@@ -71,7 +74,7 @@ public final class Utils {
     public static Bitmap createBitmapFromContent(Content content, Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        View cv = inflater.inflate(R.layout.preview_content_dialog, null, false);
+        @SuppressLint("InflateParams") View cv = inflater.inflate(R.layout.wall_content, null, false);
 
         TextView titleTV = (TextView) cv.findViewById(R.id.tv_title);
         TextView noteTV = (TextView) cv.findViewById(R.id.tv_note);
@@ -79,15 +82,17 @@ public final class Utils {
 
         titleTV.setText(content.getTitle());
         noteTV.setText(content.getNote());
+
+        titleTV.setVisibility(TextUtils.isEmpty(titleTV.getText()) ? View.GONE : View.VISIBLE);
+        noteTV.setVisibility(TextUtils.isEmpty(noteTV.getText()) ? View.GONE : View.VISIBLE);
+
         try {
             Drawable image = Glide.with(context)
                     .load(content.getImageUri())
                     .fitCenter()
                     .into(700, 700)
                     .get();
-            if (image == null) {
-                imageView.setVisibility(View.GONE);
-            }
+            imageView.setVisibility(image == null ? View.GONE : View.VISIBLE);
             imageView.setImageDrawable(image);
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,7 +108,27 @@ public final class Utils {
         final Bitmap bitmap = Bitmap.createBitmap(cv.getMeasuredWidth(),
                 cv.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
+
         cv.draw(canvas);
+
+//        Matrix m = new Matrix();
+//        m.preScale(-1, 1);
+//        Bitmap dst = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, false);
+//        dst.setDensity(DisplayMetrics.DENSITY_DEFAULT);
+
+        // TODO del
+//        String filename = "pippo.png";
+//        File sd = Environment.getExternalStorageDirectory();
+//        File dest = new File(sd, filename);
+//
+//        try {
+//            FileOutputStream out = new FileOutputStream(dest);
+//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+//            out.flush();
+//            out.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         return bitmap;
     }
 }

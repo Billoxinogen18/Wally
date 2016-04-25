@@ -34,6 +34,8 @@ import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.StreamingTexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.Matrix4;
+import org.rajawali3d.math.Quaternion;
+import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.Plane;
 import org.rajawali3d.primitives.ScreenQuad;
 import org.rajawali3d.renderer.RajawaliRenderer;
@@ -41,6 +43,7 @@ import org.rajawali3d.renderer.RajawaliRenderer;
 
 import javax.microedition.khronos.opengles.GL10;
 
+import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
@@ -113,15 +116,15 @@ public class WallyRenderer extends RajawaliRenderer {
                     } catch (ATexture.TextureException e) {
                         Log.e(TAG, "Exception generating mContent3D texture", e);
                     }
+
                     material.setColorInfluence(0);
                     material.enableLighting(true);
                     material.setDiffuseMethod(new DiffuseMethod.Lambert());
 
-                    mContent3D = new Plane(1f, 1.6f, 1, 1);
+                    mContent3D = new ContentPlane(1f, 1.6f, 1, 1);
                     mContent3D.setMaterial(material);
                     mContent3D.setPosition(mContentPose.getPosition());
-                    mContent3D.setRotation(mContentPose.getOrientation());
-                    mContent3DLight.setPosition(mContentPose.getPosition());
+                    mContent3D.setOrientation(mContentPose.getOrientation());
 
                     getCurrentScene().addChild(mContent3D);
                 } else {
@@ -130,26 +133,28 @@ public class WallyRenderer extends RajawaliRenderer {
                 mContentUpdated = false;
             } else if (mContentNewPose != null) {
                 // Remove old animation
-                if (mContentMoveAnim != null) {
-                    mContentMoveAnim.pause();
-                    getCurrentScene().unregisterAnimation(mContentMoveAnim);
-                    mContentMoveAnim = null;
-                }
+//                if (mContentMoveAnim != null) {
+//                    mContentMoveAnim.pause();
+//                    getCurrentScene().unregisterAnimation(mContentMoveAnim);
+//                    mContentMoveAnim = null;
+//                }
+//
+//                mContentMoveAnim = new TranslateAnimation3D(mContentNewPose.getPosition());
+//                mContentMoveAnim.setTransformable3D(mContent3D);
+//                mContentMoveAnim.setDurationMilliseconds(500);
+//                mContentMoveAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+//                getCurrentScene().registerAnimation(mContentMoveAnim);
+//                mContentMoveAnim.play();
+//
+//                mContent3DLight.setPosition(mContentNewPose.getPosition());
+//                // TODO make this with animation too
+//                mContent3D.setOrientation(mContentPose.getOrientation());
 
-                mContentMoveAnim = new TranslateAnimation3D(mContentNewPose.getPosition());
-                mContentMoveAnim.setTransformable3D(mContent3D);
-                mContentMoveAnim.setDurationMilliseconds(500);
-                mContentMoveAnim.setInterpolator(new AccelerateDecelerateInterpolator());
-                getCurrentScene().registerAnimation(mContentMoveAnim);
-                mContentMoveAnim.play();
-
-                mContent3DLight.setPosition(mContentNewPose.getPosition());
-                // TODO make this with animation too
-                mContent3D.setOrientation(mContentNewPose.getOrientation());
-
-
-                mContentPose = mContentNewPose;
-                mContentNewPose = null;
+//                mContent3D.setRotation(mContentPose.getOrientation().x, mContentPose.getOrientation().y, mContentPose.getOrientation().z);
+//
+//
+//                mContentPose = mContentNewPose;
+//                mContentNewPose = null;
             }
 
         }

@@ -2,6 +2,7 @@ package com.wally.wally.tango;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.transition.Scene;
 import android.util.Log;
 
 import com.google.atap.tango.ux.TangoUx;
@@ -15,6 +16,7 @@ import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
+import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
@@ -55,7 +57,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private boolean mIsFrameAvailableTangoThread;
     private double mRgbTimestampGlThread;
 
-    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid){
+    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid) {
         mSurfaceView = rajawaliSurfaceView;
         mRenderer = new WallyRenderer(context.getApplicationContext());
         mSurfaceView.setSurfaceRenderer(mRenderer);
@@ -220,6 +222,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
             }
         }.execute();
     }
+
 
     /**
      * Connects the view and renderer to the color camara and callbacks.

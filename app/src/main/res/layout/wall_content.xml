@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_title"
+        style="@style/TextAppearance.AppCompat.Headline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:ellipsize="end"
+        android:lines="1"
+        android:maxLines="1"
+        android:padding="8dp"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:text="Title here" />
+
+    <TextView
+        android:id="@+id/tv_note"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_title"
+        android:layout_marginBottom="16dp"
+        android:background="@null"
+        android:fontFamily="serif"
+        android:padding="8dp"
+        android:scrollbars="none"
+        android:textSize="16sp"
+        tools:text="Note here" />
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_note"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_btn_map_75dp"
+        android:visibility="visible" />
+</RelativeLayout>

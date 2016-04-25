@@ -18,6 +18,7 @@ package com.wally.wally.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -26,10 +27,10 @@ import android.view.View;
 
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
+import com.google.atap.tangoservice.TangoPoseData;
 import com.wally.wally.R;
 import com.wally.wally.dal.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
-import com.wally.wally.fragments.PreviewContentDialogFragment;
 import com.wally.wally.tango.TangoManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -115,5 +116,12 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
         i.putExtra(ARG_ADF_UUID, uuid);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         return i;
+    }
+
+    private class ContentFitter extends AsyncTask<Content, TangoPoseData, Void> {
+        @Override
+        protected Void doInBackground(Content... params) {
+            return null;
+        }
     }
 }
