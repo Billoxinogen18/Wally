@@ -67,8 +67,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             updateImage();
         }
 
-        mTitleEt = (EditText) dialogView.findViewById(R.id.et_title);
-        mNoteEt = (EditText) dialogView.findViewById(R.id.et_note);
+        mTitleEt = (EditText) dialogView.findViewById(R.id.tv_title);
+        mNoteEt = (EditText) dialogView.findViewById(R.id.tv_note);
 
         builder.setView(dialogView);
         Dialog dialog = builder.create();

@@ -44,8 +44,8 @@ public class PreviewContentDialogFragment extends DialogFragment {
 
         ImageView mImageView = (ImageView) dialogView.findViewById(R.id.image);
 
-        TextView mTitleEt = (TextView) dialogView.findViewById(R.id.et_title);
-        TextView mNoteEt = (TextView) dialogView.findViewById(R.id.et_note);
+        TextView mTitleEt = (TextView) dialogView.findViewById(R.id.tv_title);
+        TextView mNoteEt = (TextView) dialogView.findViewById(R.id.tv_note);
 
         if(!TextUtils.isEmpty(content.getTitle())){
             mTitleEt.setText(content.getTitle());
