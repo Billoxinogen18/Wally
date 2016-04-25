@@ -26,7 +26,10 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation3D;
 import org.rajawali3d.animation.TranslateAnimation3D;
+import org.rajawali3d.lights.ALight;
+import org.rajawali3d.lights.DirectionalLight;
 import org.rajawali3d.lights.PointLight;
+import org.rajawali3d.lights.SpotLight;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
@@ -45,6 +48,10 @@ import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.dal.Content;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+
 /**
  * Very simple example point to point renderer which displays a line fixed in place.
  * Whenever the user clicks on the screen, the line is re-rendered with an endpoint
@@ -56,6 +63,7 @@ public class WallyRenderer extends RajawaliRenderer {
 
     private Animation3D mContentMoveAnim;
     private Object3D mContent3D;
+    private ALight mContent3DLight;
     private Content mContentData;
     private Pose mContentPose;
     private Pose mContentNewPose;
@@ -88,11 +96,15 @@ public class WallyRenderer extends RajawaliRenderer {
         }
         getCurrentScene().addChildAt(backgroundQuad, 0);
 
-        PointLight light = new PointLight();
-        light.setPosition(0, 0, 0);
-        light.setColor(1, 1, 1);
-        light.setPower(0.8f);
-        getCurrentScene().addLight(light);
+        mContent3DLight = new PointLight();
+        mContent3DLight.setColor(1.0f, 1.0f, 1.0f);
+        mContent3DLight.setPower(1);
+
+//        PointLight light = new PointLight();
+//        light.setPosition(0, 0, 0);
+//        light.setColor(1, 1, 1);
+//        light.setPower(0.8f);
+//        getCurrentScene().addLight(light);
     }
 
     @Override
@@ -107,7 +119,8 @@ public class WallyRenderer extends RajawaliRenderer {
                 if (mContentPose != null) {
                     Material material = new Material();
                     try {
-                        Texture t = new Texture("mContent3D", R.drawable.earth_diffuse);
+                        Texture t = new Texture("mContent3D",
+                                Utils.createBitmapFromContent(mContentData, getContext()));
                         material.addTexture(t);
                     } catch (ATexture.TextureException e) {
                         Log.e(TAG, "Exception generating mContent3D texture", e);
@@ -120,15 +133,15 @@ public class WallyRenderer extends RajawaliRenderer {
                     mContent3D.setMaterial(material);
                     mContent3D.setPosition(mContentPose.getPosition());
                     mContent3D.setRotation(mContentPose.getOrientation());
+                    mContent3DLight.setPosition(mContentPose.getPosition());
+
                     getCurrentScene().addChild(mContent3D);
                 } else {
                     mContent3D = null;
                 }
                 mContentUpdated = false;
             } else if (mContentNewPose != null) {
-                Log.d(TAG, "onRender() called with: " + "elapsedRealTime = [" + elapsedRealTime + "], deltaTime = [" + deltaTime + "]");
                 // Remove old animation
-
                 if (mContentMoveAnim != null) {
                     mContentMoveAnim.pause();
                     getCurrentScene().unregisterAnimation(mContentMoveAnim);
@@ -142,8 +155,10 @@ public class WallyRenderer extends RajawaliRenderer {
                 getCurrentScene().registerAnimation(mContentMoveAnim);
                 mContentMoveAnim.play();
 
-//                // TODO make this with animation too
+                mContent3DLight.setPosition(mContentNewPose.getPosition());
+                // TODO make this with animation too
                 mContent3D.setOrientation(mContentNewPose.getOrientation());
+
 
                 mContentPose = mContentNewPose;
                 mContentNewPose = null;

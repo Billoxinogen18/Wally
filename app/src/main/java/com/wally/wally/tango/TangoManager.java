@@ -182,6 +182,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     }
 
     public void startContentFitting(final Content content) {
+        // TODO add handlers for UI button managing. ¬
         new AsyncTask<Void, TangoPoseData, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -191,7 +192,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
                         break;
                     }
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(600);
                         publishProgress(doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread));
                     } catch (Exception e) {
                         e.printStackTrace();
