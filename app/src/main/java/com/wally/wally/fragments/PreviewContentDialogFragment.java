@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.wally.wally.R;
-import com.wally.wally.datacontroller.Content;
+import com.wally.wally.datacontroller.content.Content;
 
 
 public class PreviewContentDialogFragment extends DialogFragment {

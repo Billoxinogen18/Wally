@@ -27,10 +27,9 @@ import android.view.View;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.wally.wally.R;
-import com.wally.wally.datacontroller.Content;
+import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.Utils;
 import com.wally.wally.fragments.NewContentDialogFragment;
-import com.wally.wally.fragments.PreviewContentDialogFragment;
 import com.wally.wally.tango.TangoManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;

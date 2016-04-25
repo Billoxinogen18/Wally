@@ -3,6 +3,8 @@ package com.wally.wally.datacontroller;
 import android.content.Context;
 
 import com.firebase.client.Firebase;
+import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.FirebaseDAL;
 
 import java.util.Collection;
 

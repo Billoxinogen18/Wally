@@ -1,10 +1,8 @@
 package com.wally.wally;
 
 import android.Manifest;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -18,12 +16,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.wally.wally.datacontroller.Content;
+import com.wally.wally.datacontroller.content.Content;
 
 import com.google.atap.tangoservice.Tango;
 
 import java.text.DateFormat;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by ioane5 on 3/29/16.

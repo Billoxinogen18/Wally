@@ -44,7 +44,7 @@ import javax.microedition.khronos.opengles.GL10;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
-import com.wally.wally.datacontroller.Content;
+import com.wally.wally.datacontroller.content.Content;
 
 /**
  * Very simple example point to point renderer which displays a line fixed in place.

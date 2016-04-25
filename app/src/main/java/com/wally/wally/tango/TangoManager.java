@@ -19,7 +19,7 @@ import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.WallyRenderer;
-import com.wally.wally.datacontroller.Content;
+import com.wally.wally.datacontroller.content.Content;
 
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;

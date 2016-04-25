@@ -1,20 +1,18 @@
-package com.wally.wally.datacontroller;
+package com.wally.wally.datacontroller.content;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wally.wally.datacontroller.content.Location;
 
 import java.io.Serializable;
 
-public class Content implements Serializable{
+public class Content implements Serializable {
     private static final int MAX_TITLE_LENGTH = 150;
     private String id;
     private String title;
     private String note;
     private String imageUri;
+    private String uuid;
+    private TangoData tangoData;
     private Location location;
-//    private SocialVisibility visibility;
-//    private Range range;
-//    private long timestamp;
 
     public Content() {}
 
@@ -30,6 +28,25 @@ public class Content implements Serializable{
     void setId(String id) {
         this.id = id;
     }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public Content withUuid(String uuid) {
+        this.uuid = uuid;
+        return this;
+    }
+
+    public TangoData getTangoData() {
+        return tangoData;
+    }
+
+    public Content withTangoData(TangoData tangoData) {
+        this.tangoData = tangoData;
+        return this;
+    }
+
 
     public String getTitle() {
         return title;
@@ -69,33 +86,6 @@ public class Content implements Serializable{
         return this;
     }
 
-//    public SocialVisibility getVisibility() {
-//        return visibility;
-//    }
-
-//    public Content withVisibility(SocialVisibility visibility) {
-//        this.visibility = visibility;
-//        return this;
-//    }
-
-//    public Range getRange() {
-//        return range;
-//    }
-
-//    public Content withRange(Range range) {
-//        this.range = range;
-//        return this;
-//    }
-
-//    public long getTimestamp() {
-//        return timestamp;
-//    }
-//
-//    public Content withTimestamp(long timestamp) {
-//        this.timestamp = timestamp;
-//        return this;
-//    }
-
     @Override
     public String toString() {
         return "Content{" +
@@ -104,9 +94,6 @@ public class Content implements Serializable{
                 ", note='" + note + '\'' +
                 ", imageUri='" + imageUri + '\'' +
                 ", location=" + location +
-//                ", visibility=" + visibility +
-//                ", range=" + range +
-//                ", timestamp=" + timestamp +
                 '}';
     }
 }

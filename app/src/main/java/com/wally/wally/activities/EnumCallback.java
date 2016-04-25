@@ -4,7 +4,7 @@ import android.support.annotation.Nullable;
 
 
 import com.wally.wally.datacontroller.Callback;
-import com.wally.wally.datacontroller.Content;
+import com.wally.wally.datacontroller.content.Content;
 
 import java.util.Collection;
 
