@@ -29,7 +29,7 @@ import com.wally.wally.App;
 import com.wally.wally.fragments.PreviewContentDialogFragment;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.dal.Content;
+import com.wally.wally.datacontroller.Content;
 
 import java.util.Collection;
 import java.util.HashMap;

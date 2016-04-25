@@ -3,8 +3,8 @@ package com.wally.wally.activities;
 import android.support.annotation.Nullable;
 
 
-import com.wally.wally.dal.Callback;
-import com.wally.wally.dal.Content;
+import com.wally.wally.datacontroller.dal.Callback;
+import com.wally.wally.datacontroller.Content;
 
 import java.util.Collection;
 

@@ -1,15 +1,13 @@
-package com.wally.wally.dal;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
+package com.wally.wally.datacontroller;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.wally.wally.datacontroller.dal.Callback;
+import com.wally.wally.datacontroller.dal.DataAccessLayer;
+import com.wally.wally.datacontroller.dal.Query;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;

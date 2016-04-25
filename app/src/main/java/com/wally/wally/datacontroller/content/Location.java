@@ -1,4 +1,4 @@
-package com.wally.wally.dal.content;
+package com.wally.wally.datacontroller.content;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.android.gms.maps.model.LatLng;

@@ -3,10 +3,8 @@ package com.wally.wally.datacontroller;
 import android.content.Context;
 
 import com.firebase.client.Firebase;
-import com.wally.wally.dal.Callback;
-import com.wally.wally.dal.Content;
-import com.wally.wally.dal.DataAccessLayer;
-import com.wally.wally.dal.FirebaseDAL;
+import com.wally.wally.datacontroller.dal.Callback;
+import com.wally.wally.datacontroller.dal.DataAccessLayer;
 
 import java.util.Collection;
 
@@ -38,5 +36,4 @@ public class DataController {
     public void fetch(Callback<Collection<Content>> resultCallback) {
         contentManager.fetch(null, resultCallback);
     }
-
 }

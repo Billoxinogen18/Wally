@@ -27,7 +27,7 @@ import android.view.View;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.wally.wally.R;
-import com.wally.wally.dal.Content;
+import com.wally.wally.datacontroller.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.fragments.PreviewContentDialogFragment;
 import com.wally.wally.tango.TangoManager;

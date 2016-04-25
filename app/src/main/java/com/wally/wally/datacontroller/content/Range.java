@@ -1,4 +1,4 @@
-package com.wally.wally.dal.content;
+package com.wally.wally.datacontroller.content;
 
 /**
  * Created by Xato on 4/7/2016.

@@ -1,9 +1,7 @@
-package com.wally.wally.dal;
+package com.wally.wally.datacontroller;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.wally.wally.dal.content.Location;
-import com.wally.wally.dal.content.Range;
-import com.wally.wally.dal.content.SocialVisibility;
+import com.wally.wally.datacontroller.content.Location;
 
 import java.io.Serializable;
 
@@ -14,8 +12,8 @@ public class Content implements Serializable{
     private String note;
     private String imageUri;
     private Location location;
-    private SocialVisibility visibility;
-    private Range range;
+//    private SocialVisibility visibility;
+//    private Range range;
     private long timestamp;
 
     public Content() {
@@ -72,32 +70,32 @@ public class Content implements Serializable{
         return this;
     }
 
-    public SocialVisibility getVisibility() {
-        return visibility;
-    }
+//    public SocialVisibility getVisibility() {
+//        return visibility;
+//    }
 
-    public Content withVisibility(SocialVisibility visibility) {
-        this.visibility = visibility;
-        return this;
-    }
+//    public Content withVisibility(SocialVisibility visibility) {
+//        this.visibility = visibility;
+//        return this;
+//    }
 
-    public Range getRange() {
-        return range;
-    }
+//    public Range getRange() {
+//        return range;
+//    }
 
-    public Content withRange(Range range) {
-        this.range = range;
-        return this;
-    }
+//    public Content withRange(Range range) {
+//        this.range = range;
+//        return this;
+//    }
 
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public Content withTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-        return this;
-    }
+//    public long getTimestamp() {
+//        return timestamp;
+//    }
+//
+//    public Content withTimestamp(long timestamp) {
+//        this.timestamp = timestamp;
+//        return this;
+//    }
 
     @Override
     public String toString() {
@@ -107,8 +105,8 @@ public class Content implements Serializable{
                 ", note='" + note + '\'' +
                 ", imageUri='" + imageUri + '\'' +
                 ", location=" + location +
-                ", visibility=" + visibility +
-                ", range=" + range +
+//                ", visibility=" + visibility +
+//                ", range=" + range +
                 ", timestamp=" + timestamp +
                 '}';
     }
