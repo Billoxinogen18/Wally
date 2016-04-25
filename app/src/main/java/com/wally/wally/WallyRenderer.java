@@ -15,54 +15,37 @@
  */
 package com.wally.wally;
 
-import com.google.atap.tangoservice.TangoCameraIntrinsics;
-import com.google.atap.tangoservice.TangoPoseData;
-
 import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.ScaleGestureDetector;
 
-import org.rajawali3d.Object3D;
-import org.rajawali3d.animation.Animation3D;
-import org.rajawali3d.animation.TranslateAnimation3D;
-import org.rajawali3d.lights.ALight;
-import org.rajawali3d.lights.PointLight;
-import org.rajawali3d.materials.Material;
-import org.rajawali3d.materials.methods.DiffuseMethod;
-import org.rajawali3d.materials.textures.ATexture;
-import org.rajawali3d.materials.textures.StreamingTexture;
-import org.rajawali3d.materials.textures.Texture;
-import org.rajawali3d.math.Matrix4;
-import org.rajawali3d.primitives.Plane;
-import org.rajawali3d.primitives.ScreenQuad;
-import org.rajawali3d.renderer.RajawaliRenderer;
-
-
-import javax.microedition.khronos.opengles.GL10;
-
+import com.google.atap.tangoservice.TangoCameraIntrinsics;
+import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
-import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.tango.VisualContentManager;
+
+import org.rajawali3d.lights.ALight;
+import org.rajawali3d.lights.PointLight;
+import org.rajawali3d.materials.Material;
+import org.rajawali3d.materials.textures.ATexture;
+import org.rajawali3d.materials.textures.StreamingTexture;
+import org.rajawali3d.math.Matrix4;
+import org.rajawali3d.primitives.ScreenQuad;
+import org.rajawali3d.renderer.RajawaliRenderer;
+
+import javax.microedition.khronos.opengles.GL10;
 
 /**
  * Very simple example point to point renderer which displays a line fixed in place.
  * Whenever the user clicks on the screen, the line is re-rendered with an endpoint
  * placed at the point corresponding to the depth at the point of the click.
  */
-public class WallyRenderer extends RajawaliRenderer {
+public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetector.OnScaleGestureListener {
 
     private static final String TAG = WallyRenderer.class.getSimpleName();
-
-    private Animation3D mContentMoveAnim;
-    private Object3D mContent3D;
-    private ALight mContent3DLight;
-    private Content mContentData;
-    private Pose mContentPose;
-    private Pose mContentNewPose;
-    private boolean mContentUpdated = false;
 
     private VisualContentManager mVisualContentManager;
 
@@ -94,9 +77,11 @@ public class WallyRenderer extends RajawaliRenderer {
         }
         getCurrentScene().addChildAt(backgroundQuad, 0);
 
-        mContent3DLight = new PointLight();
+        ALight mContent3DLight = new PointLight();
         mContent3DLight.setColor(1.0f, 1.0f, 1.0f);
         mContent3DLight.setPower(1);
+
+        renderStaticContent();
     }
 
 
@@ -127,77 +112,6 @@ public class WallyRenderer extends RajawaliRenderer {
         super.onRender(elapsedRealTime, deltaTime);
     }
 
-    /*
-    @Override
-    protected void onRender(long elapsedRealTime, double deltaTime) {
-        // Update the AR object if necessary
-        // Synchronize against concurrent access with the setter below.
-        synchronized (this) {
-            if (mContentUpdated) {
-                if (mContent3D != null) {
-                    getCurrentScene().removeChild(mContent3D);
-                }
-                if (mContentPose != null) {
-                    Material material = new Material();
-                    try {
-                        Texture t = new Texture("mContent3D",
-                                Utils.createBitmapFromContent(mContentData, getContext()));
-                        material.addTexture(t);
-                    } catch (ATexture.TextureException e) {
-                        Log.e(TAG, "Exception generating mContent3D texture", e);
-                    }
-                    material.setColorInfluence(0);
-                    material.enableLighting(true);
-                    material.setDiffuseMethod(new DiffuseMethod.Lambert());
-
-                    mContent3D = new Plane(1f, 1.6f, 1, 1);
-                    mContent3D.setMaterial(material);
-                    mContent3D.setPosition(mContentPose.getPosition());
-                    mContent3D.setRotation(mContentPose.getOrientation());
-                    mContent3DLight.setPosition(mContentPose.getPosition());
-
-                    getCurrentScene().addChild(mContent3D);
-                } else {
-                    mContent3D = null;
-                }
-                mContentUpdated = false;
-            } else if (mContentNewPose != null) {
-                // Remove old animation
-                if (mContentMoveAnim != null) {
-                    mContentMoveAnim.pause();
-                    getCurrentScene().unregisterAnimation(mContentMoveAnim);
-                    mContentMoveAnim = null;
-                }
-
-                mContentMoveAnim = new TranslateAnimation3D(mContentNewPose.getPosition());
-                mContentMoveAnim.setTransformable3D(mContent3D);
-                mContentMoveAnim.setDurationMilliseconds(500);
-                mContentMoveAnim.setInterpolator(new AccelerateDecelerateInterpolator());
-                getCurrentScene().registerAnimation(mContentMoveAnim);
-                mContentMoveAnim.play();
-
-                mContent3DLight.setPosition(mContentNewPose.getPosition());
-                // TODO make this with animation too
-                mContent3D.setOrientation(mContentNewPose.getOrientation());
-
-
-                mContentPose = mContentNewPose;
-                mContentNewPose = null;
-            }
-
-        }
-        super.onRender(elapsedRealTime, deltaTime);
-    }
-*/
-    public synchronized void setContent(TangoPoseData point, Content content) {
-        mContentPose = ScenePoseCalculator.toOpenGLPose(point);
-        mContentUpdated = true;
-        mContentData = content;
-    }
-
-    public synchronized void updateContentPosition(TangoPoseData newPoint) {
-        mContentNewPose = ScenePoseCalculator.toOpenGLPose(newPoint);
-    }
 
     /**
      * Update the scene camera based on the provided pose in Tango start of service frame.
@@ -254,6 +168,26 @@ public class WallyRenderer extends RajawaliRenderer {
 
     @Override
     public void onTouchEvent(MotionEvent event) {
+
+    }
+
+    @Override
+    public boolean onScale(ScaleGestureDetector detector) {
+        float scale = detector.getScaleFactor();
+        VisualContentManager.ActiveVisualContent activeVisualContent = mVisualContentManager.getActiveContent();
+        if(activeVisualContent != null){
+            activeVisualContent.getObject3D().setScale(scale);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onScaleBegin(ScaleGestureDetector detector) {
+        return false;
+    }
+
+    @Override
+    public void onScaleEnd(ScaleGestureDetector detector) {
 
     }
 }
