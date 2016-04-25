@@ -18,6 +18,7 @@ import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
 import com.google.atap.tangoservice.TangoErrorException;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class ADFChooser extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if (!hasADFPermissions()) {
+        if (Utils.hasNoADFPermissions(getBaseContext())) {
             requestADFPermission();
         }
     }
@@ -43,7 +44,7 @@ public class ADFChooser extends AppCompatActivity {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         synchronized (this) {
-            if (!hasADFPermissions()) {
+            if (Utils.hasNoADFPermissions(getBaseContext())) {
                 Log.i(TAG, "onResume: Didn't have ADF permission returning.");
             } else {
                 loadRecycler();
@@ -89,10 +90,6 @@ public class ADFChooser extends AppCompatActivity {
         startActivityForResult(
                 Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
                 Tango.TANGO_INTENT_ACTIVITYCODE);
-    }
-
-    private boolean hasADFPermissions() {
-        return Tango.hasPermission(getBaseContext(), Tango.PERMISSIONTYPE_ADF_LOAD_SAVE);
     }
 
 

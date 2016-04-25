@@ -2,13 +2,12 @@ package com.wally.wally;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -20,10 +19,10 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.wally.wally.dal.Content;
+import com.wally.wally.datacontroller.content.Content;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import com.google.atap.tangoservice.Tango;
+
 import java.text.DateFormat;
 
 /**
@@ -71,6 +70,10 @@ public final class Utils {
         }
     }
 
+    public static boolean hasNoADFPermissions(Context context) {
+        return !Tango.hasPermission(context, Tango.PERMISSIONTYPE_ADF_LOAD_SAVE);
+    }
+
     public static Bitmap createBitmapFromContent(Content content, Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -108,27 +111,7 @@ public final class Utils {
         final Bitmap bitmap = Bitmap.createBitmap(cv.getMeasuredWidth(),
                 cv.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-
         cv.draw(canvas);
-
-//        Matrix m = new Matrix();
-//        m.preScale(-1, 1);
-//        Bitmap dst = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, false);
-//        dst.setDensity(DisplayMetrics.DENSITY_DEFAULT);
-
-        // TODO del
-//        String filename = "pippo.png";
-//        File sd = Environment.getExternalStorageDirectory();
-//        File dest = new File(sd, filename);
-//
-//        try {
-//            FileOutputStream out = new FileOutputStream(dest);
-//            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-//            out.flush();
-//            out.close();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
         return bitmap;
     }
 }

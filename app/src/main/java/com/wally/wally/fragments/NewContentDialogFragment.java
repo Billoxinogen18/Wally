@@ -21,7 +21,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.wally.wally.R;
 import com.wally.wally.activities.ChoosePhotoActivity;
-import com.wally.wally.dal.Content;
+import com.wally.wally.datacontroller.content.Content;
 
 /**
  * New Post dialog, that manages adding new content.

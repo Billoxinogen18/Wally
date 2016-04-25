@@ -21,7 +21,7 @@ import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.WallyRenderer;
-import com.wally.wally.dal.Content;
+import com.wally.wally.datacontroller.content.Content;
 
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -65,8 +65,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         mTangoUx = new TangoUx(context);
         this.adfUuid = adfUuid;
 
-        TangoUxLayout mTangoUxLayout = tangoUxLayout;
-        mTangoUx.setLayout(mTangoUxLayout);
+        mTangoUx.setLayout(tangoUxLayout);
 
         mPointCloudManager = new TangoPointCloudManager();
     }
