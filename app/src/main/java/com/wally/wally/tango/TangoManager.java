@@ -60,8 +60,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         mTangoUx = new TangoUx(context);
         this.adfUuid = adfUuid;
 
-        TangoUxLayout mTangoUxLayout = tangoUxLayout;
-        mTangoUx.setLayout(mTangoUxLayout);
+        mTangoUx.setLayout(tangoUxLayout);
 
         mPointCloudManager = new TangoPointCloudManager();
     }

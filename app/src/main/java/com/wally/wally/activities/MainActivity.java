@@ -27,6 +27,7 @@ import android.view.View;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 import com.wally.wally.dal.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.fragments.PreviewContentDialogFragment;
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
         mTangoManager = new TangoManager(this, mSurfaceView, mTangoUxLayout, adfUuid);
 
 
-        if (!hasADFPermissions()) {
+        if (Utils.hasNoADFPermissions(getBaseContext())) {
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
             requestADFPermission();
         }
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         // TODO check if here shoud be synchronized or not
-        if (!hasADFPermissions()) {
+        if (Utils.hasNoADFPermissions(getBaseContext())) {
             Log.i(TAG, "onResume: Didn't have ADF permission returning.");
             return;
 
@@ -99,9 +100,6 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
                 Tango.TANGO_INTENT_ACTIVITYCODE);
     }
 
-    private boolean hasADFPermissions() {
-        return Tango.hasPermission(getBaseContext(), Tango.PERMISSIONTYPE_ADF_LOAD_SAVE);
-    }
 
     /**
      * Returns intent to start main activity.

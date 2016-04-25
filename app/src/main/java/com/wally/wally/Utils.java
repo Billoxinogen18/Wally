@@ -7,6 +7,8 @@ import android.support.v4.app.ActivityCompat;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 
+import com.google.atap.tangoservice.Tango;
+
 import java.text.DateFormat;
 
 /**
@@ -53,4 +55,9 @@ public final class Utils {
             return DateUtils.formatDateTime(context, date, DateUtils.FORMAT_ABBREV_ALL);
         }
     }
+
+    public static boolean hasNoADFPermissions(Context context) {
+        return !Tango.hasPermission(context, Tango.PERMISSIONTYPE_ADF_LOAD_SAVE);
+    }
+
 }
