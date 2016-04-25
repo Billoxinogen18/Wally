@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.wally.wally.components.SquareRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:padding="16dp">
 
@@ -29,6 +29,7 @@
         android:layout_marginBottom="16dp"
         android:background="@null"
         android:fontFamily="serif"
+        android:minLines="2"
         android:padding="8dp"
         android:scrollbars="none"
         android:textSize="16sp"
@@ -43,4 +44,4 @@
         android:scaleType="centerCrop"
         android:src="@drawable/ic_btn_map_75dp"
         android:visibility="visible" />
-</RelativeLayout>
+</com.wally.wally.components.SquareRelativeLayout>

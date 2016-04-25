@@ -27,21 +27,25 @@ import android.view.View;
 
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
-import com.google.atap.tangoservice.TangoPoseData;
 import com.wally.wally.R;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.Utils;
 import com.wally.wally.fragments.NewContentDialogFragment;
+import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 
-public class MainActivity extends AppCompatActivity implements NewContentDialogFragment.NewContentDialogListener {
+public class MainActivity extends AppCompatActivity implements
+        NewContentDialogFragment.NewContentDialogListener,
+        ContentFitter.FittingStatusListener {
+
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String ARG_ADF_UUID = "ARG_ADF_UUID";
 
     private TangoManager mTangoManager;
+    private ContentFitter mContentFitter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +62,21 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
             requestADFPermission();
         }
+
+        // Restore states here
+        if (savedInstanceState != null && savedInstanceState.containsKey("FITTING_CONTENT")) {
+            Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
+            mContentFitter = new ContentFitter(getBaseContext(), c, mTangoManager);
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mTangoManager.onPause();
+        if (mContentFitter != null) {
+            mContentFitter.cancel(true);
+        }
     }
 
     @Override
@@ -78,6 +91,11 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
 
         }
         mTangoManager.onResume();
+        if (mContentFitter != null) {
+            mContentFitter = new ContentFitter(getBaseContext(), mContentFitter.getContent(), mTangoManager);
+            mContentFitter.setFittingStatusListener(this);
+            mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
     }
 
     public void onNewContentClick(View v) {
@@ -92,8 +110,31 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
 
     @Override
     public void onContentCreated(Content content) {
-        Log.d(TAG, "onContentCreated() called with: " + "content = [" + content + "]");
-        mTangoManager.startContentFitting(content);
+        if (mContentFitter != null) {
+            Log.e(TAG, "onContentCreated: called when content was already fitting");
+            return;
+        }
+        mContentFitter = new ContentFitter(getBaseContext(), content, mTangoManager);
+        mContentFitter.setFittingStatusListener(this);
+        mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    @Override
+    public void onContentFit(boolean isValidPlane) {
+        // TODO show green button
+        Log.i(TAG, "onContentFit: isValidPlane = " + isValidPlane);
+    }
+
+    @Override
+    public void onContentFitError() {
+        // TODO show red button and disable
+        Log.i(TAG, "onContentFitError: ");
+    }
+
+    @Override
+    public void onAbortFitting() {
+        // TODO return to add mode
+        Log.i(TAG, "onAbortFitting: ");
     }
 
 
@@ -102,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
                 Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
                 Tango.TANGO_INTENT_ACTIVITYCODE);
     }
-
 
     /**
      * Returns intent to start main activity.
@@ -116,10 +156,12 @@ public class MainActivity extends AppCompatActivity implements NewContentDialogF
         return i;
     }
 
-    private class ContentFitter extends AsyncTask<Content, TangoPoseData, Void> {
-        @Override
-        protected Void doInBackground(Content... params) {
-            return null;
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mContentFitter != null) {
+            outState.putSerializable("FITTING_CONTENT", mContentFitter.getContent());
         }
     }
 }

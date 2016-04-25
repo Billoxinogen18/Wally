@@ -60,7 +60,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private boolean mIsFrameAvailableTangoThread;
     private double mRgbTimestampGlThread;
 
-    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid){
+    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid) {
         mContext = context;
         mSurfaceView = rajawaliSurfaceView;
         mVisualContentManager = new VisualContentManager();
@@ -190,46 +190,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         }
     }
 
-    public void startContentFitting(final Content content) {
-        // TODO add handlers for UI button managing. ¬
-        new AsyncTask<Void, TangoPoseData, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                Bitmap bitmap = Utils.createBitmapFromContent(content,mContext);
-                Pose pose = ScenePoseCalculator.toOpenGLPose(doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread));
-                VisualContentManager.ActiveVisualContent activeVisualContent = new VisualContentManager.ActiveVisualContent(bitmap, pose);
-                mVisualContentManager.setActiveContent(activeVisualContent);
-                while (true) {
-                    if (isCancelled()) {
-                        break;
-                    }
-                    try {
-                        Thread.sleep(600);
-                        publishProgress(doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                return null;
-            }
-
-            @Override
-            protected void onProgressUpdate(TangoPoseData... newPose) {
-                super.onProgressUpdate(newPose);
-                if (newPose != null) {
-                    Log.d(TAG, "onProgressUpdate() called with: " + "newPose = [" + newPose[0].toString() + "]");
-                    mVisualContentManager.getActiveContent().setNewPost(ScenePoseCalculator.toOpenGLPose(newPose[0]));
-                }
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                mVisualContentManager.activeContentAdded();
-            }
-        }.execute();
-    }
-
     /**
      * Connects the view and renderer to the color camara and callbacks.
      */
@@ -304,6 +264,35 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
                 return true;
             }
         });
+    }
+
+    public boolean isConnected() {
+        return mIsConnected;
+    }
+
+    /**
+     * Finds plane pose in the middle of the screen.
+     */
+    public TangoPoseData findPlaneInMiddle() {
+        return doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread);
+    }
+
+    public void setActiveContent(Bitmap bitmap, TangoPoseData pose) {
+        VisualContentManager.ActiveVisualContent activeVisualContent = new VisualContentManager
+                .ActiveVisualContent(bitmap, ScenePoseCalculator.toOpenGLPose(pose));
+        mVisualContentManager.setActiveContent(activeVisualContent);
+    }
+
+    public void updateActiveContent(TangoPoseData newPose) {
+        mVisualContentManager.getActiveContent().setNewPost(ScenePoseCalculator.toOpenGLPose(newPose));
+    }
+
+    public void addActiveToStaticContent() {
+        mVisualContentManager.activeContentAdded();
+    }
+
+    public void removeActiveContent() {
+        mVisualContentManager.setActiveContent(null);
     }
 
     /**

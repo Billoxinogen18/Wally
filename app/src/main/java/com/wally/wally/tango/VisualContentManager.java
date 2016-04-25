@@ -32,7 +32,7 @@ public class VisualContentManager {
     private List<VisualContent> staticContent = null;
     private ActiveVisualContent activeContent = null;
 
-    public VisualContentManager () {
+    public VisualContentManager() {
         staticContent = new ArrayList<>();
     }
 
@@ -40,12 +40,12 @@ public class VisualContentManager {
         return activeContent != null;
     }
 
-    public void activeContentAdded(){
+    public void activeContentAdded() {
         addStaticContent(activeContent);
         activeContent = null;
     }
 
-    public boolean hasStaticContent(){
+    public boolean hasStaticContent() {
         return staticContent != null && staticContent.size() > 0;
     }
 
@@ -65,17 +65,17 @@ public class VisualContentManager {
         return activeContent;
     }
 
-    public static class VisualContent{
+    public static class VisualContent {
         protected Object3D mContent3D = null;
         private Bitmap mBitmap;
         protected Pose mContentPose;
 
-        public VisualContent(Bitmap bitmap, Pose contentPose){
+        public VisualContent(Bitmap bitmap, Pose contentPose) {
             this.mBitmap = bitmap;
             this.mContentPose = contentPose;
         }
 
-        public Object3D getObject3D(){
+        public Object3D getObject3D() {
             if (mContent3D != null) return mContent3D;
             Material material = new Material();
             try {
@@ -88,7 +88,9 @@ public class VisualContentManager {
             material.enableLighting(true);
             material.setDiffuseMethod(new DiffuseMethod.Lambert());
 
-            mContent3D = new ContentPlane(1f, 1.6f, 1, 1);
+            float bitmapRatio = (float) mBitmap.getHeight() / mBitmap.getWidth();
+            float planeWidth = 1f;
+            mContent3D = new ContentPlane(planeWidth, planeWidth * bitmapRatio, 1, 1);
             mContent3D.setMaterial(material);
             mContent3D.setPosition(mContentPose.getPosition());
             mContent3D.setRotation(mContentPose.getOrientation());
@@ -96,12 +98,12 @@ public class VisualContentManager {
         }
     }
 
-    public static class ActiveVisualContent extends  VisualContent{
+    public static class ActiveVisualContent extends VisualContent {
         private Animation3D mMoveAnim = null;
         private Pose mNewPose;
         private boolean isNotYetAddedOnTheScene;
 
-        public ActiveVisualContent(Bitmap bitmap, Pose contentPose){
+        public ActiveVisualContent(Bitmap bitmap, Pose contentPose) {
             super(bitmap, contentPose);
             isNotYetAddedOnTheScene = true;
             mNewPose = null;
@@ -115,7 +117,7 @@ public class VisualContentManager {
             this.isNotYetAddedOnTheScene = isNotYetAddedOnTheScene;
         }
 
-        public void setNewPost(Pose newPose){
+        public void setNewPost(Pose newPose) {
             mNewPose = newPose;
         }
 
@@ -123,7 +125,7 @@ public class VisualContentManager {
             return mNewPose;
         }
 
-        public void animate(RajawaliScene scene){
+        public void animate(RajawaliScene scene) {
             if (mMoveAnim != null) {
                 mMoveAnim.pause();
                 scene.unregisterAnimation(mMoveAnim);

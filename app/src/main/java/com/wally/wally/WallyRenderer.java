@@ -52,10 +52,12 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     // Augmented reality related fields
     private ATexture mTangoCameraTexture;
     private boolean mSceneCameraConfigured;
+    private ScaleGestureDetector mScaleDetector;
 
     public WallyRenderer(Context context, VisualContentManager visualContentManager) {
         super(context);
         mVisualContentManager = visualContentManager;
+        mScaleDetector = new ScaleGestureDetector(context, this);
     }
 
     @Override
@@ -85,27 +87,27 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     }
 
 
-    private void renderStaticContent(){
-        for(VisualContentManager.VisualContent vContent : mVisualContentManager.getStaticContent()){
+    private void renderStaticContent() {
+        for (VisualContentManager.VisualContent vContent : mVisualContentManager.getStaticContent()) {
             getCurrentScene().addChild(vContent.getObject3D());
         }
     }
 
-    private void renderActiveContent(){
+    private void renderActiveContent() {
         VisualContentManager.ActiveVisualContent activeContent = mVisualContentManager.getActiveContent();
-        if(activeContent == null) return;
-        if (activeContent.isNotYetAddedOnTheScene()){
+        if (activeContent == null) return;
+        if (activeContent.isNotYetAddedOnTheScene()) {
             getCurrentScene().addChild(activeContent.getObject3D());
             activeContent.setIsNotYetAddedOnTheScene(false);
-        } else if (activeContent.getNewPose() != null){
+        } else if (activeContent.getNewPose() != null) {
             activeContent.animate(getCurrentScene());
         }
     }
 
     @Override
     protected void onRender(long elapsedRealTime, double deltaTime) {
-        synchronized (this){
-            if (mVisualContentManager.isContentBeingAdded()){
+        synchronized (this) {
+            if (mVisualContentManager.isContentBeingAdded()) {
                 renderActiveContent();
             }
         }
@@ -168,14 +170,15 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
 
     @Override
     public void onTouchEvent(MotionEvent event) {
-
+        mScaleDetector.onTouchEvent(event);
     }
 
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
+        Log.d(TAG, "onScale() called with: " + "detector = [" + detector + "]");
         float scale = detector.getScaleFactor();
         VisualContentManager.ActiveVisualContent activeVisualContent = mVisualContentManager.getActiveContent();
-        if(activeVisualContent != null){
+        if (activeVisualContent != null) {
             activeVisualContent.getObject3D().setScale(scale);
         }
         return true;
