@@ -48,6 +48,7 @@ import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.tango.VisualContentManager;
 
 /**
  * Very simple example point to point renderer which displays a line fixed in place.
@@ -66,12 +67,15 @@ public class WallyRenderer extends RajawaliRenderer {
     private Pose mContentNewPose;
     private boolean mContentUpdated = false;
 
+    private VisualContentManager mVisualContentManager;
+
     // Augmented reality related fields
     private ATexture mTangoCameraTexture;
     private boolean mSceneCameraConfigured;
 
-    public WallyRenderer(Context context) {
+    public WallyRenderer(Context context, VisualContentManager visualContentManager) {
         super(context);
+        mVisualContentManager = visualContentManager;
     }
 
     @Override
@@ -98,6 +102,35 @@ public class WallyRenderer extends RajawaliRenderer {
         mContent3DLight.setPower(1);
     }
 
+
+    private void renderStaticContent(){
+        for(VisualContentManager.VisualContent vContent : mVisualContentManager.getStaticContent()){
+            getCurrentScene().addChild(vContent.getObject3D());
+        }
+    }
+
+    private void renderActiveContent(){
+        VisualContentManager.ActiveVisualContent activeContent = mVisualContentManager.getActiveContent();
+        if(activeContent == null) return;
+        if (activeContent.isNotYetAddedOnTheScene()){
+            getCurrentScene().addChild(activeContent.getObject3D());
+            activeContent.setIsNotYetAddedOnTheScene(false);
+        } else if (activeContent.getNewPose() != null){
+            activeContent.animate(getCurrentScene());
+        }
+    }
+
+    @Override
+    protected void onRender(long elapsedRealTime, double deltaTime) {
+        synchronized (this){
+            if (mVisualContentManager.isContentBeingAdded()){
+                renderActiveContent();
+            }
+        }
+        super.onRender(elapsedRealTime, deltaTime);
+    }
+
+    /*
     @Override
     protected void onRender(long elapsedRealTime, double deltaTime) {
         // Update the AR object if necessary
@@ -160,7 +193,7 @@ public class WallyRenderer extends RajawaliRenderer {
         }
         super.onRender(elapsedRealTime, deltaTime);
     }
-
+*/
     public synchronized void setContent(TangoPoseData point, Content content) {
         mContentPose = ScenePoseCalculator.toOpenGLPose(point);
         mContentUpdated = true;

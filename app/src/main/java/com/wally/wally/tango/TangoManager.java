@@ -1,8 +1,8 @@
 package com.wally.wally.tango;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.transition.Scene;
 import android.util.Log;
 
 import com.google.atap.tango.ux.TangoUx;
@@ -20,6 +20,7 @@ import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
+import com.wally.wally.Utils;
 import com.wally.wally.WallyRenderer;
 import com.wally.wally.datacontroller.content.Content;
 
@@ -50,6 +51,8 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private String adfUuid;
     private double mCameraPoseTimestamp = 0;
     private boolean mIsConnected;
+    private VisualContentManager mVisualContentManager;
+    private Context mContext;
 
     // Texture rendering related fields
     // NOTE: Naming indicates which thread is in charge of updating this variable
@@ -57,9 +60,11 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private boolean mIsFrameAvailableTangoThread;
     private double mRgbTimestampGlThread;
 
-    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid) {
+    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid){
+        mContext = context;
         mSurfaceView = rajawaliSurfaceView;
-        mRenderer = new WallyRenderer(context.getApplicationContext());
+        mVisualContentManager = new VisualContentManager();
+        mRenderer = new WallyRenderer(context.getApplicationContext(), mVisualContentManager);
         mSurfaceView.setSurfaceRenderer(mRenderer);
         mTango = new Tango(context);
         mTangoUx = new TangoUx(context);
@@ -190,7 +195,10 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         new AsyncTask<Void, TangoPoseData, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                mRenderer.setContent(doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread), content);
+                Bitmap bitmap = Utils.createBitmapFromContent(content,mContext);
+                Pose pose = ScenePoseCalculator.toOpenGLPose(doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread));
+                VisualContentManager.ActiveVisualContent activeVisualContent = new VisualContentManager.ActiveVisualContent(bitmap, pose);
+                mVisualContentManager.setActiveContent(activeVisualContent);
                 while (true) {
                     if (isCancelled()) {
                         break;
@@ -210,18 +218,17 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
                 super.onProgressUpdate(newPose);
                 if (newPose != null) {
                     Log.d(TAG, "onProgressUpdate() called with: " + "newPose = [" + newPose[0].toString() + "]");
-                    mRenderer.updateContentPosition(newPose[0]);
+                    mVisualContentManager.getActiveContent().setNewPost(ScenePoseCalculator.toOpenGLPose(newPose[0]));
                 }
             }
 
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                mRenderer.setContent(null, null);
+                mVisualContentManager.activeContentAdded();
             }
         }.execute();
     }
-
 
     /**
      * Connects the view and renderer to the color camara and callbacks.
