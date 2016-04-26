@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(TAG, "call() called with: " + "result = [" + result + "], e = [" + e + "]");
                 VisualContentManager visualContentManager = mTangoManager.getVisualContentManager();
                 for (Content c : result) {
-                    Bitmap bitmap = Utils.createBitmapFromContent(c, getApplicationContext());
+                    Bitmap bitmap = Utils.createBitmapFromContent(c, getBaseContext());
                     Pose pose = c.getTangoData().getPose();
                     visualContentManager.addStaticContent(new VisualContentManager.VisualContent(bitmap, pose));
                 }

@@ -2,7 +2,6 @@ package com.wally.wally;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,9 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.wally.wally.datacontroller.content.Content;
-
 import com.google.atap.tangoservice.Tango;
+import com.wally.wally.datacontroller.content.Content;
 
 import java.text.DateFormat;
 
@@ -90,11 +88,14 @@ public final class Utils {
         noteTV.setVisibility(TextUtils.isEmpty(noteTV.getText()) ? View.GONE : View.VISIBLE);
 
         try {
-            Drawable image = Glide.with(context)
-                    .load(content.getImageUri())
-                    .fitCenter()
-                    .into(700, 700)
-                    .get();
+            Drawable image = null;
+            if (!TextUtils.isEmpty(content.getImageUri())) {
+                image = Glide.with(context)
+                        .load(content.getImageUri())
+                        .fitCenter()
+                        .into(700, 700)
+                        .get();
+            }
             imageView.setVisibility(image == null ? View.GONE : View.VISIBLE);
             imageView.setImageDrawable(image);
         } catch (Exception e) {
