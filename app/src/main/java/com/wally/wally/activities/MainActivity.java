@@ -31,6 +31,7 @@ import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.Pose;
+import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements
     private List<View> mNonFittingModeViews;
     private View mLayoutFitting;
     private FloatingActionButton mFinishFitting;
+    private String adfUuid;
 
     /**
      * Returns intent to start main activity.
@@ -82,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements
 
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
-        String adfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
+        adfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
         mTangoManager = new TangoManager(this, mSurfaceView, mTangoUxLayout, adfUuid);
 
         mLayoutFitting = findViewById(R.id.layout_fitting);
@@ -107,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements
         ((App) getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
             @Override
             public void call(Collection<Content> result, Exception e) {
+                Log.d(TAG, "call() called with: " + "result = [" + result + "], e = [" + e + "]");
                 VisualContentManager visualContentManager = mTangoManager.getVisualContentManager();
                 for (Content c : result) {
                     Bitmap bitmap = Utils.createBitmapFromContent(c, getApplicationContext());
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void saveActiveContent(Content content, Pose pose) {
         TangoData tangoData = new TangoData(pose);
-        content.setTangoData(tangoData);
+        content.withTangoData(tangoData).withUuid(adfUuid);
         ((App) getApplicationContext()).getDataController().save(content);
     }
 
@@ -196,10 +199,12 @@ public class MainActivity extends AppCompatActivity implements
 
     public void finishFitting(View v) {
         mContentFitter.finishFitting();
-        mContentFitter = null;
         changeFittingMode(false);
 
         // TODO save content
+        saveActiveContent(mContentFitter.getContent(), ScenePoseCalculator.toOpenGLPose(mContentFitter.getPose()));
+        mContentFitter = null;
+
     }
 
     private void changeFittingMode(boolean startFittingMode) {

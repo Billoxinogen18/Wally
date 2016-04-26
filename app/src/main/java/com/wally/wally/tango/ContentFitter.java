@@ -23,6 +23,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     private Content mContent;
     private Context mContext;
     private FittingStatusListener mFittingStatusListener;
+    private TangoPoseData lastPose;
 
     public ContentFitter(Context context, Content content, TangoManager tangoManager) {
         mContext = context;
@@ -82,10 +83,15 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
             newPose = null;
         }
         mFittingStatusListener.onContentFit(newPose);
-
+        lastPose = newPose;
         if (newPose != null) {
             mTangoManager.updateActiveContent(newPose);
         }
+
+    }
+
+    public TangoPoseData getPose(){
+        return lastPose;
     }
 
     @Override
