@@ -2,7 +2,6 @@ package com.wally.wally.tango;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.atap.tango.ux.TangoUx;
@@ -16,13 +15,10 @@ import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
-import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
-import com.wally.wally.Utils;
 import com.wally.wally.WallyRenderer;
-import com.wally.wally.datacontroller.content.Content;
 
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -284,14 +280,17 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     }
 
     public void updateActiveContent(TangoPoseData newPose) {
-        mVisualContentManager.getActiveContent().setNewPost(ScenePoseCalculator.toOpenGLPose(newPose));
+        if (mVisualContentManager.getActiveContent() != null) {
+            mVisualContentManager.getActiveContent().setNewPost(ScenePoseCalculator.toOpenGLPose(newPose));
+        }
     }
 
     public void addActiveToStaticContent() {
-        mVisualContentManager.activeContentAdded();
+        mVisualContentManager.activeContentAddingFinished();
     }
 
     public void removeActiveContent() {
+        Log.i(TAG, "removeActiveContent()");
         mVisualContentManager.setActiveContent(null);
     }
 

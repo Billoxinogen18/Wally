@@ -17,7 +17,7 @@ import com.wally.wally.datacontroller.content.Content;
  * <p/>
  * Created by ioane5 on 4/26/16.
  */
-public class ContentFitter extends AsyncTask<Void, TangoPoseData, Boolean> {
+public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
 
     private TangoManager mTangoManager;
     private Content mContent;
@@ -39,14 +39,26 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Boolean> {
     }
 
     @Override
-    protected Boolean doInBackground(Void... params) {
+    protected Void doInBackground(Void... params) {
         Bitmap bitmap = Utils.createBitmapFromContent(mContent, mContext);
 
         TangoPoseData tangoPoseData = getValidPose();
-        if (tangoPoseData == null) {
-            return false;
+        while (tangoPoseData == null) {
+            tangoPoseData = getValidPose();
+            mFittingStatusListener.onContentFit(null);
+            if (isCancelled()) {
+                return null;
+            }
+            try {
+                Thread.sleep(600);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
+        mFittingStatusListener.onContentFit(null);
         mTangoManager.setActiveContent(bitmap, tangoPoseData);
+
         // Update content timely, while we are cancelled.
         while (true) {
             if (isCancelled()) {
@@ -59,73 +71,64 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Boolean> {
                 e.printStackTrace();
             }
         }
-        return true;
+        return null;
     }
 
     @Override
-    protected void onProgressUpdate(TangoPoseData... newPose) {
-        super.onProgressUpdate(newPose);
-        if (mTangoManager.isConnected()) {
-            mFittingStatusListener.onContentFit(newPose != null);
-        } else {
-            mFittingStatusListener.onContentFitError();
+    protected void onProgressUpdate(TangoPoseData... newPoses) {
+        super.onProgressUpdate(newPoses);
+        TangoPoseData newPose = (newPoses != null && newPoses.length > 0) ? newPoses[0] : null;
+        if (newPose != null && newPose.statusCode == TangoPoseData.POSE_INVALID) {
+            newPose = null;
         }
+        mFittingStatusListener.onContentFit(newPose);
 
         if (newPose != null) {
-            mTangoManager.updateActiveContent(newPose[0]);
+            mTangoManager.updateActiveContent(newPose);
         }
     }
 
     @Override
-    protected void onPostExecute(Boolean success) {
-        super.onPostExecute(success);
-        if (success == null || !success) {
-            mFittingStatusListener.onAbortFitting();
-        }
+    protected void onCancelled() {
+        super.onCancelled();
         mTangoManager.removeActiveContent();
+    }
+
+    @Override
+    protected void onPostExecute(Void v) {
+        super.onPostExecute(v);
+        mTangoManager.removeActiveContent();
+    }
+
+    public void finishFitting() {
+        mTangoManager.addActiveToStaticContent();
+        cancel(true);
     }
 
     /**
      * Tries to get valid plane pose, null if interrupted.
      */
     private TangoPoseData getValidPose() {
-        while (true) {
-            if (mTangoManager.isConnected()) {
-                TangoPoseData tangoPose;
-                try {
-                    tangoPose = mTangoManager.findPlaneInMiddle();
-                    if (tangoPose != null) {
-                        return tangoPose;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+        if (mTangoManager.isConnected()) {
+            TangoPoseData tangoPose;
             try {
-                Thread.sleep(600);
-            } catch (InterruptedException e) {
+                tangoPose = mTangoManager.findPlaneInMiddle();
+                if (tangoPose != null) {
+                    return tangoPose;
+                }
+            } catch (Exception e) {
                 e.printStackTrace();
-                return null;
             }
         }
+        return null;
     }
 
     public interface FittingStatusListener {
 
         /**
-         * @param isValidPlane if the plane is valid and content can be placed.
+         * @param pose if the plane is valid and content can be placed. or null if invalid
          */
-        void onContentFit(boolean isValidPlane);
-
-        /**
-         * Something bad happened, maybe TangoManager has lost contact or something.
-         */
-        void onContentFitError();
-
-        /**
-         * Aborted fitting, show an error to the user.
-         */
-        void onAbortFitting();
+        void onContentFit(TangoPoseData pose);
     }
 }
 

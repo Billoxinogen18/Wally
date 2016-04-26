@@ -21,12 +21,14 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
+import com.google.atap.tangoservice.TangoPoseData;
 import com.wally.wally.R;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.Utils;
@@ -35,6 +37,9 @@ import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -47,6 +52,10 @@ public class MainActivity extends AppCompatActivity implements
     private TangoManager mTangoManager;
     private ContentFitter mContentFitter;
 
+    private List<View> mNonFittingModeViews;
+    private View mLayoutFitting;
+    private FloatingActionButton mFinishFitting;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements
         String adfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
         mTangoManager = new TangoManager(this, mSurfaceView, mTangoUxLayout, adfUuid);
 
+        mLayoutFitting = findViewById(R.id.layout_fitting);
+        mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
+        mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
 
         if (Utils.hasNoADFPermissions(getBaseContext())) {
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
@@ -92,7 +104,9 @@ public class MainActivity extends AppCompatActivity implements
         }
         mTangoManager.onResume();
         if (mContentFitter != null) {
-            mContentFitter = new ContentFitter(getBaseContext(), mContentFitter.getContent(), mTangoManager);
+            if (mContentFitter.isCancelled()) {
+                mContentFitter = new ContentFitter(getBaseContext(), mContentFitter.getContent(), mTangoManager);
+            }
             mContentFitter.setFittingStatusListener(this);
             mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
@@ -117,26 +131,42 @@ public class MainActivity extends AppCompatActivity implements
         mContentFitter = new ContentFitter(getBaseContext(), content, mTangoManager);
         mContentFitter.setFittingStatusListener(this);
         mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        changeFittingMode(true);
     }
 
     @Override
-    public void onContentFit(boolean isValidPlane) {
-        // TODO show green button
-        Log.i(TAG, "onContentFit: isValidPlane = " + isValidPlane);
+    public void onContentFit(final TangoPoseData pose) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mFinishFitting.setEnabled(pose != null);
+
+            }
+        });
     }
 
-    @Override
-    public void onContentFitError() {
-        // TODO show red button and disable
-        Log.i(TAG, "onContentFitError: ");
+    public void cancelFitting(View v) {
+        mContentFitter.cancel(true);
+        mContentFitter = null;
+        changeFittingMode(false);
     }
 
-    @Override
-    public void onAbortFitting() {
-        // TODO return to add mode
-        Log.i(TAG, "onAbortFitting: ");
+
+    public void finishFitting(View v) {
+        mContentFitter.finishFitting();
+        mContentFitter = null;
+        changeFittingMode(false);
+
+        // TODO save content
     }
 
+    private void changeFittingMode(boolean startFittingMode) {
+        mLayoutFitting.setVisibility(startFittingMode ? View.VISIBLE : View.GONE);
+        for (View v : mNonFittingModeViews) {
+            v.setVisibility(startFittingMode ? View.GONE : View.VISIBLE);
+        }
+    }
 
     private void requestADFPermission() {
         startActivityForResult(

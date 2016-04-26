@@ -40,7 +40,7 @@ public class VisualContentManager {
         return activeContent != null;
     }
 
-    public void activeContentAdded() {
+    public void activeContentAddingFinished() {
         addStaticContent(activeContent);
         activeContent = null;
     }

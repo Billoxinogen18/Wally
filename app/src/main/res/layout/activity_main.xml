@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         surfaceview:frameRate="60.0"
-        surfaceview:renderMode="RENDER_WHEN_DIRTY"/>
+        surfaceview:renderMode="RENDER_WHEN_DIRTY" />
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -69,10 +69,32 @@
             android:padding="20dp" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/layout_fitting"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_gravity="bottom"
+        android:gravity="center_horizontal|top"
+        android:orientation="horizontal"
+        android:visibility="gone">
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_cancel_fitting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="cancelFitting"
+            android:src="@drawable/ic_cancel_white_24dp"
+            app:backgroundTint="@color/cancel_button_color" />
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_finish_fitting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="finishFitting"
+            android:src="@drawable/ic_accept_white_24dp"
+            app:backgroundTint="@color/accept_button_color" />
 
-
+    </LinearLayout>
     <!-- Map button -->
     <android.support.v7.widget.CardView
         android:id="@+id/btn_map"
@@ -81,10 +103,10 @@
         android:layout_gravity="bottom|start"
         android:layout_margin="@dimen/fab_margin"
         android:foreground="?attr/selectableItemBackground"
+        android:onClick="onBtnMapClick"
         android:stateListAnimator="@animator/raise"
         app:layout_behavior="com.wally.wally.components.MoveUpwardBehavior"
-        tools:targetApi="lollipop"
-        android:onClick="onBtnMapClick">
+        tools:targetApi="lollipop">
 
         <ImageView
             android:id="@+id/map_background_image"
@@ -96,6 +118,7 @@
     </android.support.v7.widget.CardView>
 
     <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_new_post"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

@@ -6,4 +6,7 @@
 
     <color name="watermark">#333333</color>
     <color name="transparent_activity_background">#a4000000</color>
+
+    <color name="cancel_button_color">#F44336</color>
+    <color name="accept_button_color">#4CAF50</color>
 </resources>
