@@ -13,7 +13,7 @@ import java.util.Collection;
 
 public class DataController {
     private static final String FIREBASE_URL = "https://burning-inferno-2566.firebaseio.com/";
-    private static final String CONTENT_DB_NAME = "Test";
+    private static final String CONTENT_DB_NAME = "Contents";
     private static DataController instance;
 
     private DataAccessLayer<Content, FirebaseQuery> contentManager;
