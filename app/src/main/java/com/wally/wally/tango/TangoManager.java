@@ -29,14 +29,11 @@ import java.util.ArrayList;
  * Created by shota on 4/21/16.
  */
 public class TangoManager implements Tango.OnTangoUpdateListener {
-    private static final String TAG = TangoManager.class.getSimpleName();
-    private static final int INVALID_TEXTURE_ID = -1;
-
     public static final TangoCoordinateFramePair FRAME_PAIR = new TangoCoordinateFramePair(
             TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
             TangoPoseData.COORDINATE_FRAME_DEVICE);
-
-
+    private static final String TAG = TangoManager.class.getSimpleName();
+    private static final int INVALID_TEXTURE_ID = -1;
     private RajawaliSurfaceView mSurfaceView;
     private WallyRenderer mRenderer;
     private TangoCameraIntrinsics mIntrinsics;
@@ -59,7 +56,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid) {
         mContext = context;
         mSurfaceView = rajawaliSurfaceView;
-        mVisualContentManager = null;
+        mVisualContentManager = new VisualContentManager();
         mRenderer = new WallyRenderer(context.getApplicationContext(), mVisualContentManager);
         mSurfaceView.setSurfaceRenderer(mRenderer);
         mTango = new Tango(context);
@@ -71,6 +68,31 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         mPointCloudManager = new TangoPointCloudManager();
     }
 
+    /**
+     * Calculates and stores the fixed transformations between the device and
+     * the various sensors to be used later for transformations between frames.
+     */
+    private static DeviceExtrinsics setupExtrinsics(Tango tango) {
+        // Create camera to IMU transform.
+        TangoCoordinateFramePair framePair = new TangoCoordinateFramePair();
+        framePair.baseFrame = TangoPoseData.COORDINATE_FRAME_IMU;
+        framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR;
+        TangoPoseData imuTrgbPose = tango.getPoseAtTime(0.0, framePair);
+
+        // Create device to IMU transform.
+        framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_DEVICE;
+        TangoPoseData imuTdevicePose = tango.getPoseAtTime(0.0, framePair);
+
+        // Create depth camera to IMU transform.
+        framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH;
+        TangoPoseData imuTdepthPose = tango.getPoseAtTime(0.0, framePair);
+
+        return new DeviceExtrinsics(imuTdevicePose, imuTrgbPose, imuTdepthPose);
+    }
+
+    public VisualContentManager getVisualContentManager() {
+        return mVisualContentManager;
+    }
 
     public void setVisualContentManager(VisualContentManager visualContentManager){
         mVisualContentManager = visualContentManager;
@@ -149,7 +171,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         mExtrinsics = setupExtrinsics(mTango);
         mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
     }
-
 
     @Override
     public void onPoseAvailable(TangoPoseData pose) {
@@ -294,7 +315,9 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     }
 
     public void removeActiveContent() {
-        Log.i(TAG, "removeActiveContent()");
+        if (mVisualContentManager.getActiveContent() != null) {
+            mRenderer.removeContent(mVisualContentManager.getActiveContent().getObject3D());
+        }
         mVisualContentManager.setActiveContent(null);
     }
 
@@ -332,28 +355,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
 
         return planeFitPose;
-    }
-
-    /**
-     * Calculates and stores the fixed transformations between the device and
-     * the various sensors to be used later for transformations between frames.
-     */
-    private static DeviceExtrinsics setupExtrinsics(Tango tango) {
-        // Create camera to IMU transform.
-        TangoCoordinateFramePair framePair = new TangoCoordinateFramePair();
-        framePair.baseFrame = TangoPoseData.COORDINATE_FRAME_IMU;
-        framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR;
-        TangoPoseData imuTrgbPose = tango.getPoseAtTime(0.0, framePair);
-
-        // Create device to IMU transform.
-        framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_DEVICE;
-        TangoPoseData imuTdevicePose = tango.getPoseAtTime(0.0, framePair);
-
-        // Create depth camera to IMU transform.
-        framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH;
-        TangoPoseData imuTdepthPose = tango.getPoseAtTime(0.0, framePair);
-
-        return new DeviceExtrinsics(imuTdevicePose, imuTrgbPose, imuTdepthPose);
     }
 
 }

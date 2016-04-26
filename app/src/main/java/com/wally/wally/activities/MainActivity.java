@@ -33,9 +33,9 @@ import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.App;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.ContentFitter;
@@ -44,9 +44,8 @@ import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
-import java.util.Collection;
-
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -63,6 +62,18 @@ public class MainActivity extends AppCompatActivity implements
     private List<View> mNonFittingModeViews;
     private View mLayoutFitting;
     private FloatingActionButton mFinishFitting;
+
+    /**
+     * Returns intent to start main activity.
+     *
+     * @param uuid can be null, if we want to start with learning mode.
+     */
+    public static Intent newIntent(Context context, @Nullable String uuid) {
+        Intent i = new Intent(context, MainActivity.class);
+        i.putExtra(ARG_ADF_UUID, uuid);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        return i;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +103,11 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void fetchContentForAdf(String adfUuid)
-    {
-        ((App)getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
+    private void fetchContentForAdf(String adfUuid) {
+        ((App) getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
             @Override
             public void call(Collection<Content> result, Exception e) {
-                VisualContentManager visualContentManager = new VisualContentManager();
+                VisualContentManager visualContentManager = mTangoManager.getVisualContentManager();
                 for (Content c : result) {
                     Bitmap bitmap = Utils.createBitmapFromContent(c, getApplicationContext());
                     Pose pose = c.getTangoData().getPose();
@@ -108,10 +118,10 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    private void saveActiveContent(Content content, Pose pose){
+    private void saveActiveContent(Content content, Pose pose) {
         TangoData tangoData = new TangoData(pose);
         content.setTangoData(tangoData);
-        ((App)getApplicationContext()).getDataController().save(content);
+        ((App) getApplicationContext()).getDataController().save(content);
     }
 
     @Override
@@ -184,7 +194,6 @@ public class MainActivity extends AppCompatActivity implements
         changeFittingMode(false);
     }
 
-
     public void finishFitting(View v) {
         mContentFitter.finishFitting();
         mContentFitter = null;
@@ -205,19 +214,6 @@ public class MainActivity extends AppCompatActivity implements
                 Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
                 Tango.TANGO_INTENT_ACTIVITYCODE);
     }
-
-    /**
-     * Returns intent to start main activity.
-     *
-     * @param uuid can be null, if we want to start with learning mode.
-     */
-    public static Intent newIntent(Context context, @Nullable String uuid) {
-        Intent i = new Intent(context, MainActivity.class);
-        i.putExtra(ARG_ADF_UUID, uuid);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        return i;
-    }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

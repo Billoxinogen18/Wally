@@ -27,6 +27,7 @@ public class VisualContentManager {
 
     private List<VisualContent> staticContent = null;
     private ActiveVisualContent activeContent = null;
+    private boolean mStaticContentShouldBeRendered = false;
 
     public VisualContentManager() {
         staticContent = new ArrayList<>();
@@ -34,6 +35,10 @@ public class VisualContentManager {
 
     public boolean isContentBeingAdded() {
         return activeContent != null;
+    }
+
+    public boolean getStaticContentShouldBeRendered() {
+        return mStaticContentShouldBeRendered;
     }
 
     public void activeContentAddingFinished() {
@@ -47,28 +52,33 @@ public class VisualContentManager {
 
     public synchronized void addStaticContent(VisualContent visualContent) {
         staticContent.add(visualContent);
+        mStaticContentShouldBeRendered = true;
     }
 
     public synchronized List<VisualContent> getStaticContent() {
         return staticContent;
     }
 
-    public synchronized void setActiveContent(ActiveVisualContent activeContent) {
-        this.activeContent = activeContent;
-    }
-
     public synchronized ActiveVisualContent getActiveContent() {
         return activeContent;
     }
 
+    public synchronized void setActiveContent(ActiveVisualContent activeContent) {
+        this.activeContent = activeContent;
+    }
+
     public static class VisualContent {
         protected Object3D mContent3D = null;
-        private Bitmap mBitmap;
         protected Pose mContentPose;
+        private Bitmap mBitmap;
 
         public VisualContent(Bitmap bitmap, Pose contentPose) {
             this.mBitmap = bitmap;
             this.mContentPose = contentPose;
+        }
+
+        public boolean isNotRendered() {
+            return mContent3D == null;
         }
 
         public Object3D getObject3D() {

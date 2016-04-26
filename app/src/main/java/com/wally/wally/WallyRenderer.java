@@ -27,6 +27,7 @@ import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.tango.VisualContentManager;
 
+import org.rajawali3d.Object3D;
 import org.rajawali3d.lights.ALight;
 import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.materials.Material;
@@ -90,7 +91,9 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     private void renderStaticContent() {
         if (mVisualContentManager.hasStaticContent()){
             for (VisualContentManager.VisualContent vContent : mVisualContentManager.getStaticContent()) {
-                getCurrentScene().addChild(vContent.getObject3D());
+                if (vContent.isNotRendered()) {
+                    getCurrentScene().addChild(vContent.getObject3D());
+                }
             }
         }
     }
@@ -111,6 +114,9 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         synchronized (this) {
             if (mVisualContentManager.isContentBeingAdded()) {
                 renderActiveContent();
+            }
+            if (mVisualContentManager.getStaticContentShouldBeRendered()) {
+                renderStaticContent();
             }
         }
         super.onRender(elapsedRealTime, deltaTime);
@@ -194,5 +200,9 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
 
+    }
+
+    public void removeContent(Object3D activeContent) {
+        getCurrentScene().removeChild(activeContent);
     }
 }
