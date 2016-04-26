@@ -1,14 +1,52 @@
 package com.wally.wally.datacontroller.content;
 
 import com.firebase.client.Firebase;
+import com.firebase.client.Query;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 public class FirebaseQuery {
+    private String uuid;
+    private LatLngBounds bounds;
 
-    public FirebaseQuery() {}
+    public FirebaseQuery withUuid(String uuid) {
+        if (bounds != null) {
+            throw new UnsupportedOperationException("Can't query uuid and bounds together");
+        }
+        this.uuid = uuid;
+        return this;
+    }
 
-    public Firebase getTarget(Firebase root) {
-        // TODO: stub impl yet
-        return root;
+    public FirebaseQuery withBounds(LatLngBounds bounds) {
+        if (uuid != null) {
+            throw new UnsupportedOperationException("Can't query bounds and uuid together");
+        }
+        this.bounds = bounds;
+        return this;
+    }
+
+    public Query getTarget(Firebase fb) {
+        Query query = fb;
+
+        if (uuid != null) {
+            query =  query.equalTo(uuid, "uuid");
+        }
+
+        if (bounds != null) {
+            LatLng bottomLeft = bounds.southwest;
+            LatLng topRight = bounds.northeast;
+
+            query = query
+                    .orderByChild("location/latitude")
+                    .startAt(bottomLeft.latitude, "location/latitude")
+                    .endAt(topRight.latitude, "location/latitude")
+                    .orderByChild("location/longitude")
+                    .startAt(bottomLeft.longitude, "location/longitude")
+                    .endAt(topRight.longitude, "location/longitude");
+            // TODO needs revision
+        }
+
+        return query;
     }
 
 }

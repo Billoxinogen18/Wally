@@ -34,17 +34,18 @@ public class DataController {
     public void save(Content c) {
         contentManager.save(c);
     }
+    public void delete(Content c) { contentManager.delete(c); }
 
     public void fetch(Callback<Collection<Content>> resultCallback) {
-        contentManager.fetch(null, resultCallback);
+        contentManager.fetch(new FirebaseQuery(), resultCallback);
     }
 
     public void fetch(LatLngBounds bounds, Callback<Collection<Content>> resultCallback) {
-        // TODO
+        contentManager.fetch(new FirebaseQuery().withBounds(bounds), resultCallback);
     }
 
     public void fetch(String uuid, Callback<Collection<Content>> resultCallback) {
-        // TODO
+        contentManager.fetch(new FirebaseQuery().withUuid(uuid), resultCallback);
     }
 
 }

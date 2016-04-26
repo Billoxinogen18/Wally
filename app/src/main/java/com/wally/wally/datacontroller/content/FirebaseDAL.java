@@ -60,8 +60,8 @@ public class FirebaseDAL implements DataAccessLayer<Content, FirebaseQuery> {
 
     @Override
     public void fetch(FirebaseQuery query, final Callback<Collection<Content>> resultCallback) {
-        Firebase target = query.getTarget(fb);
-        target.addListenerForSingleValueEvent(new ValueEventListener() {
+
+        query.getTarget(fb).addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot snapshot) {
