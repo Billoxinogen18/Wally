@@ -42,6 +42,10 @@ public class Content implements Serializable {
         return tangoData;
     }
 
+    public void setTangoData(TangoData tangoData){
+        this.tangoData = tangoData;
+    }
+
     public Content withTangoData(TangoData tangoData) {
         this.tangoData = tangoData;
         return this;

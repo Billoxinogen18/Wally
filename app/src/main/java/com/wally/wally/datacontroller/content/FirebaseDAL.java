@@ -6,13 +6,12 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.DataAccessLayer;
-import com.wally.wally.datacontroller.Query;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FirebaseDAL implements DataAccessLayer<Content> {
+public class FirebaseDAL implements DataAccessLayer<Content, FirebaseQuery> {
     private Firebase fb;
 
     public FirebaseDAL(Firebase inner) {
@@ -60,8 +59,9 @@ public class FirebaseDAL implements DataAccessLayer<Content> {
     }
 
     @Override
-    public void fetch(Query query, final Callback<Collection<Content>> resultCallback) {
-        fb.addListenerForSingleValueEvent(new ValueEventListener() {
+    public void fetch(FirebaseQuery query, final Callback<Collection<Content>> resultCallback) {
+
+        query.getTarget(fb).addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
             public void onDataChange(DataSnapshot snapshot) {

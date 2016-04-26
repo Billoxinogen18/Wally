@@ -59,7 +59,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid) {
         mContext = context;
         mSurfaceView = rajawaliSurfaceView;
-        mVisualContentManager = new VisualContentManager();
+        mVisualContentManager = null;
         mRenderer = new WallyRenderer(context.getApplicationContext(), mVisualContentManager);
         mSurfaceView.setSurfaceRenderer(mRenderer);
         mTango = new Tango(context);
@@ -71,6 +71,10 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         mPointCloudManager = new TangoPointCloudManager();
     }
 
+
+    public void setVisualContentManager(VisualContentManager visualContentManager){
+        mVisualContentManager = visualContentManager;
+    }
 
     public synchronized void onPause() {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
