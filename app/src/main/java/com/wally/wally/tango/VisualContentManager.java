@@ -6,18 +6,14 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.Pose;
-import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.content.Content;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation3D;
 import org.rajawali3d.animation.TranslateAnimation3D;
-import org.rajawali3d.lights.ALight;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
-import org.rajawali3d.primitives.Plane;
 import org.rajawali3d.scene.RajawaliScene;
 
 import java.util.ArrayList;
@@ -49,11 +45,11 @@ public class VisualContentManager {
         return staticContent != null && staticContent.size() > 0;
     }
 
-    public void addStaticContent(VisualContent visualContent) {
+    public synchronized void addStaticContent(VisualContent visualContent) {
         staticContent.add(visualContent);
     }
 
-    public List<VisualContent> getStaticContent() {
+    public synchronized List<VisualContent> getStaticContent() {
         return staticContent;
     }
 

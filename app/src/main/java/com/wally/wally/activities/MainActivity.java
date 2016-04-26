@@ -18,6 +18,7 @@ package com.wally.wally.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -27,14 +28,21 @@ import android.view.View;
 
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
+import com.projecttango.rajawali.Pose;
+import com.wally.wally.App;
 import com.wally.wally.R;
+import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.Utils;
+import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoManager;
+import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
+
+import java.util.Collection;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -63,11 +71,35 @@ public class MainActivity extends AppCompatActivity implements
             requestADFPermission();
         }
 
+        fetchContentForAdf(adfUuid);
+
         // Restore states here
         if (savedInstanceState != null && savedInstanceState.containsKey("FITTING_CONTENT")) {
             Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
             mContentFitter = new ContentFitter(getBaseContext(), c, mTangoManager);
         }
+    }
+
+    private void fetchContentForAdf(String adfUuid)
+    {
+        ((App)getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
+            @Override
+            public void call(Collection<Content> result, Exception e) {
+                VisualContentManager visualContentManager = new VisualContentManager();
+                for (Content c : result) {
+                    Bitmap bitmap = Utils.createBitmapFromContent(c, getApplicationContext());
+                    Pose pose = c.getTangoData().getPose();
+                    visualContentManager.addStaticContent(new VisualContentManager.VisualContent(bitmap, pose));
+                }
+                mTangoManager.setVisualContentManager(visualContentManager);
+            }
+        });
+    }
+
+    private void saveActiveContent(Content content, Pose pose){
+        TangoData tangoData = new TangoData(pose);
+        content.setTangoData(tangoData);
+        ((App)getApplicationContext()).getDataController().save(content);
     }
 
     @Override
