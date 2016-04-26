@@ -184,17 +184,14 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         Log.d(TAG, "onScale() called with: " + "detector = [" + detector + "]");
-        float scale = detector.getScaleFactor();
-        VisualContentManager.ActiveVisualContent activeVisualContent = mVisualContentManager.getActiveContent();
-        if (activeVisualContent != null) {
-            activeVisualContent.getObject3D().setScale(scale);
-        }
+        float scale = detector.getScaleFactor() != 0 ? detector.getScaleFactor() : 1f;
+        mVisualContentManager.scaleActiveContent(scale);
         return true;
     }
 
     @Override
     public boolean onScaleBegin(ScaleGestureDetector detector) {
-        return false;
+        return true;
     }
 
     @Override

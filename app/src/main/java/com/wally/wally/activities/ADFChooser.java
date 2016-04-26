@@ -1,6 +1,9 @@
 package com.wally.wally.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,6 +28,7 @@ import java.util.List;
 
 public class ADFChooser extends AppCompatActivity {
     private static final String TAG = ADFChooser.class.getSimpleName();
+    private static final String EXPLORER_PACKAGE_NAME = "com.projecttango.tangoexplorer";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +87,11 @@ public class ADFChooser extends AppCompatActivity {
     }
 
     public void startWithNewADF(View v) {
-        startActivity(MainActivity.newIntent(getBaseContext(), null));
+        Intent intent = getPackageManager().getLaunchIntentForPackage(EXPLORER_PACKAGE_NAME);
+        if(intent == null){
+            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + EXPLORER_PACKAGE_NAME));
+        }
+        startActivity(intent);
     }
 
     private void requestADFPermission() {

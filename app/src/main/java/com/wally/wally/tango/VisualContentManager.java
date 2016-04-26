@@ -11,6 +11,7 @@ import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
 import org.rajawali3d.animation.Animation3D;
 import org.rajawali3d.animation.ScaleAnimation3D;
+import org.rajawali3d.animation.RotateAnimation3D;
 import org.rajawali3d.animation.TranslateAnimation3D;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
@@ -69,6 +70,9 @@ public class VisualContentManager {
     public synchronized void setActiveContent(ActiveVisualContent activeContent) {
         this.activeContent = activeContent;
     }
+    public void scaleActiveContent(float scaleFactor) {
+        activeContent.getObject3D().setScale(activeContent.getObject3D().getScale().x * scaleFactor);
+    }
 
     public static class VisualContent {
         protected Object3D mContent3D = null;
@@ -110,6 +114,7 @@ public class VisualContentManager {
     public static class ActiveVisualContent extends VisualContent {
         private Animation3D mMoveAnim = null;
         private Animation3D mHighlightAnimation;
+        private Animation3D mRotateAnim = null;
         private Pose mNewPose;
         private boolean isNotYetAddedOnTheScene;
 
@@ -141,12 +146,29 @@ public class VisualContentManager {
                 scene.unregisterAnimation(mMoveAnim);
                 mMoveAnim = null;
             }
+            if(mRotateAnim != null){
+                mRotateAnim.pause();
+                scene.unregisterAnimation(mRotateAnim);
+                mRotateAnim = null;
+            }
+
             mMoveAnim = new TranslateAnimation3D(mNewPose.getPosition());
+//            mRotateAnim = new RotateAnimation3D(mNewPose.getOrientation().x, mNewPose.getOrientation().y, mNewPose.getOrientation().z);
+
             mMoveAnim.setTransformable3D(mContent3D);
+//            mRotateAnim.setTransformable3D(mContent3D);
+
             mMoveAnim.setDurationMilliseconds(500);
+//            mRotateAnim.setDurationMilliseconds(500);
+
             mMoveAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+//            mRotateAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+
             scene.registerAnimation(mMoveAnim);
+//            scene.registerAnimation(mRotateAnim);
+
             mMoveAnim.play();
+//            mRotateAnim.play();
 
             if (mHighlightAnimation == null) {
                 mHighlightAnimation = new ScaleAnimation3D(new Vector3(1.1, 1.1, 1.1));
@@ -158,7 +180,6 @@ public class VisualContentManager {
                 scene.registerAnimation(mHighlightAnimation);
                 mHighlightAnimation.play();
             }
-
             // TODO make this with animation too
             mContent3D.setOrientation(mNewPose.getOrientation());
 
