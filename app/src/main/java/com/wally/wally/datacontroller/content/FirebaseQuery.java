@@ -29,7 +29,7 @@ public class FirebaseQuery {
         Query query = fb;
 
         if (uuid != null) {
-            query =  query.equalTo(uuid, "uuid");
+            query =  query.orderByChild("uuid").equalTo(uuid);
         }
 
         if (bounds != null) {
