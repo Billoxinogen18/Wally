@@ -3,6 +3,9 @@ package com.wally.wally.tango;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
+import android.view.View;
 
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
@@ -34,6 +37,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
             TangoPoseData.COORDINATE_FRAME_DEVICE);
     private static final String TAG = TangoManager.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
+    private ScaleGestureDetector mScaleDetector;
     private RajawaliSurfaceView mSurfaceView;
     private WallyRenderer mRenderer;
     private TangoCameraIntrinsics mIntrinsics;
@@ -59,6 +63,13 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         mVisualContentManager = new VisualContentManager();
         mRenderer = new WallyRenderer(context.getApplicationContext(), mVisualContentManager);
         mSurfaceView.setSurfaceRenderer(mRenderer);
+        mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mRenderer.onTouchEvent(event);
+                return true;
+            }
+        });
         mTango = new Tango(context);
         mTangoUx = new TangoUx(context);
         this.adfUuid = adfUuid;
