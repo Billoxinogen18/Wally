@@ -108,15 +108,20 @@ public class MainActivity extends AppCompatActivity implements
     private void fetchContentForAdf(String adfUuid) {
         ((App) getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
             @Override
-            public void call(Collection<Content> result, Exception e) {
+            public void call(final Collection<Content> result, Exception e) {
                 Log.d(TAG, "call() called with: " + "result = [" + result + "], e = [" + e + "]");
-                VisualContentManager visualContentManager = mTangoManager.getVisualContentManager();
-                for (Content c : result) {
-                    Bitmap bitmap = Utils.createBitmapFromContent(c, getBaseContext());
-                    Pose pose = c.getTangoData().getPose();
-                    visualContentManager.addStaticContent(new VisualContentManager.VisualContent(bitmap, pose));
-                }
-                mTangoManager.setVisualContentManager(visualContentManager);
+                final VisualContentManager visualContentManager = mTangoManager.getVisualContentManager();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Content c : result) {
+                            Bitmap bitmap = Utils.createBitmapFromContent(c, getBaseContext());
+                            Pose pose = c.getTangoData().getPose();
+                            visualContentManager.addStaticContent(new VisualContentManager.VisualContent(bitmap, pose));
+                        }
+                        mTangoManager.setVisualContentManager(visualContentManager);
+                    }
+                }).start();
             }
         });
     }

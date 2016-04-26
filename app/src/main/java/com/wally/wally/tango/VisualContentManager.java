@@ -8,12 +8,15 @@ import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.Pose;
 
 import org.rajawali3d.Object3D;
+import org.rajawali3d.animation.Animation;
 import org.rajawali3d.animation.Animation3D;
+import org.rajawali3d.animation.ScaleAnimation3D;
 import org.rajawali3d.animation.TranslateAnimation3D;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
+import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.RajawaliScene;
 
 import java.util.ArrayList;
@@ -106,6 +109,7 @@ public class VisualContentManager {
 
     public static class ActiveVisualContent extends VisualContent {
         private Animation3D mMoveAnim = null;
+        private Animation3D mHighlightAnimation;
         private Pose mNewPose;
         private boolean isNotYetAddedOnTheScene;
 
@@ -143,6 +147,17 @@ public class VisualContentManager {
             mMoveAnim.setInterpolator(new AccelerateDecelerateInterpolator());
             scene.registerAnimation(mMoveAnim);
             mMoveAnim.play();
+
+            if (mHighlightAnimation == null) {
+                mHighlightAnimation = new ScaleAnimation3D(new Vector3(1.1, 1.1, 1.1));
+                mHighlightAnimation.setRepeatMode(Animation.RepeatMode.REVERSE_INFINITE);
+                mHighlightAnimation.setDurationMilliseconds(400);
+                mHighlightAnimation.setDelayMilliseconds(1200);
+                mHighlightAnimation.setTransformable3D(mContent3D);
+                mHighlightAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+                scene.registerAnimation(mHighlightAnimation);
+                mHighlightAnimation.play();
+            }
 
             // TODO make this with animation too
             mContent3D.setOrientation(mNewPose.getOrientation());
