@@ -312,8 +312,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     }
 
     public void setActiveContent(Bitmap bitmap, TangoPoseData pose, Content content) {
-        VisualContentManager.ActiveVisualContent activeVisualContent = new VisualContentManager
-                .ActiveVisualContent(bitmap, ScenePoseCalculator.toOpenGLPose(pose), content);
+        ActiveVisualContent activeVisualContent = new ActiveVisualContent(bitmap, ScenePoseCalculator.toOpenGLPose(pose), content);
         mVisualContentManager.setActiveContent(activeVisualContent);
     }
 

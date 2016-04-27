@@ -29,12 +29,13 @@ import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.rajawali.TextureTranslateAnimation3D;
+import com.wally.wally.tango.ActiveVisualContent;
+import com.wally.wally.tango.VisualContent;
 import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
 import org.rajawali3d.animation.Animation3D;
-import org.rajawali3d.animation.ScaleAnimation3D;
 import org.rajawali3d.lights.ALight;
 import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.materials.Material;
@@ -43,7 +44,6 @@ import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.StreamingTexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.Matrix4;
-import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.ScreenQuad;
 import org.rajawali3d.renderer.RajawaliRenderer;
 import org.rajawali3d.util.ObjectColorPicker;
@@ -138,35 +138,36 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         mPicker = new ObjectColorPicker(this);
         mPicker.setOnObjectPickedListener(this);
 
-        initBorder();
+        //initBorder();
     }
 
     @Override
     public void onObjectPicked(Object3D object) {
-        ContentPlane c = (ContentPlane) object;
-        Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]");
-        mBorder.setWidth(c.getWidth() + .05f);
-        mBorder.setHeight(c.getHeight() + .05f);
-        mBorder.setPosition(object.getPosition());
-        mBorder.setOrientation(object.getOrientation());
-        getCurrentScene().addChild(mBorder);
-        mBorderAnimation.play();
+//        ContentPlane c = (ContentPlane) object;
+//        Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]");
+//        mBorder.setWidth(c.getWidth() + .05f);
+//        mBorder.setHeight(c.getHeight() + .05f);
+//        mBorder.setPosition(object.getPosition());
+//        mBorder.setOrientation(object.getOrientation());
+//        getCurrentScene().addChild(mBorder);
+//        mBorderAnimation.play();
+//
+//        if (mHighlightAnimation != null) {
+//            mHighlightAnimation.pause();
+//            getCurrentScene().unregisterAnimation(mHighlightAnimation);
+//        }
+//        mHighlightAnimation = new ScaleAnimation3D(new Vector3(1.04f, 1.04f, 1.04f));
+//        mHighlightAnimation.setDurationMilliseconds(300);
+//        mHighlightAnimation.setDelayMilliseconds(300);
+//        mHighlightAnimation.setRepeatCount(3);
+//        mHighlightAnimation.setRepeatMode(Animation.RepeatMode.REVERSE);
+//        mHighlightAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+//        mHighlightAnimation.setTransformable3D(object);
+//        getCurrentScene().registerAnimation(mHighlightAnimation);
+//        mHighlightAnimation.play();
 
-        if (mHighlightAnimation != null) {
-            mHighlightAnimation.pause();
-            getCurrentScene().unregisterAnimation(mHighlightAnimation);
-        }
-        mHighlightAnimation = new ScaleAnimation3D(new Vector3(1.04f, 1.04f, 1.04f));
-        mHighlightAnimation.setDurationMilliseconds(300);
-        mHighlightAnimation.setDelayMilliseconds(300);
-        mHighlightAnimation.setRepeatCount(3);
-        mHighlightAnimation.setRepeatMode(Animation.RepeatMode.REVERSE);
-        mHighlightAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-        mHighlightAnimation.setTransformable3D(object);
-        getCurrentScene().registerAnimation(mHighlightAnimation);
-        mHighlightAnimation.play();
-
-        VisualContentManager.VisualContent vc = mVisualContentManager.findContentByObject3D(object);
+        VisualContent vc = mVisualContentManager.findContentByObject3D(object);
+        vc.setBorder(getCurrentScene());
         mContentSelectListener.onContentSelected(vc.getContent());
     }
 
@@ -176,7 +177,7 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
 
     private void renderStaticContent() {
         if (mVisualContentManager.hasStaticContent()) {
-            for (VisualContentManager.VisualContent vContent : mVisualContentManager.getStaticContent()) {
+            for (VisualContent vContent : mVisualContentManager.getStaticContent()) {
                 if (vContent.isNotRendered()) {
                     getCurrentScene().addChild(vContent.getObject3D());
                     //changed
@@ -187,7 +188,7 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     }
 
     private void renderActiveContent() {
-        VisualContentManager.ActiveVisualContent activeContent = mVisualContentManager.getActiveContent();
+        ActiveVisualContent activeContent = mVisualContentManager.getActiveContent();
         if (activeContent == null) return;
         if (activeContent.isNotYetAddedOnTheScene()) {
             getCurrentScene().addChild(activeContent.getObject3D());
