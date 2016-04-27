@@ -56,7 +56,9 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:background="@drawable/control_panel_background"
-        android:orientation="vertical">
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="2dp">
 
         <ImageButton
             android:id="@+id/btn_delete_content"
@@ -64,7 +66,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:onClick="deleteSelectedContent"
-            android:padding="8dp"
+            android:padding="10dp"
             android:src="@drawable/ic_delete_white_24dp" />
 
         <ImageButton
@@ -74,7 +76,7 @@
             android:layout_marginTop="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:onClick="editSelectedContent"
-            android:padding="8dp"
+            android:padding="10dp"
             android:src="@drawable/ic_edit_white_24dp" />
     </LinearLayout>
 </RelativeLayout>
