@@ -58,7 +58,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
             }
         }
         mFittingStatusListener.onContentFit(null);
-        mTangoManager.setActiveContent(bitmap, tangoPoseData);
+        mTangoManager.setActiveContent(bitmap, tangoPoseData, getContent());
 
         // Update content timely, while we are cancelled.
         while (true) {

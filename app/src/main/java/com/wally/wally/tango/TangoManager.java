@@ -21,7 +21,9 @@ import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
+import com.wally.wally.ContentSelectListener;
 import com.wally.wally.WallyRenderer;
+import com.wally.wally.datacontroller.content.Content;
 
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -57,11 +59,11 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private boolean mIsFrameAvailableTangoThread;
     private double mRgbTimestampGlThread;
 
-    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid) {
+    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid, ContentSelectListener contentSelectListener) {
         mContext = context;
         mSurfaceView = rajawaliSurfaceView;
         mVisualContentManager = new VisualContentManager();
-        mRenderer = new WallyRenderer(context.getApplicationContext(), mVisualContentManager);
+        mRenderer = new WallyRenderer(context.getApplicationContext(), mVisualContentManager, contentSelectListener);
         mSurfaceView.setSurfaceRenderer(mRenderer);
         mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -309,9 +311,9 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         return doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread);
     }
 
-    public void setActiveContent(Bitmap bitmap, TangoPoseData pose) {
+    public void setActiveContent(Bitmap bitmap, TangoPoseData pose, Content content) {
         VisualContentManager.ActiveVisualContent activeVisualContent = new VisualContentManager
-                .ActiveVisualContent(bitmap, ScenePoseCalculator.toOpenGLPose(pose));
+                .ActiveVisualContent(bitmap, ScenePoseCalculator.toOpenGLPose(pose), content);
         mVisualContentManager.setActiveContent(activeVisualContent);
     }
 

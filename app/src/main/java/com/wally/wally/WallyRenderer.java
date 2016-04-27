@@ -33,6 +33,8 @@ import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
+import org.rajawali3d.animation.Animation3D;
+import org.rajawali3d.animation.ScaleAnimation3D;
 import org.rajawali3d.lights.ALight;
 import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.materials.Material;
@@ -41,6 +43,7 @@ import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.StreamingTexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.Matrix4;
+import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.ScreenQuad;
 import org.rajawali3d.renderer.RajawaliRenderer;
 import org.rajawali3d.util.ObjectColorPicker;
@@ -63,17 +66,21 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     private ATexture mTangoCameraTexture;
     private boolean mSceneCameraConfigured;
     private ScaleGestureDetector mScaleDetector;
+    private ContentSelectListener mContentSelectListener;
+    private Animation3D mHighlightAnimation;
 
     //changed
     private ObjectColorPicker mPicker;
 
+
     private ContentPlane mBorder;
     TextureTranslateAnimation3D mBorderAnimation;
 
-    public WallyRenderer(Context context, VisualContentManager visualContentManager) {
+    public WallyRenderer(Context context, VisualContentManager visualContentManager, ContentSelectListener contentSelectListener) {
         super(context);
         mVisualContentManager = visualContentManager;
         mScaleDetector = new ScaleGestureDetector(context, this);
+        mContentSelectListener = contentSelectListener;
     }
 
     private void initBorder(){
@@ -128,34 +135,47 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         mContent3DLight.setColor(1.0f, 1.0f, 1.0f);
         mContent3DLight.setPower(1);
 
-        //changed
         mPicker = new ObjectColorPicker(this);
         mPicker.setOnObjectPickedListener(this);
 
         initBorder();
     }
 
-    //changed
     @Override
     public void onObjectPicked(Object3D object) {
         ContentPlane c = (ContentPlane) object;
         Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]");
-//        mBorder.set(c.getHeight() + .05f, c.getWidth() + .05f, c.getScaleZ() + .05f);
         mBorder.setWidth(c.getWidth() + .05f);
         mBorder.setHeight(c.getHeight() + .05f);
         mBorder.setPosition(object.getPosition());
         mBorder.setOrientation(object.getOrientation());
         getCurrentScene().addChild(mBorder);
         mBorderAnimation.play();
+
+        if (mHighlightAnimation != null) {
+            mHighlightAnimation.pause();
+            getCurrentScene().unregisterAnimation(mHighlightAnimation);
+        }
+        mHighlightAnimation = new ScaleAnimation3D(new Vector3(1.04f, 1.04f, 1.04f));
+        mHighlightAnimation.setDurationMilliseconds(300);
+        mHighlightAnimation.setDelayMilliseconds(300);
+        mHighlightAnimation.setRepeatCount(3);
+        mHighlightAnimation.setRepeatMode(Animation.RepeatMode.REVERSE);
+        mHighlightAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+        mHighlightAnimation.setTransformable3D(object);
+        getCurrentScene().registerAnimation(mHighlightAnimation);
+        mHighlightAnimation.play();
+
+        VisualContentManager.VisualContent vc = mVisualContentManager.findContentByObject3D(object);
+        mContentSelectListener.onContentSelected(vc.getContent());
     }
 
     public void getObjectAt(float x, float y) {
-        Log.d(TAG, "getObjectAt() called with: " + "x = [" + x + "], y = [" + y + "]");
         mPicker.getObjectAt(x, y);
     }
 
     private void renderStaticContent() {
-        if (mVisualContentManager.hasStaticContent()){
+        if (mVisualContentManager.hasStaticContent()) {
             for (VisualContentManager.VisualContent vContent : mVisualContentManager.getStaticContent()) {
                 if (vContent.isNotRendered()) {
                     getCurrentScene().addChild(vContent.getObject3D());
@@ -247,15 +267,13 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     @Override
     public void onTouchEvent(MotionEvent event) {
         mScaleDetector.onTouchEvent(event);
-        if(event.getAction() == MotionEvent.ACTION_DOWN){
-            Log.d(TAG, "onTouchEvent() called with: " + "event = [" + event + "]" + event.getX() + ":" + event.getY());
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             getObjectAt(event.getX(), event.getY());
         }
     }
 
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
-        Log.d(TAG, "onScale() called with: " + "detector = [" + detector + "]");
         float scale = detector.getScaleFactor() != 0 ? detector.getScaleFactor() : 1f;
         mVisualContentManager.scaleActiveContent(scale);
         return true;

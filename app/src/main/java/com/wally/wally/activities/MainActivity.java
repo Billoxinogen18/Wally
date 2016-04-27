@@ -33,6 +33,7 @@ import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.App;
+import com.wally.wally.ContentSelectListener;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.Callback;
@@ -52,7 +53,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         NewContentDialogFragment.NewContentDialogListener,
-        ContentFitter.FittingStatusListener {
+        ContentFitter.FittingStatusListener, ContentSelectListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String ARG_ADF_UUID = "ARG_ADF_UUID";
@@ -85,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         adfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
-        mTangoManager = new TangoManager(this, mSurfaceView, mTangoUxLayout, adfUuid);
+        mTangoManager = new TangoManager(getBaseContext(), mSurfaceView, mTangoUxLayout, adfUuid, this);
 
         mLayoutFitting = findViewById(R.id.layout_fitting);
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
@@ -110,14 +111,16 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void call(final Collection<Content> result, Exception e) {
                 Log.d(TAG, "call() called with: " + "result = [" + result + "], e = [" + e + "]");
-                final VisualContentManager visualContentManager = mTangoManager.getVisualContentManager();
+                final VisualContentManager visualContentManager = mTangoManager
+                        .getVisualContentManager();
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         for (Content c : result) {
                             Bitmap bitmap = Utils.createBitmapFromContent(c, getBaseContext());
                             Pose pose = c.getTangoData().getPose();
-                            visualContentManager.addStaticContent(new VisualContentManager.VisualContent(bitmap, pose));
+                            visualContentManager.addStaticContent(
+                                    new VisualContentManager.VisualContent(bitmap, pose, c));
                         }
                         mTangoManager.setVisualContentManager(visualContentManager);
                     }
@@ -231,5 +234,10 @@ public class MainActivity extends AppCompatActivity implements
         if (mContentFitter != null) {
             outState.putSerializable("FITTING_CONTENT", mContentFitter.getContent());
         }
+    }
+
+    @Override
+    public void onContentSelected(Content c) {
+        Log.d(TAG, "onContentSelected() called with: " + "c = [" + c + "]");
     }
 }

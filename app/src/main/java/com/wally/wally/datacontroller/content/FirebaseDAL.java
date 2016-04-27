@@ -35,7 +35,13 @@ public class FirebaseDAL implements DataAccessLayer<Content, FirebaseQuery> {
 
     @Override
     public void save(Content c) {
-        fb.push().setValue(c);
+        if (c.getId() == null) {
+            Firebase reference = fb.push();
+            reference.setValue(c);
+            c.setId(reference.getKey());
+        } else {
+            fb.child(c.getId()).setValue(c);
+        }
     }
 
     @Override
