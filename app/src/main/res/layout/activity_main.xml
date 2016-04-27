@@ -5,9 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:fitsSystemWindows="true"
     tools:context=".activities.MainActivity">
-
 
     <org.rajawali3d.surface.RajawaliSurfaceView
         android:id="@+id/rajawali_surface"
@@ -41,8 +41,9 @@
             android:onClick="finishFitting"
             android:src="@drawable/ic_accept_white_24dp"
             app:backgroundTint="@color/accept_button_color" />
-
     </LinearLayout>
+
+    <include layout="@layout/layout_content_select" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_new_post"
@@ -84,10 +85,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|start"
-        android:src="@drawable/watermark"
-        android:tint="@color/watermark"
         android:layout_margin="@dimen/watermark_margin"
-        />
+        android:src="@drawable/watermark"
+        android:tint="@color/watermark" />
 
 
 </android.support.design.widget.CoordinatorLayout>

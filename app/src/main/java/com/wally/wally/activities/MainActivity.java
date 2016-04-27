@@ -67,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements
     private FloatingActionButton mFinishFitting;
     private String adfUuid;
 
+    private Content mSelectedContent;
+    private long mLastSelectTime;
+
     /**
      * Returns intent to start main activity.
      *
@@ -101,9 +104,12 @@ public class MainActivity extends AppCompatActivity implements
         fetchContentForAdf(adfUuid);
 
         // Restore states here
-        if (savedInstanceState != null && savedInstanceState.containsKey("FITTING_CONTENT")) {
-            Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
-            mContentFitter = new ContentFitter(getBaseContext(), c, mTangoManager);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("FITTING_CONTENT")) {
+                Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
+                mContentFitter = new ContentFitter(getBaseContext(), c, mTangoManager);
+            }
+            onContentSelected((Content) savedInstanceState.getSerializable("mSelectedContent"));
         }
     }
 
@@ -167,8 +173,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onNewContentClick(View v) {
-        NewContentDialogFragment dialog = new NewContentDialogFragment();
-        dialog.show(getSupportFragmentManager(), "NewContentDialogFragment");
+        NewContentDialogFragment.newInstance().show(getSupportFragmentManager(), "NewContentDialogFragment");
     }
 
     public void onBtnMapClick(View v) {
@@ -187,6 +192,11 @@ public class MainActivity extends AppCompatActivity implements
         mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         changeFittingMode(true);
+    }
+
+    @Override
+    public void onContentUpdated(Content content) {
+        // TODO update renderer and db.
     }
 
     @Override
@@ -210,10 +220,8 @@ public class MainActivity extends AppCompatActivity implements
         mContentFitter.finishFitting();
         changeFittingMode(false);
 
-        // TODO save content
         saveActiveContent(mContentFitter.getContent(), ScenePoseCalculator.toOpenGLPose(mContentFitter.getPose()));
         mContentFitter = null;
-
     }
 
     private void changeFittingMode(boolean startFittingMode) {
@@ -221,6 +229,52 @@ public class MainActivity extends AppCompatActivity implements
         for (View v : mNonFittingModeViews) {
             v.setVisibility(startFittingMode ? View.GONE : View.VISIBLE);
         }
+    }
+
+    @Override
+    public void onContentSelected(final Content c) {
+        Log.d(TAG, "onContentSelected() called with: " + "c = [" + c + "]");
+        runOnUiThread(new Runnable() {
+            @SuppressWarnings("ConstantConditions")
+            @Override
+            public void run() {
+                mLastSelectTime = System.currentTimeMillis();
+
+                mSelectedContent = c;
+                final View root = findViewById(R.id.layout_content_select);
+                root.setVisibility(mSelectedContent == null ? View.GONE : View.VISIBLE);
+
+                // hide after 3 secs
+                root.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Hide iff user didn't click after
+                        if (mLastSelectTime + 3000 <= System.currentTimeMillis()) {
+                            root.setVisibility(View.GONE);
+                            mSelectedContent = null;
+                        }
+                    }
+                }, 3000);
+            }
+        });
+    }
+
+    public void editSelectedContent(View view) {
+        Log.d(TAG, "editSelectedContent() called with: " + "view = [" + view + "]");
+        if (mSelectedContent == null) {
+            Log.e(TAG, "editSelectedContent: when mSelectedContent is NULL");
+            return;
+        }
+        NewContentDialogFragment.newInstance(mSelectedContent).show(getSupportFragmentManager(), "edit_content");
+    }
+
+    public void deleteSelectedContent(View view) {
+        Log.d(TAG, "deleteSelectedContent() called with: " + "view = [" + view + "]");
+        if (mSelectedContent == null) {
+            Log.e(TAG, "deleteSelectedContent: when mSelectedContent is NULL");
+            return;
+        }
+        ((App) getApplicationContext()).getDataController().delete(mSelectedContent);
     }
 
     private void requestADFPermission() {
@@ -234,11 +288,8 @@ public class MainActivity extends AppCompatActivity implements
         super.onSaveInstanceState(outState);
         if (mContentFitter != null) {
             outState.putSerializable("FITTING_CONTENT", mContentFitter.getContent());
+            outState.putSerializable("mSelectedContent", mSelectedContent);
         }
     }
 
-    @Override
-    public void onContentSelected(Content c) {
-        Log.d(TAG, "onContentSelected() called with: " + "c = [" + c + "]");
-    }
 }

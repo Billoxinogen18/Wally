@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_content_select"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="48dp"
+    android:visibility="gone"
+    tools:context=".activities.MainActivity"
+    tools:visibility="visible">
+
+    <RelativeLayout
+        android:id="@+id/layout_note_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/owner_info_background"
+        android:paddingRight="16dp">
+
+        <ImageView
+            android:id="@+id/owner_image"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginRight="16dp"
+            android:src="@drawable/sample_user_image" />
+
+        <TextView
+            android:id="@+id/owner_name"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_toRightOf="@+id/owner_image"
+            android:text="Giorgi Gogiashvili"
+            android:textColor="#ffffff"
+            tools:text="Giorgi Gogiashvili" />
+
+        <TextView
+            android:id="@+id/note_date"
+            style="@style/TextAppearance.AppCompat.Caption"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/owner_name"
+            android:layout_below="@+id/owner_name"
+            android:layout_marginTop="8dp"
+            android:text="12 sep"
+            android:textColor="#b3ffffff" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/content_control_panel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/control_panel_background"
+        android:orientation="vertical">
+
+        <ImageButton
+            android:id="@+id/btn_delete_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:onClick="deleteSelectedContent"
+            android:padding="8dp"
+            android:src="@drawable/ic_delete_white_24dp" />
+
+        <ImageButton
+            android:id="@+id/btn_edit_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:onClick="editSelectedContent"
+            android:padding="8dp"
+            android:src="@drawable/ic_edit_white_24dp" />
+    </LinearLayout>
+</RelativeLayout>

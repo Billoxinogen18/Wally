@@ -25,5 +25,6 @@
     <string name="tango_error">"Tango Exception! Try again!"</string>
     <string name="no_adfs_tango_error">No ADF UUIDs</string>
     <string name="no_uuid_tango_error">"No ADF with that UUID!"</string>
+    <string name="post_update">Update</string>
 
 </resources>

@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -25,52 +26,79 @@ import com.wally.wally.datacontroller.content.Content;
 
 /**
  * New Post dialog, that manages adding new content.
- * <p>
+ * <p/>
  * Created by ioane5 on 4/7/16.
  */
 public class NewContentDialogFragment extends DialogFragment implements View.OnClickListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
-
+    public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
     private static final int REQUEST_CODE_CHOOSE_PHOTO = 129;
+
     private NewContentDialogListener mListener;
     private View mImageContainer;
     private ImageView mImageView;
-    private String mImageUri;
     private EditText mTitleEt;
     private EditText mNoteEt;
+    private Content mContent;
+    private boolean isEditMode;
 
     // Empty constructor required for DialogFragment
     public NewContentDialogFragment() {
+    }
+
+    public static NewContentDialogFragment newInstance(Content content) {
+        Bundle args = new Bundle();
+        args.putSerializable(ARG_EDIT_CONTENT, content);
+        NewContentDialogFragment fragment = new NewContentDialogFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static NewContentDialogFragment newInstance() {
+        return new NewContentDialogFragment();
     }
 
     @SuppressLint("InflateParams")
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        if (getArguments() != null) {
+            mContent = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
+        } else {
+            isEditMode = true;
+        }
+        if (mContent == null) {
+            mContent = new Content();
+        }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
+        View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
 
-        dialogView.findViewById(R.id.btn_visibility_status).setOnClickListener(this);
-        dialogView.findViewById(R.id.btn_add_image).setOnClickListener(this);
-        dialogView.findViewById(R.id.btn_remove_image).setOnClickListener(this);
-        dialogView.findViewById(R.id.btn_pallette).setOnClickListener(this);
+        dv.findViewById(R.id.btn_visibility_status).setOnClickListener(this);
+        dv.findViewById(R.id.btn_add_image).setOnClickListener(this);
+        dv.findViewById(R.id.btn_remove_image).setOnClickListener(this);
+        dv.findViewById(R.id.btn_pallette).setOnClickListener(this);
 
-        dialogView.findViewById(R.id.btn_discard_post).setOnClickListener(this);
-        dialogView.findViewById(R.id.btn_create_post).setOnClickListener(this);
+        dv.findViewById(R.id.btn_discard_post).setOnClickListener(this);
+        dv.findViewById(R.id.btn_create_post).setOnClickListener(this);
 
-        mImageView = (ImageView) dialogView.findViewById(R.id.image);
-        mImageContainer = dialogView.findViewById(R.id.image_container);
+        if (isEditMode) {
+            Button b = (Button) dv.findViewById(R.id.btn_create_post);
+            b.setText(R.string.post_update);
+        }
+        mImageView = (ImageView) dv.findViewById(R.id.image);
+        mImageContainer = dv.findViewById(R.id.image_container);
 
         if (savedInstanceState != null) {
-            mImageUri = savedInstanceState.getString("image_uri");
-            updateImage();
+            mContent = (Content) savedInstanceState.getSerializable("content");
         }
 
-        mTitleEt = (EditText) dialogView.findViewById(R.id.tv_title);
-        mNoteEt = (EditText) dialogView.findViewById(R.id.tv_note);
+        mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
+        mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
 
-        builder.setView(dialogView);
+
+        updateViews();
+        builder.setView(dv);
         Dialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         dialog.setCanceledOnTouchOutside(false);
@@ -101,22 +129,19 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 break;
             case R.id.btn_create_post:
                 dismiss();
-                mListener.onContentCreated(new Content()
-                        .withTitle(mTitleEt.getText().toString())
-                        .withNote(mNoteEt.getText().toString())
-                        // TODO add all fields
-                        //.withVisibility()
-                        //.withRange()
-                        //.withTimestamp()
-                        .withImageUri(mImageUri)
-                );
+                updateContent();
+                if (isEditMode) {
+                    mListener.onContentUpdated(mContent);
+                } else {
+                    mListener.onContentCreated(mContent);
+                }
                 break;
             case R.id.btn_add_image:
                 startActivityForResult(ChoosePhotoActivity.newIntent(getActivity()), REQUEST_CODE_CHOOSE_PHOTO);
                 break;
             case R.id.btn_remove_image:
-                mImageUri = null;
-                updateImage();
+                mContent.withImageUri(null);
+                updateViews();
                 break;
             case R.id.btn_pallette:
             case R.id.btn_visibility_status:
@@ -140,9 +165,9 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CHOOSE_PHOTO) {
             if (resultCode == Activity.RESULT_OK) {
-                mImageUri = data.getDataString();
+                mContent.withImageUri(data.getDataString());
                 // TODO maybe save image in local cache?
-                updateImage();
+                updateViews();
             } else {
                 // TODO user canceled or error happened.
                 Log.i(TAG, "onActivityResult: canceled");
@@ -153,16 +178,31 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("image_uri", mImageUri);
+        outState.putSerializable("content", mContent);
     }
 
-    private void updateImage() {
-        if (TextUtils.isEmpty(mImageUri)) {
+    /**
+     * Updates model from views.
+     */
+    private void updateContent() {
+        mContent.withTitle(mTitleEt.getText().toString())
+                .withNote(mNoteEt.getText().toString());
+    }
+
+    /**
+     * Just updates vies from model.
+     * Call this method whenever content model is changed.
+     */
+    private void updateViews() {
+        mNoteEt.setText(mContent.getNote());
+        mTitleEt.setText(mContent.getTitle());
+
+        if (TextUtils.isEmpty(mContent.getImageUri())) {
             mImageView.setImageDrawable(null);
             mImageContainer.setVisibility(View.GONE);
         } else {
             Glide.with(getActivity())
-                    .load(mImageUri)
+                    .load(mContent.getImageUri())
                     .fitCenter()
                     .into(mImageView);
             mImageContainer.setVisibility(View.VISIBLE);
@@ -175,7 +215,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
      * @return true if everything is untouched by user.
      */
     public boolean postIsEmpty() {
-        return TextUtils.isEmpty(mImageUri)
+        return TextUtils.isEmpty(mContent.getImageUri())
                 && TextUtils.isEmpty(mNoteEt.getText())
                 && TextUtils.isEmpty(mTitleEt.getText());
     }
@@ -185,6 +225,11 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
          * When post is created by user, this method is called.
          */
         void onContentCreated(Content content);
+
+        /**
+         * When post is updated by user, this method is called.
+         */
+        void onContentUpdated(Content content);
     }
 
     public static class DiscardDoubleCheckDialogFragment extends DialogFragment {
