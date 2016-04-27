@@ -16,6 +16,7 @@
 package com.wally.wally;
 
 import android.content.Context;
+import android.opengl.GLES20;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -23,21 +24,23 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoPoseData;
+import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
+import com.projecttango.rajawali.TextureTranslateAnimation3D;
 import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
-import org.rajawali3d.animation.ScaleAnimation3D;
 import org.rajawali3d.lights.ALight;
 import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.materials.Material;
+import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.StreamingTexture;
+import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.Matrix4;
-import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.ScreenQuad;
 import org.rajawali3d.renderer.RajawaliRenderer;
 import org.rajawali3d.util.ObjectColorPicker;
@@ -64,10 +67,42 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     //changed
     private ObjectColorPicker mPicker;
 
+    private ContentPlane mBorder;
+    TextureTranslateAnimation3D mBorderAnimation;
+
     public WallyRenderer(Context context, VisualContentManager visualContentManager) {
         super(context);
         mVisualContentManager = visualContentManager;
         mScaleDetector = new ScaleGestureDetector(context, this);
+    }
+
+    private void initBorder(){
+        Material material = new Material();
+        try {
+            Texture t = new Texture("mContent3D", R.drawable.stripe);
+            t.setWrapType(ATexture.WrapType.REPEAT);
+            t.enableOffset(true);
+            t.setRepeat(20, 20);
+            material.addTexture(t);
+        } catch (ATexture.TextureException e) {
+            Log.e(TAG, "Exception generating mContent3D texture", e);
+        }
+        material.setColorInfluence(0);
+        material.enableLighting(true);
+        material.setDiffuseMethod(new DiffuseMethod.Lambert());
+
+        mBorder = new ContentPlane(1, 1, 1, 1);
+        mBorder.setMaterial(material);
+        mBorder.setBlendingEnabled(true);
+        mBorder.setBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
+        mBorderAnimation = new TextureTranslateAnimation3D();
+        mBorderAnimation.setDurationMilliseconds(5000);
+        mBorderAnimation.setDelayMilliseconds(1000);
+        mBorderAnimation.setRepeatMode(Animation.RepeatMode.INFINITE);
+        mBorderAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+        mBorderAnimation.setTransformable3D(mBorder);
+        getCurrentScene().registerAnimation(mBorderAnimation);
     }
 
     @Override
@@ -96,20 +131,22 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         //changed
         mPicker = new ObjectColorPicker(this);
         mPicker.setOnObjectPickedListener(this);
+
+        initBorder();
     }
 
     //changed
     @Override
     public void onObjectPicked(Object3D object) {
+        ContentPlane c = (ContentPlane) object;
         Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]");
-        ScaleAnimation3D s = new ScaleAnimation3D(new Vector3(1.2f,1.2f,1.2f));
-        s.setDurationMilliseconds(500);
-        s.setDelayMilliseconds(1000);
-        s.setRepeatMode(Animation.RepeatMode.INFINITE);
-        s.setInterpolator(new AccelerateDecelerateInterpolator());
-        s.setTransformable3D(object);
-        getCurrentScene().registerAnimation(s);
-        s.play();
+//        mBorder.set(c.getHeight() + .05f, c.getWidth() + .05f, c.getScaleZ() + .05f);
+        mBorder.setWidth(c.getWidth() + .05f);
+        mBorder.setHeight(c.getHeight() + .05f);
+        mBorder.setPosition(object.getPosition());
+        mBorder.setOrientation(object.getOrientation());
+        getCurrentScene().addChild(mBorder);
+        mBorderAnimation.play();
     }
 
     public void getObjectAt(float x, float y) {

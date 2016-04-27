@@ -228,4 +228,22 @@ public class ContentPlane extends Object3D {
         colors = null;
         indices = null;
     }
+
+    public float getHeight() {
+        return mHeight;
+    }
+
+    public float getWidth() {
+        return mWidth;
+    }
+
+    public void setHeight(float mHeight) {
+        this.mHeight = mHeight;
+        init(true);
+    }
+
+    public void setWidth(float mWidth) {
+        this.mWidth = mWidth;
+        init(true);
+    }
 }

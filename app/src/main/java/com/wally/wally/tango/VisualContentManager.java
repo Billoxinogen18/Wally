@@ -1,11 +1,13 @@
 package com.wally.wally.tango;
 
 import android.graphics.Bitmap;
+import android.opengl.GLES20;
 import android.util.Log;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.Pose;
+import com.wally.wally.R;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
@@ -71,7 +73,9 @@ public class VisualContentManager {
         this.activeContent = activeContent;
     }
     public void scaleActiveContent(float scaleFactor) {
-        activeContent.getObject3D().setScale(activeContent.getObject3D().getScale().x * scaleFactor);
+        if(activeContent != null) {
+            activeContent.getObject3D().setScale(activeContent.getObject3D().getScale().x * scaleFactor);
+        }
     }
 
     public static class VisualContent {
