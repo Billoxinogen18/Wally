@@ -105,7 +105,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         return mVisualContentManager;
     }
 
-    public void setVisualContentManager(VisualContentManager visualContentManager){
+    public void setVisualContentManager(VisualContentManager visualContentManager) {
         mVisualContentManager = visualContentManager;
     }
 
