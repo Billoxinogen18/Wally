@@ -42,6 +42,7 @@ import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoManager;
+import com.wally.wally.tango.VisualContent;
 import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements
                             Bitmap bitmap = Utils.createBitmapFromContent(c, getBaseContext());
                             Pose pose = c.getTangoData().getPose();
                             visualContentManager.addStaticContent(
-                                    new VisualContentManager.VisualContent(bitmap, pose, c));
+                                    new VisualContent(bitmap, pose, c));
                         }
                         mTangoManager.setVisualContentManager(visualContentManager);
                     }
