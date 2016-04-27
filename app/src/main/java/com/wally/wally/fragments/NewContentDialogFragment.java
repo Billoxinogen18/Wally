@@ -65,8 +65,9 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         if (getArguments() != null) {
             mContent = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
-        } else {
             isEditMode = true;
+        } else {
+            isEditMode = false;
         }
         if (mContent == null) {
             mContent = new Content();

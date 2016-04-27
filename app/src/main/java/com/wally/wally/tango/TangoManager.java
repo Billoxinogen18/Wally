@@ -240,7 +240,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
 
                 // Prevent concurrent access to {@code mIsFrameAvailableTangoThread} from the Tango
                 // callback thread and service disconnection from an onPause event.
-                synchronized (this) {
+                synchronized (TangoManager.this) {
                     // Don't execute any tango API actions if we're not connected to the service
                     if (!mIsConnected) {
                         return;
@@ -339,6 +339,8 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
             if (vc != null){
                 mRenderer.removeContent(vc.getObject3D());
                 mVisualContentManager.removeStaticContent(vc);
+            } else {
+                Log.d(TAG, "removeContent() called with: " + "content = [" + content + "]  VisualContent not found");
             }
         }
     }
