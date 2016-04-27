@@ -18,58 +18,6 @@
         surfaceview:renderMode="RENDER_WHEN_DIRTY" />
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/measurement"
-            android:visibility="invisible" />
-
-        <TextView
-            android:id="@+id/distance_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="invisible" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="is localized?" />
-
-        <TextView
-            android:id="@+id/is_localized_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="is valid?" />
-
-        <TextView
-            android:id="@+id/is_valid_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Extra data" />
-
-        <TextView
-            android:id="@+id/extra_data_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="20dp" />
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/layout_fitting"
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -95,6 +43,21 @@
             app:backgroundTint="@color/accept_button_color" />
 
     </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_new_post"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:onClick="onNewContentClick"
+        android:src="@drawable/ic_add_white_24dp" />
+
+    <com.google.atap.tango.ux.TangoUxLayout
+        android:id="@+id/layout_tango_ux"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <!-- Map button -->
     <android.support.v7.widget.CardView
         android:id="@+id/btn_map"
@@ -117,19 +80,14 @@
             android:src="@drawable/ic_btn_map_75dp" />
     </android.support.v7.widget.CardView>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btn_new_post"
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        android:onClick="onNewContentClick"
-        android:src="@drawable/ic_add_white_24dp" />
-
-    <com.google.atap.tango.ux.TangoUxLayout
-        android:id="@+id/layout_tango_ux"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_gravity="top|start"
+        android:src="@drawable/watermark"
+        android:tint="@color/watermark"
+        android:layout_margin="@dimen/watermark_margin"
+        />
 
 
 </android.support.design.widget.CoordinatorLayout>
