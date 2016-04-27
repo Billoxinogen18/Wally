@@ -19,6 +19,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoPoseData;
@@ -28,14 +29,19 @@ import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.Object3D;
+import org.rajawali3d.animation.Animation;
+import org.rajawali3d.animation.ScaleAnimation3D;
 import org.rajawali3d.lights.ALight;
 import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.StreamingTexture;
 import org.rajawali3d.math.Matrix4;
+import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.ScreenQuad;
 import org.rajawali3d.renderer.RajawaliRenderer;
+import org.rajawali3d.util.ObjectColorPicker;
+import org.rajawali3d.util.OnObjectPickedListener;
 
 import javax.microedition.khronos.opengles.GL10;
 
@@ -44,7 +50,7 @@ import javax.microedition.khronos.opengles.GL10;
  * Whenever the user clicks on the screen, the line is re-rendered with an endpoint
  * placed at the point corresponding to the depth at the point of the click.
  */
-public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetector.OnScaleGestureListener {
+public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetector.OnScaleGestureListener, OnObjectPickedListener {
 
     private static final String TAG = WallyRenderer.class.getSimpleName();
 
@@ -54,6 +60,9 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     private ATexture mTangoCameraTexture;
     private boolean mSceneCameraConfigured;
     private ScaleGestureDetector mScaleDetector;
+
+    //changed
+    private ObjectColorPicker mPicker;
 
     public WallyRenderer(Context context, VisualContentManager visualContentManager) {
         super(context);
@@ -84,15 +93,37 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         mContent3DLight.setColor(1.0f, 1.0f, 1.0f);
         mContent3DLight.setPower(1);
 
-        renderStaticContent();
+        //changed
+        mPicker = new ObjectColorPicker(this);
+        mPicker.setOnObjectPickedListener(this);
     }
 
+    //changed
+    @Override
+    public void onObjectPicked(Object3D object) {
+        Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]");
+        ScaleAnimation3D s = new ScaleAnimation3D(new Vector3(1.2f,1.2f,1.2f));
+        s.setDurationMilliseconds(500);
+        s.setDelayMilliseconds(1000);
+        s.setRepeatMode(Animation.RepeatMode.INFINITE);
+        s.setInterpolator(new AccelerateDecelerateInterpolator());
+        s.setTransformable3D(object);
+        getCurrentScene().registerAnimation(s);
+        s.play();
+    }
+
+    public void getObjectAt(float x, float y) {
+        Log.d(TAG, "getObjectAt() called with: " + "x = [" + x + "], y = [" + y + "]");
+        mPicker.getObjectAt(x, y);
+    }
 
     private void renderStaticContent() {
         if (mVisualContentManager.hasStaticContent()){
             for (VisualContentManager.VisualContent vContent : mVisualContentManager.getStaticContent()) {
                 if (vContent.isNotRendered()) {
                     getCurrentScene().addChild(vContent.getObject3D());
+                    //changed
+                    mPicker.registerObject(vContent.getObject3D());
                 }
             }
         }
@@ -179,6 +210,10 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     @Override
     public void onTouchEvent(MotionEvent event) {
         mScaleDetector.onTouchEvent(event);
+        if(event.getAction() == MotionEvent.ACTION_DOWN){
+            Log.d(TAG, "onTouchEvent() called with: " + "event = [" + event + "]" + event.getX() + ":" + event.getY());
+            getObjectAt(event.getX(), event.getY());
+        }
     }
 
     @Override
