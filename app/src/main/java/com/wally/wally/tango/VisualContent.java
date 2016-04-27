@@ -28,7 +28,7 @@ import org.rajawali3d.scene.RajawaliScene;
 public class VisualContent {
     private static final String TAG = VisualContent.class.getSimpleName();
 
-    private static ContentPlane mBorder;
+    protected static ContentPlane mBorder;
     private static TextureTranslateAnimation3D mBorderAnimation;
     private static Animation3D mHighlightAnimation;
 

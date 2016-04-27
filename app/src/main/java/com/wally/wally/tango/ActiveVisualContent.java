@@ -6,6 +6,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.datacontroller.content.Content;
 
+import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
 import org.rajawali3d.animation.Animation3D;
 import org.rajawali3d.animation.ScaleAnimation3D;
