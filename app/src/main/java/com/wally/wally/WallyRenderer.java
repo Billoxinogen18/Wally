@@ -16,33 +16,25 @@
 package com.wally.wally;
 
 import android.content.Context;
-import android.opengl.GLES20;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoPoseData;
-import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
-import com.projecttango.rajawali.TextureTranslateAnimation3D;
 import com.wally.wally.tango.ActiveVisualContent;
 import com.wally.wally.tango.VisualContent;
 import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.Object3D;
-import org.rajawali3d.animation.Animation;
-import org.rajawali3d.animation.Animation3D;
 import org.rajawali3d.lights.ALight;
 import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.materials.Material;
-import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.StreamingTexture;
-import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.primitives.ScreenQuad;
 import org.rajawali3d.renderer.RajawaliRenderer;
@@ -97,23 +89,28 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         }
         getCurrentScene().addChildAt(backgroundQuad, 0);
 
-        ALight mContent3DLight = new PointLight();
-        mContent3DLight.setColor(1.0f, 1.0f, 1.0f);
-        mContent3DLight.setPower(1);
+//        ALight mContent3DLight = new PointLight();
+//        mContent3DLight.setColor(1.0f, 1.0f, 1.0f);
+//        mContent3DLight.setPower(1);
 
         mPicker = new ObjectColorPicker(this);
         mPicker.setOnObjectPickedListener(this);
+
+        mPicker.registerObject(backgroundQuad);
 
     }
 
     @Override
     public void onObjectPicked(Object3D object) {
         VisualContent vc = mVisualContentManager.findContentByObject3D(object);
+        Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]");
+
         if (vc != null) {
             vc.setBorder(getCurrentScene());
             mContentSelectListener.onContentSelected(vc.getContent());
         } else{
-            Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]  Visual content is null");
+            VisualContent.removeBorder(getCurrentScene());
+            Log.d(TAG, "Visual content is null");
         }
     }
 

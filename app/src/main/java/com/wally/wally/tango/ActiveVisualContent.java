@@ -19,7 +19,7 @@ import org.rajawali3d.scene.RajawaliScene;
  */
 public class ActiveVisualContent extends VisualContent {
     private Animation3D mMoveAnim = null;
-    private Animation3D mHighlightAnimation;
+//    private Animation3D mHighlightAnimation;
     private Animation3D mRotateAnim = null;
     private Pose mNewPose;
     private boolean isNotYetAddedOnTheScene;
@@ -76,16 +76,16 @@ public class ActiveVisualContent extends VisualContent {
         mMoveAnim.play();
 //            mRotateAnim.play();
 
-        if (mHighlightAnimation == null) {
-            mHighlightAnimation = new ScaleAnimation3D(new Vector3(1.1, 1.1, 1.1));
-            mHighlightAnimation.setRepeatMode(Animation.RepeatMode.REVERSE_INFINITE);
-            mHighlightAnimation.setDurationMilliseconds(400);
-            mHighlightAnimation.setDelayMilliseconds(1200);
-            mHighlightAnimation.setTransformable3D(mContent3D);
-            mHighlightAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-            scene.registerAnimation(mHighlightAnimation);
-            mHighlightAnimation.play();
-        }
+//        if (mHighlightAnimation == null) {
+//            mHighlightAnimation = new ScaleAnimation3D(new Vector3(1.1, 1.1, 1.1));
+//            mHighlightAnimation.setRepeatMode(Animation.RepeatMode.REVERSE_INFINITE);
+//            mHighlightAnimation.setDurationMilliseconds(400);
+//            mHighlightAnimation.setDelayMilliseconds(1200);
+//            mHighlightAnimation.setTransformable3D(mContent3D);
+//            mHighlightAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+//            scene.registerAnimation(mHighlightAnimation);
+//            mHighlightAnimation.play();
+//        }
         // TODO make this with animation too
         mContent3D.setOrientation(mNewPose.getOrientation());
 

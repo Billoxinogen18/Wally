@@ -14,7 +14,7 @@ import com.wally.wally.datacontroller.content.Content;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
 import org.rajawali3d.animation.Animation3D;
-import org.rajawali3d.animation.ScaleAnimation3D;
+//import org.rajawali3d.animation.ScaleAnimation3D;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
@@ -113,18 +113,23 @@ public class VisualContent {
         scene.addChild(mBorder);
         mBorderAnimation.play();
 
-        if (mHighlightAnimation != null) {
-            mHighlightAnimation.pause();
-            scene.unregisterAnimation(mHighlightAnimation);
-        }
-        mHighlightAnimation = new ScaleAnimation3D(new Vector3(1.04f, 1.04f, 1.04f));
-        mHighlightAnimation.setDurationMilliseconds(300);
-        mHighlightAnimation.setDelayMilliseconds(300);
-        mHighlightAnimation.setRepeatCount(3);
-        mHighlightAnimation.setRepeatMode(Animation.RepeatMode.REVERSE);
-        mHighlightAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-        mHighlightAnimation.setTransformable3D(mContent3D);
-        scene.registerAnimation(mHighlightAnimation);
-        mHighlightAnimation.play();
+//        if (mHighlightAnimation != null) {
+//            mHighlightAnimation.pause();
+//            scene.unregisterAnimation(mHighlightAnimation);
+//        }
+//        mHighlightAnimation = new ScaleAnimation3D(new Vector3(1.04f, 1.04f, 1.04f));
+//        mHighlightAnimation.setDurationMilliseconds(300);
+//        mHighlightAnimation.setDelayMilliseconds(300);
+//        mHighlightAnimation.setRepeatCount(1);
+//        mHighlightAnimation.setRepeatMode(Animation.RepeatMode.NONE);
+//        mHighlightAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
+//        mHighlightAnimation.setTransformable3D(mContent3D);
+//        scene.registerAnimation(mHighlightAnimation);
+//        mHighlightAnimation.play();
+    }
+
+    public static void removeBorder(RajawaliScene scene){
+        scene.removeChild(mBorder);
+        mBorderAnimation.pause();
     }
 }
