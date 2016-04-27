@@ -65,7 +65,8 @@ public class FirebaseDAL implements DataAccessLayer<Content, FirebaseQuery> {
     }
 
     @Override
-    public void fetch(FirebaseQuery query, final Callback<Collection<Content>> resultCallback) {
+    public void fetch(final FirebaseQuery query,
+                      final Callback<Collection<Content>> resultCallback) {
 
         query.getTarget(fb).addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -73,7 +74,9 @@ public class FirebaseDAL implements DataAccessLayer<Content, FirebaseQuery> {
             public void onDataChange(DataSnapshot snapshot) {
                 Set<Content> result = new HashSet<>();
                 for (DataSnapshot contentSnapshot: snapshot.getChildren()) {
-                    result.add(contentSnapshot.getValue(Content.class));
+                    Content content = contentSnapshot.getValue(Content.class);
+                    content.setId(contentSnapshot.getKey());
+                    result.add(content);
                 }
                 resultCallback.call(result, null);
             }
@@ -85,5 +88,4 @@ public class FirebaseDAL implements DataAccessLayer<Content, FirebaseQuery> {
 
         });
     }
-
 }
