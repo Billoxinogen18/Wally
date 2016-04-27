@@ -109,8 +109,12 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     @Override
     public void onObjectPicked(Object3D object) {
         VisualContent vc = mVisualContentManager.findContentByObject3D(object);
-        vc.setBorder(getCurrentScene());
-        mContentSelectListener.onContentSelected(vc.getContent());
+        if (vc != null) {
+            vc.setBorder(getCurrentScene());
+            mContentSelectListener.onContentSelected(vc.getContent());
+        } else{
+            Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]  Visual content is null");
+        }
     }
 
     public void getObjectAt(float x, float y) {

@@ -275,6 +275,7 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
         ((App) getApplicationContext()).getDataController().delete(mSelectedContent);
+        mTangoManager.removeContent(mSelectedContent);
     }
 
     private void requestADFPermission() {
