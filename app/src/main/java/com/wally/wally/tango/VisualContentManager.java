@@ -6,12 +6,12 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.Pose;
+import com.wally.wally.datacontroller.content.Content;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
 import org.rajawali3d.animation.Animation3D;
 import org.rajawali3d.animation.ScaleAnimation3D;
-import org.rajawali3d.animation.RotateAnimation3D;
 import org.rajawali3d.animation.TranslateAnimation3D;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
@@ -70,22 +70,45 @@ public class VisualContentManager {
     public synchronized void setActiveContent(ActiveVisualContent activeContent) {
         this.activeContent = activeContent;
     }
+
     public void scaleActiveContent(float scaleFactor) {
         activeContent.getObject3D().setScale(activeContent.getObject3D().getScale().x * scaleFactor);
     }
 
+    /**
+     * Search in static visual contents with object and get content object.
+     *
+     * @param object visual object3D
+     * @return visual content
+     */
+    public VisualContent findContentByObject3D(Object3D object) {
+        // TODO make with hashmap to get better performance
+        for (VisualContent vc : staticContent) {
+            if (vc.getObject3D().equals(object)) {
+                return vc;
+            }
+        }
+        return null;
+    }
+
     public static class VisualContent {
+        protected Content mContent;
         protected Object3D mContent3D = null;
         protected Pose mContentPose;
         private Bitmap mBitmap;
 
-        public VisualContent(Bitmap bitmap, Pose contentPose) {
+        public VisualContent(Bitmap bitmap, Pose contentPose, Content content) {
             this.mBitmap = bitmap;
             this.mContentPose = contentPose;
+            mContent = content;
         }
 
         public boolean isNotRendered() {
             return mContent3D == null;
+        }
+
+        public Content getContent() {
+            return mContent;
         }
 
         public Object3D getObject3D() {
@@ -118,8 +141,8 @@ public class VisualContentManager {
         private Pose mNewPose;
         private boolean isNotYetAddedOnTheScene;
 
-        public ActiveVisualContent(Bitmap bitmap, Pose contentPose) {
-            super(bitmap, contentPose);
+        public ActiveVisualContent(Bitmap bitmap, Pose contentPose, Content content) {
+            super(bitmap, contentPose, content);
             isNotYetAddedOnTheScene = true;
             mNewPose = null;
         }
@@ -146,7 +169,7 @@ public class VisualContentManager {
                 scene.unregisterAnimation(mMoveAnim);
                 mMoveAnim = null;
             }
-            if(mRotateAnim != null){
+            if (mRotateAnim != null) {
                 mRotateAnim.pause();
                 scene.unregisterAnimation(mRotateAnim);
                 mRotateAnim = null;
