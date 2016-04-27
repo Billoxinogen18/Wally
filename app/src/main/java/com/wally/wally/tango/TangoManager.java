@@ -333,6 +333,16 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         mVisualContentManager.setActiveContent(null);
     }
 
+    public void removeContent(Content content){
+        if (mVisualContentManager.hasStaticContent()){
+            VisualContent vc = mVisualContentManager.findVisualContentByContent(content);
+            if (vc != null){
+                mRenderer.removeContent(vc.getObject3D());
+                mVisualContentManager.removeStaticContent(vc);
+            }
+        }
+    }
+
     /**
      * Use the TangoSupport library with point cloud data to calculate the plane
      * of the world feature pointed at the location the camera is looking.

@@ -1,5 +1,7 @@
 package com.wally.wally.tango;
 
+import com.wally.wally.datacontroller.content.Content;
+
 import org.rajawali3d.Object3D;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +42,11 @@ public class VisualContentManager {
         mStaticContentShouldBeRendered = true;
     }
 
+    public synchronized void removeStaticContent(VisualContent visualContent){
+        staticContent.remove(visualContent);
+        mStaticContentShouldBeRendered = true;
+    }
+
     public synchronized List<VisualContent> getStaticContent() {
         return staticContent;
     }
@@ -74,4 +81,14 @@ public class VisualContentManager {
         return null;
     }
 
+
+    public VisualContent findVisualContentByContent(Content content) {
+        // TODO make with hashmap to get better performance
+        for (VisualContent vc : staticContent) {
+            if (vc.getContent().equals(content)) {
+                return vc;
+            }
+        }
+        return null;
+    }
 }
