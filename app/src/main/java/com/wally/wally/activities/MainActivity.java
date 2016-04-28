@@ -183,21 +183,20 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onContentCreated(Content content) {
+    public void onContentCreated(Content content, boolean isEditMode) {
         if (mContentFitter != null) {
             Log.e(TAG, "onContentCreated: called when content was already fitting");
             return;
+        }
+        if (isEditMode) {
+            // remove content and start new fitting.
+            mTangoManager.removeContent(content);
         }
         mContentFitter = new ContentFitter(getBaseContext(), content, mTangoManager);
         mContentFitter.setFittingStatusListener(this);
         mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         changeFittingMode(true);
-    }
-
-    @Override
-    public void onContentUpdated(Content content) {
-        // TODO update renderer and db.
     }
 
     @Override
