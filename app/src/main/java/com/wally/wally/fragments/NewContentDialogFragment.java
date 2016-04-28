@@ -40,7 +40,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
     private static final int REQUEST_CODE_CHOOSE_PHOTO = 129;
-    private static final int MY_LOCATION_REQUEST_CODE = 22;
+    private static final int REQUEST_CODE_MY_LOCATION = 22;
 
     private NewContentDialogListener mListener;
     private View mImageContainer;
@@ -143,24 +143,12 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 }
                 break;
             case R.id.btn_create_post:
-                dismiss();
-
                 if (Utils.checkLocationPermission(getContext())) {
-                    Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-                    if (myLocation == null) {
-                        Log.e(TAG, "centerMapOnMyLocation: couldn't get user location");
-                        return;
-                    }
-                    mContent.withLocation(new com.wally.wally.datacontroller.content.Location(myLocation.getLatitude(), myLocation.getLongitude()));
-
-                    updateContent();
-                    mListener.onContentCreated(mContent, isEditMode);
-
+                    createPost();
                 } else {
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            MY_LOCATION_REQUEST_CODE);
+                            REQUEST_CODE_MY_LOCATION);
                 }
                 break;
             case R.id.btn_add_image:
@@ -179,6 +167,21 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         }
     }
 
+    @SuppressWarnings("MissingPermission")
+    private void createPost() {
+        dismiss();
+        Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        if (myLocation == null) {
+            Log.e(TAG, "centerMapOnMyLocation: couldn't get user location");
+            return;
+        }
+        mContent.withLocation(new com.wally.wally.datacontroller.content.Location(myLocation.getLatitude(), myLocation.getLongitude()));
+
+        updateContent();
+        mListener.onContentCreated(mContent, isEditMode);
+    }
+
     /**
      * Called when user finally discarded post.
      * Now you should clear all caches and destroy self.
@@ -187,27 +190,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         dismiss();
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_CHOOSE_PHOTO) {
-            if (resultCode == Activity.RESULT_OK) {
-                mContent.withImageUri(data.getDataString());
-                // TODO maybe save image in local cache?
-                updateViews();
-            } else {
-                // TODO user canceled or error happened.
-                Log.i(TAG, "onActivityResult: canceled");
-            }
-        }
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        updateContent();
-        outState.putSerializable("mContent", mContent);
-    }
 
     /**
      * Updates model from views.
@@ -246,6 +228,38 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         return TextUtils.isEmpty(mContent.getImageUri())
                 && TextUtils.isEmpty(mNoteEt.getText())
                 && TextUtils.isEmpty(mTitleEt.getText());
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_CHOOSE_PHOTO) {
+            if (resultCode == Activity.RESULT_OK) {
+                mContent.withImageUri(data.getDataString());
+                // TODO maybe save image in local cache?
+                updateViews();
+            } else {
+                // TODO user canceled or error happened.
+                Log.i(TAG, "onActivityResult: canceled");
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_MY_LOCATION) {
+            if (Utils.checkLocationPermission(getContext())) {
+                createPost();
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        updateContent();
+        outState.putSerializable("mContent", mContent);
     }
 
     public interface NewContentDialogListener {
