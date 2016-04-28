@@ -19,12 +19,14 @@ import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.ScenePoseCalculator;
+import com.projecttango.rajawali.renderables.PointCloud;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.ContentSelectListener;
 import com.wally.wally.WallyRenderer;
 import com.wally.wally.datacontroller.content.Content;
 
+import org.rajawali3d.renderer.RajawaliRenderer;
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
@@ -65,13 +67,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         mVisualContentManager = new VisualContentManager();
         mRenderer = new WallyRenderer(context.getApplicationContext(), mVisualContentManager, contentSelectListener);
         mSurfaceView.setSurfaceRenderer(mRenderer);
-        mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mRenderer.onTouchEvent(event);
-                return true;
-            }
-        });
         mTango = new Tango(context);
         mTangoUx = new TangoUx(context);
         this.adfUuid = adfUuid;
@@ -79,6 +74,8 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         mTangoUx.setLayout(tangoUxLayout);
 
         mPointCloudManager = new TangoPointCloudManager();
+
+        setTouchEnabled(true);
     }
 
     /**
@@ -177,6 +174,11 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         framePairs.add(new TangoCoordinateFramePair(
                 TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
                 TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE));
+        framePairs.add(new TangoCoordinateFramePair(
+                TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE,
+                TangoPoseData.COORDINATE_FRAME_DEVICE
+        ));
+
         mTango.connectListener(framePairs, this);
 
         // Get extrinsics from device for use in transforms. This needs
@@ -190,6 +192,12 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         if (mTangoUx != null) {
             mTangoUx.updatePoseStatus(pose.statusCode);
         }
+//        if(pose.baseFrame == TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE &&
+//                pose.targetFrame == TangoPoseData.COORDINATE_FRAME_DEVICE &&
+//                pose.statusCode == TangoPoseData.POSE_VALID){
+//            connectRenderer();
+//        }
+
         if (pose.baseFrame == TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION &&
                 pose.targetFrame == TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE &&
                 pose.statusCode == TangoPoseData.POSE_VALID) {
@@ -345,6 +353,19 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         }
     }
 
+    public void setTouchEnabled(boolean enabled){
+        if(enabled)
+            mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    mRenderer.onTouchEvent(event);
+                    return true;
+                }
+            });
+        else
+            mSurfaceView.setOnTouchListener(null);
+    }
+
     /**
      * Use the TangoSupport library with point cloud data to calculate the plane
      * of the world feature pointed at the location the camera is looking.
@@ -380,5 +401,4 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
 
         return planeFitPose;
     }
-
 }

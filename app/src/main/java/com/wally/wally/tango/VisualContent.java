@@ -113,7 +113,6 @@ public class VisualContent {
         mBorder.setHeight((float) (c.getHeight() * mContent3D.getScale().x + .05f));
         mBorder.setPosition(mContent3D.getPosition());
         mBorder.setOrientation(mContent3D.getOrientation());
-//        mBorder.setScale(mContent3D.getScale());
         scene.addChild(mBorder);
         mBorderAnimation.play();
 
