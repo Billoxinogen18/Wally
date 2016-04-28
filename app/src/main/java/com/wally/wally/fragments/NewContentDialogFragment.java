@@ -108,7 +108,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
         mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
         mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
-
+        
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getContext())
