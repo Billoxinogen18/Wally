@@ -121,8 +121,8 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
             for (VisualContent vContent : mVisualContentManager.getStaticContent()) {
                 if (vContent.isNotRendered()) {
                     getCurrentScene().addChild(vContent.getObject3D());
-                    mPicker.registerObject(vContent.getObject3D());
                 }
+                mPicker.registerObject(vContent.getObject3D());
             }
         }
     }

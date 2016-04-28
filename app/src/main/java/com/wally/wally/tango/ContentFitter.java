@@ -35,6 +35,10 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         return mContent;
     }
 
+    public double getScale() {
+        return mTangoManager.getVisualContentManager().getActiveContent().getScale();
+    }
+
     public void setFittingStatusListener(FittingStatusListener fittingStatusListener) {
         this.mFittingStatusListener = fittingStatusListener;
     }
@@ -90,7 +94,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
 
     }
 
-    public TangoPoseData getPose(){
+    public TangoPoseData getPose() {
         return lastPose;
     }
 

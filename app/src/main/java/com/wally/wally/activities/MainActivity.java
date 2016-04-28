@@ -136,8 +136,9 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    private void saveActiveContent(Content content, Pose pose) {
+    private void saveActiveContent(Content content, Pose pose, double scale) {
         TangoData tangoData = new TangoData(pose);
+        tangoData.setScale(scale);
         content.withTangoData(tangoData).withUuid(adfUuid);
         ((App) getApplicationContext()).getDataController().save(content);
     }
@@ -217,10 +218,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void finishFitting(View v) {
+        saveActiveContent(mContentFitter.getContent(), ScenePoseCalculator.toOpenGLPose(mContentFitter.getPose()), mContentFitter.getScale());
         mContentFitter.finishFitting();
         changeFittingMode(false);
-
-        saveActiveContent(mContentFitter.getContent(), ScenePoseCalculator.toOpenGLPose(mContentFitter.getPose()));
         mContentFitter = null;
     }
 

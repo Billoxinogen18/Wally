@@ -13,6 +13,7 @@ public class TangoData implements Serializable {
 
     private double[] rotation;
     private double[] translation;
+    private double scale;
 
     public TangoData() {
 
@@ -34,6 +35,14 @@ public class TangoData implements Serializable {
         this.translation[0] = pose.getPosition().x;
         this.translation[1] = pose.getPosition().y;
         this.translation[2] = pose.getPosition().z;
+    }
+
+    public double getScale() {
+        return scale;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
     }
 
     public double[] getRotation() {

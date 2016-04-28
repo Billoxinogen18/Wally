@@ -70,6 +70,9 @@ public class VisualContent {
         mContent3D.setMaterial(material);
         mContent3D.setPosition(mContentPose.getPosition());
         mContent3D.setRotation(mContentPose.getOrientation());
+        if (mContent.getTangoData() != null) {
+            mContent3D.setScale(mContent.getTangoData().getScale());
+        }
         return mContent3D;
     }
 
@@ -106,10 +109,11 @@ public class VisualContent {
     public void setBorder(RajawaliScene scene){
         ContentPlane c = (ContentPlane) mContent3D;
         if (mBorder == null) initBorder(scene);
-        mBorder.setWidth(c.getWidth() + .05f);
-        mBorder.setHeight(c.getHeight() + .05f);
+        mBorder.setWidth((float) (c.getWidth() * mContent3D.getScale().x + .05f));
+        mBorder.setHeight((float) (c.getHeight() * mContent3D.getScale().x + .05f));
         mBorder.setPosition(mContent3D.getPosition());
         mBorder.setOrientation(mContent3D.getOrientation());
+//        mBorder.setScale(mContent3D.getScale());
         scene.addChild(mBorder);
         mBorderAnimation.play();
 
@@ -132,4 +136,9 @@ public class VisualContent {
         scene.removeChild(mBorder);
         mBorderAnimation.pause();
     }
+
+    public double getScale(){
+        return getObject3D().getScale().x;
+    }
+
 }
