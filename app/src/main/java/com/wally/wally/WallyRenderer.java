@@ -104,10 +104,15 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
 
         if (vc != null) {
             mContentSelectListener.onContentSelected(vc.getContent());
-            vc.setBorder(getCurrentScene());
+            if (!vc.isSelected()){
+                vc.setBorder(getCurrentScene());
+                mVisualContentManager.deselectAll();
+                vc.setSelected(true);
+            }
         } else {
             mContentSelectListener.onContentSelected(null);
             VisualContent.removeBorder(getCurrentScene());
+            mVisualContentManager.deselectAll();
             Log.d(TAG, "Visual content is null");
         }
     }
@@ -143,6 +148,7 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         synchronized (this) {
             if (mVisualContentManager.isContentBeingAdded()) {
                 VisualContent.removeBorder(getCurrentScene());
+                mVisualContentManager.deselectAll();
                 mContentSelectListener.onContentSelected(null);
                 renderActiveContent();
             }
@@ -235,6 +241,7 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     public void removeContent(Object3D content) {
         getCurrentScene().removeChild(content);
         VisualContent.removeBorder(getCurrentScene());
+        mVisualContentManager.deselectAll();
         mContentSelectListener.onContentSelected(null);
     }
 }

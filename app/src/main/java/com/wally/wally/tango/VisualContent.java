@@ -18,6 +18,7 @@ import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
+import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.RajawaliScene;
 
 //import org.rajawali3d.animation.ScaleAnimation3D;
@@ -36,6 +37,7 @@ public class VisualContent {
     protected Object3D mContent3D = null;
     protected Pose mContentPose;
     private Bitmap mBitmap;
+    private boolean mSelected;
 
     public VisualContent(Bitmap bitmap, Pose contentPose, Content content) {
         this.mBitmap = bitmap;
@@ -56,6 +58,14 @@ public class VisualContent {
 
     public Content getContent() {
         return mContent;
+    }
+
+    public boolean isSelected() {
+        return mSelected;
+    }
+
+    public void setSelected(boolean mIsSelected) {
+        this.mSelected = mIsSelected;
     }
 
     public Object3D getObject3D() {
@@ -114,12 +124,14 @@ public class VisualContent {
 
     public void setBorder(RajawaliScene scene) {
         ContentPlane c = (ContentPlane) mContent3D;
-        if (mBorder == null) initBorder(scene);
+        if (mBorder == null) {
+            initBorder(scene);
+            scene.addChild(mBorder);
+        }
         mBorder.setWidth((float) (c.getWidth() * mContent3D.getScale().x + .05f));
         mBorder.setHeight((float) (c.getHeight() * mContent3D.getScale().x + .05f));
         mBorder.setPosition(mContent3D.getPosition());
         mBorder.setOrientation(mContent3D.getOrientation());
-        scene.addChild(mBorder);
         mBorderAnimation.play();
 
 //        if (mHighlightAnimation != null) {
@@ -137,7 +149,15 @@ public class VisualContent {
 //        mHighlightAnimation.play();
     }
 
-    public double getScale() {
+    public static void removeBorder(RajawaliScene scene){
+        if (mBorder != null) {
+            scene.removeChild(mBorder);
+            mBorderAnimation.pause();
+            mBorder = null;
+        }
+    }
+
+    public double getScale(){
         return getObject3D().getScale().x;
     }
 
