@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,7 +29,7 @@ public class PreviewContentDialogFragment extends DialogFragment {
     public static PreviewContentDialogFragment newInstance(Content content) {
         Bundle args = new Bundle();
         args.putSerializable("content", content);
-
+        Log.d(TAG, content.toString());
         PreviewContentDialogFragment fragment = new PreviewContentDialogFragment();
         fragment.setArguments(args);
         return fragment;
@@ -38,23 +39,24 @@ public class PreviewContentDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Content content = (Content)getArguments().getSerializable("content");
+        Content content = (Content) getArguments().getSerializable("content");
+        Log.d(TAG, "onCreateDialog() called with: " + "content = [" + content + "]");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.preview_content_dialog, null, false);
 
         ImageView mImageView = (ImageView) dialogView.findViewById(R.id.image);
-
         TextView mTitleEt = (TextView) dialogView.findViewById(R.id.tv_title);
         TextView mNoteEt = (TextView) dialogView.findViewById(R.id.tv_note);
 
-        if(!TextUtils.isEmpty(content.getTitle())){
+        if (!TextUtils.isEmpty(content.getTitle())) {
             mTitleEt.setText(content.getTitle());
             mTitleEt.setVisibility(View.VISIBLE);
         }
-        mNoteEt.setText(content.getNote());
-
-
-        if(!TextUtils.isEmpty(content.getImageUri())){
+        if (!TextUtils.isEmpty(content.getNote())) {
+            mNoteEt.setText(content.getNote());
+            mNoteEt.setVisibility(View.VISIBLE);
+        }
+        if (!TextUtils.isEmpty(content.getImageUri())) {
             Glide.with(getActivity())
                     .load(content.getImageUri())
                     .fitCenter()
@@ -63,7 +65,6 @@ public class PreviewContentDialogFragment extends DialogFragment {
         }
 
         builder.setView(dialogView);
-        Dialog dialog = builder.create();
-        return dialog;
+        return builder.create();
     }
 }
