@@ -108,6 +108,7 @@ public class VisualContent {
         if (mBorder == null) initBorder(scene);
         mBorder.setWidth(c.getWidth() + .05f);
         mBorder.setHeight(c.getHeight() + .05f);
+        mBorder.setScale(c.getScale());
         mBorder.setPosition(mContent3D.getPosition());
         mBorder.setOrientation(mContent3D.getOrientation());
         scene.addChild(mBorder);
