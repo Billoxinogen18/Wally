@@ -87,7 +87,7 @@
         android:layout_gravity="top|start"
         android:layout_margin="@dimen/watermark_margin"
         android:src="@drawable/watermark"
-        android:tint="@color/watermark" />
+        android:tint="@color/colorPrimaryDark" />
 
 
 </android.support.design.widget.CoordinatorLayout>
