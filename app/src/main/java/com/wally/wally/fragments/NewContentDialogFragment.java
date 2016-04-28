@@ -103,7 +103,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         mImageContainer = dv.findViewById(R.id.image_container);
 
         if (savedInstanceState != null) {
-            mContent = (Content) savedInstanceState.getSerializable("content");
+            mContent = (Content) savedInstanceState.getSerializable("mContent");
         }
 
         mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
@@ -115,7 +115,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                     .addApi(LocationServices.API)
                     .build();
         }
-
 
         updateViews();
         builder.setView(dv);
@@ -213,7 +212,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable("content", mContent);
+        updateContent();
+        outState.putSerializable("mContent", mContent);
     }
 
     /**
