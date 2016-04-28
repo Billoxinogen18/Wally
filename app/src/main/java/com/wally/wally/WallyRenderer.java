@@ -142,6 +142,8 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     protected void onRender(long elapsedRealTime, double deltaTime) {
         synchronized (this) {
             if (mVisualContentManager.isContentBeingAdded()) {
+                VisualContent.removeBorder(getCurrentScene());
+                mContentSelectListener.onContentSelected(null);
                 renderActiveContent();
             }
             if (mVisualContentManager.getStaticContentShouldBeRendered()) {
@@ -208,7 +210,7 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     @Override
     public void onTouchEvent(MotionEvent event) {
         mScaleDetector.onTouchEvent(event);
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN && !mVisualContentManager.isContentBeingAdded()) {
             getObjectAt(event.getX(), event.getY());
         }
     }
