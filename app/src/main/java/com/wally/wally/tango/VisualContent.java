@@ -14,13 +14,13 @@ import com.wally.wally.datacontroller.content.Content;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
 import org.rajawali3d.animation.Animation3D;
-//import org.rajawali3d.animation.ScaleAnimation3D;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
-import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.RajawaliScene;
+
+//import org.rajawali3d.animation.ScaleAnimation3D;
 
 /**
  * Created by shota on 4/27/16.
@@ -41,6 +41,13 @@ public class VisualContent {
         this.mBitmap = bitmap;
         this.mContentPose = contentPose;
         mContent = content;
+    }
+
+    public static void removeBorder(RajawaliScene scene) {
+        scene.removeChild(mBorder);
+        if (mBorderAnimation != null) {
+            mBorderAnimation.pause();
+        }
     }
 
     public boolean isNotRendered() {
@@ -76,7 +83,7 @@ public class VisualContent {
         return mContent3D;
     }
 
-    private void initBorder(RajawaliScene scene){
+    private void initBorder(RajawaliScene scene) {
         Material material = new Material();
         try {
             Texture t = new Texture("mContent3D", R.drawable.stripe);
@@ -105,8 +112,7 @@ public class VisualContent {
         scene.registerAnimation(mBorderAnimation);
     }
 
-
-    public void setBorder(RajawaliScene scene){
+    public void setBorder(RajawaliScene scene) {
         ContentPlane c = (ContentPlane) mContent3D;
         if (mBorder == null) initBorder(scene);
         mBorder.setWidth((float) (c.getWidth() * mContent3D.getScale().x + .05f));
@@ -131,12 +137,7 @@ public class VisualContent {
 //        mHighlightAnimation.play();
     }
 
-    public static void removeBorder(RajawaliScene scene){
-        scene.removeChild(mBorder);
-        mBorderAnimation.pause();
-    }
-
-    public double getScale(){
+    public double getScale() {
         return getObject3D().getScale().x;
     }
 

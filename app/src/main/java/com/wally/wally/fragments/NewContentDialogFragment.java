@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -110,9 +109,9 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-                    .addApi(LocationServices.API)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
                     .build();
         }
 
@@ -122,6 +121,21 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         dialog.setCanceledOnTouchOutside(false);
         return dialog;
+    }
+
+    public void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    public void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+
     }
 
     @Override
@@ -179,6 +193,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
         if (myLocation == null) {
             Log.e(TAG, "centerMapOnMyLocation: couldn't get user location");
+            Toast.makeText(getContext(), "Couldn't get user location", Toast.LENGTH_SHORT).show();
         } else {
             mContent.withLocation(new com.wally.wally.datacontroller.content.Location(
                     myLocation.getLatitude(), myLocation.getLongitude()));
@@ -266,11 +281,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         super.onSaveInstanceState(outState);
         updateContent();
         outState.putSerializable("mContent", mContent);
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
     }
 
     @Override
