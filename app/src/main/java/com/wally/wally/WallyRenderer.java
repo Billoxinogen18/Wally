@@ -30,8 +30,6 @@ import com.wally.wally.tango.VisualContent;
 import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.Object3D;
-import org.rajawali3d.lights.ALight;
-import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.StreamingTexture;
@@ -60,7 +58,6 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     private ScaleGestureDetector mScaleDetector;
     private ContentSelectListener mContentSelectListener;
     private ObjectColorPicker mPicker;
-
 
 
     public WallyRenderer(Context context, VisualContentManager visualContentManager, ContentSelectListener contentSelectListener) {
@@ -108,7 +105,7 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         if (vc != null) {
             mContentSelectListener.onContentSelected(vc.getContent());
             vc.setBorder(getCurrentScene());
-        } else{
+        } else {
             mContentSelectListener.onContentSelected(null);
             VisualContent.removeBorder(getCurrentScene());
             Log.d(TAG, "Visual content is null");
