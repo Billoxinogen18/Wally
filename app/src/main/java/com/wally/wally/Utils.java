@@ -75,6 +75,11 @@ public final class Utils {
         return !Tango.hasPermission(context, Tango.PERMISSIONTYPE_ADF_LOAD_SAVE);
     }
 
+    public static Bitmap createBitmapFromContent(Content content){
+        Context context = (Context) new Object(); //TODO get an application context
+        return createBitmapFromContent(content, context);
+    }
+
     public static Bitmap createBitmapFromContent(Content content, Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         @SuppressLint("InflateParams") View cv = inflater.inflate(R.layout.wall_content, null, false);

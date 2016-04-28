@@ -47,7 +47,7 @@ public class VisualContentBorder extends ContentPlane {
     private Material createMaterial() {
         Material material = new Material();
         try {
-            Texture t = new Texture("mContent3D", R.drawable.stripe);
+            Texture t = new Texture("mContent3D", R.drawable.stripe);   //TODO what is the mContent3D?
             t.setWrapType(ATexture.WrapType.REPEAT);
             t.enableOffset(true);
             t.setRepeat(20, 20);
