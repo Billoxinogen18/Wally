@@ -74,7 +74,13 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
 
         mPointCloudManager = new TangoPointCloudManager();
 
-        setTouchEnabled(true);
+        mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mRenderer.onTouchEvent(event);
+                return true;
+            }
+        });
     }
 
     /**
@@ -375,19 +381,5 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
 
         return planeFitPose;
-    }
-
-
-    public void setTouchEnabled(boolean enabled){
-        if(enabled)
-            mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    mRenderer.onTouchEvent(event);
-                    return true;
-                }
-            });
-        else
-            mSurfaceView.setOnTouchListener(null);
     }
 }
