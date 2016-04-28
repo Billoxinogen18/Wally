@@ -9,4 +9,5 @@
     <dimen name="content_dialog_min_width">300dp</dimen>
     <dimen name="content_view">400px</dimen>
 
+    <dimen name="wall_content_max_width">350dp</dimen>
 </resources>

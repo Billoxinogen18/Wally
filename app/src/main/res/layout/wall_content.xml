@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.wally.wally.components.SquareRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="400dp"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:padding="16dp">
@@ -44,4 +44,4 @@
         android:scaleType="centerCrop"
         android:src="@drawable/ic_btn_map_75dp"
         android:visibility="visible" />
-</com.wally.wally.components.SquareRelativeLayout>
+</RelativeLayout>

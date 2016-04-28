@@ -38,11 +38,12 @@ public class FirebaseQuery {
 
             query = query
                     .orderByChild("location/latitude")
-                    .startAt(bottomLeft.latitude, "location/latitude")
-                    .endAt(topRight.latitude, "location/latitude")
+                    .startAt(bottomLeft.latitude)
+                    .endAt(topRight.latitude)
+                    .getRef()
                     .orderByChild("location/longitude")
-                    .startAt(bottomLeft.longitude, "location/longitude")
-                    .endAt(topRight.longitude, "location/longitude");
+                    .startAt(bottomLeft.longitude)
+                    .endAt(topRight.longitude);
             // TODO needs revision
         }
 

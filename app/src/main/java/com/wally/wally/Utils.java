@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -14,7 +15,6 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -24,11 +24,14 @@ import com.wally.wally.datacontroller.content.Content;
 import java.text.DateFormat;
 
 /**
+ * Utility functions which are not specific to one part of the code goes here.
+ * <p/>
  * Created by ioane5 on 3/29/16.
  */
 public final class Utils {
 
 
+    @SuppressWarnings("unused")
     private static final String TAG = Utils.class.getSimpleName();
 
     /**
@@ -74,7 +77,6 @@ public final class Utils {
 
     public static Bitmap createBitmapFromContent(Content content, Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
         @SuppressLint("InflateParams") View cv = inflater.inflate(R.layout.wall_content, null, false);
 
         TextView titleTV = (TextView) cv.findViewById(R.id.tv_title);
@@ -103,11 +105,11 @@ public final class Utils {
             imageView.setVisibility(View.GONE);
         }
 
-        cv.setLayoutParams(new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT));
-        cv.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        Resources res = context.getResources();
+        cv.measure(
+                View.MeasureSpec.makeMeasureSpec(res.getDimensionPixelSize(R.dimen.wall_content_max_width), View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        );
         cv.layout(0, 0, cv.getMeasuredWidth(), cv.getMeasuredHeight());
 
         final Bitmap bitmap = Bitmap.createBitmap(cv.getMeasuredWidth(),
