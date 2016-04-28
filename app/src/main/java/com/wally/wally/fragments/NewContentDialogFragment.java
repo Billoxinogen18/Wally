@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -23,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.wally.wally.R;
@@ -35,7 +37,7 @@ import com.wally.wally.datacontroller.content.Content;
  * <p/>
  * Created by ioane5 on 4/7/16.
  */
-public class NewContentDialogFragment extends DialogFragment implements View.OnClickListener {
+public class NewContentDialogFragment extends DialogFragment implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
@@ -109,6 +111,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getContext())
                     .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
                     .build();
         }
 
@@ -146,6 +150,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 if (Utils.checkLocationPermission(getContext())) {
                     createPost();
                 } else {
+                    Log.d(TAG, "onClick() called with: " + "v = [" + v + "]");
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             REQUEST_CODE_MY_LOCATION);
@@ -174,9 +179,10 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
         if (myLocation == null) {
             Log.e(TAG, "centerMapOnMyLocation: couldn't get user location");
-            return;
+        } else {
+            mContent.withLocation(new com.wally.wally.datacontroller.content.Location(
+                    myLocation.getLatitude(), myLocation.getLongitude()));
         }
-        mContent.withLocation(new com.wally.wally.datacontroller.content.Location(myLocation.getLatitude(), myLocation.getLongitude()));
 
         updateContent();
         mListener.onContentCreated(mContent, isEditMode);
@@ -260,6 +266,21 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         super.onSaveInstanceState(outState);
         updateContent();
         outState.putSerializable("mContent", mContent);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 
     public interface NewContentDialogListener {
