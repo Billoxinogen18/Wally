@@ -45,6 +45,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
+        mTangoManager.setTouchEnabled(false);
         Bitmap bitmap = Utils.createBitmapFromContent(mContent, mContext);
 
         TangoPoseData tangoPoseData = getValidPose();
@@ -101,12 +102,14 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     @Override
     protected void onCancelled() {
         super.onCancelled();
+        mTangoManager.setTouchEnabled(true);
         mTangoManager.removeActiveContent();
     }
 
     @Override
     protected void onPostExecute(Void v) {
         super.onPostExecute(v);
+        mTangoManager.setTouchEnabled(true);
         mTangoManager.removeActiveContent();
     }
 

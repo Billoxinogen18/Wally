@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -24,11 +23,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.activities.ChoosePhotoActivity;
@@ -108,7 +104,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
         mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
         mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
-        
+
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getContext())
@@ -159,11 +155,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                     mContent.withLocation(new com.wally.wally.datacontroller.content.Location(myLocation.getLatitude(), myLocation.getLongitude()));
 
                     updateContent();
-                    if (isEditMode) {
-                        mListener.onContentUpdated(mContent);
-                    } else {
-                        mListener.onContentCreated(mContent);
-                    }
+                    mListener.onContentCreated(mContent, isEditMode);
+
                 } else {
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
@@ -259,12 +252,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         /**
          * When post is created by user, this method is called.
          */
-        void onContentCreated(Content content);
-
-        /**
-         * When post is updated by user, this method is called.
-         */
-        void onContentUpdated(Content content);
+        void onContentCreated(Content content, boolean isEditMode);
     }
 
     public static class DiscardDoubleCheckDialogFragment extends DialogFragment {
