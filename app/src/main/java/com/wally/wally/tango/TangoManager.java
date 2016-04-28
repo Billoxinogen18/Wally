@@ -320,7 +320,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
 
     public void updateActiveContent(TangoPoseData newPose) {
         if (mVisualContentManager.getActiveContent() != null) {
-            mVisualContentManager.getActiveContent().setNewPost(ScenePoseCalculator.toOpenGLPose(newPose));
+            mVisualContentManager.getActiveContent().setNewPose(ScenePoseCalculator.toOpenGLPose(newPose));
         }
     }
 

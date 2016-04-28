@@ -6,12 +6,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.datacontroller.content.Content;
 
-import org.rajawali3d.Object3D;
-import org.rajawali3d.animation.Animation;
 import org.rajawali3d.animation.Animation3D;
-import org.rajawali3d.animation.ScaleAnimation3D;
 import org.rajawali3d.animation.TranslateAnimation3D;
-import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.RajawaliScene;
 
 /**
@@ -38,16 +34,17 @@ public class ActiveVisualContent extends VisualContent {
         this.isNotYetAddedOnTheScene = isNotYetAddedOnTheScene;
     }
 
-    public void setNewPost(Pose newPose) {
-        mNewPose = newPose;
-    }
-
     public Pose getNewPose() {
         return mNewPose;
     }
 
+    public void setNewPose(Pose newPose) {
+        mNewPose = newPose;
+    }
+
     public void animate(RajawaliScene scene) {
         if (mMoveAnim != null) {
+
             mMoveAnim.pause();
             scene.unregisterAnimation(mMoveAnim);
             mMoveAnim = null;

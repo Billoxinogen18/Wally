@@ -55,7 +55,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
                 return null;
             }
             try {
-                Thread.sleep(600);
+                Thread.sleep(400);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return null;
@@ -70,7 +70,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
                 break;
             }
             try {
-                Thread.sleep(600);
+                Thread.sleep(400);
                 publishProgress(getValidPose());
             } catch (Exception e) {
                 e.printStackTrace();
