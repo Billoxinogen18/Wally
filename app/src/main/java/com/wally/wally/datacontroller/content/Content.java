@@ -85,7 +85,7 @@ public class Content implements Serializable {
         return location;
     }
 
-    Content withLocation(Location location) {
+    public Content withLocation(Location location) {
         this.location = location;
         return this;
     }

@@ -1,12 +1,16 @@
 package com.wally.wally.fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -20,7 +24,13 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 import com.wally.wally.activities.ChoosePhotoActivity;
 import com.wally.wally.datacontroller.content.Content;
 
@@ -34,6 +44,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
     private static final int REQUEST_CODE_CHOOSE_PHOTO = 129;
+    private static final int MY_LOCATION_REQUEST_CODE = 22;
 
     private NewContentDialogListener mListener;
     private View mImageContainer;
@@ -42,6 +53,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     private EditText mNoteEt;
     private Content mContent;
     private boolean isEditMode;
+    private GoogleApiClient mGoogleApiClient;
 
     // Empty constructor required for DialogFragment
     public NewContentDialogFragment() {
@@ -97,6 +109,13 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
         mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
 
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(getContext())
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
 
         updateViews();
         builder.setView(dv);
@@ -130,11 +149,26 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 break;
             case R.id.btn_create_post:
                 dismiss();
-                updateContent();
-                if (isEditMode) {
-                    mListener.onContentUpdated(mContent);
+
+                if (Utils.checkLocationPermission(getContext())) {
+                    Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+                    if (myLocation == null) {
+                        Log.e(TAG, "centerMapOnMyLocation: couldn't get user location");
+                        return;
+                    }
+                    mContent.withLocation(new com.wally.wally.datacontroller.content.Location(myLocation.getLatitude(), myLocation.getLongitude()));
+
+                    updateContent();
+                    if (isEditMode) {
+                        mListener.onContentUpdated(mContent);
+                    } else {
+                        mListener.onContentCreated(mContent);
+                    }
                 } else {
-                    mListener.onContentCreated(mContent);
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                            MY_LOCATION_REQUEST_CODE);
                 }
                 break;
             case R.id.btn_add_image:
