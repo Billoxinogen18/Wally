@@ -91,4 +91,11 @@ public class VisualContentManager {
         }
         return null;
     }
+
+    public void deselectAll() {
+        //TODO do better selection deselection algorithm
+        for (VisualContent vc : staticContent) {
+            vc.setSelected(false);
+        }
+    }
 }
