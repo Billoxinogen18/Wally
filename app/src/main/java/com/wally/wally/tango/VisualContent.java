@@ -18,7 +18,6 @@ import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
-import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.RajawaliScene;
 
 //import org.rajawali3d.animation.ScaleAnimation3D;
@@ -46,9 +45,12 @@ public class VisualContent {
     }
 
     public static void removeBorder(RajawaliScene scene) {
-        scene.removeChild(mBorder);
-        if (mBorderAnimation != null) {
-            mBorderAnimation.pause();
+        if (mBorder != null) {
+            scene.removeChild(mBorder);
+            if (mBorderAnimation != null) {
+                mBorderAnimation.pause();
+            }
+            mBorder = null;
         }
     }
 
@@ -149,15 +151,7 @@ public class VisualContent {
 //        mHighlightAnimation.play();
     }
 
-    public static void removeBorder(RajawaliScene scene){
-        if (mBorder != null) {
-            scene.removeChild(mBorder);
-            mBorderAnimation.pause();
-            mBorder = null;
-        }
-    }
-
-    public double getScale(){
+    public double getScale() {
         return getObject3D().getScale().x;
     }
 
