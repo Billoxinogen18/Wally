@@ -42,10 +42,11 @@ public class VisualContent2 extends ContentPlane {
         setMaterial(createMaterial(bitmap));
         setPosition(pose.getPosition());
         setRotation(pose.getOrientation());
-        if (mContent.getTangoData() != null) {
-            setScale(mContent.getTangoData().getScale());
-        }
+        setVisualContentScale();
+    }
 
+    protected void setVisualContentScale(){
+        setScale(mContent.getTangoData().getScale());
     }
 
     private Material createMaterial(Bitmap bitmap) {
@@ -65,5 +66,5 @@ public class VisualContent2 extends ContentPlane {
     public Content getContent() {
         return mContent;
     }
-    
+
 }
