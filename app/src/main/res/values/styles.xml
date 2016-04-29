@@ -30,11 +30,11 @@
     </style>
 
     <style name="AppTheme.PositiveButton">
-        <item name="colorControlNormal">#1E88E5</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
         <!--<item name="colorControlActivated">#cc4343</item>-->
         <!--<item name="colorControlHighlight">#532727</item>-->
-        <item name="colorButtonNormal">#1E88E5</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="colorButtonNormal">@color/colorAccentLight</item>
+        <item name="android:textColor">@android:color/black</item>
     </style>
 
     <style name="RemoveButtonStyle" parent="Theme.AppCompat.Light.DarkActionBar">

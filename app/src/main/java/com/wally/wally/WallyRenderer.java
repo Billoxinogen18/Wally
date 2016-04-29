@@ -103,12 +103,12 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]");
 
         if (vc != null) {
-            mContentSelectListener.onContentSelected(vc.getContent());
             if (!vc.isSelected()){
                 vc.setBorder(getCurrentScene());
                 mVisualContentManager.deselectAll();
                 vc.setSelected(true);
             }
+            mContentSelectListener.onContentSelected(vc.getContent());
         } else {
             mContentSelectListener.onContentSelected(null);
             VisualContent.removeBorder(getCurrentScene());

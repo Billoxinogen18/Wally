@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:surfaceview="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:fitsSystemWindows="true"
     tools:context=".activities.MainActivity">
 
     <org.rajawali3d.surface.RajawaliSurfaceView
@@ -16,6 +15,8 @@
         android:layout_gravity="center"
         surfaceview:frameRate="60.0"
         surfaceview:renderMode="RENDER_WHEN_DIRTY" />
+
+    <include layout="@layout/layout_content_select" />
 
     <LinearLayout
         android:id="@+id/layout_fitting"
@@ -43,8 +44,6 @@
             app:backgroundTint="@color/accept_button_color" />
     </LinearLayout>
 
-    <include layout="@layout/layout_content_select" />
-
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_new_post"
         android:layout_width="wrap_content"
@@ -52,7 +51,7 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:onClick="onNewContentClick"
-        android:src="@drawable/ic_add_white_24dp" />
+        android:src="@drawable/ic_add_black_24dp" />
 
     <com.google.atap.tango.ux.TangoUxLayout
         android:id="@+id/layout_tango_ux"
@@ -88,6 +87,4 @@
         android:layout_margin="@dimen/watermark_margin"
         android:src="@drawable/watermark"
         android:tint="@color/colorPrimaryDark" />
-
-
-</android.support.design.widget.CoordinatorLayout>
+</FrameLayout>
