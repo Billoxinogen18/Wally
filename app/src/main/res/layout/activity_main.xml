@@ -53,6 +53,14 @@
         android:onClick="onNewContentClick"
         android:src="@drawable/ic_add_black_24dp" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_margin="@dimen/watermark_margin"
+        android:src="@drawable/watermark"
+        android:tint="@color/colorPrimaryDark" />
+
     <com.google.atap.tango.ux.TangoUxLayout
         android:id="@+id/layout_tango_ux"
         android:layout_width="match_parent"
@@ -79,12 +87,4 @@
             android:clickable="false"
             android:src="@drawable/ic_btn_map_75dp" />
     </android.support.v7.widget.CardView>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|start"
-        android:layout_margin="@dimen/watermark_margin"
-        android:src="@drawable/watermark"
-        android:tint="@color/colorPrimaryDark" />
 </FrameLayout>

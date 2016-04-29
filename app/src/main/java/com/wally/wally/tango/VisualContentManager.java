@@ -3,6 +3,7 @@ package com.wally.wally.tango;
 import com.wally.wally.datacontroller.content.Content;
 
 import org.rajawali3d.Object3D;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class VisualContentManager {
      * @param object visual object3D
      * @return visual content
      */
-    public VisualContent findContentByObject3D(Object3D object) {
+    public synchronized VisualContent findContentByObject3D(Object3D object) {
         // TODO make with hashmap to get better performance
         for (VisualContent vc : staticContent) {
             if (vc.getObject3D().equals(object)) {
@@ -82,7 +83,7 @@ public class VisualContentManager {
     }
 
 
-    public VisualContent findVisualContentByContent(Content content) {
+    public synchronized VisualContent findVisualContentByContent(Content content) {
         // TODO make with hashmap to get better performance
         for (VisualContent vc : staticContent) {
             if (vc.getContent().equals(content)) {
@@ -92,7 +93,7 @@ public class VisualContentManager {
         return null;
     }
 
-    public void deselectAll() {
+    public synchronized void deselectAll() {
         //TODO do better selection deselection algorithm
         for (VisualContent vc : staticContent) {
             vc.setSelected(false);
