@@ -26,30 +26,25 @@ import org.rajawali3d.scene.RajawaliScene;
  */
 public class VisualContent2 extends ContentPlane {
     private static final String TAG = VisualContent.class.getSimpleName();
-
-    protected Content mContent;
-    private boolean mSelected;
-
     private static final float PLANE_WIDTH = 1f;
 
-    public VisualContent2(Content content, float ratio) {
-        super(PLANE_WIDTH, PLANE_WIDTH * getRatio(content), 1, 1); //TODO refactor we create bitmap twise!!!
+    protected Content mContent;
+
+
+    public VisualContent2(Content content) {
+        super();
         mContent = content;
         Bitmap bitmap = Utils.createBitmapFromContent(content);
         Pose pose = content.getTangoData().getPose();
-
+        float ratio = (float) bitmap.getHeight() / bitmap.getWidth();
+        setWidth(PLANE_WIDTH);
+        setHeight(PLANE_WIDTH * ratio);
         setMaterial(createMaterial(bitmap));
         setPosition(pose.getPosition());
         setRotation(pose.getOrientation());
         if (mContent.getTangoData() != null) {
             setScale(mContent.getTangoData().getScale());
         }
-
-    }
-
-    public static float getRatio(Content content) {
-        Bitmap bitmap = Utils.createBitmapFromContent(content);
-        return (float) bitmap.getHeight() / bitmap.getWidth();
 
     }
 
@@ -70,15 +65,5 @@ public class VisualContent2 extends ContentPlane {
     public Content getContent() {
         return mContent;
     }
-
-    public boolean isSelected() {
-        return mSelected;
-    }
-
-    public void setSelected(boolean mIsSelected) {
-        this.mSelected = mIsSelected;
-    }
-
-
-
+    
 }
