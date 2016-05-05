@@ -313,9 +313,9 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         return doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread);
     }
 
-    public void setActiveContent(Bitmap bitmap, TangoPoseData pose, Content content) {
-        ActiveVisualContent activeVisualContent = new ActiveVisualContent(bitmap, ScenePoseCalculator.toOpenGLPose(pose), content);
-        mVisualContentManager.setActiveContent(activeVisualContent);
+    public void setActiveContent(TangoPoseData pose, Content content) {
+        ActiveVisualContent activeVisualContent = new ActiveVisualContent(content, ScenePoseCalculator.toOpenGLPose(pose));
+        mVisualContentManager.setActiveContentToBeRenderedOnScreen(activeVisualContent);
     }
 
     public void updateActiveContent(TangoPoseData newPose) {
@@ -330,21 +330,20 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
 
     public void removeActiveContent() {
         if (mVisualContentManager.getActiveContent() != null) {
-            mRenderer.removeContent(mVisualContentManager.getActiveContent().getObject3D());
+            mRenderer.removeActiveContent(mVisualContentManager.getActiveContent());
+        } else {
+            Log.e(TAG, "removeActiveContent() : There was no active content to remove");
         }
-        mVisualContentManager.setActiveContent(null);
     }
 
-    public void removeContent(Content content){
-        if (mVisualContentManager.hasStaticContent()){
-            VisualContent vc = mVisualContentManager.findVisualContentByContent(content);
-            if (vc != null){
-                mRenderer.removeContent(vc.getObject3D());
-                mVisualContentManager.removeStaticContent(vc);
-            } else {
-                Log.d(TAG, "removeContent() called with: " + "content = [" + content + "]  VisualContent not found");
-            }
+    public void removeContent(Content content) {
+        VisualContent vc = mVisualContentManager.findVisualContentByContent(content);
+        if (vc != null) {
+            mRenderer.removeStaticContent(vc);
+        } else {
+            Log.d(TAG, "removeContent() called with: " + "content = [" + content + "]  VisualContent not found");
         }
+
     }
 
     /**

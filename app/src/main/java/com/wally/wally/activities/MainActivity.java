@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("FITTING_CONTENT")) {
                 Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
-                mContentFitter = new ContentFitter(getBaseContext(), c, mTangoManager);
+                mContentFitter = new ContentFitter(c, mTangoManager);
             }
             onContentSelected((Content) savedInstanceState.getSerializable("mSelectedContent"));
         }
@@ -124,10 +124,7 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void run() {
                         for (Content c : result) {
-                            Bitmap bitmap = Utils.createBitmapFromContent(c, getBaseContext());
-                            Pose pose = c.getTangoData().getPose();
-                            visualContentManager.addStaticContent(
-                                    new VisualContent(bitmap, pose, c));
+                            visualContentManager.addStaticContentToBeRenderedOnScreen(new VisualContent(c));
                         }
                         mTangoManager.setVisualContentManager(visualContentManager);
                     }
@@ -166,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements
         mTangoManager.onResume();
         if (mContentFitter != null) {
             if (mContentFitter.isCancelled()) {
-                mContentFitter = new ContentFitter(getBaseContext(), mContentFitter.getContent(), mTangoManager);
+                mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager);
             }
             mContentFitter.setFittingStatusListener(this);
             mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -192,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements
             // remove content and start new fitting.
             mTangoManager.removeContent(content);
         }
-        mContentFitter = new ContentFitter(getBaseContext(), content, mTangoManager);
+        mContentFitter = new ContentFitter(content, mTangoManager);
         mContentFitter.setFittingStatusListener(this);
         mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 

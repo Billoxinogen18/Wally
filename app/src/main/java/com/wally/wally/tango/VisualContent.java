@@ -9,6 +9,7 @@ import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.TextureTranslateAnimation3D;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.Content;
 
 import org.rajawali3d.Object3D;
@@ -20,139 +21,53 @@ import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.scene.RajawaliScene;
 
-//import org.rajawali3d.animation.ScaleAnimation3D;
-
 /**
- * Created by shota on 4/27/16.
+ * Created by shota on 4/29/16.
  */
-public class VisualContent {
+public class VisualContent extends ContentPlane {
     private static final String TAG = VisualContent.class.getSimpleName();
-
-    protected static ContentPlane mBorder;
-    private static TextureTranslateAnimation3D mBorderAnimation;
-    private static Animation3D mHighlightAnimation;
+    private static final float PLANE_WIDTH = 1f;
 
     protected Content mContent;
-    protected Object3D mContent3D = null;
-    protected Pose mContentPose;
-    private Bitmap mBitmap;
-    private boolean mSelected;
 
-    public VisualContent(Bitmap bitmap, Pose contentPose, Content content) {
-        this.mBitmap = bitmap;
-        this.mContentPose = contentPose;
+
+
+    public VisualContent(Content content) {
+        super();
         mContent = content;
-    }
-
-    public static void removeBorder(RajawaliScene scene) {
-        if (mBorder != null) {
-            scene.removeChild(mBorder);
-            if (mBorderAnimation != null) {
-                mBorderAnimation.pause();
-            }
-            mBorder = null;
+        Bitmap bitmap = Utils.createBitmapFromContent(content);
+        float ratio = (float) bitmap.getHeight() / bitmap.getWidth();
+        setWidth(PLANE_WIDTH);
+        setHeight(PLANE_WIDTH * ratio);
+        setMaterial(createMaterial(bitmap));
+        if (content.getTangoData() != null) {               //TODO fix bad design
+            Pose pose = content.getTangoData().getPose();
+            setPosition(pose.getPosition());
+            setRotation(pose.getOrientation());
         }
+        setVisualContentScale();
     }
 
-    public boolean isNotRendered() {
-        return mContent3D == null;
+    protected void setVisualContentScale(){
+        setScale(mContent.getTangoData().getScale());
+    }
+
+    private Material createMaterial(Bitmap bitmap) {
+        Material material = new Material();
+        try {
+            Texture t = new Texture("mContent3D", bitmap);  //TODO what is the mContent3D?
+            material.addTexture(t);
+        } catch (ATexture.TextureException e) {
+            Log.e(TAG, "Exception generating mContent3D texture", e);
+        }
+        material.setColorInfluence(0);
+        material.enableLighting(true);
+        material.setDiffuseMethod(new DiffuseMethod.Lambert());
+        return material;
     }
 
     public Content getContent() {
         return mContent;
-    }
-
-    public boolean isSelected() {
-        return mSelected;
-    }
-
-    public void setSelected(boolean mIsSelected) {
-        this.mSelected = mIsSelected;
-    }
-
-    public Object3D getObject3D() {
-        if (mContent3D != null) return mContent3D;
-        Material material = new Material();
-        try {
-            Texture t = new Texture("mContent3D", mBitmap);
-            material.addTexture(t);
-        } catch (ATexture.TextureException e) {
-            Log.e(TAG, "Exception generating mContent3D texture", e);
-        }
-        material.setColorInfluence(0);
-        material.enableLighting(true);
-        material.setDiffuseMethod(new DiffuseMethod.Lambert());
-
-        float bitmapRatio = (float) mBitmap.getHeight() / mBitmap.getWidth();
-        float planeWidth = 1f;
-        mContent3D = new ContentPlane(planeWidth, planeWidth * bitmapRatio, 1, 1);
-        mContent3D.setMaterial(material);
-        mContent3D.setPosition(mContentPose.getPosition());
-        mContent3D.setRotation(mContentPose.getOrientation());
-        if (mContent.getTangoData() != null) {
-            mContent3D.setScale(mContent.getTangoData().getScale());
-        }
-        return mContent3D;
-    }
-
-    private void initBorder(RajawaliScene scene) {
-        Material material = new Material();
-        try {
-            Texture t = new Texture("mContent3D", R.drawable.stripe);
-            t.setWrapType(ATexture.WrapType.REPEAT);
-            t.enableOffset(true);
-            t.setRepeat(20, 20);
-            material.addTexture(t);
-        } catch (ATexture.TextureException e) {
-            Log.e(TAG, "Exception generating mContent3D texture", e);
-        }
-        material.setColorInfluence(0);
-        material.enableLighting(true);
-        material.setDiffuseMethod(new DiffuseMethod.Lambert());
-
-        mBorder = new ContentPlane(1, 1, 1, 1);
-        mBorder.setMaterial(material);
-        mBorder.setBlendingEnabled(true);
-        mBorder.setBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-
-        mBorderAnimation = new TextureTranslateAnimation3D();
-        mBorderAnimation.setDurationMilliseconds(5000);
-        mBorderAnimation.setDelayMilliseconds(1000);
-        mBorderAnimation.setRepeatMode(Animation.RepeatMode.INFINITE);
-        mBorderAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-        mBorderAnimation.setTransformable3D(mBorder);
-        scene.registerAnimation(mBorderAnimation);
-    }
-
-    public void setBorder(RajawaliScene scene) {
-        ContentPlane c = (ContentPlane) mContent3D;
-        if (mBorder == null) {
-            initBorder(scene);
-            scene.addChild(mBorder);
-        }
-        mBorder.setWidth((float) (c.getWidth() * mContent3D.getScale().x + .05f));
-        mBorder.setHeight((float) (c.getHeight() * mContent3D.getScale().x + .05f));
-        mBorder.setPosition(mContent3D.getPosition());
-        mBorder.setOrientation(mContent3D.getOrientation());
-        mBorderAnimation.play();
-
-//        if (mHighlightAnimation != null) {
-//            mHighlightAnimation.pause();
-//            scene.unregisterAnimation(mHighlightAnimation);
-//        }
-//        mHighlightAnimation = new ScaleAnimation3D(new Vector3(1.04f, 1.04f, 1.04f));
-//        mHighlightAnimation.setDurationMilliseconds(300);
-//        mHighlightAnimation.setDelayMilliseconds(300);
-//        mHighlightAnimation.setRepeatCount(1);
-//        mHighlightAnimation.setRepeatMode(Animation.RepeatMode.NONE);
-//        mHighlightAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-//        mHighlightAnimation.setTransformable3D(mContent3D);
-//        scene.registerAnimation(mHighlightAnimation);
-//        mHighlightAnimation.play();
-    }
-
-    public double getScale() {
-        return getObject3D().getScale().x;
     }
 
 }

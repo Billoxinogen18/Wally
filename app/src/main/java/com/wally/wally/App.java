@@ -13,11 +13,17 @@ import com.wally.wally.datacontroller.DataController;
  */
 public class App extends Application {
     private DataController dataController;
+    private static Context appContext = null;
 
     @Override
     public void onCreate() {
         super.onCreate();
         dataController = DataController.create(this);
+        appContext = getBaseContext();
+    }
+
+    public static Context getContext(){
+        return appContext;
     }
 
     public DataController getDataController() {

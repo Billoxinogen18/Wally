@@ -71,7 +71,7 @@ public class VisualContentBorder extends ContentPlane {
         return mBorderAnimation;
     }
 
-    public VisualContentBorder getInstance() {
+    public static VisualContentBorder getInstance() {
         if (instance == null) {
             instance = new VisualContentBorder();
         }

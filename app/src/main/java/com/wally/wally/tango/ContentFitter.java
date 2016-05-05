@@ -21,12 +21,10 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
 
     private TangoManager mTangoManager;
     private Content mContent;
-    private Context mContext;
     private FittingStatusListener mFittingStatusListener;
     private TangoPoseData lastPose;
 
-    public ContentFitter(Context context, Content content, TangoManager tangoManager) {
-        mContext = context;
+    public ContentFitter(Content content, TangoManager tangoManager) {
         mContent = content;
         mTangoManager = tangoManager;
     }
@@ -36,7 +34,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     }
 
     public double getScale() {
-        return mTangoManager.getVisualContentManager().getActiveContent().getScale();
+        return mTangoManager.getVisualContentManager().getActiveContent().getScale().x;
     }
 
     public void setFittingStatusListener(FittingStatusListener fittingStatusListener) {
@@ -45,8 +43,6 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        Bitmap bitmap = Utils.createBitmapFromContent(mContent, mContext);
-
         TangoPoseData tangoPoseData = getValidPose();
         while (tangoPoseData == null) {
             tangoPoseData = getValidPose();
@@ -62,7 +58,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
             }
         }
         mFittingStatusListener.onContentFit(null);
-        mTangoManager.setActiveContent(bitmap, tangoPoseData, getContent());
+        mTangoManager.setActiveContent(tangoPoseData, getContent());
 
         // Update content timely, while we are cancelled.
         while (true) {

@@ -76,7 +76,7 @@ public final class Utils {
     }
 
     public static Bitmap createBitmapFromContent(Content content){
-        Context context = (Context) new Object(); //TODO get an application context
+        Context context = App.getContext();
         return createBitmapFromContent(content, context);
     }
 

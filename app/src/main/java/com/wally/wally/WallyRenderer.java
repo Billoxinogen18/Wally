@@ -27,6 +27,7 @@ import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.tango.ActiveVisualContent;
 import com.wally.wally.tango.VisualContent;
+import com.wally.wally.tango.VisualContentBorder;
 import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.Object3D;
@@ -86,9 +87,6 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         }
         getCurrentScene().addChildAt(backgroundQuad, 0);
 
-//        ALight mContent3DLight = new PointLight();
-//        mContent3DLight.setColor(1.0f, 1.0f, 1.0f);
-//        mContent3DLight.setPower(1);
 
         mPicker = new ObjectColorPicker(this);
         mPicker.setOnObjectPickedListener(this);
@@ -104,15 +102,17 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
 
         if (vc != null) {
             mContentSelectListener.onContentSelected(vc.getContent());
-            if (!vc.isSelected()){
-                vc.setBorder(getCurrentScene());
-                mVisualContentManager.deselectAll();
-                vc.setSelected(true);
+            if (mVisualContentManager.isSelectedContent(vc)) {
+                addBorder();
+            } else {
+                mVisualContentManager.setSelectedContent(vc);
+                removeBorder();
+                VisualContentBorder.getInstance().updateBorderForContent(getCurrentScene(), vc);
+                addBorder();
             }
         } else {
             mContentSelectListener.onContentSelected(null);
-            VisualContent.removeBorder(getCurrentScene());
-            mVisualContentManager.deselectAll();
+            removeBorder();
             Log.d(TAG, "Visual content is null");
         }
     }
@@ -122,39 +122,40 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     }
 
     private void renderStaticContent() {
-        if (mVisualContentManager.hasStaticContent()) {
-            for (VisualContent vContent : mVisualContentManager.getStaticContent()) {
-                if (vContent.isNotRendered()) {
-                    getCurrentScene().addChild(vContent.getObject3D());
-                }
-                mPicker.registerObject(vContent.getObject3D());
+        if (mVisualContentManager.hasStaticContentToBeRendered()) {
+            while(!mVisualContentManager.getStaticContentToBeRenderedOnScreen().isEmpty()){ //TODO refactor nicely
+                VisualContent visualContent = mVisualContentManager.getStaticContentToBeRenderedOnScreen().get(0);
+                getCurrentScene().addChild(visualContent);
+                mVisualContentManager.addStaticContentAlreadyRenderedOnScreen(visualContent);
+                mPicker.registerObject(visualContent);
             }
         }
     }
 
+
     private void renderActiveContent() {
-        ActiveVisualContent activeContent = mVisualContentManager.getActiveContent();
-        if (activeContent == null) return;
-        if (activeContent.isNotYetAddedOnTheScene()) {
-            getCurrentScene().addChild(activeContent.getObject3D());
-            activeContent.setIsNotYetAddedOnTheScene(false);
-        } else if (activeContent.getNewPose() != null) {
-            activeContent.animate(getCurrentScene());
+        if (mVisualContentManager.shouldActiveContentREnderOnScreen()) {
+            ActiveVisualContent activeVisualContent = mVisualContentManager.getActiveContent();
+            if (activeVisualContent == null) {
+                Log.e(TAG, "Error in logic activeVisualContent should not be null");
+            }
+            removeBorder();
+            getCurrentScene().addChild(activeVisualContent);
+            mVisualContentManager.activeContentAlreadyRenderedOnScreen();
+
+        } else if (mVisualContentManager.isActiveContentRenderedOnScreen()) {
+            if (mVisualContentManager.getActiveContent().shouldAnimate()) {
+                mVisualContentManager.getActiveContent().animate(getCurrentScene());
+            }
         }
+
     }
 
     @Override
     protected void onRender(long elapsedRealTime, double deltaTime) {
         synchronized (this) {
-            if (mVisualContentManager.isContentBeingAdded()) {
-                VisualContent.removeBorder(getCurrentScene());
-                mVisualContentManager.deselectAll();
-                mContentSelectListener.onContentSelected(null);
-                renderActiveContent();
-            }
-            if (mVisualContentManager.getStaticContentShouldBeRendered()) {
-                renderStaticContent();
-            }
+            renderActiveContent();
+            renderStaticContent();
         }
         super.onRender(elapsedRealTime, deltaTime);
     }
@@ -216,7 +217,7 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     @Override
     public void onTouchEvent(MotionEvent event) {
         mScaleDetector.onTouchEvent(event);
-        if (event.getAction() == MotionEvent.ACTION_DOWN && !mVisualContentManager.isContentBeingAdded()) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN && !mVisualContentManager.isActiveContentRenderedOnScreen()) {
             getObjectAt(event.getX(), event.getY());
         }
     }
@@ -224,7 +225,11 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         float scale = detector.getScaleFactor() != 0 ? detector.getScaleFactor() : 1f;
-        mVisualContentManager.scaleActiveContent(scale);
+        if (mVisualContentManager.isActiveContentRenderedOnScreen()) {
+            mVisualContentManager.getActiveContent().scaleContent(scale);
+        } else {
+            Log.e(TAG, "onScale() was called but active content is not on screen");
+        }
         return true;
     }
 
@@ -238,10 +243,30 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
 
     }
 
-    public void removeContent(Object3D content) {
-        getCurrentScene().removeChild(content);
-        VisualContent.removeBorder(getCurrentScene());
-        mVisualContentManager.deselectAll();
+    private void removeBorder() {
+        if (mVisualContentManager.isBorderOnScreen()) {
+            getCurrentScene().removeChild(VisualContentBorder.getInstance());
+            mVisualContentManager.setBorderOnScreen(false);
+        }
+    }
+
+    private void addBorder() {
+        if (!mVisualContentManager.isBorderOnScreen()) {
+            getCurrentScene().addChild(VisualContentBorder.getInstance());
+            mVisualContentManager.setBorderOnScreen(true);
+        }
+    }
+
+    public void removeActiveContent(ActiveVisualContent activeVisualContent) {
+        getCurrentScene().removeChild(activeVisualContent);
+        mVisualContentManager.removeActiveContent();
         mContentSelectListener.onContentSelected(null);
+    }
+
+    public void removeStaticContent(VisualContent visualContent) {
+        getCurrentScene().removeChild(visualContent);
+        mVisualContentManager.removeStaticContentAlreadyRenderedOnScreen(visualContent);
+        mContentSelectListener.onContentSelected(null);
+        removeBorder();
     }
 }
