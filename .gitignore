@@ -48,3 +48,4 @@ captures/
 # Debug API keys are different for each machine. 
 app/src/debug/res/values/google_maps_api.xml
 
+.DS_Store
