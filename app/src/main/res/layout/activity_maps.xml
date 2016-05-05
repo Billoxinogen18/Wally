@@ -1,6 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" 
-    android:layout_height="match_parent" android:layout_width="match_parent">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.MapFragment"
@@ -8,15 +10,24 @@
         android:layout_height="match_parent"
         tools:context=".activities.MapsActivity" />
 
+    <ImageButton
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:onClick="onBtnCameraClick"
+        android:padding="16dp"
+        android:src="@drawable/ic_arrow_back_black_24dp" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/my_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_margin="@dimen/fab_margin"
         android:background="@android:color/background_light"
-        android:src="@drawable/ic_my_location_black_24dp"
-        android:onClick="onMyLocationClick"/>
-    
+        android:onClick="onMyLocationClick"
+        android:src="@drawable/ic_my_location_black_24dp" />
+
 </RelativeLayout>

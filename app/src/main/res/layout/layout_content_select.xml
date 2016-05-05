@@ -4,8 +4,8 @@
     android:id="@+id/layout_content_select"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_margin="48dp"
     android:orientation="vertical"
-    android:padding="48dp"
     android:visibility="gone"
     tools:context=".activities.MainActivity"
     tools:visibility="visible">

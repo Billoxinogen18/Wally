@@ -132,7 +132,6 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         }
     }
 
-
     private void renderActiveContent() {
         if (mVisualContentManager.shouldActiveContentREnderOnScreen()) {
             ActiveVisualContent activeVisualContent = mVisualContentManager.getActiveContent();
@@ -148,7 +147,6 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
                 mVisualContentManager.getActiveContent().animate(getCurrentScene());
             }
         }
-
     }
 
     @Override

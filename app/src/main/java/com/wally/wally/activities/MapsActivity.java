@@ -26,10 +26,10 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.wally.wally.App;
-import com.wally.wally.fragments.PreviewContentDialogFragment;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.fragments.PreviewContentDialogFragment;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -218,5 +218,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    public void onBtnCameraClick(View view) {
+        onBackPressed();
     }
 }
