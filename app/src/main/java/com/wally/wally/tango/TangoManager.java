@@ -358,8 +358,8 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     }
 
     public void addActiveToStaticContent() {
-        removeActiveContent();
         mVisualContentManager.activeContentAddingFinished();
+        removeActiveContent();
     }
 
     public void removeActiveContent() {

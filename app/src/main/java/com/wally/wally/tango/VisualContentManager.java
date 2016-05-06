@@ -55,7 +55,7 @@ public class VisualContentManager {
 
     public synchronized void activeContentAddingFinished() {
         addStaticContentToBeRenderedOnScreen(mActiveContent); //TODO check addToBeRenderedOnScreen or addAlreadyRenderedOnScreen
-        mActiveContent = null;
+//        mActiveContent = null;
     }
 
     public synchronized ActiveVisualContent getActiveContent() {
