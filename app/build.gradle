@@ -35,6 +35,12 @@ android {
             disable 'RtlHardcoded'
         }
     }
+
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+        }
+    }
 }
 
 repositories {
@@ -47,8 +53,8 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile (name: 'TangoSupport_Kajam_Java', ext: 'aar')
-    compile (name: 'TangoUX_Kajam_Java', ext: 'aar')
+    compile(name: 'TangoSupport_Kajam_Java', ext: 'aar')
+    compile(name: 'TangoUX_Kajam_Java', ext: 'aar')
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:design:23.3.0'
     compile 'com.android.support:cardview-v7:23.3.0'
