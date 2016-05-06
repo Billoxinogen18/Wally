@@ -13,22 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.wally.wally;
+package com.wally.wally.tango;
 
 import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
-import com.wally.wally.tango.ActiveVisualContent;
-import com.wally.wally.tango.VisualContent;
-import com.wally.wally.tango.VisualContentBorder;
-import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.materials.Material;
@@ -47,7 +42,7 @@ import javax.microedition.khronos.opengles.GL10;
  * Whenever the user clicks on the screen, the line is re-rendered with an endpoint
  * placed at the point corresponding to the depth at the point of the click.
  */
-public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetector.OnScaleGestureListener, OnObjectPickedListener {
+public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedListener {
 
     private static final String TAG = WallyRenderer.class.getSimpleName();
 
@@ -56,16 +51,14 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     // Augmented reality related fields
     private ATexture mTangoCameraTexture;
     private boolean mSceneCameraConfigured;
-    private ScaleGestureDetector mScaleDetector;
-    private ContentSelectListener mContentSelectListener;
+//    private ScaleGestureDetector mScaleDetector;
+    private OnVisualContentSelectedListener mOnContentSelectedListener;
     private ObjectColorPicker mPicker;
 
 
-    public WallyRenderer(Context context, VisualContentManager visualContentManager, ContentSelectListener contentSelectListener) {
+    public WallyRenderer(Context context, VisualContentManager visualContentManager) {
         super(context);
         mVisualContentManager = visualContentManager;
-        mScaleDetector = new ScaleGestureDetector(context, this);
-        mContentSelectListener = contentSelectListener;
     }
 
     @Override
@@ -101,7 +94,6 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
         Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]");
 
         if (vc != null) {
-            mContentSelectListener.onContentSelected(vc.getContent());
             if (mVisualContentManager.isSelectedContent(vc)) {
                 addBorder();
             } else {
@@ -111,10 +103,10 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
                 addBorder();
             }
         } else {
-            mContentSelectListener.onContentSelected(null);
             removeBorder();
             Log.d(TAG, "Visual content is null");
         }
+        mOnContentSelectedListener.onVisualContentSelected(vc);
     }
 
     public void getObjectAt(float x, float y) {
@@ -214,31 +206,9 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
 
     @Override
     public void onTouchEvent(MotionEvent event) {
-        mScaleDetector.onTouchEvent(event);
         if (event.getAction() == MotionEvent.ACTION_DOWN && !mVisualContentManager.isActiveContentRenderedOnScreen()) {
             getObjectAt(event.getX(), event.getY());
         }
-    }
-
-    @Override
-    public boolean onScale(ScaleGestureDetector detector) {
-        float scale = detector.getScaleFactor() != 0 ? detector.getScaleFactor() : 1f;
-        if (mVisualContentManager.isActiveContentRenderedOnScreen()) {
-            mVisualContentManager.getActiveContent().scaleContent(scale);
-        } else {
-            Log.e(TAG, "onScale() was called but active content is not on screen");
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onScaleBegin(ScaleGestureDetector detector) {
-        return true;
-    }
-
-    @Override
-    public void onScaleEnd(ScaleGestureDetector detector) {
-
     }
 
     private void removeBorder() {
@@ -258,13 +228,17 @@ public class WallyRenderer extends RajawaliRenderer implements ScaleGestureDetec
     public void removeActiveContent(ActiveVisualContent activeVisualContent) {
         getCurrentScene().removeChild(activeVisualContent);
         mVisualContentManager.removeActiveContent();
-        mContentSelectListener.onContentSelected(null);
+        mOnContentSelectedListener.onVisualContentSelected(null);
     }
 
     public void removeStaticContent(VisualContent visualContent) {
         getCurrentScene().removeChild(visualContent);
         mVisualContentManager.removeStaticContentAlreadyRenderedOnScreen(visualContent);
-        mContentSelectListener.onContentSelected(null);
+        mOnContentSelectedListener.onVisualContentSelected(null);
         removeBorder();
+    }
+
+    public void setOnContentSelectListener(OnVisualContentSelectedListener mContentSelectListener) {
+        this.mOnContentSelectedListener = mContentSelectListener;
     }
 }

@@ -16,15 +16,15 @@
 
 package com.wally.wally.activities;
 
+
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.google.atap.tango.ux.TangoUxLayout;
@@ -33,48 +33,37 @@ import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.App;
-import com.wally.wally.ContentSelectListener;
+import com.wally.wally.OnContentSelectedListener;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoManager;
-import com.wally.wally.tango.VisualContent;
-import com.wally.wally.tango.VisualContentManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
-
-public class MainActivity extends AppCompatActivity implements
-        NewContentDialogFragment.NewContentDialogListener,
-        ContentFitter.FittingStatusListener, ContentSelectListener {
+public class MainActivity extends AppCompatActivity implements OnContentSelectedListener, ContentFitter.OnContentFitListener, NewContentDialogFragment.NewContentDialogListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String ARG_ADF_UUID = "ARG_ADF_UUID";
 
     private TangoManager mTangoManager;
-    private ContentFitter mContentFitter;
 
-    private List<View> mNonFittingModeViews;
-    private View mLayoutFitting;
-    private FloatingActionButton mFinishFitting;
     private String adfUuid;
 
-    private Content mSelectedContent;
-    private long mLastSelectTime;
+    private FloatingActionButton mFinishFitting;
+    private View mLayoutFitting;
+    private List<View> mNonFittingModeViews;
 
-    /**
-     * Returns intent to start main activity.
-     *
-     * @param uuid can be null, if we want to start with learning mode.
-     */
+    private View mSelectedMenuView;
+    private long mLastSelectTime;
+    private Content mSelectedContent;
+
     public static Intent newIntent(Context context, @Nullable String uuid) {
         Intent i = new Intent(context, MainActivity.class);
         i.putExtra(ARG_ADF_UUID, uuid);
@@ -90,63 +79,37 @@ public class MainActivity extends AppCompatActivity implements
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         adfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
-        mTangoManager = new TangoManager(getBaseContext(), mSurfaceView, mTangoUxLayout, adfUuid, this);
+        mTangoManager = new TangoManager(getBaseContext(), mSurfaceView, mTangoUxLayout, adfUuid);
+        mTangoManager.restoreState(savedInstanceState);
+        mTangoManager.setOnContentSelectedListener(this);
+        mTangoManager.setOnContentFitListener(this);
 
         mLayoutFitting = findViewById(R.id.layout_fitting);
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
 
+        mSelectedMenuView = findViewById(R.id.layout_content_select);
+
+        assert mSurfaceView != null;
+        mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mTangoManager.onSurfaceTouch(event);
+                return true;
+            }
+        });
+
         if (Utils.hasNoADFPermissions(getBaseContext())) {
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
             requestADFPermission();
         }
-
-        fetchContentForAdf(adfUuid);
-
-        // Restore states here
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("FITTING_CONTENT")) {
-                Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
-                mContentFitter = new ContentFitter(c, mTangoManager);
-            }
-            onContentSelected((Content) savedInstanceState.getSerializable("mSelectedContent"));
-        }
-    }
-
-    private void fetchContentForAdf(String adfUuid) {
-        ((App) getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
-            @Override
-            public void call(final Collection<Content> result, Exception e) {
-                Log.d(TAG, "call() called with: " + "result = [" + result + "], e = [" + e + "]");
-                final VisualContentManager visualContentManager = mTangoManager
-                        .getVisualContentManager();
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (Content c : result) {
-                            visualContentManager.addStaticContentToBeRenderedOnScreen(new VisualContent(c));
-                        }
-                        mTangoManager.setVisualContentManager(visualContentManager);
-                    }
-                }).start();
-            }
-        });
-    }
-
-    private void saveActiveContent(Content content, Pose pose, double scale) {
-        TangoData tangoData = new TangoData(pose);
-        tangoData.setScale(scale);
-        content.withTangoData(tangoData).withUuid(adfUuid);
-        ((App) getApplicationContext()).getDataController().save(content);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mTangoManager.onPause();
-        if (mContentFitter != null) {
-            mContentFitter.cancel(true);
-        }
+
     }
 
     @Override
@@ -161,13 +124,15 @@ public class MainActivity extends AppCompatActivity implements
 
         }
         mTangoManager.onResume();
-        if (mContentFitter != null) {
-            if (mContentFitter.isCancelled()) {
-                mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager);
-            }
-            mContentFitter.setFittingStatusListener(this);
-            mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putSerializable("mSelectedContent", mSelectedContent);
+
+        mTangoManager.onSaveInstanceState(outState);
     }
 
     public void onNewContentClick(View v) {
@@ -179,83 +144,7 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(mapIntent);
     }
 
-    @Override
-    public void onContentCreated(Content content, boolean isEditMode) {
-        if (mContentFitter != null) {
-            Log.e(TAG, "onContentCreated: called when content was already fitting");
-            return;
-        }
-        if (isEditMode) {
-            // remove content and start new fitting.
-            mTangoManager.removeContent(content);
-        }
-        mContentFitter = new ContentFitter(content, mTangoManager);
-        mContentFitter.setFittingStatusListener(this);
-        mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-        changeFittingMode(true);
-    }
-
-    @Override
-    public void onContentFit(final TangoPoseData pose) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mFinishFitting.setEnabled(pose != null);
-
-            }
-        });
-    }
-
-    public void cancelFitting(View v) {
-        mContentFitter.cancel(true);
-        mContentFitter = null;
-        changeFittingMode(false);
-    }
-
-    public void finishFitting(View v) {
-        saveActiveContent(mContentFitter.getContent(), ScenePoseCalculator.toOpenGLPose(mContentFitter.getPose()), mContentFitter.getScale());
-        mContentFitter.finishFitting();
-        changeFittingMode(false);
-        mContentFitter = null;
-    }
-
-    private void changeFittingMode(boolean startFittingMode) {
-        mLayoutFitting.setVisibility(startFittingMode ? View.VISIBLE : View.GONE);
-        for (View v : mNonFittingModeViews) {
-            v.setVisibility(startFittingMode ? View.GONE : View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onContentSelected(final Content c) {
-        Log.d(TAG, "onContentSelected() called with: " + "c = [" + c + "]");
-        runOnUiThread(new Runnable() {
-            @SuppressWarnings("ConstantConditions")
-            @Override
-            public void run() {
-                mLastSelectTime = System.currentTimeMillis();
-
-                mSelectedContent = c;
-                final View root = findViewById(R.id.layout_content_select);
-                root.setVisibility(mSelectedContent == null ? View.GONE : View.VISIBLE);
-
-                // hide after 3 secs
-                root.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Hide iff user didn't click after
-                        if (mLastSelectTime + 3000 <= System.currentTimeMillis()) {
-                            root.setVisibility(View.GONE);
-                            mSelectedContent = null;
-                        }
-                    }
-                }, 3000);
-            }
-        });
-    }
-
-    public void editSelectedContent(View view) {
+    public void onEditSelectedContentClick(View view) {
         Log.d(TAG, "editSelectedContent() called with: " + "view = [" + view + "]");
         if (mSelectedContent == null) {
             Log.e(TAG, "editSelectedContent: when mSelectedContent is NULL");
@@ -264,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements
         NewContentDialogFragment.newInstance(mSelectedContent).show(getSupportFragmentManager(), "edit_content");
     }
 
-    public void deleteSelectedContent(View view) {
+    public void onDeleteSelectedContentClick(View view) {
         Log.d(TAG, "deleteSelectedContent() called with: " + "view = [" + view + "]");
         if (mSelectedContent == null) {
             Log.e(TAG, "deleteSelectedContent: when mSelectedContent is NULL");
@@ -274,19 +163,81 @@ public class MainActivity extends AppCompatActivity implements
         mTangoManager.removeContent(mSelectedContent);
     }
 
+
+    @Override
+    public void onContentSelected(Content content) {
+        mSelectedContent = content;
+        runOnUiThread(new Runnable() {
+            @SuppressWarnings("ConstantConditions")
+            @Override
+            public void run() {
+                mSelectedMenuView.setVisibility(mSelectedContent == null ? View.GONE : View.VISIBLE);
+                mLastSelectTime = System.currentTimeMillis();
+
+                mSelectedMenuView.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Hide iff user didn't click after
+                        if (mLastSelectTime + 3000 <= System.currentTimeMillis()) {
+                            mSelectedMenuView.setVisibility(View.GONE);
+                            mSelectedContent = null;
+                        }
+                    }
+                }, 3000);
+            }
+        });
+    }
+
+    @Override
+    public void onContentFit(final TangoPoseData pose) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mFinishFitting.setEnabled(pose != null);
+            }
+        });
+    }
+
+    @Override
+    public void onContentFittingFinished(Content content, TangoPoseData pose, double scale){
+        saveActiveContent(content, ScenePoseCalculator.toOpenGLPose(pose), scale);
+    }
+
+    @Override
+    public void onFitStatusChange(boolean fittingStarted) {
+        mLayoutFitting.setVisibility(fittingStarted ? View.VISIBLE : View.GONE);
+        for (View v : mNonFittingModeViews) {
+            v.setVisibility(fittingStarted ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onContentCreated(Content content, boolean isEditMode) {
+        if (isEditMode) {
+            // remove content and start new fitting.
+            mTangoManager.removeContent(content);
+        }
+        mTangoManager.onContentCreated(content);
+    }
+
+    public void onCancelFittingClick(View view) {
+        mTangoManager.cancelFitting();
+    }
+
+    public void onFinishFittingClick(View view) {
+        mTangoManager.finishFitting();
+    }
+
+    private void saveActiveContent(Content content, Pose pose, double scale) {
+        TangoData tangoData = new TangoData(pose);
+        tangoData.setScale(scale);
+        content.withTangoData(tangoData).withUuid(adfUuid);
+        ((App) getApplicationContext()).getDataController().save(content);
+    }
+
     private void requestADFPermission() {
         startActivityForResult(
                 Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
                 Tango.TANGO_INTENT_ACTIVITYCODE);
     }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (mContentFitter != null) {
-            outState.putSerializable("FITTING_CONTENT", mContentFitter.getContent());
-            outState.putSerializable("mSelectedContent", mSelectedContent);
-        }
-    }
-
 }
