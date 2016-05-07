@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestId()
+                .requestIdToken("128879657860-0skgvreu35ilodekimh7l3mbia49o0nu.apps.googleusercontent.com")
                 .build();
 
         // Build a GoogleApiClient with access to the Google Sign-In API and the
@@ -191,8 +192,9 @@ public class MainActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
+
             // TODO get token and send to firebase
-            // acct.getIdToken();
+            Log.d(TAG, "handleSignInResult: " + acct.getIdToken());
 
             findViewById(R.id.btn_google_sign_in).setVisibility(View.GONE);
             findViewById(R.id.btn_new_post).setVisibility(View.VISIBLE);
@@ -258,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        // Synchronize against disconnecting while the service is being used in the OpenGL thread or
+        // Synchronize against discoxnnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         // TODO check if here shoud be synchronized or not
         if (Utils.hasNoADFPermissions(getBaseContext())) {
