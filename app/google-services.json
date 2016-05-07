@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "128879657860",
+    "project_id": "unified-cortex-126421"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128879657860:android:bb939bb44a247b3b",
+        "android_client_info": {
+          "package_name": "com.wally.wally"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "128879657860-rojejqf1bv1jkgqqdgrm6uh4tcbpt9et.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wally.wally",
+            "certificate_hash": "3836DF252D895D956CBEB7310A53C15C33ABF6E7"
+          }
+        },
+        {
+          "client_id": "128879657860-0skgvreu35ilodekimh7l3mbia49o0nu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcjO_L073A38ueuUwAXqwaOe9SNulxG1k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
