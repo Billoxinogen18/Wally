@@ -35,12 +35,8 @@ public class DataController {
         return instance;
     }
 
-    public void save(Content c) {
-        contentManager.save(c);
-    }
-    public void delete(Content c) { contentManager.delete(c); }
-
     private static void firebaseAuth(String accessToken, final Callback<Boolean> resultCallback) {
+        Log.d("AUTH", "firebaseAuth() called with: " + "accessToken = [" + accessToken + "], resultCallback = [" + resultCallback + "]");
         fbInstance.authWithOAuthToken("google", accessToken, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
@@ -55,8 +51,16 @@ public class DataController {
         });
     }
 
+    public void save(Content c) {
+        contentManager.save(c);
+    }
+
+    public void delete(Content c) {
+        contentManager.delete(c);
+    }
+
     public void googleAuth(String accessToken, Callback<Boolean> resultCallback) {
-        
+
         firebaseAuth(accessToken, resultCallback);
     }
 

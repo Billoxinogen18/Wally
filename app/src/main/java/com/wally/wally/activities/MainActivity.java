@@ -28,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -127,8 +128,10 @@ public class MainActivity extends AppCompatActivity implements
 
         // TODO refactor WITH GioGoG
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
                 .requestId()
+                .requestEmail()
+                .requestProfile()
+                .requestServerAuthCode("128879657860-0skgvreu35ilodekimh7l3mbia49o0nu.apps.googleusercontent.com")
                 .requestIdToken("128879657860-0skgvreu35ilodekimh7l3mbia49o0nu.apps.googleusercontent.com")
                 .build();
 
@@ -191,20 +194,36 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
-            App app = ((App) getApplicationContext());
-            app.getDataController().googleAuth(acct.getIdToken(), new Callback<Boolean>() {
+            final GoogleSignInAccount acct = result.getSignInAccount();
+            new AsyncTask<Void, Void, String>() {
                 @Override
-                public void call(Boolean result, Exception e) {
-                    if (e != null) {
-                        Log.d("auth", result.toString());
-                    } else {
-                        Log.d("auth", e.toString());
+                protected String doInBackground(Void... params) {
+                    try {
+                        return GoogleAuthUtil.getToken(getBaseContext(), acct.getEmail(), "oauth2:profile email");
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+                    return null;
                 }
-            });
-            // TODO get token and send to firebase
-            Log.d(TAG, "handleSignInResult: " + acct.getIdToken());
+
+                @Override
+                protected void onPostExecute(String token) {
+                    super.onPostExecute(token);
+
+                    ((App) getApplicationContext()).getDataController().googleAuth(token, new Callback<Boolean>() {
+                        @Override
+                        public void call(Boolean result, Exception e) {
+                            Log.d(TAG, "call() called with: " + "result = [" + result + "], e = [" + e + "]");
+                            if (e == null) {
+                                Log.d(TAG, result.toString());
+                            } else {
+                                Log.d(TAG, e.toString());
+                            }
+                        }
+                    });
+                    Log.d(TAG, "handleSignInResult: " + acct.getIdToken());
+                }
+            }.execute();
 
             findViewById(R.id.btn_google_sign_in).setVisibility(View.GONE);
             findViewById(R.id.btn_new_post).setVisibility(View.VISIBLE);
@@ -235,7 +254,6 @@ public class MainActivity extends AppCompatActivity implements
         ((App) getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
             @Override
             public void call(final Collection<Content> result, Exception e) {
-                Log.d(TAG, "call() called with: " + "result = [" + result + "], e = [" + e + "]");
                 final VisualContentManager visualContentManager = mTangoManager
                         .getVisualContentManager();
                 new Thread(new Runnable() {

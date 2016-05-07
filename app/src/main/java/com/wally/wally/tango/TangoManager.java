@@ -1,7 +1,6 @@
 package com.wally.wally.tango;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -221,6 +220,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
 
     @Override
     public void onTangoEvent(TangoEvent event) {
+        Log.d(TAG, "onTangoEvent() called with: " + "event = [" + event + "]");
         if (mTangoUx != null) {
             mTangoUx.updateTangoEvent(event);
         }
