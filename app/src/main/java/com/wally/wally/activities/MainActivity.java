@@ -192,7 +192,17 @@ public class MainActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-
+            App app = ((App) getApplicationContext());
+            app.getDataController().googleAuth(acct.getIdToken(), new Callback<Boolean>() {
+                @Override
+                public void call(Boolean result, Exception e) {
+                    if (e != null) {
+                        Log.d("auth", result.toString());
+                    } else {
+                        Log.d("auth", e.toString());
+                    }
+                }
+            });
             // TODO get token and send to firebase
             Log.d(TAG, "handleSignInResult: " + acct.getIdToken());
 
