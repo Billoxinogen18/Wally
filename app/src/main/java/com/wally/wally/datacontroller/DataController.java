@@ -5,10 +5,15 @@ import android.content.Context;
 import com.firebase.client.Firebase;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.content.FirebaseDAL;
 import com.wally.wally.datacontroller.content.FirebaseQuery;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 public class DataController {
@@ -16,9 +21,9 @@ public class DataController {
     private static final String CONTENT_DB_NAME = "Contents";
     private static DataController instance;
 
-    private DataAccessLayer<Content, FirebaseQuery> contentManager;
+    private DataAccessLayer<FirebaseContent, FirebaseQuery> contentManager;
 
-    private DataController(DataAccessLayer<Content, FirebaseQuery> contentManager) {
+    private DataController(DataAccessLayer<FirebaseContent, FirebaseQuery> contentManager) {
         this.contentManager = contentManager;
     }
 
@@ -32,20 +37,34 @@ public class DataController {
     }
 
     public void save(Content c) {
-        contentManager.save(c);
+        contentManager.save(new FirebaseContent(c));
     }
-    public void delete(Content c) { contentManager.delete(c); }
+    public void delete(Content c) { contentManager.delete(new FirebaseContent(c)); }
 
-    public void fetch(Callback<Collection<Content>> resultCallback) {
-        contentManager.fetch(new FirebaseQuery(), resultCallback);
+    public void fetch(LatLngBounds bounds, final Callback<Collection<Content>> resultCallback) {
+        contentManager.fetch(new FirebaseQuery().withBounds(bounds), new Callback<Collection<FirebaseContent>>() {
+            @Override
+            public void call(Collection<FirebaseContent> result, Exception e) {
+                List<Content> contents = new ArrayList<>();
+                for (FirebaseContent c : result) {
+                    contents.add(c.toContent());
+                }
+                resultCallback.call(contents, e);
+            }
+        });
     }
 
-    public void fetch(LatLngBounds bounds, Callback<Collection<Content>> resultCallback) {
-        contentManager.fetch(new FirebaseQuery().withBounds(bounds), resultCallback);
-    }
-
-    public void fetch(String uuid, Callback<Collection<Content>> resultCallback) {
-        contentManager.fetch(new FirebaseQuery().withUuid(uuid), resultCallback);
+    public void fetch(String uuid, final Callback<Collection<Content>> resultCallback) {
+        contentManager.fetch(new FirebaseQuery().withUuid(uuid), new Callback<Collection<FirebaseContent>>() {
+            @Override
+            public void call(Collection<FirebaseContent> result, Exception e) {
+                List<Content> contents = new ArrayList<>();
+                for (FirebaseContent c : result) {
+                    contents.add(c.toContent());
+                }
+                resultCallback.call(contents, e);
+            }
+        });
     }
 
 }

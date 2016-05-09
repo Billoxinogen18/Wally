@@ -45,12 +45,27 @@ public class TangoData implements Serializable {
         this.scale = scale;
     }
 
+    public TangoData withScale(double scale) {
+        this.scale = scale;
+        return this;
+    }
+
     public double[] getRotation() {
         return rotation;
     }
 
+    public TangoData withRotation(double[] rotation) {
+        this.rotation = rotation;
+        return this;
+    }
+
     public double[] getTranslation() {
         return translation;
+    }
+
+    public TangoData withTranslation(double[] translation) {
+        this.translation = translation;
+        return this;
     }
 
     @JsonIgnore

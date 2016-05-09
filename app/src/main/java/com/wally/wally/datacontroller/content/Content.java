@@ -1,6 +1,5 @@
 package com.wally.wally.datacontroller.content;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
@@ -22,13 +21,13 @@ public class Content implements Serializable {
         this.id = id;
     }
 
-    @JsonIgnore
     public String getId() {
         return this.id;
     }
 
-    void setId(String id) {
+    public Content withId(String id) {
         this.id = id;
+        return this;
     }
 
     public String getUuid() {
