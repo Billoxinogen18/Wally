@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+@Deprecated
 public class FirebaseDAL implements DataAccessLayer<FirebaseContent, FirebaseQuery> {
     private Firebase fb;
 

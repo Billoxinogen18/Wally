@@ -1,6 +1,7 @@
 package com.wally.wally.datacontroller.firebase;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.firebase.client.Firebase;
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
@@ -123,6 +124,20 @@ public class FirebaseContent {
 
     public boolean getIsPreviewVisible() {
         return isPreviewVisible;
+    }
+
+    public void save(Firebase ref) {
+        if (id == null) {
+            ref = ref.push();
+            ref.setValue(this);
+            setId(ref.getKey());
+        } else {
+            ref.child(id).setValue(this);
+        }
+    }
+
+    public void delete(Firebase ref) {
+        ref.child(id).removeValue();
     }
 
     public Content toContent() {
