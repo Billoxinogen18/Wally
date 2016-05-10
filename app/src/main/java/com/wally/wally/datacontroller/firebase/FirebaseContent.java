@@ -1,7 +1,10 @@
-package com.wally.wally.datacontroller.content;
+package com.wally.wally.datacontroller.firebase;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.TangoData;
+import com.wally.wally.datacontroller.content.Visibility;
 
 import java.util.Date;
 

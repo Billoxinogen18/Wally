@@ -1,4 +1,4 @@
-package com.wally.wally.datacontroller.content;
+package com.wally.wally.datacontroller.firebase;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;

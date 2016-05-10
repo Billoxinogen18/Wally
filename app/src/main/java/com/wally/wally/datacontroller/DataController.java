@@ -5,20 +5,18 @@ import android.content.Context;
 import com.firebase.client.Firebase;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.FirebaseContent;
-import com.wally.wally.datacontroller.content.FirebaseDAL;
-import com.wally.wally.datacontroller.content.FirebaseQuery;
+import com.wally.wally.datacontroller.firebase.FirebaseContent;
+import com.wally.wally.datacontroller.firebase.FirebaseDAL;
+import com.wally.wally.datacontroller.firebase.FirebaseQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class DataController {
     private static final String FIREBASE_URL = "https://burning-inferno-2566.firebaseio.com/";
-    private static final String CONTENT_DB_NAME = "Contents";
+    private static final String CONTENT_DB_NAME = "Develop-Contents";
     private static DataController instance;
 
     private DataAccessLayer<FirebaseContent, FirebaseQuery> contentManager;
@@ -36,9 +34,8 @@ public class DataController {
         return instance;
     }
 
-    public void save(Content c) {
-        contentManager.save(new FirebaseContent(c));
-    }
+    public void save(Content c) { contentManager.save(new FirebaseContent(c)); }
+
     public void delete(Content c) { contentManager.delete(new FirebaseContent(c)); }
 
     public void fetch(LatLngBounds bounds, final Callback<Collection<Content>> resultCallback) {
