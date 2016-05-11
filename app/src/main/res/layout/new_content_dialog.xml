@@ -46,17 +46,14 @@
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
-                <Button
+                <Spinner
                     android:id="@+id/btn_visibility_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:background="?attr/selectableItemBackground"
-                    android:drawableRight="@drawable/ic_public_visibility_24dp"
-                    android:padding="8dp"
-                    android:text="Public"
-                    android:textAllCaps="false" />
+                    android:layout_centerVertical="true">
+
+                </Spinner>
             </RelativeLayout>
 
             <EditText
@@ -113,6 +110,12 @@
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
 
+    <android.support.v4.widget.Space
+        android:id="@+id/range_slider"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
     <LinearLayout
         android:id="@+id/bottom_panel"
         android:layout_width="match_parent"
@@ -140,6 +143,32 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
             android:src="@drawable/ic_select_colors_24dp" />
+
+        <ToggleButton
+            android:id="@+id/is_visible_on_map"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:layout_marginTop="-4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:drawableStart="@drawable/preview_visibility"
+            android:text=""
+            android:textOn=""
+            android:textOff=""
+            android:padding="8dp"/>
+
+        <ToggleButton
+            android:id="@+id/range_button"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:layout_marginTop="-4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:drawableStart="@drawable/preview_visibility"
+            android:text=""
+            android:textOn=""
+            android:textOff=""
+            android:padding="8dp"/>
 
         <android.support.v4.widget.Space
             android:layout_width="0dp"

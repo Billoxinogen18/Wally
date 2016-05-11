@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.widget.Space;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -18,9 +19,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
@@ -31,6 +35,7 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.activities.ChoosePhotoActivity;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.Visibility;
 
 /**
  * New Post dialog, that manages adding new content.
@@ -45,10 +50,15 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     private static final int REQUEST_CODE_MY_LOCATION = 22;
 
     private NewContentDialogListener mListener;
+
     private View mImageContainer;
     private ImageView mImageView;
     private EditText mTitleEt;
     private EditText mNoteEt;
+    private Space mRangeSlider;
+    private Spinner mVisibilitySpinner;
+    private ToggleButton mPreviewVisibilityToggle;
+
     private Content mContent;
     private boolean isEditMode;
     private GoogleApiClient mGoogleApiClient;
@@ -79,33 +89,51 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         } else {
             isEditMode = false;
         }
-        if (mContent == null) {
-            mContent = new Content();
-        }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
-
-        dv.findViewById(R.id.btn_visibility_status).setOnClickListener(this);
-        dv.findViewById(R.id.btn_add_image).setOnClickListener(this);
-        dv.findViewById(R.id.btn_remove_image).setOnClickListener(this);
-        dv.findViewById(R.id.btn_pallette).setOnClickListener(this);
-
-        dv.findViewById(R.id.btn_discard_post).setOnClickListener(this);
-        dv.findViewById(R.id.btn_create_post).setOnClickListener(this);
-
-        if (isEditMode) {
-            Button b = (Button) dv.findViewById(R.id.btn_create_post);
-            b.setText(R.string.post_update);
-        }
-        mImageView = (ImageView) dv.findViewById(R.id.image);
-        mImageContainer = dv.findViewById(R.id.image_container);
 
         if (savedInstanceState != null) {
             mContent = (Content) savedInstanceState.getSerializable("mContent");
         }
 
+        if (mContent == null) {
+            mContent = new Content();
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
+
+//        dv.findViewById(R.id.btn_visibility_status).setOnClickListener(this);
+        dv.findViewById(R.id.btn_add_image).setOnClickListener(this);
+        dv.findViewById(R.id.btn_remove_image).setOnClickListener(this);
+        dv.findViewById(R.id.btn_pallette).setOnClickListener(this);
+        dv.findViewById(R.id.btn_discard_post).setOnClickListener(this);
+        dv.findViewById(R.id.btn_create_post).setOnClickListener(this);
+
+        mImageView = (ImageView) dv.findViewById(R.id.image);
+        mImageContainer = dv.findViewById(R.id.image_container);
         mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
         mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
+        mVisibilitySpinner = (Spinner) dv.findViewById(R.id.btn_visibility_status);
+        mVisibilitySpinner.setAdapter(new VisibilityAdapter(getContext()));
+        mPreviewVisibilityToggle = (ToggleButton) dv.findViewById(R.id.is_visible_on_map);
+        mRangeSlider = (Space) dv.findViewById(R.id.range_slider);
+
+        ToggleButton rangeButton = (ToggleButton) dv.findViewById(R.id.range_button);
+        rangeButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    mRangeSlider.setVisibility(View.VISIBLE);
+                }else{
+                    mRangeSlider.setVisibility(View.GONE);
+                }
+
+            }
+        });
+
+        if (isEditMode) {
+            Button b = (Button) dv.findViewById(R.id.btn_create_post);
+            b.setText(R.string.post_update);
+        }
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -179,7 +207,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 updateViews();
                 break;
             case R.id.btn_pallette:
-            case R.id.btn_visibility_status:
                 Toast.makeText(getActivity(), "Not yet implemented", Toast.LENGTH_SHORT).show();
                 break;
             default:
@@ -196,7 +223,18 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             Log.e(TAG, "centerMapOnMyLocation: couldn't get user location");
             Toast.makeText(getContext(), "Couldn't get user location", Toast.LENGTH_SHORT).show();
         } else {
-            mContent.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
+            //noinspection WrongConstant
+            Visibility.SocialVisibility socialVisibility =
+                    new Visibility.SocialVisibility((Integer) mVisibilitySpinner.getSelectedItem());
+
+            boolean isPreviewable = mPreviewVisibilityToggle.isChecked();
+
+            mContent.withLocation(new LatLng(myLocation.getLatitude(),myLocation.getLongitude()))
+                    .withVisibility(new Visibility()
+                            .withSocialVisibility(socialVisibility)
+                            .withRangeVisibility(null)
+                            .withTimeVisibility(null)
+                            .withVisiblePreview(isPreviewable));
         }
 
         updateContent();

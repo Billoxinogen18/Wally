@@ -117,9 +117,9 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
         if (mVisualContentManager.hasStaticContentToBeRendered()) {
             while(!mVisualContentManager.getStaticContentToBeRenderedOnScreen().isEmpty()){ //TODO refactor nicely
                 VisualContent visualContent = mVisualContentManager.getStaticContentToBeRenderedOnScreen().get(0);
-                getCurrentScene().addChild(visualContent);
+                getCurrentScene().addChild(visualContent.getVisual());
                 mVisualContentManager.addStaticContentAlreadyRenderedOnScreen(visualContent);
-                mPicker.registerObject(visualContent);
+                mPicker.registerObject(visualContent.getVisual());
             }
         }
     }
@@ -131,7 +131,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
                 Log.e(TAG, "Error in logic activeVisualContent should not be null");
             }
             removeBorder();
-            getCurrentScene().addChild(activeVisualContent);
+            getCurrentScene().addChild(activeVisualContent.getVisual());
             mVisualContentManager.activeContentAlreadyRenderedOnScreen();
 
         } else if (mVisualContentManager.isActiveContentRenderedOnScreen()) {
@@ -226,13 +226,13 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
     }
 
     public void removeActiveContent(ActiveVisualContent activeVisualContent) {
-        getCurrentScene().removeChild(activeVisualContent);
+        getCurrentScene().removeChild(activeVisualContent.getVisual());
         mVisualContentManager.removeActiveContent();
         mOnContentSelectedListener.onVisualContentSelected(null);
     }
 
     public void removeStaticContent(VisualContent visualContent) {
-        getCurrentScene().removeChild(visualContent);
+        getCurrentScene().removeChild(visualContent.getVisual());
         mVisualContentManager.removeStaticContentAlreadyRenderedOnScreen(visualContent);
         mOnContentSelectedListener.onVisualContentSelected(null);
         removeBorder();

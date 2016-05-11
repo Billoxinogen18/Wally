@@ -32,23 +32,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     }
 
     public double getScale() {
-
-        if (mTangoManager == null) {
-            Log.d("bla", "tango");
-        }
-
-        if (mTangoManager.getVisualContentManager() == null) {
-            Log.d("bla", "visualcontentmanager");
-        }
-
-        if (mTangoManager.getVisualContentManager().getActiveContent() == null) {
-            Log.d("bla", "active content");
-        }
-
-        if (mTangoManager.getVisualContentManager().getActiveContent().getScale() == null) {
-            Log.d("bla", "scalse");
-        }
-        return mTangoManager.getVisualContentManager().getActiveContent().getScale().x;
+        return mTangoManager.getVisualContentManager().getActiveContent().getVisual().getScale().x;
     }
 
     public void setFittingStatusListener(OnContentFitListener fittingStatusListener) {
@@ -72,7 +56,6 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
             }
         }
         mFittingStatusListener.onContentFit(null);
-        Log.d("BLS", "Setting activecontent to tango... " + getContent());
         mTangoManager.setActiveContent(tangoPoseData, getContent());
 
         // Update content timely, while we are cancelled.
