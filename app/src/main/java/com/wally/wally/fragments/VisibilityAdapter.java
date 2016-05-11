@@ -39,7 +39,7 @@ public class VisibilityAdapter extends BaseAdapter {
 
     private Context mContext;
 
-    public VisibilityAdapter(Context context){
+    public VisibilityAdapter(Context context) {
         this.mContext = context;
     }
 
@@ -61,9 +61,9 @@ public class VisibilityAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         TextView tv;
-        if(convertView == null){
+        if (convertView == null) {
             tv = new TextView(mContext);
-        }else{
+        } else {
             tv = (TextView) convertView;
         }
 

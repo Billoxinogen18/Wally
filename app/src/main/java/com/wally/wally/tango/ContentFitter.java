@@ -1,7 +1,6 @@
 package com.wally.wally.tango;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.atap.tangoservice.TangoPoseData;
 import com.wally.wally.datacontroller.content.Content;

@@ -121,9 +121,9 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         rangeButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
+                if (isChecked) {
                     mRangeSlider.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     mRangeSlider.setVisibility(View.GONE);
                 }
 
@@ -229,7 +229,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
             boolean isPreviewable = mPreviewVisibilityToggle.isChecked();
 
-            mContent.withLocation(new LatLng(myLocation.getLatitude(),myLocation.getLongitude()))
+            mContent.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()))
                     .withVisibility(new Visibility()
                             .withSocialVisibility(socialVisibility)
                             .withRangeVisibility(null)

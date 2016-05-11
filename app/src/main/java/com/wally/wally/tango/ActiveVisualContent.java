@@ -58,17 +58,17 @@ public class ActiveVisualContent extends VisualContent {
 
     public void scaleContent(double byFactor){
         TangoData tangoData = mContent.getTangoData();
-        if(tangoData != null){
+        if (tangoData != null) {
             tangoData.setScale(tangoData.getScale() * byFactor);
             refreshVisualScale();
-        }else{
+        } else {
             Log.e(TAG, "scaleContent: tangoData was null");
         }
     }
 
 
     @Override
-    public ContentPlane getVisual(){
+    public ContentPlane getVisual() {
         super.getVisual();
         mVisual.setPosition(mCurrentPose.getPosition());
         mVisual.setRotation(mCurrentPose.getOrientation());

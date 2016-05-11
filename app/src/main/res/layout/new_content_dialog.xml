@@ -114,7 +114,7 @@
         android:id="@+id/range_slider"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/bottom_panel"
@@ -148,27 +148,27 @@
             android:id="@+id/is_visible_on_map"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:gravity="center"
             android:layout_marginTop="-4dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:drawableStart="@drawable/preview_visibility"
+            android:gravity="center"
+            android:padding="8dp"
             android:text=""
-            android:textOn=""
             android:textOff=""
-            android:padding="8dp"/>
+            android:textOn="" />
 
         <ToggleButton
             android:id="@+id/range_button"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:gravity="center"
             android:layout_marginTop="-4dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:drawableStart="@drawable/preview_visibility"
+            android:gravity="center"
+            android:padding="8dp"
             android:text=""
-            android:textOn=""
             android:textOff=""
-            android:padding="8dp"/>
+            android:textOn="" />
 
         <android.support.v4.widget.Space
             android:layout_width="0dp"

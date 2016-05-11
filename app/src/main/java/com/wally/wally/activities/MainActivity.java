@@ -122,14 +122,14 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        mTangoManager.onPause();
         hideProgress();
+        mTangoManager.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mLoginManager.isLoggedIn()) {
+        if (!mLoginManager.isLoggedIn()) {
             showProgress();
             mLoginManager.tryLogin();
         }
@@ -254,6 +254,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLogin(String userName) {
         Log.d(TAG, "onLogin() called with: " + "userName = [" + userName + "]");
+        hideProgress();
+        // TODO update views
     }
 
     private void saveActiveContent(Content content, Pose pose, double scale) {

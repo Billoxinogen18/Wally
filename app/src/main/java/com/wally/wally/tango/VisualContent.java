@@ -29,7 +29,7 @@ public class VisualContent {
         mContent = content;
     }
 
-    protected void refreshVisualScale(){
+    protected void refreshVisualScale() {
         mVisual.setScale(mContent.getTangoData().getScale());
     }
 
@@ -50,8 +50,8 @@ public class VisualContent {
     }
 
     //Should be called from rajawali thread
-    public ContentPlane getVisual(){
-        if(mVisual == null) {
+    public ContentPlane getVisual() {
+        if (mVisual == null) {
             mVisual = new ContentPlane();
 
             Bitmap bitmap = Utils.createBitmapFromContent(mContent);

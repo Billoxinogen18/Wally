@@ -193,6 +193,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
         editor.putInt("AUTH_TYPE", AUTH_TYPE_GUEST);
         editor.apply();
+        mAuthListener.onAuth(true);
     }
 
     public boolean isUserAGuest() {

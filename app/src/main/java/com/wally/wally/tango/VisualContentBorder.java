@@ -44,6 +44,13 @@ public class VisualContentBorder extends ContentPlane {
         mAnimationWorking = false;
     }
 
+    public static VisualContentBorder getInstance() {
+        if (instance == null) {
+            instance = new VisualContentBorder();
+        }
+        return instance;
+    }
+
     private Material createMaterial() {
         Material material = new Material();
         try {
@@ -69,13 +76,6 @@ public class VisualContentBorder extends ContentPlane {
         mBorderAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
         mBorderAnimation.setTransformable3D(this);
         return mBorderAnimation;
-    }
-
-    public static VisualContentBorder getInstance() {
-        if (instance == null) {
-            instance = new VisualContentBorder();
-        }
-        return instance;
     }
 
     private void playAnimation(RajawaliScene scene) {

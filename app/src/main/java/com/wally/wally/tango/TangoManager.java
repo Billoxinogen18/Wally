@@ -36,10 +36,10 @@ import java.util.Collection;
  * Created by shota on 4/21/16.
  */
 public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDetector.OnScaleGestureListener, OnVisualContentSelectedListener {
-    private static final String TAG = TangoManager.class.getSimpleName();
     public static final TangoCoordinateFramePair FRAME_PAIR = new TangoCoordinateFramePair(
             TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
             TangoPoseData.COORDINATE_FRAME_DEVICE);
+    private static final String TAG = TangoManager.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
 
     private Context mContext;
@@ -93,23 +93,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         fetchContentForAdf(adfUuid);
     }
 
-    private void fetchContentForAdf(String adfUuid) {
-        ((App) mContext.getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
-            @Override
-            public void call(final Collection<Content> result, Exception e) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (Content c : result) {
-                            Log.d(TAG, c.toString());
-                            mVisualContentManager.addStaticContentToBeRenderedOnScreen(new VisualContent(c));
-                        }
-                    }
-                }).start();
-            }
-        });
-    }
-
     /**
      * Calculates and stores the fixed transformations between the device and
      * the various sensors to be used later for transformations between frames.
@@ -130,6 +113,23 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         TangoPoseData imuTdepthPose = tango.getPoseAtTime(0.0, framePair);
 
         return new DeviceExtrinsics(imuTdevicePose, imuTrgbPose, imuTdepthPose);
+    }
+
+    private void fetchContentForAdf(String adfUuid) {
+        ((App) mContext.getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
+            @Override
+            public void call(final Collection<Content> result, Exception e) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Content c : result) {
+                            Log.d(TAG, c.toString());
+                            mVisualContentManager.addStaticContentToBeRenderedOnScreen(new VisualContent(c));
+                        }
+                    }
+                }).start();
+            }
+        });
     }
 
     public VisualContentManager getVisualContentManager() {
@@ -461,7 +461,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
 
     @Override
     public void onVisualContentSelected(VisualContent c) {
-        onContentSelectedListener.onContentSelected(c != null ? c.getContent(): null);
+        onContentSelectedListener.onContentSelected(c != null ? c.getContent() : null);
 
     }
 
@@ -494,7 +494,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         onContentFitListener.onFitStatusChange(false);
     }
 
-    public void finishFitting(){
+    public void finishFitting() {
         mContentFitter.finishFitting();
         mContentFitter = null;
         onContentFitListener.onFitStatusChange(false);
