@@ -36,26 +36,31 @@ import java.util.Collection;
  * Created by shota on 4/21/16.
  */
 public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDetector.OnScaleGestureListener, OnVisualContentSelectedListener {
+    private static final String TAG = TangoManager.class.getSimpleName();
     public static final TangoCoordinateFramePair FRAME_PAIR = new TangoCoordinateFramePair(
             TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
             TangoPoseData.COORDINATE_FRAME_DEVICE);
-    private static final String TAG = TangoManager.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
-    private ScaleGestureDetector mScaleDetector;
-    private RajawaliSurfaceView mSurfaceView;
-    private WallyRenderer mRenderer;
+
+    private Context mContext;
+
     private TangoCameraIntrinsics mIntrinsics;
     private DeviceExtrinsics mExtrinsics;
     private TangoPointCloudManager mPointCloudManager;
     private Tango mTango;
     private TangoUx mTangoUx;
-    private String mAdfUuid;
-    private double mCameraPoseTimestamp = 0;
-    private boolean mIsConnected;
+
+    private RajawaliSurfaceView mSurfaceView;
+    private WallyRenderer mRenderer;
     private VisualContentManager mVisualContentManager;
-    private Context mContext;
 
     private ContentFitter mContentFitter;
+    private ScaleGestureDetector mScaleDetector;
+
+    private String mAdfUuid;
+    private double mCameraPoseTimestamp = 0;
+
+    private boolean mIsConnected;
 
     // Texture rendering related fields
     // NOTE: Naming indicates which thread is in charge of updating this variable
@@ -174,7 +179,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
 
         if (mContentFitter != null) {
             if (mContentFitter.isCancelled()) {
-                Log.d("BLA", "OnResume()()()");
                 mContentFitter = new ContentFitter(mContentFitter.getContent(), this);
             }
             mContentFitter.setFittingStatusListener(onContentFitListener);
@@ -457,9 +461,8 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
 
     @Override
     public void onVisualContentSelected(VisualContent c) {
-        if(c!=null){
-            onContentSelectedListener.onContentSelected(c.getContent());
-        }
+        onContentSelectedListener.onContentSelected(c != null ? c.getContent(): null);
+
     }
 
     public void onContentCreated(Content content) {
@@ -467,7 +470,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
             Log.e(TAG, "onContentCreated: called when content was already fitting");
             return;
         }
-        Log.d("BLA", "OnContentCreated()()()");
         mContentFitter = new ContentFitter(content, this);
         mContentFitter.setFittingStatusListener(onContentFitListener);
         mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -480,16 +482,15 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("FITTING_CONTENT")) {
                 Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
-                Log.d("BLA", "restoreState()()()");
                 mContentFitter = new ContentFitter(c, this);
             }
-            onContentSelectedListener.onContentSelected((Content) savedInstanceState.getSerializable("mSelectedContent"));
         }
     }
 
     public void cancelFitting() {
         mContentFitter.cancel(true);
         mContentFitter = null;
+
         onContentFitListener.onFitStatusChange(false);
     }
 

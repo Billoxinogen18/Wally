@@ -132,7 +132,7 @@ public class VisualContentManager {
     public synchronized VisualContent findContentByObject3D(Object3D object) {
         // TODO make with hashmap to get better performance
         for (VisualContent vc : mAlreadyRenderedOnScene) {
-            if (vc.equals(object)) {
+            if (vc.getVisual().equals(object)) {
                 return vc;
             }
         }
