@@ -46,6 +46,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
     private GoogleApiClient mGoogleApiClient;
     private LoginListener mLoginListener;
     private AuthListener mAuthListener;
+
     /**
      * We need fragmentActivity because it gives us more flexibility using GoogleClientApi
      *
@@ -82,10 +83,10 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
     }
 
     /**
-     * Try to login silently without showing on UI.
-     * If user has logged in once, we must be able to silently sign in.
+     * Try to authenticate silently without showing on UI.
+     * If user has authenticated even once, we must be able to silently sign in.
      */
-    public void trySilentLogin() {
+    public void trySilentAuth() {
         OptionalPendingResult<GoogleSignInResult> pendingResult =
                 Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (pendingResult.isDone()) {
@@ -160,7 +161,8 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         if (TextUtils.isEmpty(token)) {
             throw new IllegalStateException("You can call tryLogin only when token is present!");
         }
-        DataController dc = ((App) mContext.getApplicationContext()).getDataController();
+        DataController dc = App.getInstance().getDataController();
+        // TODO get and update object in application
         dc.googleAuth(getToken(), new Callback<Boolean>() {
             @Override
             public void call(Boolean result, Exception e) {
@@ -191,6 +193,15 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
         editor.putInt("AUTH_TYPE", AUTH_TYPE_GUEST);
         editor.apply();
+    }
+
+    public boolean isUserAGuest() {
+        return PreferenceManager
+                .getDefaultSharedPreferences(mContext).getInt("AUTH_TYPE", -1) == AUTH_TYPE_GUEST;
+    }
+
+    public boolean isLoggedIn() {
+        return App.getInstance().getUserInfo() != null || isUserAGuest();
     }
 
     /**

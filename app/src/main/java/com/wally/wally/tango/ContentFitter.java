@@ -33,19 +33,19 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
 
     public double getScale() {
 
-        if(mTangoManager == null){
+        if (mTangoManager == null) {
             Log.d("bla", "tango");
         }
 
-        if(mTangoManager.getVisualContentManager() == null){
+        if (mTangoManager.getVisualContentManager() == null) {
             Log.d("bla", "visualcontentmanager");
         }
 
-        if(mTangoManager.getVisualContentManager().getActiveContent() == null){
+        if (mTangoManager.getVisualContentManager().getActiveContent() == null) {
             Log.d("bla", "active content");
         }
 
-        if(mTangoManager.getVisualContentManager().getActiveContent().getScale() == null){
+        if (mTangoManager.getVisualContentManager().getActiveContent().getScale() == null) {
             Log.d("bla", "scalse");
         }
         return mTangoManager.getVisualContentManager().getActiveContent().getScale().x;

@@ -33,7 +33,8 @@ public class FirebaseContent {
     private Date visibleUntil;
     private boolean isPreviewVisible;
 
-    public FirebaseContent() {}
+    public FirebaseContent() {
+    }
 
     public FirebaseContent(Content content) {
         id = content.getId();
@@ -65,13 +66,13 @@ public class FirebaseContent {
         }
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     @JsonIgnore
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getNote() {

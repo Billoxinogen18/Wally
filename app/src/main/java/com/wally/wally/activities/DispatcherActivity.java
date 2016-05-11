@@ -21,7 +21,7 @@ public class DispatcherActivity extends AppCompatActivity implements LoginManage
         super.onCreate(savedInstanceState);
         LoginManager manager = new LoginManager(this);
         manager.setAuthListener(this);
-        manager.trySilentLogin();
+        manager.trySilentAuth();
     }
 
     @Override

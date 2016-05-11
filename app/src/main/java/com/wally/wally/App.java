@@ -12,18 +12,22 @@ import com.wally.wally.datacontroller.DataController;
  * Created by ioane5 on 3/31/16.
  */
 public class App extends Application {
+    private static App sInstance = null;
     private DataController dataController;
-    private static Context appContext = null;
+
+    public static App getInstance() {
+        return sInstance;
+    }
+
+    public static Context getContext() {
+        return sInstance.getBaseContext();
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         dataController = DataController.create(this);
-        appContext = getBaseContext();
-    }
-
-    public static Context getContext(){
-        return appContext;
+        sInstance = this;
     }
 
     public DataController getDataController() {
@@ -31,9 +35,13 @@ public class App extends Application {
     }
 
     @Override
-    protected void attachBaseContext(Context base){
+    protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
 
+    // TODO change with real use object
+    public Object getUserInfo() {
+        return null;
+    }
 }

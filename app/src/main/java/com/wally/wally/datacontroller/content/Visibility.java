@@ -19,22 +19,22 @@ public class Visibility implements Serializable {
     private boolean isPreviewVisible;
 
 
-    public Visibility withSocialVisibility(SocialVisibility socialVisibility){
+    public Visibility withSocialVisibility(SocialVisibility socialVisibility) {
         this.socialVisibility = socialVisibility;
         return this;
     }
 
-    public Visibility withRangeVisibility(RangeVisibility rangeVisibility){
+    public Visibility withRangeVisibility(RangeVisibility rangeVisibility) {
         this.rangeVisibility = rangeVisibility;
         return this;
     }
 
-    public Visibility withTimeVisibility(Date visibleUntil){
+    public Visibility withTimeVisibility(Date visibleUntil) {
         this.visibleUntil = visibleUntil;
         return this;
     }
 
-    public Visibility withVisiblePreview(boolean isPreviewVisible){
+    public Visibility withVisiblePreview(boolean isPreviewVisible) {
         this.isPreviewVisible = isPreviewVisible;
         return this;
     }
@@ -55,57 +55,62 @@ public class Visibility implements Serializable {
         return isPreviewVisible;
     }
 
-    public static class SocialVisibility implements Serializable{
-        @IntDef({PRIVATE, PUBLIC, FRIENDS, CUSTOM, ANONYMOUS})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface SocialVisibilityMode {}
+    public static class SocialVisibility implements Serializable {
         public static final int PRIVATE = 0;
         public static final int PUBLIC = 1;
         public static final int FRIENDS = 2;
         public static final int CUSTOM = 3;
         public static final int ANONYMOUS = 4;
-
         //TODO Change to User object
         private List<String> users;
         private int mode;
 
-        public SocialVisibility(@SocialVisibilityMode int mode){
+        public SocialVisibility(@SocialVisibilityMode int mode) {
             setMode(mode);
         }
 
-        public void setMode(@SocialVisibilityMode int mode){
+        public
+        @SocialVisibilityMode
+        int getMode() {
+            return mode;
+        }
+
+        public void setMode(@SocialVisibilityMode int mode) {
             this.mode = mode;
         }
 
-        public @SocialVisibilityMode int getMode(){
-            return mode;
+        @IntDef({PRIVATE, PUBLIC, FRIENDS, CUSTOM, ANONYMOUS})
+        @Retention(RetentionPolicy.SOURCE)
+        public @interface SocialVisibilityMode {
         }
 
     }
 
-    public static class RangeVisibility implements Serializable{
-        @IntDef({HERE, NEAR, LOCAL, DISTANT, FAR})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface RangeVisibilityMode {}
-
+    public static class RangeVisibility implements Serializable {
         public static final int HERE = 0;
         public static final int NEAR = 1;
         public static final int LOCAL = 2;
         public static final int DISTANT = 3;
         public static final int FAR = 4;
-
         private int range;
 
-        public RangeVisibility(@RangeVisibilityMode int range){
+        public RangeVisibility(@RangeVisibilityMode int range) {
             setRange(range);
         }
 
-        public void setRange(@RangeVisibilityMode int range){
+        public
+        @RangeVisibilityMode
+        int getRange() {
+            return range;
+        }
+
+        public void setRange(@RangeVisibilityMode int range) {
             this.range = range;
         }
 
-        public @RangeVisibilityMode int getRange(){
-            return range;
+        @IntDef({HERE, NEAR, LOCAL, DISTANT, FAR})
+        @Retention(RetentionPolicy.SOURCE)
+        public @interface RangeVisibilityMode {
         }
     }
 }

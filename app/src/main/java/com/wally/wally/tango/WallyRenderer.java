@@ -51,7 +51,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
     // Augmented reality related fields
     private ATexture mTangoCameraTexture;
     private boolean mSceneCameraConfigured;
-//    private ScaleGestureDetector mScaleDetector;
+    //    private ScaleGestureDetector mScaleDetector;
     private OnVisualContentSelectedListener mOnContentSelectedListener;
     private ObjectColorPicker mPicker;
 

@@ -1,5 +1,4 @@
 package com.wally.wally.datacontroller;
-
 import android.content.Context;
 import android.util.Log;
 
@@ -9,8 +8,6 @@ import com.firebase.client.FirebaseError;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.firebase.FirebaseContent;
-import com.wally.wally.datacontroller.firebase.FirebaseDAL;
-import com.wally.wally.datacontroller.firebase.FirebaseQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +19,6 @@ public class DataController {
     private static final String CONTENT_DB_NAME = "Develop-Contents";
     private static DataController instance;
     private static Firebase firebaseRoot;
-    private static Firebase fbInstance;
 
     private DataController(Firebase firebase) {
         firebaseRoot = firebase;
@@ -31,17 +27,14 @@ public class DataController {
     public static DataController create(Context context) {
         if (instance == null) {
             Firebase.setAndroidContext(context);
-            fbInstance = new Firebase(FIREBASE_URL);
-            instance = new DataController(new FirebaseDAL(fbInstance.child(CONTENT_DB_NAME)));
             Firebase firebase = new Firebase(FIREBASE_URL).child(CONTENT_DB_NAME);
             instance = new DataController(firebase);
         }
         return instance;
     }
 
-    private static void firebaseAuth(String accessToken, final Callback<Boolean> resultCallback) {
-        Log.d("AUTH", "firebaseAuth() called with: " + "accessToken = [" + accessToken + "], resultCallback = [" + resultCallback + "]");
-        fbInstance.authWithOAuthToken("google", accessToken, new Firebase.AuthResultHandler() {
+    private void firebaseAuth(String accessToken, final Callback<Boolean> resultCallback) {
+        firebaseRoot.authWithOAuthToken("google", accessToken, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
                 Log.d("auth", authData.getProviderData().get("displayName").toString());
@@ -55,19 +48,17 @@ public class DataController {
         });
     }
 
-    public void save(Content c) {
-        contentManager.save(c);
+    public void googleAuth(String accessToken, Callback<Boolean> resultCallback) {
+        firebaseAuth(accessToken, resultCallback);
     }
-    public void save(Content c) { new FirebaseContent(c).save(firebaseRoot); }
+
+    public void save(Content c) {
+        new FirebaseContent(c).save(firebaseRoot);
+    }
 
     public void delete(Content c) {
-        contentManager.delete(c);
+        new FirebaseContent(c).delete(firebaseRoot);
     }
-
-    public void googleAuth(String accessToken, Callback<Boolean> resultCallback) {
-
-        firebaseAuth(accessToken, resultCallback);
-    public void delete(Content c) { new FirebaseContent(c).delete(firebaseRoot); }
 
     public void fetch(LatLngBounds bounds, final Callback<Collection<Content>> resultCallback) {
         new LatLngQuery(bounds).fetch(firebaseRoot, createFetchCallback(resultCallback));

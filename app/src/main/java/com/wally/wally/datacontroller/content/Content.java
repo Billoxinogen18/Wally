@@ -87,11 +87,11 @@ public class Content implements Serializable {
         return this;
     }
 
-    public Visibility getVisibility(){
+    public Visibility getVisibility() {
         return visibility;
     }
 
-    public Content withVisibility(Visibility visibility){
+    public Content withVisibility(Visibility visibility) {
         this.visibility = visibility;
         return this;
     }
