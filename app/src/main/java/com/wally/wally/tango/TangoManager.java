@@ -1,10 +1,11 @@
 package com.wally.wally.tango;
 
 import android.content.Context;
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.View;
 
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
@@ -20,19 +21,21 @@ import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
-import com.wally.wally.ContentSelectListener;
-import com.wally.wally.WallyRenderer;
+import com.wally.wally.App;
+import com.wally.wally.OnContentSelectedListener;
+import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.content.Content;
 
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by shota on 4/21/16.
  */
-public class TangoManager implements Tango.OnTangoUpdateListener {
+public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDetector.OnScaleGestureListener, OnVisualContentSelectedListener {
     public static final TangoCoordinateFramePair FRAME_PAIR = new TangoCoordinateFramePair(
             TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
             TangoPoseData.COORDINATE_FRAME_DEVICE);
@@ -46,11 +49,13 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private TangoPointCloudManager mPointCloudManager;
     private Tango mTango;
     private TangoUx mTangoUx;
-    private String adfUuid;
+    private String mAdfUuid;
     private double mCameraPoseTimestamp = 0;
     private boolean mIsConnected;
     private VisualContentManager mVisualContentManager;
     private Context mContext;
+
+    private ContentFitter mContentFitter;
 
     // Texture rendering related fields
     // NOTE: Naming indicates which thread is in charge of updating this variable
@@ -58,26 +63,44 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
     private boolean mIsFrameAvailableTangoThread;
     private double mRgbTimestampGlThread;
 
-    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid, ContentSelectListener contentSelectListener) {
+    private OnContentSelectedListener onContentSelectedListener;
+    private ContentFitter.OnContentFitListener onContentFitListener;
+
+    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid) {
         mContext = context;
         mSurfaceView = rajawaliSurfaceView;
+        mAdfUuid = adfUuid;
+
         mVisualContentManager = new VisualContentManager();
-        mRenderer = new WallyRenderer(context.getApplicationContext(), mVisualContentManager, contentSelectListener);
+
+        mRenderer = new WallyRenderer(context, mVisualContentManager);
+        mRenderer.setOnContentSelectListener(this);
+
         mSurfaceView.setSurfaceRenderer(mRenderer);
 
         mTango = new Tango(context);
         mTangoUx = new TangoUx(context);
-        this.adfUuid = adfUuid;
+        mPointCloudManager = new TangoPointCloudManager();
+        mScaleDetector = new ScaleGestureDetector(context, this);
 
         mTangoUx.setLayout(tangoUxLayout);
 
-        mPointCloudManager = new TangoPointCloudManager();
+        fetchContentForAdf(adfUuid);
+    }
 
-        mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+    private void fetchContentForAdf(String adfUuid) {
+        ((App) mContext.getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
             @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mRenderer.onTouchEvent(event);
-                return true;
+            public void call(final Collection<Content> result, Exception e) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for (Content c : result) {
+                            Log.d(TAG, c.toString());
+                            mVisualContentManager.addStaticContentToBeRenderedOnScreen(new VisualContent(c));
+                        }
+                    }
+                }).start();
             }
         });
     }
@@ -108,9 +131,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
         return mVisualContentManager;
     }
 
-    public void setVisualContentManager(VisualContentManager visualContentManager) {
-        mVisualContentManager = visualContentManager;
-    }
 
     public synchronized void onPause() {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
@@ -127,6 +147,10 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
             mTango.disconnect();
             mTangoUx.stop();
             mIsConnected = false;
+        }
+
+        if (mContentFitter != null) {
+            mContentFitter.cancel(true);
         }
 
     }
@@ -148,6 +172,16 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
             }
         }
 
+        if (mContentFitter != null) {
+            if (mContentFitter.isCancelled()) {
+                Log.d("BLA", "OnResume()()()");
+                mContentFitter = new ContentFitter(mContentFitter.getContent(), this);
+            }
+            mContentFitter.setFittingStatusListener(onContentFitListener);
+            mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            onContentFitListener.onFitStatusChange(true);
+        }
+
     }
 
     /**
@@ -158,10 +192,10 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
                 TangoConfig.CONFIG_TYPE_DEFAULT);
 
         ArrayList<String> fullUUIDList = mTango.listAreaDescriptions();
-        String tempAdfUuid = adfUuid;
+        String tempAdfUuid = mAdfUuid;
         // Load the latest ADF if ADFs are found.
         if (fullUUIDList.size() > 0) {
-            if (adfUuid == null || adfUuid.equals("")) {
+            if (mAdfUuid == null || mAdfUuid.equals("")) {
                 tempAdfUuid = fullUUIDList.get(fullUUIDList.size() - 1);
             }
             config.putString(TangoConfig.KEY_STRING_AREADESCRIPTION, tempAdfUuid);
@@ -220,7 +254,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
 
     @Override
     public void onTangoEvent(TangoEvent event) {
-        Log.d(TAG, "onTangoEvent() called with: " + "event = [" + event + "]");
         if (mTangoUx != null) {
             mTangoUx.updateTangoEvent(event);
         }
@@ -326,6 +359,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
 
     public void addActiveToStaticContent() {
         mVisualContentManager.activeContentAddingFinished();
+        removeActiveContent();
     }
 
     public void removeActiveContent() {
@@ -375,10 +409,93 @@ public class TangoManager implements Tango.OnTangoUpdateListener {
                 mTango.getPoseAtTime(xyzIj.timestamp, FRAME_PAIR);
 
         // Update the AR object location.
-        TangoPoseData planeFitPose = ScenePoseCalculator.planeFitToTangoWorldPose(
+
+        return ScenePoseCalculator.planeFitToTangoWorldPose(
                 intersectionPointPlaneModelPair.intersectionPoint,
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
+    }
 
-        return planeFitPose;
+    public void setOnContentSelectedListener(OnContentSelectedListener onContentSelectedListener) {
+        this.onContentSelectedListener = onContentSelectedListener;
+    }
+
+    public void onSurfaceTouch(MotionEvent event) {
+        mScaleDetector.onTouchEvent(event);
+        mRenderer.onTouchEvent(event);
+    }
+
+    public void setOnContentFitListener(ContentFitter.OnContentFitListener onContentFitListener) {
+        this.onContentFitListener = onContentFitListener;
+    }
+
+    public void onSaveInstanceState(Bundle outState) {
+        if (mContentFitter != null) {
+            outState.putSerializable("FITTING_CONTENT", mContentFitter.getContent());
+        }
+    }
+
+    @Override
+    public boolean onScale(ScaleGestureDetector detector) {
+        float scale = detector.getScaleFactor() != 0 ? detector.getScaleFactor() : 1f;
+        if (mVisualContentManager.isActiveContentRenderedOnScreen()) {
+            mVisualContentManager.getActiveContent().scaleContent(scale);
+        } else {
+            Log.e(TAG, "onScale() was called but active content is not on screen");
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onScaleBegin(ScaleGestureDetector detector) {
+        return true;
+    }
+
+    @Override
+    public void onScaleEnd(ScaleGestureDetector detector) {
+
+    }
+
+    @Override
+    public void onVisualContentSelected(VisualContent c) {
+        if(c!=null){
+            onContentSelectedListener.onContentSelected(c.getContent());
+        }
+    }
+
+    public void onContentCreated(Content content) {
+        if (mContentFitter != null) {
+            Log.e(TAG, "onContentCreated: called when content was already fitting");
+            return;
+        }
+        Log.d("BLA", "OnContentCreated()()()");
+        mContentFitter = new ContentFitter(content, this);
+        mContentFitter.setFittingStatusListener(onContentFitListener);
+        mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        onContentFitListener.onFitStatusChange(true);
+    }
+
+    public void restoreState(Bundle savedInstanceState) {
+        // Restore states here
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("FITTING_CONTENT")) {
+                Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
+                Log.d("BLA", "restoreState()()()");
+                mContentFitter = new ContentFitter(c, this);
+            }
+            onContentSelectedListener.onContentSelected((Content) savedInstanceState.getSerializable("mSelectedContent"));
+        }
+    }
+
+    public void cancelFitting() {
+        mContentFitter.cancel(true);
+        mContentFitter = null;
+        onContentFitListener.onFitStatusChange(false);
+    }
+
+    public void finishFitting(){
+        mContentFitter.finishFitting();
+        mContentFitter = null;
+        onContentFitListener.onFitStatusChange(false);
     }
 }

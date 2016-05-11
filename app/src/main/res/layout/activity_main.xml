@@ -31,7 +31,7 @@
             android:id="@+id/btn_cancel_fitting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="cancelFitting"
+            android:onClick="onCancelFittingClick"
             android:src="@drawable/ic_cancel_white_24dp"
             app:backgroundTint="@color/cancel_button_color" />
 
@@ -39,7 +39,7 @@
             android:id="@+id/btn_finish_fitting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="finishFitting"
+            android:onClick="onFinishFittingClick"
             android:src="@drawable/ic_accept_white_24dp"
             app:backgroundTint="@color/accept_button_color" />
     </LinearLayout>

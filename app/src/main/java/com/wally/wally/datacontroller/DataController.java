@@ -8,22 +8,24 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.FirebaseDAL;
-import com.wally.wally.datacontroller.content.FirebaseQuery;
+import com.wally.wally.datacontroller.firebase.FirebaseContent;
+import com.wally.wally.datacontroller.firebase.FirebaseDAL;
+import com.wally.wally.datacontroller.firebase.FirebaseQuery;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 
 public class DataController {
     private static final String FIREBASE_URL = "https://burning-inferno-2566.firebaseio.com/";
-    private static final String CONTENT_DB_NAME = "Contents";
+    private static final String CONTENT_DB_NAME = "Develop-Contents";
     private static DataController instance;
+    private static Firebase firebaseRoot;
     private static Firebase fbInstance;
 
-    private DataAccessLayer<Content, FirebaseQuery> contentManager;
-
-    private DataController(DataAccessLayer<Content, FirebaseQuery> contentManager) {
-        this.contentManager = contentManager;
+    private DataController(Firebase firebase) {
+        firebaseRoot = firebase;
     }
 
     public static DataController create(Context context) {
@@ -31,6 +33,8 @@ public class DataController {
             Firebase.setAndroidContext(context);
             fbInstance = new Firebase(FIREBASE_URL);
             instance = new DataController(new FirebaseDAL(fbInstance.child(CONTENT_DB_NAME)));
+            Firebase firebase = new Firebase(FIREBASE_URL).child(CONTENT_DB_NAME);
+            instance = new DataController(firebase);
         }
         return instance;
     }
@@ -54,6 +58,7 @@ public class DataController {
     public void save(Content c) {
         contentManager.save(c);
     }
+    public void save(Content c) { new FirebaseContent(c).save(firebaseRoot); }
 
     public void delete(Content c) {
         contentManager.delete(c);
@@ -62,14 +67,33 @@ public class DataController {
     public void googleAuth(String accessToken, Callback<Boolean> resultCallback) {
 
         firebaseAuth(accessToken, resultCallback);
+    public void delete(Content c) { new FirebaseContent(c).delete(firebaseRoot); }
+
+    public void fetch(LatLngBounds bounds, final Callback<Collection<Content>> resultCallback) {
+        new LatLngQuery(bounds).fetch(firebaseRoot, createFetchCallback(resultCallback));
     }
 
-    public void fetch(LatLngBounds bounds, Callback<Collection<Content>> resultCallback) {
-        contentManager.fetch(new FirebaseQuery().withBounds(bounds), resultCallback);
+    public void fetch(String uuid, final Callback<Collection<Content>> resultCallback) {
+        new UUIDQuery(uuid).fetch(firebaseRoot, createFetchCallback(resultCallback));
     }
 
-    public void fetch(String uuid, Callback<Collection<Content>> resultCallback) {
-        contentManager.fetch(new FirebaseQuery().withUuid(uuid), resultCallback);
+    private Callback<Collection<FirebaseContent>> createFetchCallback(
+            final Callback<Collection<Content>> resultCallback) {
+        return new Callback<Collection<FirebaseContent>>() {
+            @Override
+            public void call(Collection<FirebaseContent> result, Exception e) {
+                List<Content> contents = new ArrayList<>();
+                for (FirebaseContent c : result) {
+                    contents.add(convertToContent(c));
+                }
+                resultCallback.call(contents, e);
+            }
+        };
+    }
+
+    private Content convertToContent(FirebaseContent firebaseContent) {
+        // TODO
+        return firebaseContent.toContent();
     }
 
 }

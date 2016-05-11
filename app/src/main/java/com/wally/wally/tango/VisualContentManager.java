@@ -3,7 +3,6 @@ package com.wally.wally.tango;
 import com.wally.wally.datacontroller.content.Content;
 
 import org.rajawali3d.Object3D;
-import org.rajawali3d.scene.RajawaliScene;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +55,7 @@ public class VisualContentManager {
 
     public synchronized void activeContentAddingFinished() {
         addStaticContentToBeRenderedOnScreen(mActiveContent); //TODO check addToBeRenderedOnScreen or addAlreadyRenderedOnScreen
-        mActiveContent = null;
+//        mActiveContent = null;
     }
 
     public synchronized ActiveVisualContent getActiveContent() {

@@ -1,6 +1,6 @@
 package com.wally.wally.datacontroller.content;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.Serializable;
 
@@ -12,7 +12,8 @@ public class Content implements Serializable {
     private String imageUri;
     private String uuid;
     private TangoData tangoData;
-    private Location location;
+    private LatLng location;
+    private Visibility visibility;
 
     public Content() {}
 
@@ -20,13 +21,13 @@ public class Content implements Serializable {
         this.id = id;
     }
 
-    @JsonIgnore
     public String getId() {
         return this.id;
     }
 
-    void setId(String id) {
+    public Content withId(String id) {
         this.id = id;
+        return this;
     }
 
     public String getUuid() {
@@ -40,10 +41,6 @@ public class Content implements Serializable {
 
     public TangoData getTangoData() {
         return tangoData;
-    }
-
-    public void setTangoData(TangoData tangoData){
-        this.tangoData = tangoData;
     }
 
     public Content withTangoData(TangoData tangoData) {
@@ -81,12 +78,21 @@ public class Content implements Serializable {
         return this;
     }
 
-    public Location getLocation() {
+    public LatLng getLocation() {
         return location;
     }
 
-    public Content withLocation(Location location) {
+    public Content withLocation(LatLng location) {
         this.location = location;
+        return this;
+    }
+
+    public Visibility getVisibility(){
+        return visibility;
+    }
+
+    public Content withVisibility(Visibility visibility){
+        this.visibility = visibility;
         return this;
     }
 
