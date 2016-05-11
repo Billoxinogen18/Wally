@@ -18,50 +18,50 @@ public class DataController {
     private static final String FIREBASE_URL = "https://burning-inferno-2566.firebaseio.com/";
     private static final String CONTENT_DB_NAME = "Develop-Contents";
     private static DataController instance;
+    private static Firebase firebaseRoot;
 
-    private DataAccessLayer<FirebaseContent, FirebaseQuery> contentManager;
-
-    private DataController(DataAccessLayer<FirebaseContent, FirebaseQuery> contentManager) {
-        this.contentManager = contentManager;
+    private DataController(Firebase firebase) {
+        firebaseRoot = firebase;
     }
 
     public static DataController create(Context context) {
         if (instance == null) {
             Firebase.setAndroidContext(context);
-            Firebase fb = new Firebase(FIREBASE_URL);
-            instance = new DataController(new FirebaseDAL(fb.child(CONTENT_DB_NAME)));
+            Firebase firebase = new Firebase(FIREBASE_URL).child(CONTENT_DB_NAME);
+            instance = new DataController(firebase);
         }
         return instance;
     }
 
-    public void save(Content c) { contentManager.save(new FirebaseContent(c)); }
+    public void save(Content c) { new FirebaseContent(c).save(firebaseRoot); }
 
-    public void delete(Content c) { contentManager.delete(new FirebaseContent(c)); }
+    public void delete(Content c) { new FirebaseContent(c).delete(firebaseRoot); }
 
     public void fetch(LatLngBounds bounds, final Callback<Collection<Content>> resultCallback) {
-        contentManager.fetch(new FirebaseQuery().withBounds(bounds), new Callback<Collection<FirebaseContent>>() {
-            @Override
-            public void call(Collection<FirebaseContent> result, Exception e) {
-                List<Content> contents = new ArrayList<>();
-                for (FirebaseContent c : result) {
-                    contents.add(c.toContent());
-                }
-                resultCallback.call(contents, e);
-            }
-        });
+        new LatLngQuery(bounds).fetch(firebaseRoot, createFetchCallback(resultCallback));
     }
 
     public void fetch(String uuid, final Callback<Collection<Content>> resultCallback) {
-        contentManager.fetch(new FirebaseQuery().withUuid(uuid), new Callback<Collection<FirebaseContent>>() {
+        new UUIDQuery(uuid).fetch(firebaseRoot, createFetchCallback(resultCallback));
+    }
+
+    private Callback<Collection<FirebaseContent>> createFetchCallback(
+            final Callback<Collection<Content>> resultCallback) {
+        return new Callback<Collection<FirebaseContent>>() {
             @Override
             public void call(Collection<FirebaseContent> result, Exception e) {
                 List<Content> contents = new ArrayList<>();
                 for (FirebaseContent c : result) {
-                    contents.add(c.toContent());
+                    contents.add(convertToContent(c));
                 }
                 resultCallback.call(contents, e);
             }
-        });
+        };
+    }
+
+    private Content convertToContent(FirebaseContent firebaseContent) {
+        // TODO
+        return firebaseContent.toContent();
     }
 
 }

@@ -1,53 +1,40 @@
 package com.wally.wally.datacontroller.firebase;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
+import com.firebase.client.ValueEventListener;
+import com.wally.wally.datacontroller.Callback;
 
-public class FirebaseQuery {
-    private String uuid;
-    private LatLngBounds bounds;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-    public FirebaseQuery withUuid(String uuid) {
-        if (bounds != null) {
-            throw new UnsupportedOperationException("Can't query uuid and bounds together");
-        }
-        this.uuid = uuid;
-        return this;
-    }
+public abstract class FirebaseQuery {
 
-    public FirebaseQuery withBounds(LatLngBounds bounds) {
-        if (uuid != null) {
-            throw new UnsupportedOperationException("Can't query bounds and uuid together");
-        }
-        this.bounds = bounds;
-        return this;
-    }
+    public abstract Query getTarget(Firebase ref);
 
-    public Query getTarget(Firebase fb) {
-        Query query = fb;
+    public final void fetch(Firebase ref, final Callback<Collection<FirebaseContent>> resultCallback) {
+        getTarget(ref).addListenerForSingleValueEvent(new ValueEventListener() {
 
-        if (uuid != null) {
-            query =  query.orderByChild("uuid").equalTo(uuid);
-        }
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                Set<FirebaseContent> result = new HashSet<>();
+                for (DataSnapshot contentSnapshot: snapshot.getChildren()) {
+                    FirebaseContent content = contentSnapshot.getValue(FirebaseContent.class);
+                    content.setId(contentSnapshot.getKey());
+                    result.add(content);
+                }
+                resultCallback.call(result, null);
+            }
 
-        if (bounds != null) {
-            LatLng bottomLeft = bounds.southwest;
-            LatLng topRight = bounds.northeast;
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                resultCallback.call(null, firebaseError.toException());
+            }
 
-            query = query
-                    .orderByChild("location/latitude")
-                    .startAt(bottomLeft.latitude)
-                    .endAt(topRight.latitude)
-                    .getRef()
-                    .orderByChild("location/longitude")
-                    .startAt(bottomLeft.longitude)
-                    .endAt(topRight.longitude);
-            // TODO needs revision
-        }
-
-        return query;
+        });
     }
 
 }
