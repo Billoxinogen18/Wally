@@ -27,5 +27,6 @@
     <string name="no_uuid_tango_error">"No ADF with that UUID!"</string>
     <string name="post_update">Update</string>
     <string name="loading">Loading…</string>
+    <string name="loading_message">Loading</string>
 
 </resources>
