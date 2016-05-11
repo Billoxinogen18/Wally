@@ -1,11 +1,15 @@
 package com.wally.wally;
 
 import android.accounts.Account;
-import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.api.Auth;
@@ -22,6 +26,9 @@ import com.google.android.gms.common.api.Scope;
 import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.DataController;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 
 /**
  * Class that manages login flow
@@ -30,24 +37,22 @@ import com.wally.wally.datacontroller.DataController;
  */
 public class LoginManager implements GoogleApiClient.OnConnectionFailedListener {
 
+    public static final int AUTH_TYPE_GOOGLE = 0;
+    public static final int AUTH_TYPE_GUEST = 1;
     @SuppressWarnings("unused")
     private static final String TAG = LoginManager.class.getSimpleName();
     private static final int REQUEST_CODE_SIGN_IN = 129;
-
-    private ProgressDialog mProgressDialog;
     private FragmentActivity mContext;
     private GoogleApiClient mGoogleApiClient;
     private LoginListener mLoginListener;
-
+    private AuthListener mAuthListener;
     /**
      * We need fragmentActivity because it gives us more flexibility using GoogleClientApi
      *
-     * @param context       to access GPlus services
-     * @param loginListener listener gets callbacks from login flow
+     * @param context to access GPlus services
      */
-    public LoginManager(FragmentActivity context, LoginListener loginListener) {
+    public LoginManager(FragmentActivity context) {
         mContext = context;
-        mLoginListener = loginListener;
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestId()
@@ -61,7 +66,14 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
                 .enableAutoManage(mContext /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        trySilentLogin();
+    }
+
+    public void setAuthListener(AuthListener authListener) {
+        mAuthListener = authListener;
+    }
+
+    public void setLoginListener(LoginListener loginListener) {
+        mLoginListener = loginListener;
     }
 
     public void setUpGoogleButton(SignInButton signInButton) {
@@ -73,7 +85,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
      * Try to login silently without showing on UI.
      * If user has logged in once, we must be able to silently sign in.
      */
-    private void trySilentLogin() {
+    public void trySilentLogin() {
         OptionalPendingResult<GoogleSignInResult> pendingResult =
                 Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (pendingResult.isDone()) {
@@ -82,12 +94,10 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         } else {
             // There's no immediate result ready, displays some progress indicator and waits for the
             // async callback.
-            showProgressDialog();
             pendingResult.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(@NonNull GoogleSignInResult result) {
                     handleSignInResult(result);
-                    hideProgressDialog();
                 }
             });
         }
@@ -107,7 +117,6 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         }
         return false;
     }
-
 
     @SuppressWarnings("ConstantConditions")
     private void handleSignInResult(GoogleSignInResult result) {
@@ -130,38 +139,14 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
                 @Override
                 protected void onPostExecute(String token) {
                     super.onPostExecute(token);
-
-                    DataController dc = ((App) mContext.getApplicationContext()).getDataController();
-                    dc.googleAuth(token, new Callback<Boolean>() {
-                        @Override
-                        public void call(Boolean result, Exception e) {
-                            if (e == null) {
-                                mLoginListener.onLogin(result.toString());
-                            } else {
-                                mLoginListener.onLogin(null);
-                            }
-                        }
-                    });
+                    saveToken(token);
+                    Log.d(TAG, "onPostExecute() called with: " + "token = [" + token + "]");
+                    mAuthListener.onAuth(true);
                 }
             }.execute();
         } else {
-            mLoginListener.onLogin(null);
-        }
-    }
-
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(mContext);
-            mProgressDialog.setMessage(mContext.getString(R.string.loading));
-            mProgressDialog.setIndeterminate(true);
-        }
-
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
+            saveToken(null);
+            mAuthListener.onAuth(false);
         }
     }
 
@@ -170,14 +155,64 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
 
     }
 
+    public void tryLogin() {
+        String token = getToken();
+        if (TextUtils.isEmpty(token)) {
+            throw new IllegalStateException("You can call tryLogin only when token is present!");
+        }
+        DataController dc = ((App) mContext.getApplicationContext()).getDataController();
+        dc.googleAuth(getToken(), new Callback<Boolean>() {
+            @Override
+            public void call(Boolean result, Exception e) {
+                if (e == null) {
+                    mLoginListener.onLogin(result.toString());
+                } else {
+                    mLoginListener.onLogin(null);
+                }
+            }
+        });
+    }
+
+    private String getToken() {
+        return PreferenceManager.getDefaultSharedPreferences(mContext).getString("AUTH_TOKEN", null);
+    }
+
+    private void saveToken(String token) {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        editor.putString("AUTH_TOKEN", token);
+        editor.putInt("AUTH_TYPE", AUTH_TYPE_GOOGLE);
+        editor.apply();
+    }
+
+    /**
+     * Called when user wants to continue as guest.
+     */
+    public void guestSignIn() {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        editor.putInt("AUTH_TYPE", AUTH_TYPE_GUEST);
+        editor.apply();
+    }
+
+    /**
+     * We have several types of authentication.
+     * Google Plus auth, and guest mode.
+     * <p/>
+     * Later we may add Facebook auth support.
+     */
+    @IntDef({AUTH_TYPE_GOOGLE, AUTH_TYPE_GUEST})
+    @Retention(RetentionPolicy.SOURCE)
+
+    public @interface AuthType {
+    }
+
+    /**
+     * Interface callbacks for authentication listening.
+     */
+    public interface AuthListener {
+        void onAuth(boolean isSuccess);
+    }
+
     public interface LoginListener {
-
-        // TODO maybe add account here.
-
-        /**
-         * User was already logged in
-         */
         void onLogin(String userName);
-
     }
 }

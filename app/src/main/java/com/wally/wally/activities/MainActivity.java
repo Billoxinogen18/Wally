@@ -33,7 +33,6 @@ import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.App;
 import com.wally.wally.ContentSelectListener;
-import com.wally.wally.LoginManager;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.Callback;
@@ -71,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements
     private Content mSelectedContent;
     private long mLastSelectTime;
 
-    private LoginManager mLoginManager;
 
     /**
      * Returns intent to start main activity.
