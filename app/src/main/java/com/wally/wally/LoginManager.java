@@ -28,6 +28,8 @@ import com.google.android.gms.common.api.Scope;
 import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.user.User;
+import com.wally.wally.userManager.SocialUser;
+import com.wally.wally.userManager.SocialUserFactory;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -170,7 +172,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
             @Override
             public void call(User result, Exception e) {
                 if (e == null) {
-                    mLoginListener.onLogin(result.toString());
+                    mLoginListener.onLogin(SocialUserFactory.getSocialUser(result));
                 } else {
                     mLoginListener.onLogin(null);
                 }
@@ -228,6 +230,6 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
     }
 
     public interface LoginListener {
-        void onLogin(String userName);
+        void onLogin(SocialUser user);
     }
 }
