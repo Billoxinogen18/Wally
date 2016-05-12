@@ -268,14 +268,14 @@ public class MainActivity extends AppCompatActivity implements
 
     private void showProgress() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
+            mProgressDialog.dismiss();
         }
-        mProgressDialog = ProgressDialog.show(this, null, "Loading...", true);
+        mProgressDialog = ProgressDialog.show(this, null, getString(R.string.loading_message), true);
     }
 
     private void hideProgress() {
         if (mProgressDialog != null) {
-            mProgressDialog.hide();
+            mProgressDialog.dismiss();
         }
     }
 
