@@ -1,6 +1,7 @@
 package com.wally.wally.fragments;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -10,7 +11,7 @@ import com.wally.wally.R;
 import com.wally.wally.datacontroller.content.Visibility;
 
 /**
- * Created by Xato on 5/9/2016.
+ * Created by GioGoG on 5/9/2016.
  */
 public class VisibilityAdapter extends BaseAdapter {
     private static final int[] images = {
@@ -21,6 +22,7 @@ public class VisibilityAdapter extends BaseAdapter {
             R.drawable.ic_anonymous_visibility_black_24dp
     };
 
+    // TODO move to strings.xml
     private static final String[] titles = {
             "Private",
             "Friends",
@@ -59,17 +61,17 @@ public class VisibilityAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View view, ViewGroup parent) {
         TextView tv;
-        if (convertView == null) {
-            tv = new TextView(mContext);
+        if (view == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            tv = (TextView) inflater.inflate(R.layout.support_simple_spinner_dropdown_item, parent, false);
+            tv.setCompoundDrawablePadding(mContext.getResources().getDimensionPixelSize(R.dimen.drawable_padding));
         } else {
-            tv = (TextView) convertView;
+            tv = (TextView) view;
         }
-
         tv.setText(titles[position]);
         tv.setCompoundDrawablesWithIntrinsicBounds(images[position], 0, 0, 0);
-
         return tv;
     }
 }

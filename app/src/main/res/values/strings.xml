@@ -28,5 +28,6 @@
     <string name="post_update">Update</string>
     <string name="loading">Loading…</string>
     <string name="loading_message">Loading</string>
+    <string name="content_meta_info_dialog_title">More</string>
 
 </resources>
