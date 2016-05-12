@@ -51,9 +51,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true">
+                    android:layout_centerVertical="true" />
 
-                </Spinner>
             </RelativeLayout>
 
             <EditText
@@ -144,31 +143,13 @@
             android:padding="8dp"
             android:src="@drawable/ic_select_colors_24dp" />
 
-        <ToggleButton
-            android:id="@+id/is_visible_on_map"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="-4dp"
+        <ImageButton
+            android:id="@+id/btn_more_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableStart="@drawable/preview_visibility"
-            android:gravity="center"
             android:padding="8dp"
-            android:text=""
-            android:textOff=""
-            android:textOn="" />
-
-        <ToggleButton
-            android:id="@+id/range_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="-4dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:drawableStart="@drawable/preview_visibility"
-            android:gravity="center"
-            android:padding="8dp"
-            android:text=""
-            android:textOff=""
-            android:textOn="" />
+            android:src="@drawable/ic_more_horiz_black_24dp" />
 
         <android.support.v4.widget.Space
             android:layout_width="0dp"

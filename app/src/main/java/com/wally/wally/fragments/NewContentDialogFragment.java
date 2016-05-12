@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.widget.Space;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,12 +18,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
@@ -36,6 +33,8 @@ import com.wally.wally.Utils;
 import com.wally.wally.activities.ChoosePhotoActivity;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Visibility;
+
+import java.util.Date;
 
 /**
  * New Post dialog, that manages adding new content.
@@ -55,13 +54,12 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     private ImageView mImageView;
     private EditText mTitleEt;
     private EditText mNoteEt;
-    private Space mRangeSlider;
     private Spinner mVisibilitySpinner;
-    private ToggleButton mPreviewVisibilityToggle;
 
     private Content mContent;
     private boolean isEditMode;
     private GoogleApiClient mGoogleApiClient;
+    private boolean mIsDialogShown = false;
 
     // Empty constructor required for DialogFragment
     public NewContentDialogFragment() {
@@ -92,6 +90,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
         if (savedInstanceState != null) {
             mContent = (Content) savedInstanceState.getSerializable("mContent");
+            mIsDialogShown = savedInstanceState.getBoolean("mIsDialogShown");
         }
 
         if (mContent == null) {
@@ -101,12 +100,12 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
 
-//        dv.findViewById(R.id.btn_visibility_status).setOnClickListener(this);
         dv.findViewById(R.id.btn_add_image).setOnClickListener(this);
         dv.findViewById(R.id.btn_remove_image).setOnClickListener(this);
         dv.findViewById(R.id.btn_pallette).setOnClickListener(this);
         dv.findViewById(R.id.btn_discard_post).setOnClickListener(this);
         dv.findViewById(R.id.btn_create_post).setOnClickListener(this);
+        dv.findViewById(R.id.btn_more_settings).setOnClickListener(this);
 
         mImageView = (ImageView) dv.findViewById(R.id.image);
         mImageContainer = dv.findViewById(R.id.image_container);
@@ -114,27 +113,11 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
         mVisibilitySpinner = (Spinner) dv.findViewById(R.id.btn_visibility_status);
         mVisibilitySpinner.setAdapter(new VisibilityAdapter(getContext()));
-        mPreviewVisibilityToggle = (ToggleButton) dv.findViewById(R.id.is_visible_on_map);
-        mRangeSlider = (Space) dv.findViewById(R.id.range_slider);
-
-        ToggleButton rangeButton = (ToggleButton) dv.findViewById(R.id.range_button);
-        rangeButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    mRangeSlider.setVisibility(View.VISIBLE);
-                } else {
-                    mRangeSlider.setVisibility(View.GONE);
-                }
-
-            }
-        });
 
         if (isEditMode) {
             Button b = (Button) dv.findViewById(R.id.btn_create_post);
             b.setText(R.string.post_update);
         }
-
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getContext())
@@ -143,7 +126,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                     .addApi(LocationServices.API)
                     .build();
         }
-
         updateViews();
         builder.setView(dv);
         Dialog dialog = builder.create();
@@ -154,6 +136,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
     public void onStart() {
         mGoogleApiClient.connect();
+        showDialog(mIsDialogShown);
         super.onStart();
     }
 
@@ -209,6 +192,10 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             case R.id.btn_pallette:
                 Toast.makeText(getActivity(), "Not yet implemented", Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.btn_more_settings:
+                showDialog(false);
+                MetaInfoDialogFragment.newInstance(mContent).show(getChildFragmentManager(), "meta_info_dialog");
+                break;
             default:
                 Log.e(TAG, "onClick: " + v.getId());
         }
@@ -223,20 +210,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             Log.e(TAG, "centerMapOnMyLocation: couldn't get user location");
             Toast.makeText(getContext(), "Couldn't get user location", Toast.LENGTH_SHORT).show();
         } else {
-            //noinspection WrongConstant
-            Visibility.SocialVisibility socialVisibility =
-                    new Visibility.SocialVisibility((Integer) mVisibilitySpinner.getSelectedItem());
-
-            boolean isPreviewable = mPreviewVisibilityToggle.isChecked();
-
-            mContent.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()))
-                    .withVisibility(new Visibility()
-                            .withSocialVisibility(socialVisibility)
-                            .withRangeVisibility(null)
-                            .withTimeVisibility(null)
-                            .withVisiblePreview(isPreviewable));
+            mContent.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
         }
-
         updateContent();
         mListener.onContentCreated(mContent, isEditMode);
     }
@@ -254,8 +229,24 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
      * Updates model from views.
      */
     private void updateContent() {
+        //noinspection WrongConstant
+        Visibility.SocialVisibility socialVisibility =
+                new Visibility.SocialVisibility((Integer) mVisibilitySpinner.getSelectedItem());
+
+        // TODO add views
+        Visibility.RangeVisibility rangeVisibility = null;
+        Date time = null;
+        boolean isPreviewVisible = false;
+
+        Visibility visibility = new Visibility()
+                .withSocialVisibility(socialVisibility)
+                .withRangeVisibility(rangeVisibility)
+                .withTimeVisibility(time)
+                .withVisiblePreview(isPreviewVisible);
+
         mContent.withTitle(mTitleEt.getText().toString())
-                .withNote(mNoteEt.getText().toString());
+                .withNote(mNoteEt.getText().toString())
+                .withVisibility(visibility);
     }
 
     /**
@@ -319,6 +310,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         super.onSaveInstanceState(outState);
         updateContent();
         outState.putSerializable("mContent", mContent);
+        outState.putBoolean("mIsDialogShown", mIsDialogShown);
     }
 
     @Override
@@ -329,6 +321,20 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    public void onMetaInfoDialogDismiss(Content content) {
+        mContent = content;
+        showDialog(true);
+    }
+
+    public void showDialog(boolean show) {
+        if (!show) {
+            getDialog().hide();
+        } else {
+            getDialog().show();
+        }
+        mIsDialogShown = show;
     }
 
     public interface NewContentDialogListener {
@@ -365,6 +371,62 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             AlertDialog dialog = builder.create();
             dialog.setCanceledOnTouchOutside(false);
             return dialog;
+        }
+    }
+
+    public static class MetaInfoDialogFragment extends DialogFragment {
+
+        private Content mContent;
+
+        public MetaInfoDialogFragment() {
+        }
+
+        public static MetaInfoDialogFragment newInstance(Content content) {
+            Bundle args = new Bundle();
+            args.putSerializable(ARG_EDIT_CONTENT, content);
+            MetaInfoDialogFragment fragment = new MetaInfoDialogFragment();
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            mContent = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
+            if (savedInstanceState != null) {
+                mContent = (Content) savedInstanceState.getSerializable("mContent");
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            View dv = LayoutInflater.from(getContext()).inflate(R.layout.content_meta_info_dialog, null, false);
+
+            dv.findViewById(R.id.btn_dismiss).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                    ((NewContentDialogFragment) getParentFragment()).onMetaInfoDialogDismiss(mContent);
+                }
+            });
+
+            updateViews();
+            builder.setView(dv);
+            AlertDialog dialog = builder.create();
+            dialog.setCanceledOnTouchOutside(false);
+            return dialog;
+        }
+
+        private void updateContent() {
+
+        }
+
+        private void updateViews() {
+
+        }
+
+        @Override
+        public void onSaveInstanceState(Bundle outState) {
+            super.onSaveInstanceState(outState);
+            outState.putSerializable("mContent", mContent);
         }
     }
 }
