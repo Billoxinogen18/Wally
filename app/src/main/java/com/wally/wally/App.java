@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 
 import com.wally.wally.datacontroller.DataController;
+import com.wally.wally.userManager.SocialUser;
 
 /**
  * Application class for Application wide feature initializations.
@@ -13,7 +14,9 @@ import com.wally.wally.datacontroller.DataController;
  */
 public class App extends Application {
     private static App sInstance = null;
+
     private DataController dataController;
+    private SocialUser mUser;
 
     public static App getInstance() {
         return sInstance;
@@ -30,18 +33,21 @@ public class App extends Application {
         sInstance = this;
     }
 
-    public DataController getDataController() {
-        return dataController;
-    }
-
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
     }
 
-    // TODO change with real use object
-    public Object getUserInfo() {
-        return null;
+    public DataController getDataController() {
+        return dataController;
+    }
+
+    public SocialUser getUser() {
+        return mUser;
+    }
+
+    public void setUser(SocialUser user){
+        mUser = user;
     }
 }

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
@@ -31,22 +30,17 @@ import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.SocialUserFactory;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-
 /**
  * Class that manages login flow
  * <p/>
  * Created by ioane5 on 5/10/16.
  */
 public class LoginManager implements GoogleApiClient.OnConnectionFailedListener {
-
+    private static final String TAG = LoginManager.class.getSimpleName();
     public static final int AUTH_TYPE_GOOGLE = 0;
     public static final int AUTH_TYPE_GUEST = 1;
-    @SuppressWarnings("unused")
-    private static final String TAG = LoginManager.class.getSimpleName();
     private static final int REQUEST_CODE_SIGN_IN = 129;
+
     private Context mContext;
     private GoogleApiClient mGoogleApiClient;
     private LoginListener mLoginListener;
@@ -61,8 +55,6 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         mContext = fragmentActivity;
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestId()
-                .requestProfile()
                 .requestScopes(new Scope(Scopes.PLUS_LOGIN))
                 .build();
 
@@ -158,7 +150,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
+        Log.d(TAG, "onConnectionFailed() called with: " + "connectionResult = [" + connectionResult + "]");
     }
 
     public void tryLogin() {
@@ -207,19 +199,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
     }
 
     public boolean isLoggedIn() {
-        return App.getInstance().getUserInfo() != null || isUserAGuest();
-    }
-
-    /**
-     * We have several types of authentication.
-     * Google Plus auth, and guest mode.
-     * <p/>
-     * Later we may add Facebook auth support.
-     */
-    @IntDef({AUTH_TYPE_GOOGLE, AUTH_TYPE_GUEST})
-    @Retention(RetentionPolicy.SOURCE)
-
-    public @interface AuthType {
+        return App.getInstance().getUser() != null || isUserAGuest();
     }
 
     /**

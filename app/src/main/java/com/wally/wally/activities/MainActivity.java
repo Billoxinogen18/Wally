@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLogin(SocialUser user) {
         Log.d(TAG, "onLogin() called with: " + "userName = [" + user + "]");
-        // TODO add user to application context
+        App.getInstance().setUser(user);
         hideProgress();
         // TODO update views
     }
