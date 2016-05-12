@@ -9,6 +9,8 @@ import android.view.ScaleGestureDetector;
 
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
+import com.google.atap.tango.ux.UxExceptionEvent;
+import com.google.atap.tango.ux.UxExceptionEventListener;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoConfig;
@@ -82,9 +84,8 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         mRenderer.setOnContentSelectListener(this);
 
         mSurfaceView.setSurfaceRenderer(mRenderer);
-
-        mTango = new Tango(context);
         mTangoUx = new TangoUx(context);
+
         mPointCloudManager = new TangoPointCloudManager();
         mScaleDetector = new ScaleGestureDetector(context, this);
 
@@ -164,17 +165,21 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         if (!mIsConnected) {
-            try {
-                TangoUx.StartParams params = new TangoUx.StartParams();
-                mTangoUx.start(params);
-                mTangoUx.setUxExceptionEventListener(UxExceptionEvents.getInstance());
-                connectTango();
-                mIsConnected = true;
-            } catch (TangoOutOfDateException e) {
-                if (mTangoUx != null) {
-                    mTangoUx.showTangoOutOfDate();
+            TangoUx.StartParams params = new TangoUx.StartParams();
+            mTangoUx.start(params);
+            mTango = new Tango(mContext, new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        connectTango();
+                        mIsConnected = true;
+                    } catch (TangoOutOfDateException e) {
+                        if (mTangoUx != null) {
+                            mTangoUx.showTangoOutOfDate();
+                        }
+                    }
                 }
-            }
+            });
         }
 
         if (mContentFitter != null) {
@@ -499,4 +504,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         mContentFitter = null;
         onContentFitListener.onFitStatusChange(false);
     }
+
+
 }
