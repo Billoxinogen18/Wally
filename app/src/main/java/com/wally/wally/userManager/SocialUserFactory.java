@@ -17,15 +17,25 @@ import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.wally.wally.datacontroller.user.User;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by Meravici on 5/12/2016.
  */
 public class SocialUserFactory {
     public static final String TAG = SocialUserFactory.class.getSimpleName();
+    private Map<String, SocialUser> userCache;
+
+    public SocialUserFactory(){
+        userCache = new HashMap<>();
+    }
 
     public void getSocialUser(final User baseUser, final Context context, final UserLoadListener userLoadListener) {
         final CompoundUser compoundUser = new CompoundUser();
-        if (baseUser.getGgId() != null) {
+        if(userCache.containsKey(baseUser.getId())){
+            userLoadListener.onUserLoad(userCache.get(baseUser.getId()));
+        }else if (baseUser.getGgId() != null) {
             getGoogleUser(baseUser, context, new UserLoadListener() {
                 @Override
                 public void onUserLoad(SocialUser user) {
@@ -34,6 +44,7 @@ public class SocialUserFactory {
                     if (baseUser.getFbId() != null) {
                         compoundUser.addSocialUser(new FacebookUser(baseUser));
                     }
+                    userCache.put(baseUser.getId(), compoundUser);
                     userLoadListener.onUserLoad(compoundUser);
                 }
             });
