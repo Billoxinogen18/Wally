@@ -25,6 +25,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.DataController;
+import com.wally.wally.datacontroller.user.User;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -163,9 +164,9 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         }
         DataController dc = App.getInstance().getDataController();
         // TODO get and update object in application
-        dc.googleAuth(getToken(), new Callback<Boolean>() {
+        dc.googleAuth(getToken(), new Callback<User>() {
             @Override
-            public void call(Boolean result, Exception e) {
+            public void call(User result, Exception e) {
                 if (e == null) {
                     mLoginListener.onLogin(result.toString());
                 } else {

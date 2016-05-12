@@ -8,17 +8,19 @@ import com.firebase.client.FirebaseError;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.firebase.FirebaseContent;
+import com.wally.wally.datacontroller.user.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 
 public class DataController {
     private static final String FIREBASE_URL = "https://burning-inferno-2566.firebaseio.com/";
     private static final String CONTENT_DB_NAME = "Develop-Contents";
     private static DataController instance;
-    private static Firebase firebaseRoot;
+    private Firebase firebaseRoot;
 
     private DataController(Firebase firebase) {
         firebaseRoot = firebase;
@@ -33,22 +35,24 @@ public class DataController {
         return instance;
     }
 
-    private void firebaseAuth(String accessToken, final Callback<Boolean> resultCallback) {
+    private void firebaseAuth(String accessToken, final Callback<User> resultCallback) {
         firebaseRoot.authWithOAuthToken("google", accessToken, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
-                Log.d("auth", authData.getProviderData().get("displayName").toString());
-                resultCallback.call(true, null);
+                // Map<String, Object> data = authData.getProviderData();
+                String ggId = (String) authData.getProviderData().get("id");
+                User user = new User(authData.getUid()).withGgId(ggId);
+                resultCallback.call(user, null);
             }
 
             @Override
             public void onAuthenticationError(FirebaseError firebaseError) {
-                resultCallback.call(false, firebaseError.toException());
+                resultCallback.call(null, firebaseError.toException());
             }
         });
     }
 
-    public void googleAuth(String accessToken, Callback<Boolean> resultCallback) {
+    public void googleAuth(String accessToken, Callback<User> resultCallback) {
         firebaseAuth(accessToken, resultCallback);
     }
 

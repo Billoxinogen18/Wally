@@ -2,7 +2,9 @@ package com.wally.wally.datacontroller.firebase;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.datacontroller.content.Visibility;
@@ -137,8 +139,35 @@ public class FirebaseContent {
         }
     }
 
+    public void save(Firebase ref, final Callback<Boolean> statusCallback) {
+        ref.push().setValue(this, new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError == null) {
+                    setId(firebase.getKey());
+                    statusCallback.call(true, null);
+                } else {
+                    statusCallback.call(false, firebaseError.toException());
+                }
+            }
+        });
+    }
+
     public void delete(Firebase ref) {
         ref.child(id).removeValue();
+    }
+
+    public void delete(Firebase ref, final Callback<Boolean> statusCallback) {
+        ref.child(getId()).removeValue(new Firebase.CompletionListener() {
+            @Override
+            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                if (firebaseError == null) {
+                    statusCallback.call(true, null);
+                } else {
+                    statusCallback.call(false, firebaseError.toException());
+                }
+            }
+        });
     }
 
     public Content toContent() {
