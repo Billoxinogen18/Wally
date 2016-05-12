@@ -19,17 +19,32 @@ public class FacebookUser extends AbstractSocialUser {
     }
 
     @Override
-    public URL getAvatarUrl() {
+    public String getAvatarUrl() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public URL getCoverUrl() {
+    public String getCoverUrl() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<AbstractSocialUser> getFriends() {
+    public void getFriends(FriendsLoadListener friendsLoadListener) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SocialUser withName(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SocialUser withAvatar(String avatarUrl) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SocialUser withCover(String coverUrl) {
         throw new UnsupportedOperationException();
     }
 }

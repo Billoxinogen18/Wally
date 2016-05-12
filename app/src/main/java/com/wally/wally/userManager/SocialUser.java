@@ -9,7 +9,11 @@ import java.util.List;
 public interface SocialUser {
     String getId();
     String getName();
-    URL getAvatarUrl();
-    URL getCoverUrl();
-    List<AbstractSocialUser> getFriends();
+    String getAvatarUrl();
+    String getCoverUrl();
+    void getFriends(FriendsLoadListener friendsLoadListener);
+
+    SocialUser withName(String name);
+    SocialUser withAvatar(String avatarUrl);
+    SocialUser withCover(String coverUrl);
 }

@@ -164,7 +164,14 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
             @Override
             public void call(User result, Exception e) {
                 if (e == null) {
-                    mLoginListener.onLogin(SocialUserFactory.getSocialUser(result));
+                    App.getInstance().getSocialUserFactory().getSocialUser(result, mContext,
+                            new SocialUserFactory.UserLoadListener() {
+                                @Override
+                                public void onUserLoad(SocialUser user) {
+                                    mLoginListener.onLogin(user);
+                                }
+                            });
+
                 } else {
                     mLoginListener.onLogin(null);
                 }

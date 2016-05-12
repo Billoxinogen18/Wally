@@ -18,9 +18,4 @@ public abstract class AbstractSocialUser implements SocialUser {
     public String getId(){
         return mBaseUser.getId();
     }
-
-    public abstract String getName();
-    public abstract URL getAvatarUrl();
-    public abstract URL getCoverUrl();
-    public abstract List<AbstractSocialUser> getFriends();
 }
