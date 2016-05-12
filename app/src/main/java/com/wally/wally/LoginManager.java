@@ -1,6 +1,8 @@
 package com.wally.wally;
 
 import android.accounts.Account;
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -26,6 +28,8 @@ import com.google.android.gms.common.api.Scope;
 import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.user.User;
+import com.wally.wally.userManager.SocialUser;
+import com.wally.wally.userManager.SocialUserFactory;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -43,7 +47,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
     @SuppressWarnings("unused")
     private static final String TAG = LoginManager.class.getSimpleName();
     private static final int REQUEST_CODE_SIGN_IN = 129;
-    private FragmentActivity mContext;
+    private Context mContext;
     private GoogleApiClient mGoogleApiClient;
     private LoginListener mLoginListener;
     private AuthListener mAuthListener;
@@ -51,10 +55,10 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
     /**
      * We need fragmentActivity because it gives us more flexibility using GoogleClientApi
      *
-     * @param context to access GPlus services
+     * @param fragmentActivity to access GPlus services
      */
-    public LoginManager(FragmentActivity context) {
-        mContext = context;
+    public LoginManager(FragmentActivity fragmentActivity) {
+        mContext = fragmentActivity;
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestId()
@@ -65,7 +69,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         // Build a GoogleApiClient with access to the Google Sign-In API and the
         // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(mContext)
-                .enableAutoManage(mContext /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(fragmentActivity /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
     }
@@ -105,9 +109,9 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         }
     }
 
-    public void onGoogleSignInClicked() {
+    public void onGoogleSignInClicked(Activity activity) {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        mContext.startActivityForResult(signInIntent, REQUEST_CODE_SIGN_IN);
+        activity.startActivityForResult(signInIntent, REQUEST_CODE_SIGN_IN);
     }
 
     @SuppressWarnings("UnusedParameters")
@@ -168,7 +172,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
             @Override
             public void call(User result, Exception e) {
                 if (e == null) {
-                    mLoginListener.onLogin(result.toString());
+                    mLoginListener.onLogin(SocialUserFactory.getSocialUser(result));
                 } else {
                     mLoginListener.onLogin(null);
                 }
@@ -226,6 +230,6 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
     }
 
     public interface LoginListener {
-        void onLogin(String userName);
+        void onLogin(SocialUser user);
     }
 }

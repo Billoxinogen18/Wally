@@ -43,6 +43,7 @@ import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoManager;
+import com.wally.wally.userManager.SocialUser;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
@@ -252,8 +253,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLogin(String userName) {
-        Log.d(TAG, "onLogin() called with: " + "userName = [" + userName + "]");
+    public void onLogin(SocialUser user) {
+        Log.d(TAG, "onLogin() called with: " + "userName = [" + user + "]");
+        // TODO add user to application context
         hideProgress();
         // TODO update views
     }
