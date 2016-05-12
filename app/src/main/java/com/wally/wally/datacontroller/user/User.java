@@ -16,6 +16,10 @@ public class User {
         return ggId;
     }
 
+    public String getFbId() {
+        return null;
+    }
+
     public User withGgId(String ggId) {
         this.ggId = ggId;
         return this;
