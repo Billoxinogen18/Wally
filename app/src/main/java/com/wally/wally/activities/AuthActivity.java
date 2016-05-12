@@ -26,12 +26,12 @@ public class AuthActivity extends AppCompatActivity implements LoginManager.Auth
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_auth);
         // create before setting content view
         // (On Silent login, views won't be inflated and we will directly go to home screen)
         mManager = new LoginManager(this);
         mManager.setAuthListener(this);
 
-        setContentView(R.layout.activity_login);
         SignInButton plusSignIn = (SignInButton) findViewById(R.id.btn_google_sign_in);
         mManager.setUpGoogleButton(plusSignIn);
         Button signInAsGuest = (Button) findViewById(R.id.btn_sign_in_as_guest);
@@ -44,7 +44,7 @@ public class AuthActivity extends AppCompatActivity implements LoginManager.Auth
         plusSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mManager.onGoogleSignInClicked();
+                mManager.onGoogleSignInClicked(AuthActivity.this);
             }
         });
     }
