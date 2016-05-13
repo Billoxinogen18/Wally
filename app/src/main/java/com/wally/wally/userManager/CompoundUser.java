@@ -1,14 +1,16 @@
 package com.wally.wally.userManager;
 
-import java.net.URL;
+import android.os.AsyncTask;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by Xato on 5/12/2016.
  */
 public class CompoundUser implements SocialUser {
-    List<AbstractSocialUser> socialUsers;
+    List<SocialUser> socialUsers;
 
     public CompoundUser() {
         socialUsers = new ArrayList<>();
@@ -21,7 +23,7 @@ public class CompoundUser implements SocialUser {
         return null;
     }
 
-    public void addSocialUser(AbstractSocialUser user){
+    public void addSocialUser(SocialUser user){
         socialUsers.add(user);
     }
 
@@ -34,7 +36,7 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public URL getAvatarUrl() {
+    public String getAvatarUrl() {
         if(socialUsers.size() > 0){
             return socialUsers.get(0).getAvatarUrl();
         }
@@ -42,7 +44,7 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public URL getCoverUrl() {
+    public String getCoverUrl() {
         if(socialUsers.size() > 0){
             return socialUsers.get(0).getCoverUrl();
         }
@@ -50,11 +52,52 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public List<AbstractSocialUser> getFriends() {
-        List<AbstractSocialUser> friends = new ArrayList<>();
-        for(AbstractSocialUser user : socialUsers){
-            friends.addAll(user.getFriends());
-        }
-        return friends;
+    public void getFriends(final FriendsLoadListener friendsLoadListener) {
+        new AsyncTask<Void, Void, List<SocialUser>>() {
+            @Override
+            protected List<SocialUser> doInBackground(Void... params) {
+                final List<SocialUser> result = new ArrayList<>();
+                CountDownLatch latch = new CountDownLatch(socialUsers.size());
+                for(SocialUser user : socialUsers){
+                    user.getFriends(new FriendsLoadListener() {
+                        @Override
+                        public void onFriendsLoad(List<SocialUser> friends) {
+                            updateFriends(result, friends);
+                        }
+                    });
+                }
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                return result;
+            }
+
+            @Override
+            protected void onPostExecute(List<SocialUser> result) {
+                super.onPostExecute(socialUsers);
+                friendsLoadListener.onFriendsLoad(result);
+            }
+        };
+    }
+
+    @Override
+    public SocialUser withName(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SocialUser withAvatar(String avatarUrl) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SocialUser withCover(String coverUrl) {
+        throw new UnsupportedOperationException();
+    }
+
+    private synchronized void updateFriends(List<SocialUser> dest, List<SocialUser> src){
+        dest.addAll(src);
     }
 }
