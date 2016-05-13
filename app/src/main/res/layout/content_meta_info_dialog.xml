@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
     android:padding="8dp"
     tools:context=".activities.MainActivity">
 
@@ -34,26 +35,74 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
             android:padding="8dp"
             android:text="Visibility"
             android:textColor="@color/colorPrimary" />
 
-        <Spinner
-            android:id="@+id/range_visibility"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <include layout="@layout/divider" />
-
-        <android.support.v7.widget.SwitchCompat
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:layout_marginTop="4dp"
-            android:padding="12dp"
-            android:text="Preview is not Visible" />
+            android:layout_marginLeft="8dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="8dp">
 
-        <include layout="@layout/divider" />
+            <TextView
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Note is visible" />
+
+            <Spinner
+                android:id="@+id/spinner_range_visibility"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="8dp" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
+            android:background="@color/dividerColor" />
+
+        <LinearLayout
+            android:id="@+id/layout_map_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:descendantFocusability="blocksDescendants"
+            android:gravity="center">
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="16dp"
+                android:text="Preview Is visible on map" />
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/checkbox_map_preview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:padding="4dp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
+            android:background="@color/dividerColor" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,17 +111,20 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tv_note_delete_time"
+                style="@style/TextAppearance.AppCompat.Body1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="?attr/selectableItemBackground"
                 android:padding="16dp"
-                android:text="The Note will be deleted at: 12/04/2016" />
+                tools:text="The Note will be deleted at: 12/04/2016" />
 
             <ImageButton
-                android:id="@+id/btn_reset_time_visibility"
+                android:id="@+id/btn_reset_delete_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="12dp"
+                android:layout_marginRight="4dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="8dp"
                 android:src="@drawable/ic_clear_black_24dp" />

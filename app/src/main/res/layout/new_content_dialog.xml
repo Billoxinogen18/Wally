@@ -33,7 +33,7 @@
                     style="@style/TextAppearance.AppCompat.Headline"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_toLeftOf="@+id/btn_visibility_status"
+                    android:layout_toLeftOf="@+id/spinner_visibility_status"
                     android:background="@null"
                     android:ellipsize="end"
                     android:hint="@string/content_title_hint"
@@ -47,7 +47,7 @@
                     android:textStyle="bold" />
 
                 <Spinner
-                    android:id="@+id/btn_visibility_status"
+                    android:id="@+id/spinner_visibility_status"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
@@ -123,6 +123,7 @@
         android:layout_gravity="bottom"
         android:background="@android:color/white"
         android:elevation="4dp"
+        android:gravity="center"
         android:orientation="horizontal"
         android:padding="8dp"
         tools:targetApi="lollipop">

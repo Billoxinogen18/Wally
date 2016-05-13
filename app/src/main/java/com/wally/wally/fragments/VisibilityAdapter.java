@@ -14,30 +14,7 @@ import com.wally.wally.datacontroller.content.Visibility;
  * Created by GioGoG on 5/9/2016.
  */
 public class VisibilityAdapter extends BaseAdapter {
-    private static final int[] images = {
-            R.drawable.ic_private_visibility_black_24dp,
-            R.drawable.ic_friends_visibility_black_24dp,
-            R.drawable.ic_public_visibility_24dp,
-            R.drawable.ic_custom_visibility_black_24dp,
-            R.drawable.ic_anonymous_visibility_black_24dp
-    };
 
-    // TODO move to strings.xml
-    private static final String[] titles = {
-            "Private",
-            "Friends",
-            "Public",
-            "Custom",
-            "Anonymous"
-    };
-
-    private static final int[] values = {
-            Visibility.SocialVisibility.PRIVATE,
-            Visibility.SocialVisibility.FRIENDS,
-            Visibility.SocialVisibility.PUBLIC,
-            Visibility.SocialVisibility.CUSTOM,
-            Visibility.SocialVisibility.ANONYMOUS
-    };
 
     private Context mContext;
 
@@ -47,12 +24,12 @@ public class VisibilityAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return images.length;
+        return Visibility.SocialVisibility.getSize();
     }
 
     @Override
-    public Object getItem(int position) {
-        return values[position];
+    public Integer getItem(int position) {
+        return position;
     }
 
     @Override
@@ -70,8 +47,8 @@ public class VisibilityAdapter extends BaseAdapter {
         } else {
             tv = (TextView) view;
         }
-        tv.setText(titles[position]);
-        tv.setCompoundDrawablesWithIntrinsicBounds(images[position], 0, 0, 0);
+        tv.setText(Visibility.SocialVisibility.toString(position));
+        tv.setCompoundDrawablesWithIntrinsicBounds(Visibility.SocialVisibility.toDrawableRes(position), 0, 0, 0);
         return tv;
     }
 }

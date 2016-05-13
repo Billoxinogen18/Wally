@@ -29,5 +29,23 @@
     <string name="loading">Loading…</string>
     <string name="loading_message">Loading</string>
     <string name="content_meta_info_dialog_title">More</string>
+    <string name="checked_preview_on_map">Show preview on map</string>
+    <string name="unchecked_preview_on_map">Don\'t show preview on map</string>
+    <string name="empty_note_time_visibility">Click to set delete Date</string>
+    <string name="note_time_visibility">The note will be deleted at: %s</string>
 
+    <string-array name="social_visibility">
+        <item>Private</item>
+        <item>Public</item>
+        <item>Friends</item>
+        <item>Anonymous</item>
+    </string-array>
+
+    <string-array name="visibility_ranges">
+        <item>Here</item>
+        <item>Near</item>
+        <item>Local</item>
+        <item>Distant</item>
+        <item>Far</item>
+    </string-array>
 </resources>

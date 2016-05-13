@@ -15,7 +15,8 @@ public class Content implements Serializable {
     private LatLng location;
     private Visibility visibility;
 
-    public Content() {}
+    public Content() {
+    }
 
     public Content(String id) {
         this.id = id;
@@ -103,7 +104,10 @@ public class Content implements Serializable {
                 ", title='" + title + '\'' +
                 ", note='" + note + '\'' +
                 ", imageUri='" + imageUri + '\'' +
+                ", uuid='" + uuid + '\'' +
+                ", tangoData=" + tangoData +
                 ", location=" + location +
+                ", visibility=" + visibility +
                 '}';
     }
 }

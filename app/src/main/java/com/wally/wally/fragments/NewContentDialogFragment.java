@@ -17,10 +17,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -59,7 +64,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     private Content mContent;
     private boolean isEditMode;
     private GoogleApiClient mGoogleApiClient;
-    private boolean mIsDialogShown = false;
+    private boolean mIsDialogShown = true;
 
     // Empty constructor required for DialogFragment
     public NewContentDialogFragment() {
@@ -90,7 +95,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
         if (savedInstanceState != null) {
             mContent = (Content) savedInstanceState.getSerializable("mContent");
-            mIsDialogShown = savedInstanceState.getBoolean("mIsDialogShown");
+            mIsDialogShown = savedInstanceState.getBoolean("mIsDialogShown", true);
         }
 
         if (mContent == null) {
@@ -111,7 +116,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         mImageContainer = dv.findViewById(R.id.image_container);
         mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
         mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
-        mVisibilitySpinner = (Spinner) dv.findViewById(R.id.btn_visibility_status);
+        mVisibilitySpinner = (Spinner) dv.findViewById(R.id.spinner_visibility_status);
         mVisibilitySpinner.setAdapter(new VisibilityAdapter(getContext()));
 
         if (isEditMode) {
@@ -135,9 +140,9 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     }
 
     public void onStart() {
+        super.onStart();
         mGoogleApiClient.connect();
         showDialog(mIsDialogShown);
-        super.onStart();
     }
 
     public void onStop() {
@@ -233,16 +238,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         Visibility.SocialVisibility socialVisibility =
                 new Visibility.SocialVisibility((Integer) mVisibilitySpinner.getSelectedItem());
 
-        // TODO add views
-        Visibility.RangeVisibility rangeVisibility = null;
-        Date time = null;
-        boolean isPreviewVisible = false;
-
         Visibility visibility = new Visibility()
-                .withSocialVisibility(socialVisibility)
-                .withRangeVisibility(rangeVisibility)
-                .withTimeVisibility(time)
-                .withVisiblePreview(isPreviewVisible);
+                .withSocialVisibility(socialVisibility);
 
         mContent.withTitle(mTitleEt.getText().toString())
                 .withNote(mNoteEt.getText().toString())
@@ -308,6 +305,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState() called with: " + "outState = [" + outState + "]");
         updateContent();
         outState.putSerializable("mContent", mContent);
         outState.putBoolean("mIsDialogShown", mIsDialogShown);
@@ -329,10 +327,12 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     }
 
     public void showDialog(boolean show) {
-        if (!show) {
-            getDialog().hide();
-        } else {
-            getDialog().show();
+        if (getDialog() != null) {
+            if (!show) {
+                getDialog().hide();
+            } else {
+                getDialog().show();
+            }
         }
         mIsDialogShown = show;
     }
@@ -374,9 +374,15 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         }
     }
 
-    public static class MetaInfoDialogFragment extends DialogFragment {
+    public static class MetaInfoDialogFragment extends DialogFragment implements
+            AdapterView.OnItemSelectedListener,
+            DatePickerDialogFragment.DatePickListener {
 
-        private Content mContent;
+        public static final String TAG = MetaInfoDialogFragment.class.getSimpleName();
+
+        private Content mCont;
+        private TextView mNoteDeleteTime;
+        private View mNoteDeleteTimeClear;
 
         public MetaInfoDialogFragment() {
         }
@@ -389,44 +395,138 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             return fragment;
         }
 
+        @SuppressLint("InflateParams")
         @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            mContent = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
+            mCont = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
+            //noinspection ConstantConditions
+            if (mCont.getVisibility() == null) {
+                mCont.withVisibility(new Visibility());
+            }
             if (savedInstanceState != null) {
-                mContent = (Content) savedInstanceState.getSerializable("mContent");
+                mCont = (Content) savedInstanceState.getSerializable("mContent");
+                Log.d(TAG, "onCreateDialog() state restore " + mCont);
             }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            View dv = LayoutInflater.from(getContext()).inflate(R.layout.content_meta_info_dialog, null, false);
+            View dv = LayoutInflater.from(getContext())
+                    .inflate(R.layout.content_meta_info_dialog, null, false);
 
-            dv.findViewById(R.id.btn_dismiss).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dismiss();
-                    ((NewContentDialogFragment) getParentFragment()).onMetaInfoDialogDismiss(mContent);
-                }
-            });
+            initViews(dv);
 
-            updateViews();
             builder.setView(dv);
             AlertDialog dialog = builder.create();
             dialog.setCanceledOnTouchOutside(false);
             return dialog;
         }
 
-        private void updateContent() {
+        private void initViews(View v) {
+            v.findViewById(R.id.btn_dismiss).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                }
+            });
 
+            // Init range visibility
+            Spinner rangeSpinner = (Spinner) v.findViewById(R.id.spinner_range_visibility);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+                    android.R.layout.simple_spinner_item, Visibility.RangeVisibility.toList());
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            rangeSpinner.setAdapter(adapter);
+            rangeSpinner.setOnItemSelectedListener(this);
+
+            // init map preview
+            final CheckBox checkBoxMapPreview = (CheckBox) v.findViewById(R.id.checkbox_map_preview);
+            checkBoxMapPreview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mCont.getVisibility().withVisiblePreview(isChecked);
+                    Log.d(TAG, "onCheckedChanged: " + mCont);
+                }
+            });
+            v.findViewById(R.id.layout_map_preview).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    checkBoxMapPreview.performClick();
+                }
+            });
+
+            // init time to live view
+            mNoteDeleteTime = (TextView) v.findViewById(R.id.tv_note_delete_time);
+            mNoteDeleteTime.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    DatePickerDialogFragment.newInstance().show(getChildFragmentManager(), "date_picker");
+                }
+            });
+            mNoteDeleteTimeClear = v.findViewById(R.id.btn_reset_delete_time);
+            mNoteDeleteTimeClear.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onDateSelected(null);
+                }
+            });
+
+            // Init views from model
+            Visibility visibility = mCont.getVisibility();
+
+            if (visibility.getRangeVisibility() != null) {
+                rangeSpinner.setSelection(visibility.getRangeVisibility().getRange());
+            }
+            checkBoxMapPreview.setChecked(visibility.isPreviewVisible());
+            updateTimeVisibilityView();
         }
 
-        private void updateViews() {
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            super.onDismiss(dialog);
+            Log.d(TAG, "onDismiss()");
+            ((NewContentDialogFragment) getParentFragment()).onMetaInfoDialogDismiss(mCont);
+        }
+
+        // called when visibility item is selected.
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            mCont.getVisibility().withRangeVisibility(new Visibility.RangeVisibility(position));
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
 
         }
 
         @Override
         public void onSaveInstanceState(Bundle outState) {
             super.onSaveInstanceState(outState);
-            outState.putSerializable("mContent", mContent);
+            Log.d(TAG, "onSaveInstanceState() content: " + mCont + "]");
+            outState.putSerializable("mContent", mCont);
+        }
+
+        // Called when time picker dismisses
+        @Override
+        public void onDateSelected(Date selectedDate) {
+            mCont.getVisibility().withTimeVisibility(selectedDate);
+            Log.d(TAG, "onDateSelected() " + mCont);
+            updateTimeVisibilityView();
+        }
+
+        // Just update time visibility view with date from content
+        @SuppressWarnings("ConstantConditions")
+        private void updateTimeVisibilityView() {
+            Date date = mCont.getVisibility().getVisibleUntil();
+            String text;
+            if (date == null) {
+                text = getString(R.string.empty_note_time_visibility);
+                mNoteDeleteTimeClear.setVisibility(View.INVISIBLE);
+            } else {
+                text = String.format(getString(R.string.note_time_visibility),
+                        Utils.formatDateSmart(getContext(), date.getTime()));
+                mNoteDeleteTimeClear.setVisibility(View.VISIBLE);
+            }
+            mNoteDeleteTime.setText(text);
         }
     }
 }

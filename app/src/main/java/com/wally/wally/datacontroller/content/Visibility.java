@@ -1,10 +1,15 @@
 package com.wally.wally.datacontroller.content;
 
+import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;
+
+import com.wally.wally.App;
+import com.wally.wally.R;
 
 import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -55,18 +60,51 @@ public class Visibility implements Serializable {
         return isPreviewVisible;
     }
 
+    @Override
+    public String toString() {
+        return "Visibility{" +
+                "socialVisibility=" + socialVisibility +
+                ", rangeVisibility=" + rangeVisibility +
+                ", visibleUntil=" + visibleUntil +
+                ", isPreviewVisible=" + isPreviewVisible +
+                '}';
+    }
+
     public static class SocialVisibility implements Serializable {
         public static final int PRIVATE = 0;
         public static final int PUBLIC = 1;
         public static final int FRIENDS = 2;
-        public static final int CUSTOM = 3;
-        public static final int ANONYMOUS = 4;
-        //TODO Change to User object
-        private List<String> users;
+        public static final int ANONYMOUS = 3;
+
         private int mode;
 
         public SocialVisibility(@SocialVisibilityMode int mode) {
             setMode(mode);
+        }
+
+        public static String toString(@SocialVisibilityMode int range) {
+            return App.getContext().getResources().getStringArray(R.array.social_visibility)[range];
+        }
+
+        public static
+        @DrawableRes
+        int toDrawableRes(@SocialVisibilityMode int range) {
+            switch (range) {
+                case PRIVATE:
+                    return R.drawable.ic_private_visibility_black_24dp;
+                case PUBLIC:
+                    return R.drawable.ic_public_visibility_24dp;
+                case FRIENDS:
+                    return R.drawable.ic_friends_visibility_black_24dp;
+                case ANONYMOUS:
+                    return R.drawable.ic_anonymous_visibility_black_24dp;
+                default:
+                    throw new IllegalArgumentException("Unsupported image");
+            }
+        }
+
+        public static int getSize() {
+            return 4;
         }
 
         public
@@ -79,7 +117,7 @@ public class Visibility implements Serializable {
             this.mode = mode;
         }
 
-        @IntDef({PRIVATE, PUBLIC, FRIENDS, CUSTOM, ANONYMOUS})
+        @IntDef({PRIVATE, PUBLIC, FRIENDS, ANONYMOUS})
         @Retention(RetentionPolicy.SOURCE)
         public @interface SocialVisibilityMode {
         }
@@ -92,10 +130,20 @@ public class Visibility implements Serializable {
         public static final int LOCAL = 2;
         public static final int DISTANT = 3;
         public static final int FAR = 4;
+
         private int range;
 
         public RangeVisibility(@RangeVisibilityMode int range) {
             setRange(range);
+        }
+
+        public static List<String> toList() {
+            return Arrays.asList(
+                    App.getContext().getResources().getStringArray(R.array.visibility_ranges));
+        }
+
+        public String toString(@RangeVisibilityMode int range) {
+            return App.getContext().getResources().getStringArray(R.array.visibility_ranges)[range];
         }
 
         public
