@@ -2,7 +2,6 @@ package com.wally.wally;
 
 import android.app.Application;
 import android.content.Context;
-import android.support.multidex.MultiDex;
 
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.userManager.SocialUser;
@@ -39,7 +38,6 @@ public class App extends Application {
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-        MultiDex.install(this);
     }
 
     public DataController getDataController() {
