@@ -1,5 +1,7 @@
 package com.wally.wally.userManager;
 
+import com.wally.wally.datacontroller.user.User;
+
 import java.net.URL;
 import java.util.List;
 
@@ -7,7 +9,7 @@ import java.util.List;
  * Created by Xato on 5/12/2016.
  */
 public interface SocialUser {
-    String getId();
+    User getBaseUser();
     String getName();
     String getAvatarUrl();
     String getCoverUrl();

@@ -15,7 +15,7 @@ public abstract class AbstractSocialUser implements SocialUser {
         mBaseUser = baseUser;
     }
 
-    public String getId(){
-        return mBaseUser.getId();
+    public User getBaseUser(){
+        return mBaseUser;
     }
 }

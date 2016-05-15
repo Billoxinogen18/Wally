@@ -33,6 +33,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.activities.ChoosePhotoActivity;
@@ -244,6 +245,9 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         mContent.withTitle(mTitleEt.getText().toString())
                 .withNote(mNoteEt.getText().toString())
                 .withVisibility(visibility);
+
+        mContent.withAuthor(App.getInstance().getUser().getBaseUser());
+
     }
 
     /**
