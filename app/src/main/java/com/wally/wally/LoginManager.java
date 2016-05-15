@@ -24,6 +24,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.plus.Plus;
 import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.user.User;
@@ -55,7 +56,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         mContext = fragmentActivity;
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(new Scope(Scopes.PLUS_LOGIN))
+                .requestScopes(Plus.SCOPE_PLUS_LOGIN, Plus.SCOPE_PLUS_PROFILE)
                 .build();
 
         // Build a GoogleApiClient with access to the Google Sign-In API and the
@@ -63,6 +64,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         mGoogleApiClient = new GoogleApiClient.Builder(mContext)
                 .enableAutoManage(fragmentActivity /* FragmentActivity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addApi(Plus.API)
                 .build();
     }
 
@@ -164,7 +166,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
             @Override
             public void call(User result, Exception e) {
                 if (e == null) {
-                    App.getInstance().getSocialUserFactory().getSocialUser(result, mContext,
+                    App.getInstance().getSocialUserFactory().getSocialUser(result, mGoogleApiClient,
                             new SocialUserFactory.UserLoadListener() {
                                 @Override
                                 public void onUserLoad(SocialUser user) {
