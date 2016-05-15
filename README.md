@@ -42,3 +42,7 @@ Be carefull when you suppress warning.
 **Never** suppress warning that might crash or break application. 
 You can suppress when you definitely have a reason. 
 *For example when you know that variable will never be null and lint warns you NullPointerException, you can suppres warning.* 
+
+
+# Useful Links
+[Google Sign in sample (With silent sign in)] (https://github.com/googlesamples/google-services/blob/master/android/signin/app/src/main/java/com/google/samples/quickstart/signin/SignInActivity.java)
