@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
- * Created by Xato on 5/12/2016.
+ * Created by Meravici on 5/12/2016.
  */
 public class CompoundUser implements SocialUser {
     List<SocialUser> socialUsers;
@@ -18,14 +18,14 @@ public class CompoundUser implements SocialUser {
         socialUsers = new ArrayList<>();
     }
 
-    public User getBaseUser(){
-        if(socialUsers.size() > 0){
+    public User getBaseUser() {
+        if (socialUsers.size() > 0) {
             return socialUsers.get(0).getBaseUser();
         }
         return null;
     }
 
-    public void addSocialUser(SocialUser user){
+    public void addSocialUser(SocialUser user) {
         socialUsers.add(user);
     }
 
@@ -47,7 +47,7 @@ public class CompoundUser implements SocialUser {
 
     @Override
     public String getAvatarUrl() {
-        if(socialUsers.size() > 0){
+        if (socialUsers.size() > 0) {
             return socialUsers.get(0).getAvatarUrl();
         }
         return null;
@@ -55,7 +55,7 @@ public class CompoundUser implements SocialUser {
 
     @Override
     public String getCoverUrl() {
-        if(socialUsers.size() > 0){
+        if (socialUsers.size() > 0) {
             return socialUsers.get(0).getCoverUrl();
         }
         return null;
@@ -68,7 +68,7 @@ public class CompoundUser implements SocialUser {
             protected List<SocialUser> doInBackground(Void... params) {
                 final List<SocialUser> result = new ArrayList<>();
                 CountDownLatch latch = new CountDownLatch(socialUsers.size());
-                for(SocialUser user : socialUsers){
+                for (SocialUser user : socialUsers) {
                     user.getFriends(new FriendsLoadListener() {
                         @Override
                         public void onFriendsLoad(List<SocialUser> friends) {
@@ -112,7 +112,7 @@ public class CompoundUser implements SocialUser {
         throw new UnsupportedOperationException();
     }
 
-    private synchronized void updateFriends(List<SocialUser> dest, List<SocialUser> src){
+    private synchronized void updateFriends(List<SocialUser> dest, List<SocialUser> src) {
         dest.addAll(src);
     }
 }

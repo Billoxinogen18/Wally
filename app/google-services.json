@@ -1,19 +1,19 @@
 {
   "project_info": {
-    "project_number": "128879657860",
-    "project_id": "unified-cortex-126421"
+    "project_number": "412984760622",
+    "project_id": "crypto-gradient-131308"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:128879657860:android:bb939bb44a247b3b",
+        "mobilesdk_app_id": "1:412984760622:android:bb939bb44a247b3b",
         "android_client_info": {
           "package_name": "com.wally.wally"
         }
       },
       "oauth_client": [
         {
-          "client_id": "128879657860-rojejqf1bv1jkgqqdgrm6uh4tcbpt9et.apps.googleusercontent.com",
+          "client_id": "412984760622-4s7gp0d860684tih6q8lcncqms2lt0uv.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.wally.wally",
@@ -21,13 +21,13 @@
           }
         },
         {
-          "client_id": "128879657860-0skgvreu35ilodekimh7l3mbia49o0nu.apps.googleusercontent.com",
+          "client_id": "412984760622-ej5mnmqr4d429gisakjq42s4clr4q9lr.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAcjO_L073A38ueuUwAXqwaOe9SNulxG1k"
+          "current_key": "AIzaSyAxkBKfFIldmLw8g_a1h20UA1doipUvXcs"
         }
       ],
       "services": {

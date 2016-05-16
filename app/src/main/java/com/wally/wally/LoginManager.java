@@ -37,9 +37,9 @@ import com.wally.wally.userManager.SocialUserFactory;
  * Created by ioane5 on 5/10/16.
  */
 public class LoginManager implements GoogleApiClient.OnConnectionFailedListener {
-    private static final String TAG = LoginManager.class.getSimpleName();
     public static final int AUTH_TYPE_GOOGLE = 0;
     public static final int AUTH_TYPE_GUEST = 1;
+    private static final String TAG = LoginManager.class.getSimpleName();
     private static final int REQUEST_CODE_SIGN_IN = 129;
 
     private Context mContext;
@@ -57,6 +57,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestScopes(Plus.SCOPE_PLUS_LOGIN, Plus.SCOPE_PLUS_PROFILE)
+                .requestEmail()
                 .build();
 
         // Build a GoogleApiClient with access to the Google Sign-In API and the
@@ -141,7 +142,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
                     super.onPostExecute(token);
                     saveToken(token);
                     Log.d(TAG, "onPostExecute() called with: " + "token = [" + token + "]");
-                    mAuthListener.onAuth(true);
+                    mAuthListener.onAuth(!TextUtils.isEmpty(token));
                 }
             }.execute();
         } else {
