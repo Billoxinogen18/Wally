@@ -160,7 +160,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onNewContentClick(View v) {
-        NewContentDialogFragment.newInstance().show(getSupportFragmentManager(), "NewContentDialogFragment");
+        NewContentDialogFragment.newInstance()
+                .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
     }
 
     public void onBtnMapClick(View v) {
@@ -174,7 +175,8 @@ public class MainActivity extends AppCompatActivity implements
             Log.e(TAG, "editSelectedContent: when mSelectedContent is NULL");
             return;
         }
-        NewContentDialogFragment.newInstance(mSelectedContent).show(getSupportFragmentManager(), "edit_content");
+        NewContentDialogFragment.newInstance(mSelectedContent)
+                .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
     }
 
     public void onDeleteSelectedContentClick(View view) {
