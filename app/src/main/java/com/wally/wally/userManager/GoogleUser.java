@@ -1,21 +1,7 @@
 package com.wally.wally.userManager;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.plus.People;
-import com.google.android.gms.plus.Plus;
 import com.wally.wally.datacontroller.user.User;
-
-import java.net.URL;
-import java.util.List;
 
 /**
  * Created by Meravici on 5/12/2016.
@@ -23,9 +9,10 @@ import java.util.List;
 public class GoogleUser extends AbstractSocialUser {
     private GoogleApiClient mGoogleApiClient;
 
-    private String mName;
+    private String mDisplayName;
     private String mAvatarUrl;
     private String mCoverUrl;
+    private String mFirstName;
 
     protected GoogleUser(User baseUser) {
         super(baseUser);
@@ -36,8 +23,13 @@ public class GoogleUser extends AbstractSocialUser {
     }
 
     @Override
-    public String getName() {
-        return mName;
+    public String getDisplayName() {
+        return mDisplayName;
+    }
+
+    @Override
+    public String getFirstName() {
+        return mDisplayName;
     }
 
     @Override
@@ -56,8 +48,14 @@ public class GoogleUser extends AbstractSocialUser {
     }
 
     @Override
-    public SocialUser withName(String name) {
-        mName = name;
+    public SocialUser withDisplayName(String displayName) {
+        mDisplayName = displayName;
+        return this;
+    }
+
+    @Override
+    public SocialUser withFirstName(String firstName) {
+        mFirstName = firstName;
         return this;
     }
 

@@ -30,9 +30,17 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public String getName() {
-        if (socialUsers.size() > 0) {
-            return socialUsers.get(0).getName();
+    public String getDisplayName() {
+        if(socialUsers.size() > 0){
+            return socialUsers.get(0).getDisplayName();
+        }
+        return null;
+    }
+
+    @Override
+    public String getFirstName() {
+        if(socialUsers.size() > 0){
+            return socialUsers.get(0).getFirstName();
         }
         return null;
     }
@@ -85,7 +93,12 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public SocialUser withName(String name) {
+    public SocialUser withDisplayName(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SocialUser withFirstName(String name) {
         throw new UnsupportedOperationException();
     }
 
