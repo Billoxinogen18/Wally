@@ -1,6 +1,8 @@
 package com.wally.wally.datacontroller.user;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String id;
     private String ggId;
 

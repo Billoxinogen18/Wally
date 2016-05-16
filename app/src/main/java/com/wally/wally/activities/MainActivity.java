@@ -27,7 +27,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
@@ -38,6 +41,7 @@ import com.wally.wally.LoginManager;
 import com.wally.wally.OnContentSelectedListener;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.components.CircleTransform;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.fragments.NewContentDialogFragment;
@@ -168,6 +172,11 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(mapIntent);
     }
 
+    public void onShowProfileClick(View v) {
+        Intent profileIntent = ProfileActivity.newIntent(getBaseContext(), App.getInstance().getUser());
+        startActivity(profileIntent);
+    }
+
     public void onEditSelectedContentClick(View view) {
         Log.d(TAG, "editSelectedContent() called with: " + "view = [" + view + "]");
         if (mSelectedContent == null) {
@@ -258,6 +267,13 @@ public class MainActivity extends AppCompatActivity implements
         App.getInstance().setUser(user);
         hideProgress();
         // TODO update views
+        Log.d(TAG, "onLogin: " + user.getAvatarUrl());
+        Glide.with(getBaseContext())
+                .load(user.getAvatarUrl())
+                .transform(new CircleTransform(getBaseContext()))
+                .into((ImageView) findViewById(R.id.profile_image));
+
+        ((TextView)findViewById(R.id.profile_name)).setText(user.getFirstName());
     }
 
     private void saveActiveContent(Content content, Pose pose, double scale) {

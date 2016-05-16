@@ -59,9 +59,9 @@ public class SocialUserFactory {
                             try {
                                 Person person = personBuffer.get(0);
                                 SocialUser googleUser = new GoogleUser(baseUser)
-                                        .withName(person.getDisplayName())
+                                        .withDisplayName(person.getDisplayName())
+                                        .withFirstName(person.getName().getGivenName())
                                         .withAvatar(person.getImage().getUrl());
-
                                 userLoadListener.onUserLoad(googleUser);
                             } finally {
                                 personBuffer.release();

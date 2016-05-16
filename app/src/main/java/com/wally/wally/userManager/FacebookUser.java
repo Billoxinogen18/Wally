@@ -14,9 +14,15 @@ public class FacebookUser extends AbstractSocialUser {
     }
 
     @Override
-    public String getName() {
+    public String getDisplayName() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public String getFirstName() {
+        throw new UnsupportedOperationException();
+    }
+
 
     @Override
     public String getAvatarUrl() {
@@ -34,7 +40,12 @@ public class FacebookUser extends AbstractSocialUser {
     }
 
     @Override
-    public SocialUser withName(String name) {
+    public SocialUser withDisplayName(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SocialUser withFirstName(String name) {
         throw new UnsupportedOperationException();
     }
 

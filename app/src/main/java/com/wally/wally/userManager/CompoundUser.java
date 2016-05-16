@@ -2,6 +2,8 @@ package com.wally.wally.userManager;
 
 import android.os.AsyncTask;
 
+import com.wally.wally.datacontroller.user.User;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -16,9 +18,9 @@ public class CompoundUser implements SocialUser {
         socialUsers = new ArrayList<>();
     }
 
-    public String getId(){
+    public User getBaseUser(){
         if(socialUsers.size() > 0){
-            return socialUsers.get(0).getId();
+            return socialUsers.get(0).getBaseUser();
         }
         return null;
     }
@@ -28,9 +30,17 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public String getName() {
+    public String getDisplayName() {
         if(socialUsers.size() > 0){
-            return socialUsers.get(0).getName();
+            return socialUsers.get(0).getDisplayName();
+        }
+        return null;
+    }
+
+    @Override
+    public String getFirstName() {
+        if(socialUsers.size() > 0){
+            return socialUsers.get(0).getFirstName();
         }
         return null;
     }
@@ -83,7 +93,12 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public SocialUser withName(String name) {
+    public SocialUser withDisplayName(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SocialUser withFirstName(String name) {
         throw new UnsupportedOperationException();
     }
 
