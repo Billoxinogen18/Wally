@@ -115,7 +115,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Log.d(TAG, bounds.toString());
             markersSetVisible(true);
             mLastRequestId = System.currentTimeMillis();
-            app.getDataController().fetch(bounds, new EnumCallback(mLastRequestId) {
+            app.getDataController().fetchByBounds(bounds, new EnumCallback(mLastRequestId) {
 
                 @Override
                 public void call(@NotNull Collection<Content> result, @Nullable Exception e) {

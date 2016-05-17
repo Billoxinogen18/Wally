@@ -115,7 +115,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     }
 
     private void fetchContentForAdf(String adfUuid) {
-        ((App) mContext.getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
+        ((App) mContext.getApplicationContext()).getDataController().fetchByUUID(adfUuid, new Callback<Collection<Content>>() {
             @Override
             public void call(final Collection<Content> result, Exception e) {
                 new Thread(new Runnable() {
