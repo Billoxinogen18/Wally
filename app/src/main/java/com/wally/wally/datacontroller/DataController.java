@@ -1,5 +1,6 @@
 package com.wally.wally.datacontroller;
 import android.content.Context;
+import android.util.Log;
 
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
@@ -44,6 +45,7 @@ public class DataController {
                 // Map<String, Object> data = authData.getProviderData();
                 String ggId = (String) authData.getProviderData().get("id");
                 User user = new User(authData.getUid()).withGgId(ggId);
+                users.child(user.getId()).setValue(user);
                 resultCallback.call(user, null);
             }
 
@@ -76,6 +78,10 @@ public class DataController {
 
     public void fetchByAuthor(String authorId, final Callback<Collection<Content>> resultCallback) {
         new AuthorQuery(authorId).fetch(contents, createFetchCallback(resultCallback));
+    }
+
+    public void fetchByAuthor(User author, final Callback<Collection<Content>> resultCallback) {
+        fetchByAuthor(author.getId(), resultCallback);
     }
 
     private Callback<Collection<FirebaseContent>> createFetchCallback(
