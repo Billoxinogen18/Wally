@@ -89,22 +89,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        if (getArguments() != null) {
-            mContent = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
-            isEditMode = true;
-        } else {
-            isEditMode = false;
-        }
-
-        if (savedInstanceState != null) {
-            mContent = (Content) savedInstanceState.getSerializable("mContent");
-            mIsDialogShown = savedInstanceState.getBoolean("mIsDialogShown", true);
-        }
-
-        if (mContent == null) {
-            mContent = new Content();
-        }
-
+        initContent(savedInstanceState);
         mAuthor = App.getInstance().getUser().getBaseUser();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -142,6 +127,27 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         dialog.setCanceledOnTouchOutside(false);
         return dialog;
+    }
+
+    private void initContent(Bundle savedInstanceState) {
+        if (getArguments() != null) {
+            mContent = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
+            isEditMode = true;
+        } else {
+            isEditMode = false;
+        }
+
+        if (savedInstanceState != null) {
+            mContent = (Content) savedInstanceState.getSerializable("mContent");
+            mIsDialogShown = savedInstanceState.getBoolean("mIsDialogShown", true);
+        }
+
+        if (mContent == null) {
+            mContent = new Content();
+        }
+        if (mContent.getVisibility() == null) {
+            mContent.withVisibility(new Visibility());
+        }
     }
 
     public void onStart() {

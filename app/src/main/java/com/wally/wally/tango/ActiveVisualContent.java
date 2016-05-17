@@ -18,15 +18,13 @@ import org.rajawali3d.scene.RajawaliScene;
 public class ActiveVisualContent extends VisualContent {
     private static final String TAG = ActiveVisualContent.class.getSimpleName();
     private Animation3D mMoveAnim = null;
-    private Pose mCurrentPose;
     private Pose mNewPose;
 
-    public ActiveVisualContent(Content content, Pose pose) {
+    public ActiveVisualContent(Content content) {
         super(content);
-        mCurrentPose = pose;
     }
 
-    public boolean shouldAnimate(){
+    public boolean shouldAnimate() {
         return mNewPose != null;
     }
 
@@ -52,11 +50,11 @@ public class ActiveVisualContent extends VisualContent {
 
         // TODO make rotate animation too
         mVisual.setOrientation(mNewPose.getOrientation());
-        mCurrentPose = mNewPose;
+        mContent.getTangoData().updatePose(mNewPose);
         mNewPose = null;
     }
 
-    public void scaleContent(double byFactor){
+    public void scaleContent(double byFactor) {
         TangoData tangoData = mContent.getTangoData();
         if (tangoData != null) {
             tangoData.setScale(tangoData.getScale() * byFactor);
@@ -66,12 +64,12 @@ public class ActiveVisualContent extends VisualContent {
         }
     }
 
-
     @Override
     public ContentPlane getVisual() {
         super.getVisual();
-        mVisual.setPosition(mCurrentPose.getPosition());
-        mVisual.setRotation(mCurrentPose.getOrientation());
+        Pose currentPose = mContent.getTangoData().getPose();
+        mVisual.setPosition(currentPose.getPosition());
+        mVisual.setRotation(currentPose.getOrientation());
         return mVisual;
     }
 }

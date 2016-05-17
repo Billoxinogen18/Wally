@@ -129,11 +129,11 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
             ActiveVisualContent activeVisualContent = mVisualContentManager.getActiveContent();
             if (activeVisualContent == null) {
                 Log.e(TAG, "Error in logic activeVisualContent should not be null");
+                return;
             }
             removeBorder();
             getCurrentScene().addChild(activeVisualContent.getVisual());
             mVisualContentManager.activeContentAlreadyRenderedOnScreen();
-
         } else if (mVisualContentManager.isActiveContentRenderedOnScreen()) {
             if (mVisualContentManager.getActiveContent().shouldAnimate()) {
                 mVisualContentManager.getActiveContent().animate(getCurrentScene());

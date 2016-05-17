@@ -34,8 +34,6 @@ import com.bumptech.glide.Glide;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
-import com.projecttango.rajawali.Pose;
-import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.App;
 import com.wally.wally.LoginManager;
 import com.wally.wally.OnContentSelectedListener;
@@ -43,7 +41,6 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoManager;
@@ -238,8 +235,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onContentFittingFinished(Content content, TangoPoseData pose, double scale) {
-        saveActiveContent(content, ScenePoseCalculator.toOpenGLPose(pose), scale);
+    public void onContentFittingFinished(Content content) {
+        saveActiveContent(content);
     }
 
     @Override
@@ -267,6 +264,7 @@ public class MainActivity extends AppCompatActivity implements
         mTangoManager.finishFitting();
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onLogin(SocialUser user) {
         Log.d(TAG, "onLogin() called with: " + "userName = [" + user + "]");
@@ -284,10 +282,8 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    private void saveActiveContent(Content content, Pose pose, double scale) {
-        TangoData tangoData = new TangoData(pose);
-        tangoData.setScale(scale);
-        content.withTangoData(tangoData).withUuid(mAdfUuid);
+    private void saveActiveContent(Content content) {
+        content.withUuid(mAdfUuid);
         ((App) getApplicationContext()).getDataController().save(content);
     }
 

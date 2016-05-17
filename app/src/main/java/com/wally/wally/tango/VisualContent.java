@@ -34,7 +34,6 @@ public class VisualContent {
     }
 
     private Material createMaterial(Bitmap bitmap) {
-        Log.d(TAG, "createMaterial() called with: " + "bitmap = [" + bitmap + "]");
         Material material = new Material();
         try {
             Texture t = new Texture("mContent3D", bitmap);  //TODO what is the mContent3D?
@@ -55,6 +54,7 @@ public class VisualContent {
             mVisual = new ContentPlane();
 
             Bitmap bitmap = Utils.createBitmapFromContent(mContent);
+            Log.d(TAG, "getVisual() bitmap " + bitmap.getHeight() + "x" + bitmap.getWidth());
             float ratio = (float) bitmap.getHeight() / bitmap.getWidth();
             mVisual.setWidth(PLANE_WIDTH);
             mVisual.setHeight(PLANE_WIDTH * ratio);

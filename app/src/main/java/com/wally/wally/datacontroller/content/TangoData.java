@@ -13,25 +13,30 @@ public class TangoData implements Serializable {
 
     private double[] rotation;
     private double[] translation;
-    private double scale;
+    private double scale = 1.0;
 
     public TangoData() {
 
     }
 
-    public TangoData(double[] rotation, double[] translation){
+    @SuppressWarnings("unused")
+    public TangoData(double[] rotation, double[] translation) {
         this.rotation = rotation;
         this.translation = translation;
     }
 
-    public TangoData(Pose pose){
+    public TangoData(Pose pose) {
         this.rotation = new double[4];
+        this.translation = new double[3];
+        updatePose(pose);
+    }
+
+    public void updatePose(Pose pose) {
         this.rotation[0] = pose.getOrientation().w;
         this.rotation[1] = pose.getOrientation().x;
         this.rotation[2] = pose.getOrientation().y;
         this.rotation[3] = pose.getOrientation().z;
 
-        this.translation = new double[3];
         this.translation[0] = pose.getPosition().x;
         this.translation[1] = pose.getPosition().y;
         this.translation[2] = pose.getPosition().z;
@@ -69,12 +74,11 @@ public class TangoData implements Serializable {
     }
 
     @JsonIgnore
-    public Pose getPose(){
-        Pose result = null;
-        Vector3 v = new Vector3(translation[0],translation[1], translation[2]);
+    public Pose getPose() {
+        Pose result;
+        Vector3 v = new Vector3(translation[0], translation[1], translation[2]);
         Quaternion q = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
-        result = new Pose(v,q);
+        result = new Pose(v, q);
         return result;
-
     }
 }

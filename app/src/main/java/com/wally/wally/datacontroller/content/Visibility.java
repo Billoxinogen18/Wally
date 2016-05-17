@@ -23,6 +23,11 @@ public class Visibility implements Serializable {
     private Date visibleUntil;
     private boolean isPreviewVisible;
 
+    public Visibility() {
+        socialVisibility = new SocialVisibility(SocialVisibility.PUBLIC);
+        rangeVisibility = new RangeVisibility(RangeVisibility.DISTANT);
+        isPreviewVisible = true;
+    }
 
     public Visibility withSocialVisibility(SocialVisibility socialVisibility) {
         this.socialVisibility = socialVisibility;

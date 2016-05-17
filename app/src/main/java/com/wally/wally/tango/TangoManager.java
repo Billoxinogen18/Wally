@@ -18,6 +18,7 @@ import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
+import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
@@ -25,6 +26,7 @@ import com.wally.wally.App;
 import com.wally.wally.OnContentSelectedListener;
 import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.TangoData;
 
 import org.rajawali3d.scene.ASceneFrameCallback;
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -354,7 +356,10 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     }
 
     public void setActiveContent(TangoPoseData pose, Content content) {
-        ActiveVisualContent activeVisualContent = new ActiveVisualContent(content, ScenePoseCalculator.toOpenGLPose(pose));
+        Pose glPose = ScenePoseCalculator.toOpenGLPose(pose);
+        content.withTangoData(new TangoData(glPose));
+
+        ActiveVisualContent activeVisualContent = new ActiveVisualContent(content);
         mVisualContentManager.setActiveContentToBeRenderedOnScreen(activeVisualContent);
     }
 
