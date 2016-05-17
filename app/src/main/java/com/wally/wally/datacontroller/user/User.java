@@ -5,6 +5,9 @@ import java.io.Serializable;
 public class User implements Serializable {
     private String id;
     private String ggId;
+    private String fbId;
+
+    public User() {}
 
     public User(String id) {
         this.id = id;
@@ -19,11 +22,16 @@ public class User implements Serializable {
     }
 
     public String getFbId() {
-        return null;
+        return fbId;
     }
 
     public User withGgId(String ggId) {
         this.ggId = ggId;
+        return this;
+    }
+
+    public User withFbId(String fbId) {
+        this.fbId = fbId;
         return this;
     }
 }

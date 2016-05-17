@@ -39,6 +39,7 @@ import com.wally.wally.Utils;
 import com.wally.wally.activities.ChoosePhotoActivity;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.datacontroller.user.User;
 
 import java.util.Date;
 
@@ -62,6 +63,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     private EditText mNoteEt;
     private Spinner mVisibilitySpinner;
 
+    private User mAuthor;
     private Content mContent;
     private boolean isEditMode;
     private GoogleApiClient mGoogleApiClient;
@@ -102,6 +104,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         if (mContent == null) {
             mContent = new Content();
         }
+
+        mAuthor = App.getInstance().getUser().getBaseUser();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
@@ -173,7 +177,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             case R.id.btn_discard_post:
                 if (!postIsEmpty()) {
                     DiscardDoubleCheckDialogFragment dialog = new DiscardDoubleCheckDialogFragment();
-                    dialog.show(getChildFragmentManager(), "DiscardDoubleCheckDialogFragment");
+                    dialog.show(getChildFragmentManager(), DiscardDoubleCheckDialogFragment.TAG);
                 } else {
                     onContentDiscarded();
                 }
@@ -182,7 +186,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 if (Utils.checkLocationPermission(getContext())) {
                     createPost();
                 } else {
-                    Log.d(TAG, "onClick() called with: " + "v = [" + v + "]");
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                             REQUEST_CODE_MY_LOCATION);
@@ -200,7 +203,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 break;
             case R.id.btn_more_settings:
                 showDialog(false);
-                MetaInfoDialogFragment.newInstance(mContent).show(getChildFragmentManager(), "meta_info_dialog");
+                MetaInfoDialogFragment.newInstance(mContent).show(getChildFragmentManager(), MetaInfoDialogFragment.TAG);
                 break;
             default:
                 Log.e(TAG, "onClick: " + v.getId());
@@ -235,19 +238,18 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
      * Updates model from views.
      */
     private void updateContent() {
+        if (mContent.getVisibility() == null) {
+            mContent.withVisibility(new Visibility());
+        }
         //noinspection WrongConstant
         Visibility.SocialVisibility socialVisibility =
                 new Visibility.SocialVisibility((Integer) mVisibilitySpinner.getSelectedItem());
 
-        Visibility visibility = new Visibility()
-                .withSocialVisibility(socialVisibility);
+        mContent.getVisibility().withSocialVisibility(socialVisibility);
 
         mContent.withTitle(mTitleEt.getText().toString())
-                .withNote(mNoteEt.getText().toString())
-                .withVisibility(visibility);
-
-        mContent.withAuthor(App.getInstance().getUser().getBaseUser());
-
+                .withNote(mNoteEt.getText().toString());
+        mContent.withAuthor(mAuthor);
     }
 
     /**
@@ -309,20 +311,9 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState() called with: " + "outState = [" + outState + "]");
         updateContent();
         outState.putSerializable("mContent", mContent);
         outState.putBoolean("mIsDialogShown", mIsDialogShown);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     public void onMetaInfoDialogDismiss(Content content) {
@@ -341,6 +332,16 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         mIsDialogShown = show;
     }
 
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
     public interface NewContentDialogListener {
         /**
          * When post is created by user, this method is called.
@@ -349,6 +350,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     }
 
     public static class DiscardDoubleCheckDialogFragment extends DialogFragment {
+
+        public static final String TAG = DiscardDoubleCheckDialogFragment.class.getSimpleName();
 
         public DiscardDoubleCheckDialogFragment() {
         }
@@ -410,7 +413,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             }
             if (savedInstanceState != null) {
                 mCont = (Content) savedInstanceState.getSerializable("mContent");
-                Log.d(TAG, "onCreateDialog() state restore " + mCont);
             }
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -448,7 +450,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     mCont.getVisibility().withVisiblePreview(isChecked);
-                    Log.d(TAG, "onCheckedChanged: " + mCont);
                 }
             });
             v.findViewById(R.id.layout_map_preview).setOnClickListener(new View.OnClickListener() {
@@ -463,7 +464,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             mNoteDeleteTime.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    DatePickerDialogFragment.newInstance().show(getChildFragmentManager(), "date_picker");
+                    DatePickerDialogFragment.newInstance().show(getChildFragmentManager(),
+                            DatePickerDialogFragment.TAG);
                 }
             });
             mNoteDeleteTimeClear = v.findViewById(R.id.btn_reset_delete_time);
@@ -487,8 +489,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         @Override
         public void onDismiss(DialogInterface dialog) {
             super.onDismiss(dialog);
-            Log.d(TAG, "onDismiss()");
-            ((NewContentDialogFragment) getParentFragment()).onMetaInfoDialogDismiss(mCont);
+            NewContentDialogFragment frag = (NewContentDialogFragment) getParentFragment();
+            frag.onMetaInfoDialogDismiss(mCont);
         }
 
         // called when visibility item is selected.
@@ -505,7 +507,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         @Override
         public void onSaveInstanceState(Bundle outState) {
             super.onSaveInstanceState(outState);
-            Log.d(TAG, "onSaveInstanceState() content: " + mCont + "]");
             outState.putSerializable("mContent", mCont);
         }
 
@@ -513,7 +514,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         @Override
         public void onDateSelected(Date selectedDate) {
             mCont.getVisibility().withTimeVisibility(selectedDate);
-            Log.d(TAG, "onDateSelected() " + mCont);
             updateTimeVisibilityView();
         }
 

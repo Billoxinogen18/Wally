@@ -20,6 +20,7 @@ import java.util.Date;
 public class DatePickerDialogFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
 
+    public static final String TAG = DatePickerDialogFragment.class.getSimpleName();
     public static DatePickerDialogFragment newInstance() {
         return new DatePickerDialogFragment();
     }

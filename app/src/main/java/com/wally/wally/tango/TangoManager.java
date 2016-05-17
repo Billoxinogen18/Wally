@@ -9,8 +9,6 @@ import android.view.ScaleGestureDetector;
 
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
-import com.google.atap.tango.ux.UxExceptionEvent;
-import com.google.atap.tango.ux.UxExceptionEventListener;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoConfig;
@@ -117,7 +115,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     }
 
     private void fetchContentForAdf(String adfUuid) {
-        ((App) mContext.getApplicationContext()).getDataController().fetch(adfUuid, new Callback<Collection<Content>>() {
+        ((App) mContext.getApplicationContext()).getDataController().fetchByUUID(adfUuid, new Callback<Collection<Content>>() {
             @Override
             public void call(final Collection<Content> result, Exception e) {
                 new Thread(new Runnable() {
@@ -145,6 +143,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         // will block here until all Tango callback calls are finished. If you lock against this
         // object in a Tango callback thread it will cause a deadlock.
         if (mIsConnected) {
+            mIsConnected = false;
             mRenderer.getCurrentScene().clearFrameCallbacks();
             mTango.disconnectCamera(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
             // We need to invalidate the connected texture ID so that we cause a re-connection
@@ -152,7 +151,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
             mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
             mTango.disconnect();
             mTangoUx.stop();
-            mIsConnected = false;
         }
 
         if (mContentFitter != null) {
@@ -161,7 +159,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
 
     }
 
-    public synchronized void onResume() {
+    public void onResume() {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         if (!mIsConnected) {

@@ -8,8 +8,11 @@ import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.datacontroller.user.User;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FirebaseContent {
 
@@ -19,6 +22,7 @@ public class FirebaseContent {
     private String uuid;
     private String title;
     private String imageUri;
+    private User author;
 
     // Location
     private double latitude;
@@ -45,6 +49,7 @@ public class FirebaseContent {
         uuid = content.getUuid();
         title = content.getTitle();
         imageUri = content.getImageUri();
+        author = content.getAuthor();
 
         LatLng location = content.getLocation();
         if (location != null) {
@@ -91,6 +96,10 @@ public class FirebaseContent {
 
     public String getImageUri() {
         return imageUri;
+    }
+
+    public User getAuthor() {
+        return author;
     }
 
     public double getLatitude() {
@@ -177,6 +186,7 @@ public class FirebaseContent {
                 .withUuid(uuid)
                 .withImageUri(imageUri)
                 .withTitle(title)
+                .withAuthor(author)
                 .withLocation(new LatLng(latitude, longitude))
                 .withTangoData(new TangoData()
                         .withScale(scale)

@@ -13,23 +13,26 @@ import com.wally.wally.datacontroller.user.User;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 
 public class DataController {
     private static final String FIREBASE_URL = "https://burning-inferno-2566.firebaseio.com/";
-    private static final String CONTENT_DB_NAME = "Develop-Contents";
+    private static final String DB_PATH = "Develop";
     private static DataController instance;
     private Firebase firebaseRoot;
+    private Firebase users;
+    private Firebase contents;
 
     private DataController(Firebase firebase) {
         firebaseRoot = firebase;
+        users = firebaseRoot.child("Users");
+        contents = firebaseRoot.child("Contents");
     }
 
     public static DataController create(Context context) {
         if (instance == null) {
             Firebase.setAndroidContext(context);
-            Firebase firebase = new Firebase(FIREBASE_URL).child(CONTENT_DB_NAME);
+            Firebase firebase = new Firebase(FIREBASE_URL).child(DB_PATH);
             instance = new DataController(firebase);
         }
         return instance;
@@ -42,6 +45,7 @@ public class DataController {
                 // Map<String, Object> data = authData.getProviderData();
                 String ggId = (String) authData.getProviderData().get("id");
                 User user = new User(authData.getUid()).withGgId(ggId);
+                users.child(user.getId()).setValue(user);
                 resultCallback.call(user, null);
             }
 
@@ -57,19 +61,27 @@ public class DataController {
     }
 
     public void save(Content c) {
-        new FirebaseContent(c).save(firebaseRoot);
+        new FirebaseContent(c).save(contents);
     }
 
     public void delete(Content c) {
-        new FirebaseContent(c).delete(firebaseRoot);
+        new FirebaseContent(c).delete(contents);
     }
 
-    public void fetch(LatLngBounds bounds, final Callback<Collection<Content>> resultCallback) {
-        new LatLngQuery(bounds).fetch(firebaseRoot, createFetchCallback(resultCallback));
+    public void fetchByBounds(LatLngBounds bounds, final Callback<Collection<Content>> resultCallback) {
+        new LatLngQuery(bounds).fetch(contents, createFetchCallback(resultCallback));
     }
 
-    public void fetch(String uuid, final Callback<Collection<Content>> resultCallback) {
-        new UUIDQuery(uuid).fetch(firebaseRoot, createFetchCallback(resultCallback));
+    public void fetchByUUID(String uuid, final Callback<Collection<Content>> resultCallback) {
+        new UUIDQuery(uuid).fetch(contents, createFetchCallback(resultCallback));
+    }
+
+    public void fetchByAuthor(String authorId, final Callback<Collection<Content>> resultCallback) {
+        new AuthorQuery(authorId).fetch(contents, createFetchCallback(resultCallback));
+    }
+
+    public void fetchByAuthor(User author, final Callback<Collection<Content>> resultCallback) {
+        fetchByAuthor(author.getId(), resultCallback);
     }
 
     private Callback<Collection<FirebaseContent>> createFetchCallback(
