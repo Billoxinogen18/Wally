@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements
     private TangoManager mTangoManager;
     private LoginManager mLoginManager;
 
+    private View mNewContentBtn;
+
     private FloatingActionButton mFinishFitting;
     private View mLayoutFitting;
     private List<View> mNonFittingModeViews;
@@ -93,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
         // Initialize views
+        mNewContentBtn = findViewById(R.id.btn_new_post);
+
         mLayoutFitting = findViewById(R.id.layout_fitting);
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
@@ -274,6 +278,8 @@ public class MainActivity extends AppCompatActivity implements
                 .into((ImageView) findViewById(R.id.profile_image));
 
         ((TextView)findViewById(R.id.profile_name)).setText(user.getFirstName());
+        mNewContentBtn.setVisibility(View.VISIBLE);
+
     }
 
     private void saveActiveContent(Content content, Pose pose, double scale) {
