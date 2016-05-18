@@ -138,6 +138,8 @@ public class MainActivity extends AppCompatActivity implements
         if (!mLoginManager.isLoggedIn()) {
             showProgress();
             mLoginManager.tryLogin();
+        }else{
+            displayProfileBar(App.getInstance().getUser());
         }
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
@@ -272,6 +274,11 @@ public class MainActivity extends AppCompatActivity implements
         hideProgress();
         // TODO update views
         Log.d(TAG, "onLogin: " + user.getAvatarUrl());
+        displayProfileBar(user);
+
+    }
+
+    private void displayProfileBar(SocialUser user) {
         Glide.with(getBaseContext())
                 .load(user.getAvatarUrl())
                 .transform(new CircleTransform(getBaseContext()))
@@ -279,7 +286,6 @@ public class MainActivity extends AppCompatActivity implements
 
         ((TextView)findViewById(R.id.profile_name)).setText(user.getFirstName());
         mNewContentBtn.setVisibility(View.VISIBLE);
-
     }
 
     private void saveActiveContent(Content content) {
