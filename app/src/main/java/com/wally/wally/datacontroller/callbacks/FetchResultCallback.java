@@ -4,5 +4,4 @@ import com.wally.wally.datacontroller.content.Content;
 
 import java.util.Collection;
 
-public interface FetchResultCallback extends Callback<Collection<Content>> {
-}
+public interface FetchResultCallback extends Callback<Collection<Content>> {}

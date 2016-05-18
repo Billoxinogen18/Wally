@@ -4,15 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.google.android.gms.maps.model.LatLng;
-import com.wally.wally.datacontroller.Callback;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.TangoData;
-import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FirebaseContent {
 
@@ -154,10 +149,8 @@ public class FirebaseContent {
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
                 if (firebaseError == null) {
                     setId(firebase.getKey());
-                    statusCallback.call(true, null);
-                } else {
-                    statusCallback.call(false, firebaseError.toException());
                 }
+                statusCallback.onResult(firebaseError == null);
             }
         });
     }
@@ -170,11 +163,7 @@ public class FirebaseContent {
         ref.child(getId()).removeValue(new Firebase.CompletionListener() {
             @Override
             public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                if (firebaseError == null) {
-                    statusCallback.call(true, null);
-                } else {
-                    statusCallback.call(false, firebaseError.toException());
-                }
+                statusCallback.onResult(firebaseError == null);
             }
         });
     }

@@ -13,9 +13,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by Meravici on 5/7/2016.
- */
 public class Visibility implements Serializable {
 
     private SocialVisibility socialVisibility;
