@@ -35,10 +35,6 @@ public class DataController {
         return instance;
     }
 
-    public void googleAuth(String accessToken, Callback<User> callback) {
-        firebaseAuth(accessToken, callback);
-    }
-
     public void save(Content c) {
         new FirebaseContent(c).save(contents);
     }
@@ -63,18 +59,29 @@ public class DataController {
         fetchByAuthor(author.getId(), resultCallback);
     }
 
-    private void firebaseAuth(String accessToken, final Callback<User> callback) {
-        // TODO
-        // make method more abstract
-        // move provider specific data to caller method
-        firebaseRoot.authWithOAuthToken("google", accessToken, new Firebase.AuthResultHandler() {
+    public void googleAuth(String accessToken, final Callback<User> callback) {
+        firebaseAuth("google", accessToken, new Callback<AuthData>() {
+            @Override
+            public void onResult(AuthData authData) {
+                String id = authData.getUid();
+                String ggId = (String) authData.getProviderData().get("id");
+                User user = new User(id).withGgId(ggId);
+                users.child(id).child("ggId").setValue(ggId);
+                callback.onResult(user);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                callback.onError(e);
+            }
+        });
+    }
+
+    private void firebaseAuth(String provider, String token, final Callback<AuthData> callback) {
+        firebaseRoot.authWithOAuthToken(provider, token, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
-                // Map<String, Object> data = authData.getProviderData();
-                String ggId = (String) authData.getProviderData().get("id");
-                User user = new User(authData.getUid()).withGgId(ggId);
-                users.child(user.getId()).setValue(user);
-                callback.onResult(user);
+                callback.onResult(authData);
             }
 
             @Override
