@@ -82,6 +82,7 @@ public final class Utils {
 
     public static Bitmap createBitmapFromContent(Content content, Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        context.setTheme(R.style.AppTheme);
         @SuppressLint("InflateParams") View cv = inflater.inflate(R.layout.wall_content, null, false);
 
         TextView titleTV = (TextView) cv.findViewById(R.id.tv_title);

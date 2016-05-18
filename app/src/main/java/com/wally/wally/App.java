@@ -44,7 +44,7 @@ public class App extends Application {
         return dataController;
     }
 
-    public SocialUserFactory getSocialUserFactory(){
+    public SocialUserFactory getSocialUserFactory() {
         return socialUserFactory;
     }
 
@@ -52,7 +52,7 @@ public class App extends Application {
         return mUser;
     }
 
-    public void setUser(SocialUser user){
+    public void setUser(SocialUser user) {
         mUser = user;
     }
 }
