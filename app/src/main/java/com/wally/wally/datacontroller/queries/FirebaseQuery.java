@@ -1,13 +1,13 @@
-package com.wally.wally.datacontroller.firebase;
+package com.wally.wally.datacontroller.queries;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
-import com.wally.wally.datacontroller.Callback;
+import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
+import com.wally.wally.datacontroller.content.FirebaseContent;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,7 +15,7 @@ public abstract class FirebaseQuery {
 
     public abstract Query getTarget(Firebase ref);
 
-    public final void fetch(Firebase ref, final Callback<Collection<FirebaseContent>> resultCallback) {
+    public final void fetch(Firebase ref, final FirebaseFetchResultCallback resultCallback) {
         getTarget(ref).addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
@@ -26,12 +26,12 @@ public abstract class FirebaseQuery {
                     content.setId(contentSnapshot.getKey());
                     result.add(content);
                 }
-                resultCallback.call(result, null);
+                resultCallback.onResult(result);
             }
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                resultCallback.call(null, firebaseError.toException());
+                resultCallback.onError(firebaseError.toException());
             }
 
         });

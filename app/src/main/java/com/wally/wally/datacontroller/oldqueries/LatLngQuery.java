@@ -1,10 +1,10 @@
-package com.wally.wally.datacontroller;
+package com.wally.wally.datacontroller.oldqueries;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.Query;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.wally.wally.datacontroller.firebase.FirebaseQuery;
 
+@Deprecated
 public class LatLngQuery extends FirebaseQuery {
     private LatLngBounds bounds;
 

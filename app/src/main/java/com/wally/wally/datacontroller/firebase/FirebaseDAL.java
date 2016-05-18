@@ -7,6 +7,8 @@ import com.firebase.client.ValueEventListener;
 import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.DataAccessLayer;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.FirebaseContent;
+import com.wally.wally.datacontroller.oldqueries.FirebaseQuery;
 
 import java.util.Collection;
 import java.util.HashSet;

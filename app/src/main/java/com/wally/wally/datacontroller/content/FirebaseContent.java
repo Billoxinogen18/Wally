@@ -1,4 +1,4 @@
-package com.wally.wally.datacontroller.firebase;
+package com.wally.wally.datacontroller.content;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.firebase.client.Firebase;

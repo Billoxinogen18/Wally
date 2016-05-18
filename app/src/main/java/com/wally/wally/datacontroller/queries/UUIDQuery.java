@@ -1,8 +1,7 @@
-package com.wally.wally.datacontroller;
+package com.wally.wally.datacontroller.queries;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.Query;
-import com.wally.wally.datacontroller.firebase.FirebaseQuery;
 
 public class UUIDQuery extends FirebaseQuery {
     private String uuid;

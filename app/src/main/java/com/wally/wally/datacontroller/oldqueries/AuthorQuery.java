@@ -1,10 +1,10 @@
-package com.wally.wally.datacontroller;
+package com.wally.wally.datacontroller.oldqueries;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.Query;
-import com.wally.wally.datacontroller.firebase.FirebaseQuery;
 
 
+@Deprecated
 public class AuthorQuery extends FirebaseQuery {
     private String authorId;
 

@@ -1,13 +1,15 @@
 package com.wally.wally.datacontroller;
+
 import android.content.Context;
-import android.util.Log;
 
 import com.firebase.client.AuthData;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.wally.wally.datacontroller.queries.*;
+import com.wally.wally.datacontroller.callbacks.*;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.firebase.FirebaseContent;
+import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.ArrayList;
@@ -38,7 +40,8 @@ public class DataController {
         return instance;
     }
 
-    private void firebaseAuth(String accessToken, final Callback<User> resultCallback) {
+    private void firebaseAuth(String accessToken,
+                              final com.wally.wally.datacontroller.callbacks.Callback<User> callback) {
         firebaseRoot.authWithOAuthToken("google", accessToken, new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
@@ -46,18 +49,34 @@ public class DataController {
                 String ggId = (String) authData.getProviderData().get("id");
                 User user = new User(authData.getUid()).withGgId(ggId);
                 users.child(user.getId()).setValue(user);
-                resultCallback.call(user, null);
+                callback.onResult(user);
             }
 
             @Override
             public void onAuthenticationError(FirebaseError firebaseError) {
-                resultCallback.call(null, firebaseError.toException());
+                callback.onError(firebaseError.toException());
             }
         });
     }
 
-    public void googleAuth(String accessToken, Callback<User> resultCallback) {
-        firebaseAuth(accessToken, resultCallback);
+    @Deprecated
+    public void googleAuth(String accessToken, final Callback<User> resultCallback) {
+        firebaseAuth(accessToken, new com.wally.wally.datacontroller.callbacks.Callback<User>() {
+            @Override
+            public void onResult(User result) {
+                resultCallback.call(result, null);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                resultCallback.call(null, e);
+            }
+        });
+    }
+
+    public void googleAuth(String accessToken,
+                           com.wally.wally.datacontroller.callbacks.Callback<User> callback) {
+        firebaseAuth(accessToken, callback);
     }
 
     public void save(Content c) {
@@ -68,22 +87,69 @@ public class DataController {
         new FirebaseContent(c).delete(contents);
     }
 
+    /**
+     * @deprecated use {@link #fetchByBounds(LatLngBounds, FetchResultCallback)} ()} instead.
+     */
+    @Deprecated
     public void fetchByBounds(LatLngBounds bounds, final Callback<Collection<Content>> resultCallback) {
-        new LatLngQuery(bounds).fetch(contents, createFetchCallback(resultCallback));
+        new com.wally.wally.datacontroller.oldqueries.LatLngQuery(bounds)
+                .fetch(contents, createFetchCallback(resultCallback));
     }
 
+    public void fetchByBounds(LatLngBounds bounds, final FetchResultCallback callback) {
+        new LatLngQuery(bounds).fetch(contents, createFetchCallback(callback));
+    }
+
+    /**
+     * @deprecated use {@link #fetchByUUID(String, FetchResultCallback)} ()} instead.
+     */
+    @Deprecated
     public void fetchByUUID(String uuid, final Callback<Collection<Content>> resultCallback) {
-        new UUIDQuery(uuid).fetch(contents, createFetchCallback(resultCallback));
+        new com.wally.wally.datacontroller.oldqueries.UUIDQuery(uuid)
+                .fetch(contents, createFetchCallback(resultCallback));
     }
 
+    public void fetchByUUID(String uuid, final FetchResultCallback callback) {
+        new UUIDQuery(uuid).fetch(contents, createFetchCallback(callback));
+    }
+
+    /**
+     * @deprecated use {@link #fetchByAuthor(String, FetchResultCallback)} instead.
+     */
+    @Deprecated
     public void fetchByAuthor(String authorId, final Callback<Collection<Content>> resultCallback) {
-        new AuthorQuery(authorId).fetch(contents, createFetchCallback(resultCallback));
+        new com.wally.wally.datacontroller.oldqueries.AuthorQuery(authorId)
+                .fetch(contents, createFetchCallback(resultCallback));
     }
 
-    public void fetchByAuthor(User author, final Callback<Collection<Content>> resultCallback) {
+    public void fetchByAuthor(String authorId, final FetchResultCallback callback) {
+        new AuthorQuery(authorId).fetch(contents, createFetchCallback(callback));
+    }
+
+    public void fetchByAuthor(User author, FetchResultCallback resultCallback) {
         fetchByAuthor(author.getId(), resultCallback);
     }
 
+
+    private FirebaseFetchResultCallback createFetchCallback(final FetchResultCallback callback) {
+        return new FirebaseFetchResultCallback() {
+            @Override
+            public void onResult(Collection<FirebaseContent> result) {
+                List<Content> contents = new ArrayList<>();
+                for (FirebaseContent c : result) {
+                    contents.add(convertToContent(c));
+                }
+                callback.onResult(contents);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                callback.onError(e);
+            }
+        };
+    }
+
+    @Deprecated
     private Callback<Collection<FirebaseContent>> createFetchCallback(
             final Callback<Collection<Content>> resultCallback) {
         return new Callback<Collection<FirebaseContent>>() {
