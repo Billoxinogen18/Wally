@@ -278,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    @SuppressWarnings("ConstantConditions")
     private void displayProfileBar(SocialUser user) {
         Glide.with(getBaseContext())
                 .load(user.getAvatarUrl())

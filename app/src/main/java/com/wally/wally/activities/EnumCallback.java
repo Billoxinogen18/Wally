@@ -1,25 +1,15 @@
 package com.wally.wally.activities;
 
-import android.support.annotation.Nullable;
+import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 
-
-import com.wally.wally.datacontroller.Callback;
-import com.wally.wally.datacontroller.content.Content;
-
-import java.util.Collection;
-
-/**
- * Created by Xato on 4/8/2016.
- */
-public abstract class EnumCallback implements Callback<Collection<Content>> {
+public abstract class EnumCallback implements FetchResultCallback {
     private long id;
-    public EnumCallback(long id){
+
+    public EnumCallback(long id) {
         this.id = id;
     }
 
-    public long getId(){
+    public long getId() {
         return id;
     }
-    @Override
-    public abstract void call(@Nullable Collection<Content> result, @Nullable Exception e);
 }

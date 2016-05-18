@@ -25,8 +25,8 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
-import com.wally.wally.datacontroller.Callback;
 import com.wally.wally.datacontroller.DataController;
+import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.SocialUserFactory;
@@ -164,20 +164,22 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         DataController dc = App.getInstance().getDataController();
         // TODO get and update object in application
         dc.googleAuth(getToken(), new Callback<User>() {
-            @Override
-            public void call(User result, Exception e) {
-                if (e == null) {
-                    App.getInstance().getSocialUserFactory().getSocialUser(result, mGoogleApiClient,
-                            new SocialUserFactory.UserLoadListener() {
-                                @Override
-                                public void onUserLoad(SocialUser user) {
-                                    mLoginListener.onLogin(user);
-                                }
-                            });
 
-                } else {
-                    mLoginListener.onLogin(null);
-                }
+            @Override
+            public void onResult(User result) {
+                SocialUserFactory sf = App.getInstance().getSocialUserFactory();
+                sf.getSocialUser(result, mGoogleApiClient,
+                        new SocialUserFactory.UserLoadListener() {
+                            @Override
+                            public void onUserLoad(SocialUser user) {
+                                mLoginListener.onLogin(user);
+                            }
+                        });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                mLoginListener.onLogin(null);
             }
         });
     }

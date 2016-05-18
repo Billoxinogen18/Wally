@@ -24,7 +24,7 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.App;
 import com.wally.wally.OnContentSelectedListener;
-import com.wally.wally.datacontroller.Callback;
+import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 
@@ -117,9 +117,10 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     }
 
     private void fetchContentForAdf(String adfUuid) {
-        ((App) mContext.getApplicationContext()).getDataController().fetchByUUID(adfUuid, new Callback<Collection<Content>>() {
+        ((App) mContext.getApplicationContext()).getDataController().fetchByUUID(adfUuid, new FetchResultCallback() {
+
             @Override
-            public void call(final Collection<Content> result, Exception e) {
+            public void onResult(final Collection<Content> result) {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -129,6 +130,11 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
                         }
                     }
                 }).start();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // TODO write error
             }
         });
     }
