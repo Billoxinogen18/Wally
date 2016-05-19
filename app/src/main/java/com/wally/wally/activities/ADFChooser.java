@@ -37,8 +37,12 @@ public class ADFChooser extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if (Utils.hasNoADFPermissions(getBaseContext())) {
-            requestADFPermission();
+        if(Utils.isTangoDevice(getBaseContext())) {
+            if (Utils.hasNoADFPermissions(getBaseContext())) {
+                requestADFPermission();
+            }
+        }else{
+            startActivity(MainActivity.newIntent(getBaseContext(), null));
         }
     }
 
@@ -48,8 +52,8 @@ public class ADFChooser extends AppCompatActivity {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         synchronized (this) {
-            if (Utils.hasNoADFPermissions(getBaseContext())) {
-                Log.i(TAG, "onResume: Didn't have ADF permission returning.");
+            if (!Utils.isTangoDevice(getBaseContext()) && Utils.hasNoADFPermissions(getBaseContext())) {
+                Log.i(TAG, "onResume: No Tango or Didn't have ADF permission returning.");
             } else {
                 loadRecycler();
             }

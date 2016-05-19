@@ -3,6 +3,7 @@ package com.wally.wally;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -22,6 +23,7 @@ import com.google.atap.tangoservice.Tango;
 import com.wally.wally.datacontroller.content.Content;
 
 import java.text.DateFormat;
+import java.util.List;
 
 /**
  * Utility functions which are not specific to one part of the code goes here.
@@ -123,5 +125,18 @@ public final class Utils {
         Canvas canvas = new Canvas(bitmap);
         cv.draw(canvas);
         return bitmap;
+    }
+
+    public static boolean isTangoDevice(Context context){
+        List<ApplicationInfo> packages;
+        PackageManager pm;
+
+        pm = context.getPackageManager();
+        packages = pm.getInstalledApplications(0);
+        for (ApplicationInfo packageInfo : packages) {
+            if(packageInfo.packageName.equals("com.projecttango.tango"))
+                return true;
+        }
+        return false;
     }
 }

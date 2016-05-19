@@ -8,6 +8,12 @@
     android:animateLayoutChanges="true"
     tools:context=".activities.MainActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Camera Disabled! No Tango Device!"
+        android:layout_gravity="center"/>
+
     <org.rajawali3d.surface.RajawaliSurfaceView
         android:id="@+id/rajawali_surface"
         android:layout_width="match_parent"

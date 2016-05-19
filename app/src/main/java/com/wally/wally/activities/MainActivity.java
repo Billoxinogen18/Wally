@@ -27,6 +27,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -98,38 +99,48 @@ public class MainActivity extends AppCompatActivity implements
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         mSelectedMenuView = findViewById(R.id.layout_content_select);
-
-        // Initialize managers
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-        TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
-        mAdfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
-        mTangoManager = new TangoManager(getBaseContext(), mSurfaceView, mTangoUxLayout, mAdfUuid);
-        mTangoManager.setOnContentSelectedListener(this);
-        mTangoManager.setOnContentFitListener(this);
-        mTangoManager.restoreState(savedInstanceState);
+        // Initialize managers
 
-        mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                mTangoManager.onSurfaceTouch(event);
-                return true;
+        if(Utils.isTangoDevice(getBaseContext())){
+
+            TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
+            mAdfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
+
+            mTangoManager = new TangoManager(getBaseContext(), mSurfaceView, mTangoUxLayout, mAdfUuid);
+            mTangoManager.setOnContentSelectedListener(this);
+            mTangoManager.setOnContentFitListener(this);
+            mTangoManager.restoreState(savedInstanceState);
+
+            mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    mTangoManager.onSurfaceTouch(event);
+                    return true;
+                }
+            });
+
+            if (Utils.hasNoADFPermissions(getBaseContext())) {
+                Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
+                requestADFPermission();
             }
-        });
+        }else{
+            ((ViewGroup) mSurfaceView.getParent()).removeView(mSurfaceView);
+        }
+
+
 
         mLoginManager = new LoginManager(this);
         mLoginManager.setLoginListener(this);
-
-        if (Utils.hasNoADFPermissions(getBaseContext())) {
-            Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
-            requestADFPermission();
-        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         hideProgress();
-        mTangoManager.onPause();
+        if(Utils.isTangoDevice(getBaseContext())) {
+            mTangoManager.onPause();
+        }
     }
 
     @Override
@@ -138,31 +149,40 @@ public class MainActivity extends AppCompatActivity implements
         if (!mLoginManager.isLoggedIn()) {
             showProgress();
             mLoginManager.tryLogin();
+            if(Utils.isTangoDevice(getBaseContext())) {
+                mNewContentBtn.setVisibility(View.VISIBLE);
+            }
         }else{
             displayProfileBar(App.getInstance().getUser());
         }
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
-        if (Utils.hasNoADFPermissions(getBaseContext())) {
+        if (Utils.isTangoDevice(getBaseContext()) && Utils.hasNoADFPermissions(getBaseContext())) {
             Log.i(TAG, "onResume: Didn't have ADF permission returning.");
             return;
 
         }
-        mTangoManager.onResume();
+        if(Utils.isTangoDevice(getBaseContext())) {
+            mTangoManager.onResume();
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("mSelectedContent", mSelectedContent);
-        mTangoManager.onSaveInstanceState(outState);
+        if(Utils.isTangoDevice(getBaseContext())) {
+            mTangoManager.onSaveInstanceState(outState);
+        }
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mSelectedContent = (Content) savedInstanceState.getSerializable("mSelectedContent");
-        mTangoManager.removeContent(mSelectedContent);
+        if(Utils.isTangoDevice(getBaseContext())) {
+            mTangoManager.removeContent(mSelectedContent);
+        }
         onContentSelected(mSelectedContent);
     }
 
@@ -282,11 +302,11 @@ public class MainActivity extends AppCompatActivity implements
     private void displayProfileBar(SocialUser user) {
         Glide.with(getBaseContext())
                 .load(user.getAvatarUrl())
+                .override(1000, 1000)
                 .transform(new CircleTransform(getBaseContext()))
                 .into((ImageView) findViewById(R.id.profile_image));
 
         ((TextView)findViewById(R.id.profile_name)).setText(user.getFirstName());
-        mNewContentBtn.setVisibility(View.VISIBLE);
     }
 
     private void saveActiveContent(Content content) {
