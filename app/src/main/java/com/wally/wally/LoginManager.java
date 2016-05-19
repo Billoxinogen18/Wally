@@ -1,20 +1,16 @@
 package com.wally.wally;
 
-import android.accounts.Account;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
@@ -57,6 +53,7 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestScopes(Plus.SCOPE_PLUS_LOGIN, Plus.SCOPE_PLUS_PROFILE)
+                .requestIdToken(mContext.getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
 
@@ -122,32 +119,9 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
     @SuppressWarnings("ConstantConditions")
     private void handleSignInResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
-            final GoogleSignInAccount acct = result.getSignInAccount();
-            // To get token we need network connection. Thats is why we need to use asyncTask.
-            new AsyncTask<Void, Void, String>() {
-                @Override
-                protected String doInBackground(Void... params) {
-                    try {
-                        Account account = new Account(acct.getEmail(), "com.google");
-                        return GoogleAuthUtil.getToken(mContext, account, "oauth2:profile email");
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(String token) {
-                    super.onPostExecute(token);
-                    saveToken(token);
-                    Log.d(TAG, "onPostExecute() called with: " + "token = [" + token + "]");
-                    mAuthListener.onAuth(!TextUtils.isEmpty(token));
-                }
-            }.execute();
-        } else {
-            saveToken(null);
-            mAuthListener.onAuth(false);
+            String token = result.getSignInAccount().getIdToken();
+            saveToken(token);
+            mAuthListener.onAuth(!TextUtils.isEmpty(token));
         }
     }
 
