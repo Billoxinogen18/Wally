@@ -1,7 +1,9 @@
 {
   "project_info": {
     "project_number": "412984760622",
-    "project_id": "crypto-gradient-131308"
+    "firebase_url": "https://crypto-gradient-131308.firebaseio.com",
+    "project_id": "crypto-gradient-131308",
+    "storage_bucket": "crypto-gradient-131308.appspot.com"
   },
   "client": [
     {
@@ -19,6 +21,10 @@
             "package_name": "com.wally.wally",
             "certificate_hash": "3836DF252D895D956CBEB7310A53C15C33ABF6E7"
           }
+        },
+        {
+          "client_id": "412984760622-h59fbqkh76cg5v1fu8f9me0hpioaamcn.apps.googleusercontent.com",
+          "client_type": 3
         },
         {
           "client_id": "412984760622-ej5mnmqr4d429gisakjq42s4clr4q9lr.apps.googleusercontent.com",
