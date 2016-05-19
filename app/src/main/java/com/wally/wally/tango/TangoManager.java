@@ -157,17 +157,16 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
             // We need to invalidate the connected texture ID so that we cause a re-connection
             // in the OpenGL thread after resume
             mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
-            mTango.disconnect();
-            mTangoUx.stop();
         }
+        mTango.disconnect();
+        mTangoUx.stop();
 
         if (mContentFitter != null) {
             mContentFitter.cancel(true);
         }
-
     }
 
-    public void onResume() {
+    public synchronized void onResume() {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         if (!mIsConnected) {
@@ -196,7 +195,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
             mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             onContentFitListener.onFitStatusChange(true);
         }
-
     }
 
     /**
