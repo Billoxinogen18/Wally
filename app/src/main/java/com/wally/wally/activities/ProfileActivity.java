@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -27,9 +29,13 @@ import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.userManager.SocialUser;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener, FetchResultCallback {
+
+    private static final String TAG = ProfileActivity.class.getSimpleName();
 
     private static final float PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR = 0.9f;
     private static final float PERCENTAGE_TO_HIDE_TITLE_DETAILS = 0.3f;
@@ -179,8 +185,12 @@ public class ProfileActivity extends AppCompatActivity implements AppBarLayout.O
      */
     @Override
     public void onResult(Collection<Content> result) {
-        mContentAdapter.setData(result);
+        ArrayList<Content> data = new ArrayList<>(result.size());
+        data.addAll(result);
 
+        mContentAdapter.setData(data);
+        result.size();
+        Log.d(TAG, "onResult() called with: " + "result = [" + result.size() + "]");
     }
 
     @Override
@@ -190,9 +200,9 @@ public class ProfileActivity extends AppCompatActivity implements AppBarLayout.O
 
     private class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ViewHolder> {
 
-        private Collection<Content> mData;
+        private List<Content> mData;
 
-        public void setData(Collection<Content> data) {
+        public void setData(List<Content> data) {
             mData = data;
             // this thing adds insert animation and updates data
             notifyItemRangeInserted(0, getItemCount());
@@ -206,8 +216,24 @@ public class ProfileActivity extends AppCompatActivity implements AppBarLayout.O
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
+        public void onBindViewHolder(ViewHolder vh, int position) {
+            Content c = mData.get(position);
 
+            if (!TextUtils.isEmpty(c.getImageUri())) {
+                Glide.with(getBaseContext())
+                        .load(c.getImageUri())
+                        .fitCenter()
+                        .into(vh.image);
+
+                vh.image.setVisibility(View.VISIBLE);
+            } else {
+                vh.image.setVisibility(View.GONE);
+            }
+            vh.title.setText(c.getTitle());
+            vh.title.setVisibility(TextUtils.isEmpty(c.getTitle()) ? View.GONE : View.VISIBLE);
+
+            vh.note.setText(c.getNote());
+            vh.note.setVisibility(TextUtils.isEmpty(c.getTitle()) ? View.GONE : View.VISIBLE);
         }
 
         @Override
@@ -217,8 +243,15 @@ public class ProfileActivity extends AppCompatActivity implements AppBarLayout.O
 
         public class ViewHolder extends RecyclerView.ViewHolder {
 
+            public TextView note;
+            public TextView title;
+            public ImageView image;
+
             public ViewHolder(View itemView) {
                 super(itemView);
+                note = (TextView) findViewById(R.id.tv_note);
+                title = (TextView) findViewById(R.id.tv_title);
+                image = (ImageView) findViewById(R.id.image_view);
             }
         }
     }
