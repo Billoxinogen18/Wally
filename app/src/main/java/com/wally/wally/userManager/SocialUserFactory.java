@@ -23,6 +23,7 @@ import java.util.Map;
  */
 public class SocialUserFactory {
     public static final String TAG = SocialUserFactory.class.getSimpleName();
+    private static final int DEFAULT_AVATAR_SIZE = 256;
     private Map<String, SocialUser> userCache;
 
     public SocialUserFactory() {
@@ -61,7 +62,7 @@ public class SocialUserFactory {
                                 SocialUser googleUser = new GoogleUser(baseUser)
                                         .withDisplayName(person.getDisplayName())
                                         .withFirstName(person.getName().getGivenName())
-                                        .withAvatar(person.getImage().getUrl());
+                                        .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
                                 userLoadListener.onUserLoad(googleUser);
                             } finally {
                                 personBuffer.release();
