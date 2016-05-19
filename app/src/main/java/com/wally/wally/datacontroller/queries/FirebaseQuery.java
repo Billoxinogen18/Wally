@@ -1,10 +1,10 @@
 package com.wally.wally.datacontroller.queries;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.FirebaseContent;
 
@@ -14,9 +14,9 @@ import java.util.Set;
 
 public abstract class FirebaseQuery {
 
-    public abstract Query getTarget(Firebase ref);
+    public abstract Query getTarget(DatabaseReference ref);
 
-    public final void fetch(Firebase ref, final Callback<Collection<FirebaseContent>> callback) {
+    public final void fetch(DatabaseReference ref, final Callback<Collection<FirebaseContent>> callback) {
         getTarget(ref).addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override
@@ -31,8 +31,8 @@ public abstract class FirebaseQuery {
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                callback.onError(firebaseError.toException());
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
             }
 
         });

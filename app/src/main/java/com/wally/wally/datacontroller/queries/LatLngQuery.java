@@ -1,8 +1,8 @@
 package com.wally.wally.datacontroller.queries;
 
-import com.firebase.client.Firebase;
-import com.firebase.client.Query;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 
 public class LatLngQuery extends FirebaseQuery {
     private LatLngBounds bounds;
@@ -14,7 +14,7 @@ public class LatLngQuery extends FirebaseQuery {
     }
 
     @Override
-    public Query getTarget(Firebase root) {
+    public Query getTarget(DatabaseReference root) {
         return root
                 .orderByChild("location/latitude")
                 .startAt(bounds.southwest.latitude)

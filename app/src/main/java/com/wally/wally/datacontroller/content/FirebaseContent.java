@@ -1,9 +1,8 @@
 package com.wally.wally.datacontroller.content;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 
@@ -68,7 +67,6 @@ public class FirebaseContent {
         }
     }
 
-    @JsonIgnore
     public String getId() {
         return id;
     }
@@ -133,7 +131,7 @@ public class FirebaseContent {
         return isPreviewVisible;
     }
 
-    public void save(Firebase ref) {
+    public void save(DatabaseReference ref) {
         if (id == null) {
             ref = ref.push();
             ref.setValue(this);
@@ -143,10 +141,10 @@ public class FirebaseContent {
         }
     }
 
-    public void save(Firebase ref, final Callback<Boolean> statusCallback) {
-        ref.push().setValue(this, new Firebase.CompletionListener() {
+    public void save(DatabaseReference ref, final Callback<Boolean> statusCallback) {
+        ref.push().setValue(this, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError == null) {
                     setId(firebase.getKey());
                 }
@@ -155,14 +153,14 @@ public class FirebaseContent {
         });
     }
 
-    public void delete(Firebase ref) {
+    public void delete(DatabaseReference ref) {
         ref.child(id).removeValue();
     }
 
-    public void delete(Firebase ref, final Callback<Boolean> statusCallback) {
-        ref.child(getId()).removeValue(new Firebase.CompletionListener() {
+    public void delete(DatabaseReference ref, final Callback<Boolean> statusCallback) {
+        ref.child(getId()).removeValue(new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 statusCallback.onResult(firebaseError == null);
             }
         });

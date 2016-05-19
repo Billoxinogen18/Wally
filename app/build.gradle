@@ -67,6 +67,11 @@ dependencies {
     // Firebase
     compile 'com.google.firebase:firebase-core:9.0.0'
     compile 'com.google.firebase:firebase-storage:9.0.0'
+    // TODO
+    // If i comment out following line this error will go away
+    //      05-19 18:43:34.410 15768-15792/com.wally.wally E/DynamiteModule: Failed to load module descriptor class:
+    //      Didn't find class "com.google.android.gms.dynamite.descriptors.com.google.firebase.auth.ModuleDescriptor" on path:...
+    // But than I won't be able to use firebase auth
     compile 'com.google.firebase:firebase-auth:9.0.0'
     compile 'com.google.firebase:firebase-database:9.0.0'
 }

@@ -1,8 +1,7 @@
 package com.wally.wally.datacontroller.queries;
 
-import com.firebase.client.Firebase;
-import com.firebase.client.Query;
-
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 
 public class AuthorQuery extends FirebaseQuery {
     private String authorId;
@@ -14,7 +13,7 @@ public class AuthorQuery extends FirebaseQuery {
     }
 
     @Override
-    public Query getTarget(Firebase ref) {
+    public Query getTarget(DatabaseReference ref) {
         return ref.orderByChild("author/id").equalTo(authorId);
     }
 }

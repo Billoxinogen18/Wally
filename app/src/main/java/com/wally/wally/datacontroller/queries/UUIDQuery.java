@@ -1,7 +1,7 @@
 package com.wally.wally.datacontroller.queries;
 
-import com.firebase.client.Firebase;
-import com.firebase.client.Query;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 
 public class UUIDQuery extends FirebaseQuery {
     private String uuid;
@@ -13,7 +13,7 @@ public class UUIDQuery extends FirebaseQuery {
     }
 
     @Override
-    public Query getTarget(Firebase ref) {
+    public Query getTarget(DatabaseReference ref) {
         return ref.orderByChild("uuid").equalTo(uuid);
     }
 }
