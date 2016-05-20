@@ -2,7 +2,6 @@ package com.wally.wally.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -38,7 +37,7 @@ public class ADFChooser extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         if(Utils.isTangoDevice(getBaseContext())) {
-            if (Utils.hasNoADFPermissions(getBaseContext())) {
+            if (!Utils.hasADFPermissions(getBaseContext())) {
                 requestADFPermission();
             }
         }else{
@@ -52,10 +51,10 @@ public class ADFChooser extends AppCompatActivity {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         synchronized (this) {
-            if (!Utils.isTangoDevice(getBaseContext()) && Utils.hasNoADFPermissions(getBaseContext())) {
-                Log.i(TAG, "onResume: No Tango or Didn't have ADF permission returning.");
-            } else {
+            if (Utils.isTangoDevice(getBaseContext()) && Utils.hasADFPermissions(getBaseContext())) {
                 loadRecycler();
+            } else {
+                Log.i(TAG, "onResume: No Tango or Didn't have ADF permission returning.");
             }
         }
     }
@@ -109,25 +108,6 @@ public class ADFChooser extends AppCompatActivity {
 
         private final List<Pair<String, TangoAreaDescriptionMetaData>> mData;
 
-        class ADFViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
-            TextView name;
-            TextView uuid;
-
-            public ADFViewHolder(View itemView) {
-                super(itemView);
-                name = (TextView) itemView.findViewById(R.id.tv_name);
-                uuid = (TextView) itemView.findViewById(R.id.tv_uuid);
-                itemView.setOnClickListener(this);
-            }
-
-            @Override
-            public void onClick(View v) {
-                String uuid = mData.get(getAdapterPosition()).first;
-                startActivity(MainActivity.newIntent(getBaseContext(), uuid));
-            }
-        }
-
         public ADFListAdapter(List<Pair<String, TangoAreaDescriptionMetaData>> data) {
             mData = data;
         }
@@ -156,6 +136,25 @@ public class ADFChooser extends AppCompatActivity {
         @Override
         public int getItemCount() {
             return mData == null ? 0 : mData.size();
+        }
+
+        class ADFViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+
+            TextView name;
+            TextView uuid;
+
+            public ADFViewHolder(View itemView) {
+                super(itemView);
+                name = (TextView) itemView.findViewById(R.id.tv_name);
+                uuid = (TextView) itemView.findViewById(R.id.tv_uuid);
+                itemView.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v) {
+                String uuid = mData.get(getAdapterPosition()).first;
+                startActivity(MainActivity.newIntent(getBaseContext(), uuid));
+            }
         }
     }
 }

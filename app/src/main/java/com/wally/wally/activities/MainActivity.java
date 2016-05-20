@@ -102,8 +102,7 @@ public class MainActivity extends AppCompatActivity implements
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         // Initialize managers
 
-        if(Utils.isTangoDevice(getBaseContext())){
-
+        if (Utils.isTangoDevice(getBaseContext())) {
             TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
             mAdfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
 
@@ -120,15 +119,13 @@ public class MainActivity extends AppCompatActivity implements
                 }
             });
 
-            if (Utils.hasNoADFPermissions(getBaseContext())) {
+            if (!Utils.hasADFPermissions(getBaseContext())) {
                 Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
                 requestADFPermission();
             }
-        }else{
+        } else {
             ((ViewGroup) mSurfaceView.getParent()).removeView(mSurfaceView);
         }
-
-
 
         mLoginManager = new LoginManager(this);
         mLoginManager.setLoginListener(this);
@@ -138,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         hideProgress();
-        if(Utils.isTangoDevice(getBaseContext())) {
+        if (Utils.isTangoDevice(getBaseContext())) {
             mTangoManager.onPause();
         }
     }
@@ -149,20 +146,13 @@ public class MainActivity extends AppCompatActivity implements
         if (!mLoginManager.isLoggedIn()) {
             showProgress();
             mLoginManager.tryLogin();
-            if(Utils.isTangoDevice(getBaseContext())) {
+            if (Utils.isTangoDevice(getBaseContext())) {
                 mNewContentBtn.setVisibility(View.VISIBLE);
             }
-        }else{
+        } else {
             displayProfileBar(App.getInstance().getUser());
         }
-        // Synchronize against disconnecting while the service is being used in the OpenGL thread or
-        // in the UI thread.
-        if (Utils.isTangoDevice(getBaseContext()) && Utils.hasNoADFPermissions(getBaseContext())) {
-            Log.i(TAG, "onResume: Didn't have ADF permission returning.");
-            return;
-
-        }
-        if(Utils.isTangoDevice(getBaseContext())) {
+        if (Utils.isTangoDevice(getBaseContext())) {
             mTangoManager.onResume();
         }
     }
@@ -171,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("mSelectedContent", mSelectedContent);
-        if(Utils.isTangoDevice(getBaseContext())) {
+        if (Utils.isTangoDevice(getBaseContext())) {
             mTangoManager.onSaveInstanceState(outState);
         }
     }
@@ -180,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mSelectedContent = (Content) savedInstanceState.getSerializable("mSelectedContent");
-        if(Utils.isTangoDevice(getBaseContext())) {
+        if (Utils.isTangoDevice(getBaseContext())) {
             mTangoManager.removeContent(mSelectedContent);
         }
         onContentSelected(mSelectedContent);
@@ -306,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements
                 .transform(new CircleTransform(getBaseContext()))
                 .into((ImageView) findViewById(R.id.profile_image));
 
-        ((TextView)findViewById(R.id.profile_name)).setText(user.getFirstName());
+        ((TextView) findViewById(R.id.profile_name)).setText(user.getFirstName());
     }
 
     private void saveActiveContent(Content content) {
