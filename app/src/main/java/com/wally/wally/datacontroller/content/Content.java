@@ -13,7 +13,7 @@ public class Content implements Serializable {
     private String imageUri;
     private String uuid;
     private TangoData tangoData;
-    private LatLng location;
+    private SerializableLatLng location;
     private Visibility visibility;
     private User author;
 
@@ -82,11 +82,11 @@ public class Content implements Serializable {
     }
 
     public LatLng getLocation() {
-        return location;
+        return location.toLatLng();
     }
 
     public Content withLocation(LatLng location) {
-        this.location = location;
+        this.location = new SerializableLatLng(location);
         return this;
     }
 
@@ -100,11 +100,11 @@ public class Content implements Serializable {
     }
 
 
-    public User getAuthor(){
+    public User getAuthor() {
         return author;
     }
 
-    public Content withAuthor(User author){
+    public Content withAuthor(User author) {
         this.author = author;
         return this;
     }
@@ -121,5 +121,19 @@ public class Content implements Serializable {
                 ", location=" + location +
                 ", visibility=" + visibility +
                 '}';
+    }
+
+    private static class SerializableLatLng implements Serializable {
+        private double lat;
+        private double lng;
+
+        public SerializableLatLng(LatLng loc) {
+            lat = loc.latitude;
+            lng = loc.longitude;
+        }
+
+        public LatLng toLatLng() {
+            return new LatLng(lat, lng);
+        }
     }
 }
