@@ -21,7 +21,7 @@ import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.user.User;
 
 public class DataController {
-    private static final String FIREBASE_URL = "https://crypto-gradient-131308.firebaseio.com/";
+    public static final String TAG = DataController.class.getSimpleName();
     private static final String DB_PATH = "Firebase-Update";
     private static DataController instance;
     private FirebaseAuth authManager;
@@ -37,11 +37,18 @@ public class DataController {
         authManager = FirebaseAuth.getInstance();
     }
 
+    /**
+     * @deprecated use {@link #create()} instead.
+     */
+    @Deprecated
     public static DataController create(Context context) {
+        return create();
+    }
+
+    public static DataController create() {
         if (instance == null) {
-            DatabaseReference ref = FirebaseDatabase.getInstance()
-                    .getReferenceFromUrl(FIREBASE_URL).child(DB_PATH);
-            instance = new DataController(ref);
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+            instance = new DataController(ref.child(DB_PATH));
         }
         return instance;
     }
@@ -71,7 +78,7 @@ public class DataController {
     }
 
     public void googleAuth(String accessToken, final Callback<User> callback) {
-        Log.d("Test", "Login");
+        Log.d(TAG, "googleAuth");
         AuthCredential credentials = GoogleAuthProvider.getCredential(accessToken, null);
         authManager.signInWithCredential(credentials)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -90,19 +97,4 @@ public class DataController {
             }
         });
     }
-
-//    private void firebaseAuth(String provider, String token, final Callback<AuthData> callback) {
-//        firebaseRoot.authWithOAuthToken(provider, token, new Firebase.AuthResultHandler() {
-//            @Override
-//            public void onAuthenticated(AuthData authData) {
-//                callback.onResult(authData);
-//            }
-//
-//            @Override
-//            public void onAuthenticationError(FirebaseError firebaseError) {
-//                callback.onError(firebaseError.toException());
-//            }
-//        });
-//    }
-
 }
