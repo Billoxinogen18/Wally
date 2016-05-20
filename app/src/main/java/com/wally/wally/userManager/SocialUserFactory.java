@@ -9,6 +9,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.playlog.internal.LogEvent;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
@@ -68,8 +69,8 @@ public class SocialUserFactory {
                                 personBuffer.release();
                             }
                         } else {
-                            userLoadListener.onUserLoad(null);
-                            Log.e(TAG, "Error requesting people data: " + peopleData.getStatus());
+                            Log.e(TAG, "onResult: Error requesting people data" + peopleData.getStatus());
+                            userLoadListener.onUserLoad(new DummyUser(baseUser));
                         }
                     }
                 });
