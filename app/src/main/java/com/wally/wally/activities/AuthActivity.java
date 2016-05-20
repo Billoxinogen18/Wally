@@ -9,6 +9,7 @@ import android.widget.Button;
 
 import com.google.android.gms.common.SignInButton;
 import com.wally.wally.LoginManager;
+import com.wally.wally.LoginManagerFactory;
 import com.wally.wally.R;
 
 /**
@@ -16,7 +17,7 @@ import com.wally.wally.R;
  * <br/>
  * User can auth using G+ or Continue as Anonymous Guest user.
  */
-public class AuthActivity extends AppCompatActivity implements LoginManager.AuthListener {
+public class AuthActivity extends LoginActivity implements LoginManager.AuthListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = AuthActivity.class.getSimpleName();
@@ -29,7 +30,7 @@ public class AuthActivity extends AppCompatActivity implements LoginManager.Auth
         setContentView(R.layout.activity_auth);
         // create before setting content view
         // (On Silent login, views won't be inflated and we will directly go to home screen)
-        mManager = new LoginManager(this);
+        mManager = LoginManagerFactory.getLoginManager(this);
         mManager.setAuthListener(this);
 
         SignInButton plusSignIn = (SignInButton) findViewById(R.id.btn_google_sign_in);

@@ -37,6 +37,7 @@ import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.wally.wally.App;
 import com.wally.wally.LoginManager;
+import com.wally.wally.LoginManagerFactory;
 import com.wally.wally.OnContentSelectedListener;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
@@ -52,7 +53,7 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements
+public class MainActivity extends LoginActivity implements
         OnContentSelectedListener,
         ContentFitter.OnContentFitListener,
         NewContentDialogFragment.NewContentDialogListener,
@@ -127,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements
             ((ViewGroup) mSurfaceView.getParent()).removeView(mSurfaceView);
         }
 
-        mLoginManager = new LoginManager(this);
+        mLoginManager = LoginManagerFactory.getLoginManager(this);
         mLoginManager.setLoginListener(this);
     }
 

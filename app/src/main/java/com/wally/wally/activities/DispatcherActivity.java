@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.wally.wally.LoginManager;
+import com.wally.wally.LoginManagerFactory;
 
 /**
  * This activity makes decision which activity to start.
@@ -14,12 +15,12 @@ import com.wally.wally.LoginManager;
  * If user was previously authenticated we start {@link MainActivity}. <br/>
  * Else it starts {@link AuthActivity}.
  */
-public class DispatcherActivity extends AppCompatActivity implements LoginManager.AuthListener {
+public class DispatcherActivity extends LoginActivity implements LoginManager.AuthListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        LoginManager manager = new LoginManager(this);
+        LoginManager manager = LoginManagerFactory.getLoginManager(this);
         manager.setAuthListener(this);
         manager.trySilentAuth();
     }

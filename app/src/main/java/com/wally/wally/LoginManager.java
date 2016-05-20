@@ -32,39 +32,24 @@ import com.wally.wally.userManager.SocialUserFactory;
  * <p/>
  * Created by ioane5 on 5/10/16.
  */
-public class LoginManager implements GoogleApiClient.OnConnectionFailedListener {
+public class LoginManager{
     public static final int AUTH_TYPE_GOOGLE = 0;
     public static final int AUTH_TYPE_GUEST = 1;
     private static final String TAG = LoginManager.class.getSimpleName();
     private static final int REQUEST_CODE_SIGN_IN = 129;
 
-    private Context mContext;
     private GoogleApiClient mGoogleApiClient;
     private LoginListener mLoginListener;
     private AuthListener mAuthListener;
+    private SharedPreferences mPreferences;
 
-    /**
-     * We need fragmentActivity because it gives us more flexibility using GoogleClientApi
-     *
-     * @param fragmentActivity to access GPlus services
-     */
-    public LoginManager(FragmentActivity fragmentActivity) {
-        mContext = fragmentActivity;
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(Plus.SCOPE_PLUS_LOGIN, Plus.SCOPE_PLUS_PROFILE)
-                .requestIdToken(mContext.getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
 
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
-                .enableAutoManage(fragmentActivity /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .addApi(Plus.API)
-                .build();
+    public LoginManager(GoogleApiClient api, SharedPreferences preferences){
+        mGoogleApiClient = api;
+        mPreferences = preferences;
     }
+
 
     public void setAuthListener(AuthListener authListener) {
         mAuthListener = authListener;
@@ -125,11 +110,6 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
         }
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed() called with: " + "connectionResult = [" + connectionResult + "]");
-    }
-
     public void tryLogin() {
         String token = getToken();
         if (TextUtils.isEmpty(token)) {
@@ -159,11 +139,11 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
     }
 
     private String getToken() {
-        return PreferenceManager.getDefaultSharedPreferences(mContext).getString("AUTH_TOKEN", null);
+        return mPreferences.getString("AUTH_TOKEN", null);
     }
 
     private void saveToken(String token) {
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        SharedPreferences.Editor editor = mPreferences.edit();
         editor.putString("AUTH_TOKEN", token);
         editor.putInt("AUTH_TYPE", AUTH_TYPE_GOOGLE);
         editor.apply();
@@ -173,15 +153,14 @@ public class LoginManager implements GoogleApiClient.OnConnectionFailedListener 
      * Called when user wants to continue as guest.
      */
     public void guestSignIn() {
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        SharedPreferences.Editor editor = mPreferences.edit();
         editor.putInt("AUTH_TYPE", AUTH_TYPE_GUEST);
         editor.apply();
         mAuthListener.onAuth(true);
     }
 
     public boolean isUserAGuest() {
-        return PreferenceManager
-                .getDefaultSharedPreferences(mContext).getInt("AUTH_TYPE", -1) == AUTH_TYPE_GUEST;
+        return mPreferences.getInt("AUTH_TYPE", -1) == AUTH_TYPE_GUEST;
     }
 
     public boolean isLoggedIn() {
