@@ -123,6 +123,22 @@ public class Content implements Serializable {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Content content = (Content) o;
+
+        return id != null ? id.equals(content.id) : content.id == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
+
     private static class SerializableLatLng implements Serializable {
         private double lat;
         private double lng;
@@ -134,6 +150,14 @@ public class Content implements Serializable {
 
         public LatLng toLatLng() {
             return new LatLng(lat, lng);
+        }
+
+        @Override
+        public String toString() {
+            return "SerializableLatLng{" +
+                    "lat=" + lat +
+                    ", lng=" + lng +
+                    '}';
         }
     }
 }
