@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "412984760622",
-    "firebase_url": "https://crypto-gradient-131308.firebaseio.com",
-    "project_id": "crypto-gradient-131308",
-    "storage_bucket": "crypto-gradient-131308.appspot.com"
+    "project_number": "55413750712",
+    "firebase_url": "https://wally-virtual-notes.firebaseio.com",
+    "project_id": "wally-virtual-notes",
+    "storage_bucket": "wally-virtual-notes.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:412984760622:android:bb939bb44a247b3b",
+        "mobilesdk_app_id": "1:55413750712:android:bb939bb44a247b3b",
         "android_client_info": {
           "package_name": "com.wally.wally"
         }
       },
       "oauth_client": [
         {
-          "client_id": "412984760622-4s7gp0d860684tih6q8lcncqms2lt0uv.apps.googleusercontent.com",
+          "client_id": "55413750712-03pdciev4hh9f96q5752795fg63n0qve.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.wally.wally",
@@ -23,17 +23,17 @@
           }
         },
         {
-          "client_id": "412984760622-h59fbqkh76cg5v1fu8f9me0hpioaamcn.apps.googleusercontent.com",
+          "client_id": "55413750712-f6r6n5haar7qgmr5624vlf6319bsljeu.apps.googleusercontent.com",
           "client_type": 3
         },
         {
-          "client_id": "412984760622-ej5mnmqr4d429gisakjq42s4clr4q9lr.apps.googleusercontent.com",
+          "client_id": "55413750712-ao9ic31vvsm3revppb7h8vdketi49ja9.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAxkBKfFIldmLw8g_a1h20UA1doipUvXcs"
+          "current_key": "AIzaSyBCC457DT2Y2e-9K69EVP60yfBctonk-tU"
         }
       ],
       "services": {
