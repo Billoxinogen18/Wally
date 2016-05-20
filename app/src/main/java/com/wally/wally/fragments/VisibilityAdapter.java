@@ -47,7 +47,7 @@ public class VisibilityAdapter extends BaseAdapter {
         } else {
             tv = (TextView) view;
         }
-        tv.setText(Visibility.SocialVisibility.toString(position));
+        tv.setText(Visibility.SocialVisibility.getStringRepresentation(position));
         tv.setCompoundDrawablesWithIntrinsicBounds(Visibility.SocialVisibility.toDrawableRes(position), 0, 0, 0);
         return tv;
     }
