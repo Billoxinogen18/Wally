@@ -1,4 +1,12 @@
 apply plugin: 'com.android.application'
+apply plugin: 'idea'
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
 
 android {
     compileSdkVersion 23
@@ -65,8 +73,8 @@ dependencies {
     // 3rd parties
     compile 'com.github.bumptech.glide:glide:3.7.0'
     // Firebase
-    compile 'com.google.firebase:firebase-core:9.0.0'
-    compile 'com.google.firebase:firebase-storage:9.0.0'
+//    compile 'com.google.firebase:firebase-core:9.0.0'
+//    compile 'com.google.firebase:firebase-storage:9.0.0'
     // TODO
     // If i comment out following line this error will go away
     //      05-19 18:43:34.410 15768-15792/com.wally.wally E/DynamiteModule: Failed to load module descriptor class:
@@ -74,6 +82,7 @@ dependencies {
     // But than I won't be able to use firebase auth
     compile 'com.google.firebase:firebase-auth:9.0.0'
     compile 'com.google.firebase:firebase-database:9.0.0'
+    compile 'com.firebaseui:firebase-ui-auth:0.4.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

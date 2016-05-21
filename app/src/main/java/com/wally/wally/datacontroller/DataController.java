@@ -77,6 +77,19 @@ public class DataController {
         fetchByAuthor(author.getId(), resultCallback);
     }
 
+    public User getCurrentUser(){
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+        if(user != null){
+            String id = user.getUid();
+            // .get(0) assumes only one provider (Google)
+            String ggId = user.getProviderData().get(0).getUid();
+            users.child(id).child("ggId").setValue(ggId);
+            return new User(id).withGgId(ggId);
+        }
+        return null;
+    }
+
     public void googleAuth(String accessToken, final Callback<User> callback) {
         Log.d(TAG, "googleAuth");
         AuthCredential credentials = GoogleAuthProvider.getCredential(accessToken, null);
