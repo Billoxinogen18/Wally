@@ -5,6 +5,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="alertDialogTheme">@style/AlertDialogStyle</item>
     </style>
 
     <style name="AppTheme.SplashScreen">
@@ -39,6 +40,11 @@
         <!--<item name="colorControlHighlight">#532727</item>-->
         <item name="colorButtonNormal">@color/colorAccentLight</item>
         <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="AlertDialogStyle" parent="Base.Theme.AppCompat.Light.Dialog.Alert">
+        <!-- Used for the buttons -->
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="RemoveButtonStyle" parent="Theme.AppCompat.Light.DarkActionBar">

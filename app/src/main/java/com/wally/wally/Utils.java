@@ -8,7 +8,12 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
+import android.support.annotation.FloatRange;
+import android.support.annotation.IntRange;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
@@ -134,5 +139,55 @@ public final class Utils {
         } catch (PackageManager.NameNotFoundException e) {
             return false;
         }
+    }
+
+    public static
+    @Nullable
+    Palette.Swatch getMostPopulousSwatch(Palette palette) {
+        Palette.Swatch mostPopulous = null;
+        if (palette != null) {
+            for (Palette.Swatch swatch : palette.getSwatches()) {
+                if (mostPopulous == null || swatch.getPopulation() > mostPopulous.getPopulation()) {
+                    mostPopulous = swatch;
+                }
+            }
+        }
+        return mostPopulous;
+    }
+
+
+    /**
+     * Calculate a variant of the color to make it more suitable for overlaying information. Light
+     * colors will be lightened and dark colors will be darkened
+     *
+     * @param color               the color to adjust
+     * @param isDark              whether {@code color} is light or dark
+     * @param lightnessMultiplier the amount to modify the color e.g. 0.1f will alter it by 10%
+     * @return the adjusted color
+     */
+    public static
+    @ColorInt
+    int scrimify(@ColorInt int color,
+                 boolean isDark,
+                 @FloatRange(from = 0f, to = 1f) float lightnessMultiplier) {
+        float[] hsl = new float[3];
+        android.support.v4.graphics.ColorUtils.colorToHSL(color, hsl);
+
+        if (!isDark) {
+            lightnessMultiplier += 1f;
+        } else {
+            lightnessMultiplier = 1f - lightnessMultiplier;
+        }
+
+
+        hsl[2] = Math.max(0f, Math.min(1f, hsl[2] * lightnessMultiplier));
+        return android.support.v4.graphics.ColorUtils.HSLToColor(hsl);
+    }
+
+    public static
+    @ColorInt
+    int modifyAlpha(@ColorInt int color,
+                    @IntRange(from = 0, to = 255) int alpha) {
+        return (color & 0x00ffffff) | (alpha << 24);
     }
 }

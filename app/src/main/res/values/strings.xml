@@ -141,4 +141,13 @@
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="post_cancel_edit">Cancel</string>
+
+    <string name="sort_by_location">By Location</string>
+    <string name="sort_by_date">By Date</string>
+    <string name="sort_dialog_title">Sort Content</string>
+    <string name="sort">Sort</string>
+    <string-array name="sort_options">
+        <item>@string/sort_by_date</item>
+        <item>@string/sort_by_location</item>
+    </string-array>
 </resources>

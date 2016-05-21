@@ -2,11 +2,21 @@ package com.wally.wally.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -19,12 +29,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
@@ -39,133 +49,221 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ProfileActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener, FetchResultCallback, NewContentDialogFragment.NewContentDialogListener {
+
+public class ProfileActivity extends AppCompatActivity implements FetchResultCallback, NewContentDialogFragment.NewContentDialogListener, AppBarLayout.OnOffsetChangedListener {
 
     private static final String TAG = ProfileActivity.class.getSimpleName();
-
-    private static final float PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR = 0.9f;
-    private static final float PERCENTAGE_TO_HIDE_TITLE_DETAILS = 0.3f;
-    private static final int ALPHA_ANIMATIONS_DURATION = 200;
-    private static final String SOCIAL_USER = "socialUser";
-    private boolean mIsTheTitleVisible = false;
-    private boolean mIsTheTitleContainerVisible = true;
-    private LinearLayout mTitleContainer;
-    private TextView mTitle;
-    private TextView mTitleBar;
+    private static final String ARG_SOCIAL_USER = "ARG_SOCIAL_USER";
+    private static final int PERCENTAGE_TO_ANIMATE_AVATAR = 5;
     private ImageView mAvatarImage;
     private ImageView mCoverImage;
-    private AppBarLayout mAppBarLayout;
-    private Toolbar mToolbar;
-    private SocialUser mUser;
+    private CollapsingToolbarLayout mCollapseToolbar;
+    private boolean mIsAvatarShown = true;
+    private int mMaxScrollSize;
 
     private ContentAdapter mContentAdapter;
+    private SocialUser mUser;
+
+    private int mSortType;
+    private int mDrawableTintColor = -1;
 
     public static Intent newIntent(Context context, @Nullable SocialUser user) {
         Intent i = new Intent(context, ProfileActivity.class);
-        i.putExtra(SOCIAL_USER, user);
+        i.putExtra(ARG_SOCIAL_USER, user);
         return i;
-    }
-
-    public static void startAlphaAnimation(View v, long duration, int visibility) {
-        AlphaAnimation alphaAnimation = (visibility == View.VISIBLE)
-                ? new AlphaAnimation(0f, 1f)
-                : new AlphaAnimation(1f, 0f);
-
-        alphaAnimation.setDuration(duration);
-        alphaAnimation.setFillAfter(true);
-        v.startAnimation(alphaAnimation);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+
+        if (savedInstanceState != null) {
+            mSortType = savedInstanceState.getInt("mSortType");
+        } else {
+            mSortType = 0;
+        }
+
         extractUserFromBundle(getIntent().getExtras());
-
-        bindViews();
+        initViews();
         setData();
-
-        mAppBarLayout.addOnOffsetChangedListener(this);
-        mToolbar.inflateMenu(R.menu.menu_main);
-        startAlphaAnimation(mTitle, 0, View.INVISIBLE);
-
         initGridView();
     }
 
     private void setData() {
-        mTitle.setText(mUser.getDisplayName());
-        mTitleBar.setText(mUser.getDisplayName());
+        mCollapseToolbar.setTitle(mUser.getDisplayName());
 
-        Glide.with(getBaseContext())
-                .load(mUser.getAvatarUrl())
-                .transform(new CircleTransform(getBaseContext()))
-                .into(mAvatarImage);
+        if (!TextUtils.isEmpty(mUser.getAvatarUrl())) {
+            Glide.with(getBaseContext())
+                    .load(mUser.getAvatarUrl())
+                    .transform(new CircleTransform(getBaseContext()))
+                    .into(mAvatarImage);
+        }
 
-        Glide.with(getBaseContext())
-                .load(mUser.getCoverUrl())
-                .into(mCoverImage);
+        if (!TextUtils.isEmpty(mUser.getCoverUrl())) {
+            Glide.with(getBaseContext())
+                    .load(mUser.getCoverUrl())
+                    .asBitmap()
+                    //.override(1500, 1500)
+                    .listener(new RequestListener<String, Bitmap>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            Log.wtf(TAG, "onResourceReady: " + resource.getWidth() + "X" + resource.getHeight());
+
+                            int left = resource.getWidth() / 2 - 100;
+                            int right = resource.getWidth() / 2 + 100;
+                            if (left < 0) {
+                                left = 0;
+                                right = resource.getWidth() - 1;
+                            }
+                            Palette.from(resource).clearFilters()
+                                    // Get colors only from top side of the image
+                                    .setRegion(left, 0, right, Math.min(resource.getHeight() - 1, 200))
+                                    .generate(new Palette.PaletteAsyncListener() {
+
+                                        @Override
+                                        public void onGenerated(Palette palette) {
+                                            Palette.Swatch darkMuted = palette.getDarkMutedSwatch();
+                                            Palette.Swatch lightMuted = palette.getLightMutedSwatch();
+                                            Palette.Swatch swatch = darkMuted != null ? darkMuted :
+                                                    lightMuted != null ?
+                                                            lightMuted : Utils.getMostPopulousSwatch(palette);
+                                            if (swatch == null) {
+                                                return;
+                                            }
+                                            boolean isDark = swatch.getHsl()[2] < 0.5f;
+
+                                            int scrimColor = Utils.modifyAlpha(swatch.getRgb(), 255);
+
+                                            int collapsedTitleColor = Utils.modifyAlpha(swatch.getTitleTextColor(), 200);
+                                            int expandedTitleColor = Utils.modifyAlpha(swatch.getTitleTextColor(), 240);
+
+                                            mCollapseToolbar.setStatusBarScrimColor(scrimColor);
+                                            mCollapseToolbar.setContentScrimColor(scrimColor);
+                                            mCollapseToolbar.setCollapsedTitleTextColor(collapsedTitleColor);
+                                            mCollapseToolbar.setExpandedTitleColor(expandedTitleColor);
+
+                                            int darkTint = ContextCompat.getColor(getBaseContext(), R.color.cover_dark_tint);
+                                            int lightTint = ContextCompat.getColor(getBaseContext(), R.color.cover_light_tint);
+                                            mCoverImage.setColorFilter(isDark ? darkTint : lightTint);
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                                getWindow().setStatusBarColor(Utils.scrimify(scrimColor, isDark, 0.08f));
+                                            }
+                                            mDrawableTintColor = expandedTitleColor;
+                                            // Invalidate menu to recreate menu items.
+                                            invalidateOptionsMenu();
+                                        }
+                                    });
+                            return false;
+                        }
+                    }).into(mCoverImage);
+        }
     }
 
-    private void bindViews() {
-        mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        mTitle = (TextView) findViewById(R.id.main_textview_title);
-        mTitleBar = (TextView) findViewById(R.id.main_title);
-        mTitleContainer = (LinearLayout) findViewById(R.id.main_linearlayout_title);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.main_appbar);
-        mAvatarImage = (ImageView) findViewById(R.id.main_imageview_avatar);
-        mCoverImage = (ImageView) findViewById(R.id.main_imageview_placeholder);
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("mSortType", mSortType);
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private void initViews() {
+        mAvatarImage = (ImageView) findViewById(R.id.imageview_avatar);
+        mCoverImage = (ImageView) findViewById(R.id.imageview_cover);
+
+        mCollapseToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar_layout);
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        appBarLayout.addOnOffsetChangedListener(this);
+        mMaxScrollSize = appBarLayout.getTotalScrollRange();
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+        getMenuInflater().inflate(R.menu.menu_profile, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public void onOffsetChanged(AppBarLayout appBarLayout, int offset) {
-        int maxScroll = appBarLayout.getTotalScrollRange();
-        float percentage = (float) Math.abs(offset) / (float) maxScroll;
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Tint drawables
+        if (mDrawableTintColor != -1) {
+            for (int i = 0; i < menu.size(); i++) {
+                Drawable drawable = menu.getItem(i).getIcon();
+                if (drawable == null) {
+                    continue;
+                }
+                Drawable wrappedDrawable = DrawableCompat.wrap(drawable);
+                DrawableCompat.setTint(wrappedDrawable, mDrawableTintColor);
+                menu.getItem(i).setIcon(wrappedDrawable);
+            }
+            Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_black_24dp);
+            upArrow.setColorFilter(mDrawableTintColor, PorterDuff.Mode.SRC_ATOP);
+            //noinspection ConstantConditions
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        }
 
-        handleAlphaOnTitle(percentage);
-        handleToolbarTitleVisibility(percentage);
+        return super.onPrepareOptionsMenu(menu);
     }
 
-    private void handleToolbarTitleVisibility(float percentage) {
-        if (percentage >= PERCENTAGE_TO_SHOW_TITLE_AT_TOOLBAR) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            case R.id.action_sort:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle(R.string.sort_dialog_title);
+                builder.setSingleChoiceItems(R.array.sort_options, mSortType, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        mSortType = item;
+                        dialog.dismiss();
+                        mContentAdapter.sort();
+                    }
+                });
+                builder.show();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-            if (!mIsTheTitleVisible) {
-                startAlphaAnimation(mTitle, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
-                mIsTheTitleVisible = true;
-            }
 
-        } else {
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int i) {
+        /**
+         * Just remove image on scroll
+         */
+        if (mMaxScrollSize == 0)
+            mMaxScrollSize = appBarLayout.getTotalScrollRange();
 
-            if (mIsTheTitleVisible) {
-                startAlphaAnimation(mTitle, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
-                mIsTheTitleVisible = false;
-            }
+        int percentage = (Math.abs(i)) * 100 / mMaxScrollSize;
+
+        if (percentage >= PERCENTAGE_TO_ANIMATE_AVATAR && mIsAvatarShown) {
+            mIsAvatarShown = false;
+            mAvatarImage.animate().scaleY(0).scaleX(0).setDuration(200).start();
+        }
+
+        if (percentage <= PERCENTAGE_TO_ANIMATE_AVATAR && !mIsAvatarShown) {
+            mIsAvatarShown = true;
+
+            mAvatarImage.animate()
+                    .scaleY(1).scaleX(1)
+                    .start();
         }
     }
 
-    private void handleAlphaOnTitle(float percentage) {
-        if (percentage >= PERCENTAGE_TO_HIDE_TITLE_DETAILS) {
-            if (mIsTheTitleContainerVisible) {
-                startAlphaAnimation(mTitleContainer, ALPHA_ANIMATIONS_DURATION, View.INVISIBLE);
-                mIsTheTitleContainerVisible = false;
-            }
-
-        } else {
-
-            if (!mIsTheTitleContainerVisible) {
-                startAlphaAnimation(mTitleContainer, ALPHA_ANIMATIONS_DURATION, View.VISIBLE);
-                mIsTheTitleContainerVisible = true;
-            }
-        }
-    }
 
     private void extractUserFromBundle(Bundle extras) {
-        mUser = (SocialUser) extras.getSerializable(SOCIAL_USER);
+        mUser = (SocialUser) extras.getSerializable(ARG_SOCIAL_USER);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -173,7 +271,7 @@ public class ProfileActivity extends AppCompatActivity implements AppBarLayout.O
         App app = App.getInstance();
         app.getDataController().fetchByAuthor(app.getUser().getBaseUser(), this);
 
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_content);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
                 getGridColumnCount(), StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(new ContentAdapter());
@@ -187,7 +285,7 @@ public class ProfileActivity extends AppCompatActivity implements AppBarLayout.O
      * @return optimal quantity based on rotation and size
      */
     private int getGridColumnCount() {
-        return (int) (Utils.getScreenWidthDpi(this) / 170);
+        return (int) (Utils.getScreenWidthDpi(this) / 250);
     }
 
     /**
@@ -234,6 +332,7 @@ public class ProfileActivity extends AppCompatActivity implements AppBarLayout.O
         // TODO call db
     }
 
+    @SuppressWarnings("UnusedParameters")
     private void onContentClicked(Content content, View view) {
         PreviewContentDialogFragment pd = PreviewContentDialogFragment.newInstance(content);
         pd.show(getSupportFragmentManager(), PreviewContentDialogFragment.TAG);
@@ -253,7 +352,8 @@ public class ProfileActivity extends AppCompatActivity implements AppBarLayout.O
         @Override
         public void onBindViewHolder(ViewHolder vh, int position) {
             Content c = mData.get(position);
-
+            vh.image.setImageDrawable(null);
+            vh.image.setBackground(null);
             if (!TextUtils.isEmpty(c.getImageUri())) {
                 Glide.with(getBaseContext())
                         .load(c.getImageUri())
@@ -296,6 +396,16 @@ public class ProfileActivity extends AppCompatActivity implements AppBarLayout.O
             int pos = getItemPosition(content);
             mData.set(pos, content);
             notifyItemChanged(pos);
+        }
+
+        public void sort() {
+            if (mSortType == 0) {
+                // sort by date
+                // TODO sort
+            } else {
+                // sort by location
+                // TODO Meravici
+            }
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {

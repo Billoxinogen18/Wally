@@ -1,11 +1,8 @@
 package com.wally.wally.userManager;
 
-import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -63,6 +60,9 @@ public class SocialUserFactory {
                                         .withDisplayName(person.getDisplayName())
                                         .withFirstName(person.getName().getGivenName())
                                         .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
+                                if (person.getCover() != null && person.getCover().getCoverPhoto() != null) {
+                                    googleUser.withCover(person.getCover().getCoverPhoto().getUrl());
+                                }
                                 userLoadListener.onUserLoad(googleUser);
                             } finally {
                                 personBuffer.release();
