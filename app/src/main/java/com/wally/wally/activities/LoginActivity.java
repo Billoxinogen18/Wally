@@ -10,6 +10,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 /**
  * Created by shota on 5/20/16.
  */
+//TODO rename!
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = LoginActivity.class.getSimpleName();
 

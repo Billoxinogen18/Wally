@@ -165,7 +165,7 @@ public class ProfileActivity extends AppCompatActivity implements AppBarLayout.O
     @SuppressWarnings("ConstantConditions")
     private void initGridView() {
         App app = App.getInstance();
-        app.getDataController().fetchByAuthor(app.getUser().getBaseUser(), this);
+        app.getDataController().fetchByAuthor(app.getUserManager().getUser().getBaseUser(), this);
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));

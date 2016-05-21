@@ -49,7 +49,7 @@ public class ADFChooser extends AppCompatActivity {
                 requestADFPermission();
             }
         }else{
-            startActivity(MainActivity.newIntent(getBaseContext(), null));
+            startActivity(CameraARStandardActivity.newIntent(getBaseContext()));
         }
     }
 
@@ -161,7 +161,7 @@ public class ADFChooser extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String uuid = mData.get(getAdapterPosition()).first;
-                startActivity(MainActivity.newIntent(getBaseContext(), uuid));
+                startActivity(CameraARTangoActivity.newIntent(getBaseContext(), uuid));
             }
         }
     }
