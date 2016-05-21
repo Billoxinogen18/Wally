@@ -30,7 +30,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         dataController = DataController.create(this);
-        userManager = new UserManager();
+        userManager = new UserManager(new SocialUserFactory(), dataController);
         sInstance = this;
     }
 

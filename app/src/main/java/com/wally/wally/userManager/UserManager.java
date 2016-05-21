@@ -2,6 +2,7 @@ package com.wally.wally.userManager;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.wally.wally.App;
+import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.user.User;
 
 /**
@@ -12,11 +13,13 @@ import com.wally.wally.datacontroller.user.User;
  */
 public class UserManager {
     SocialUserFactory mSocialUserFactory;
+    DataController mDataController;
     SocialUser mUser;
 
 
-    public UserManager(){
-        mSocialUserFactory = new SocialUserFactory();
+    public UserManager(SocialUserFactory socialUserFactory, DataController dataController){
+        mSocialUserFactory = socialUserFactory;
+        mDataController = dataController;
     }
 
     public void setUser(SocialUser user){
@@ -40,7 +43,7 @@ public class UserManager {
      *      .build();
      */
     public void loadUser(GoogleApiClient googleApiClient, final UserLoadListener userLoadListener) {
-        User user = App.getInstance().getDataController().getCurrentUser();
+        User user = mDataController.getCurrentUser();
 
         loadUser(user, googleApiClient, userLoadListener);
     }
@@ -50,7 +53,7 @@ public class UserManager {
         mSocialUserFactory.getSocialUser(user, googleApiClient, new UserLoadListener() {
             @Override
             public void onUserLoad(SocialUser user) {
-                App.getInstance().getUserManager().setUser(user);
+                UserManager.this.setUser(user);
                 userLoadListener.onUserLoad(user);
             }
         });
