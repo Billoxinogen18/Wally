@@ -201,6 +201,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
 
     @SuppressWarnings("ConstantConditions")
     private void displayProfileBar(SocialUser user) {
+        findViewById(R.id.profile_bar).setVisibility(View.VISIBLE);
         Glide.with(getBaseContext())
                 .load(user.getAvatarUrl())
                 .override(1000, 1000)

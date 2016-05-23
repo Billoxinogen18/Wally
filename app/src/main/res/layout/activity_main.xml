@@ -73,6 +73,7 @@
         android:tint="@color/colorPrimaryDark" />
 
     <LinearLayout
+        android:id="@+id/profile_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -80,7 +81,8 @@
         android:layout_gravity="top|end"
         android:clickable="true"
         android:onClick="onShowProfileClick"
-        android:background="?attr/selectableItemBackgroundBorderless">
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:visibility="gone">
         <ImageView
             android:id="@+id/profile_image"
             android:layout_width="30dp"
