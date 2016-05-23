@@ -14,6 +14,7 @@ import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.google.android.gms.plus.model.people.PersonBuffer;
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.HashMap;
@@ -25,7 +26,7 @@ import java.util.Map;
 public class SocialUserFactory {
     public static final String TAG = SocialUserFactory.class.getSimpleName();
     private static final int DEFAULT_AVATAR_SIZE = 256;
-    private Map<String, SocialUser> userCache;
+    private Map<Id, SocialUser> userCache;
 
     public SocialUserFactory() {
         userCache = new HashMap<>();
@@ -44,7 +45,7 @@ public class SocialUserFactory {
                     // if (baseUser.getFbId() != null) {
                     // compoundUser.addSocialUser(new FacebookUser(baseUser));
                     // }
-                    userCache.put(baseUser.getId().getId(), compoundUser);
+                    userCache.put(baseUser.getId(), compoundUser);
                     userLoadListener.onUserLoad(compoundUser);
                 }
             });
