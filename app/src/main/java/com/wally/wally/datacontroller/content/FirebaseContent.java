@@ -3,38 +3,45 @@ package com.wally.wally.datacontroller.content;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Exclude;
+import com.wally.wally.datacontroller.Utils;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.Date;
+import java.util.List;
 
 public class FirebaseContent {
+    public static final int PUBLIC = Visibility.SocialVisibility.PUBLIC;
+
+    @Exclude
+    public String id;
 
     // Content
-    private String id;
-    private String note;
-    private String uuid;
-    private String title;
-    private String imageUri;
-    private User author;
+    public String note;
+    public String uuid;
+    public String title;
+    public String imageUri;
+    public User author;
 
     // Location
-    private double latitude;
-    private double longitude;
+    public double latitude;
+    public double longitude;
 
     // TangoData
-    private double scale;
-    private double[] rotation;
-    private double[] translation;
+    public double scale;
+    public List<Double> rotation;
+    public List<Double> translation;
 
     // Visibility
-    private int socialVisibility;
-    private int rangeVisibility;
-    private Date visibleUntil;
-    private boolean isPreviewVisible;
+    public int socialVisibility;
+    public int rangeVisibility;
+    public Date visibleUntil;
+    public boolean isPreviewVisible;
 
-    public FirebaseContent() {
-    }
+    // Constructor is indirectly used by Firebase!
+    @SuppressWarnings("unused")
+    public FirebaseContent() {}
 
     public FirebaseContent(Content content) {
         id = content.getId();
@@ -54,8 +61,8 @@ public class FirebaseContent {
         TangoData tangoData = content.getTangoData();
         if (tangoData != null) {
             scale = tangoData.getScale();
-            rotation = tangoData.getRotation();
-            translation = tangoData.getTranslation();
+            rotation = Utils.arrayToList(tangoData.getRotation());
+            translation = Utils.arrayToList(tangoData.getTranslation());
         }
 
         Visibility visibility = content.getVisibility();
@@ -67,86 +74,23 @@ public class FirebaseContent {
         }
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getImageUri() {
-        return imageUri;
-    }
-
-    public User getAuthor() {
-        return author;
-    }
-
-    public double getLatitude() {
-        return latitude;
-    }
-
-    public double getLongitude() {
-        return longitude;
-    }
-
-    public double getScale() {
-        return scale;
-    }
-
-    public double[] getRotation() {
-        return rotation;
-    }
-
-    public double[] getTranslation() {
-        return translation;
-    }
-
-    public int getSocialVisibility() {
-        return socialVisibility;
-    }
-
-    public int getRangeVisibility() {
-        return rangeVisibility;
-    }
-
-    public Date getVisibleUntil() {
-        return visibleUntil;
-    }
-
-    public boolean getIsPreviewVisible() {
-        return isPreviewVisible;
-    }
-
     public void save(DatabaseReference ref) {
         if (id == null) {
             ref = ref.push();
             ref.setValue(this);
-            setId(ref.getKey());
+            id = ref.getKey();
         } else {
             ref.child(id).setValue(this);
         }
     }
 
+    @SuppressWarnings("unused")
     public void save(DatabaseReference ref, final Callback<Boolean> statusCallback) {
         ref.push().setValue(this, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError == null) {
-                    setId(firebase.getKey());
+                    id = firebase.getKey();
                 }
                 statusCallback.onResult(firebaseError == null);
             }
@@ -157,8 +101,9 @@ public class FirebaseContent {
         ref.child(id).removeValue();
     }
 
+    @SuppressWarnings("unused")
     public void delete(DatabaseReference ref, final Callback<Boolean> statusCallback) {
-        ref.child(getId()).removeValue(new DatabaseReference.CompletionListener() {
+        ref.child(id).removeValue(new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 statusCallback.onResult(firebaseError == null);
@@ -177,8 +122,8 @@ public class FirebaseContent {
                 .withLocation(new LatLng(latitude, longitude))
                 .withTangoData(new TangoData()
                         .withScale(scale)
-                        .withRotation(rotation)
-                        .withTranslation(translation))
+                        .withRotation(Utils.listToArray(rotation))
+                        .withTranslation(Utils.listToArray(translation)))
                 .withVisibility(new Visibility()
                         .withRangeVisibility(new Visibility.RangeVisibility(rangeVisibility))
                         .withSocialVisibility(new Visibility.SocialVisibility(socialVisibility))

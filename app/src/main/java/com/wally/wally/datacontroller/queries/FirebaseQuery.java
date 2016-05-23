@@ -24,7 +24,7 @@ public abstract class FirebaseQuery {
                 Set<FirebaseContent> result = new HashSet<>();
                 for (DataSnapshot contentSnapshot : snapshot.getChildren()) {
                     FirebaseContent content = contentSnapshot.getValue(FirebaseContent.class);
-                    content.setId(contentSnapshot.getKey());
+                    content.id = contentSnapshot.getKey();
                     result.add(content);
                 }
                 callback.onResult(result);

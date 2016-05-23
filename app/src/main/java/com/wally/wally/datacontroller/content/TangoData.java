@@ -8,11 +8,9 @@ import org.rajawali3d.math.vector.Vector3;
 import java.io.Serializable;
 
 public class TangoData implements Serializable {
-    // TODO: fill in with tango data
-
+    private double scale = 1.0;
     private double[] rotation;
     private double[] translation;
-    private double scale = 1.0;
 
     public TangoData() {
 

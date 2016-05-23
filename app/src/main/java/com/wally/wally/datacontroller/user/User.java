@@ -30,6 +30,8 @@ public class User implements Serializable {
         return this;
     }
 
+    // will or will not be used in future
+    @SuppressWarnings("unused")
     public User withFbId(String fbId) {
         this.fbId = fbId;
         return this;

@@ -29,7 +29,10 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        dataController = DataController.create(this);
+        // TODO: DataController.create()
+        // Is implemented with singleton
+        // Why save the instance here as well?
+        dataController = DataController.create();
         userManager = new UserManager(new SocialUserFactory(), dataController);
         sInstance = this;
     }
