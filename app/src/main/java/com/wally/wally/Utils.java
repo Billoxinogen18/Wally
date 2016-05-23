@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
@@ -189,5 +190,14 @@ public final class Utils {
     int modifyAlpha(@ColorInt int color,
                     @IntRange(from = 0, to = 255) int alpha) {
         return (color & 0x00ffffff) | (alpha << 24);
+    }
+
+    /**
+     * Change color of drawable
+     */
+    public static Drawable tintDrawable(Drawable drawable, int color) {
+        Drawable mutated = drawable.mutate();
+        mutated.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        return mutated;
     }
 }

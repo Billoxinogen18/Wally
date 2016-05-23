@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -58,12 +56,13 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
     private ImageView mAvatarImage;
     private ImageView mCoverImage;
     private CollapsingToolbarLayout mCollapseToolbar;
+    private Toolbar mToolbar;
     private boolean mIsAvatarShown = true;
+
     private int mMaxScrollSize;
-
     private ContentAdapter mContentAdapter;
-    private SocialUser mUser;
 
+    private SocialUser mUser;
     private int mSortType;
     private int mDrawableTintColor = -1;
 
@@ -181,8 +180,8 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
         appBarLayout.addOnOffsetChangedListener(this);
         mMaxScrollSize = appBarLayout.getTotalScrollRange();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -201,16 +200,17 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
                 if (drawable == null) {
                     continue;
                 }
-                Drawable wrappedDrawable = DrawableCompat.wrap(drawable);
-                DrawableCompat.setTint(wrappedDrawable, mDrawableTintColor);
-                menu.getItem(i).setIcon(wrappedDrawable);
+                menu.getItem(i).setIcon(Utils.tintDrawable(drawable, mDrawableTintColor));
             }
             Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.ic_arrow_back_black_24dp);
-            upArrow.setColorFilter(mDrawableTintColor, PorterDuff.Mode.SRC_ATOP);
             //noinspection ConstantConditions
-            getSupportActionBar().setHomeAsUpIndicator(upArrow);
-        }
+            getSupportActionBar().setHomeAsUpIndicator(Utils.tintDrawable(upArrow, mDrawableTintColor));
 
+            Drawable overflowIcon = mToolbar.getOverflowIcon();
+            if (overflowIcon != null) {
+                mToolbar.setOverflowIcon(Utils.tintDrawable(overflowIcon, mDrawableTintColor));
+            }
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 

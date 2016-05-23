@@ -150,4 +150,6 @@
         <item>@string/sort_by_date</item>
         <item>@string/sort_by_location</item>
     </string-array>
+
+    <string name="sign_out">Sign out</string>
 </resources>
