@@ -1,16 +1,13 @@
 package com.wally.wally.activities;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
@@ -26,7 +23,6 @@ import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
 
-import org.rajawali3d.surface.RajawaliSurfaceView;
 
 
 /**
@@ -160,6 +156,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
                 // user is not signed in. Maybe just wait for the user to press
                 // "sign in" again, or show a message
                 //TODO
+                Toast.makeText(this, "User could not login!!!", Toast.LENGTH_SHORT).show();
             }
         }
     }
