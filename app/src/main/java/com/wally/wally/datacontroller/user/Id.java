@@ -13,6 +13,10 @@ public class Id implements Serializable{
     private int provider;
     private String id;
 
+    public Id(){
+
+    }
+
     public Id(int provider, String id){
         // TODO validate
         this.provider = provider;

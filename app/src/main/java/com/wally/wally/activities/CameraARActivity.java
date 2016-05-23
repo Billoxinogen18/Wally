@@ -35,7 +35,6 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
     private UserManager mUserManager;
     protected DataController mDataController;
 
-    private View mNewContentBtn;
     private View mSelectedMenuView;
     private long mLastSelectTime;
     private Content mSelectedContent;
@@ -52,10 +51,6 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Initialize views
-        mNewContentBtn = findViewById(R.id.btn_new_post);
-
 
         mSelectedMenuView = findViewById(R.id.layout_content_select);
 
@@ -75,10 +70,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
     @Override
     protected void onResume() {
         super.onResume();
-        if (!mUserManager.isLoggedIn()) {
-//            showProgress();
-            mNewContentBtn.setVisibility(View.VISIBLE);
-        } else {
+        if (mUserManager.isLoggedIn()) {
             displayProfileBar(mUserManager.getUser());
         }
     }
@@ -129,6 +121,9 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
                             .setProviders(AuthUI.GOOGLE_PROVIDER)
                             .build(),
                     RC_SIGN_IN);
+        } else {
+            NewContentDialogFragment.newInstance()
+                    .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
         }
     }
 
