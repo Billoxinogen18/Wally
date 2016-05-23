@@ -35,7 +35,7 @@ public class FacebookUser extends AbstractSocialUser {
     }
 
     @Override
-    public void getFriends(FriendsLoadListener friendsLoadListener) {
+    public List<String> getFriends() {
         throw new UnsupportedOperationException();
     }
 
@@ -56,6 +56,11 @@ public class FacebookUser extends AbstractSocialUser {
 
     @Override
     public SocialUser withCover(String coverUrl) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SocialUser withFriends(List<String> friends) {
         throw new UnsupportedOperationException();
     }
 }

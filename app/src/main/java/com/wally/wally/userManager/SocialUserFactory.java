@@ -41,10 +41,10 @@ public class SocialUserFactory {
                 public void onUserLoad(SocialUser user) {
                     compoundUser.addSocialUser(user);
                     // TODO თურამეა იომ ატვეჩაი ვარო
-                    if (baseUser.getFbId() != null) {
-                        compoundUser.addSocialUser(new FacebookUser(baseUser));
-                    }
-                    userCache.put(baseUser.getId(), compoundUser);
+                    // if (baseUser.getFbId() != null) {
+                    // compoundUser.addSocialUser(new FacebookUser(baseUser));
+                    // }
+                    userCache.put(baseUser.getId().getId(), compoundUser);
                     userLoadListener.onUserLoad(compoundUser);
                 }
             });
@@ -52,7 +52,7 @@ public class SocialUserFactory {
     }
 
     private void getGoogleUser(final User baseUser, GoogleApiClient googleApiClient, final UserManager.UserLoadListener userLoadListener) {
-        Plus.PeopleApi.load(googleApiClient, baseUser.getGgId()).setResultCallback(
+        Plus.PeopleApi.load(googleApiClient, baseUser.getGgId().getId()).setResultCallback(
                 new ResultCallback<People.LoadPeopleResult>() {
                     @Override
                     public void onResult(@NonNull People.LoadPeopleResult peopleData) {
@@ -64,6 +64,7 @@ public class SocialUserFactory {
                                         .withDisplayName(person.getDisplayName())
                                         .withFirstName(person.getName().getGivenName())
                                         .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
+
                                 userLoadListener.onUserLoad(googleUser);
                             } finally {
                                 personBuffer.release();

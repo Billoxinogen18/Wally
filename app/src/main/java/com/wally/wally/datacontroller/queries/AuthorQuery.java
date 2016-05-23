@@ -2,11 +2,12 @@ package com.wally.wally.datacontroller.queries;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
+import com.wally.wally.datacontroller.user.Id;
 
 public class AuthorQuery extends FirebaseQuery {
-    private String authorId;
+    private Id authorId;
 
-    public AuthorQuery(String authorId) {
+    public AuthorQuery(Id authorId) {
         if (authorId == null)
             throw new IllegalArgumentException("Provided authorId is null");
         this.authorId = authorId;
@@ -14,6 +15,6 @@ public class AuthorQuery extends FirebaseQuery {
 
     @Override
     public Query getTarget(DatabaseReference ref) {
-        return ref.orderByChild("author/id").equalTo(authorId);
+        return ref.orderByChild("author/id").equalTo(authorId.getId());
     }
 }

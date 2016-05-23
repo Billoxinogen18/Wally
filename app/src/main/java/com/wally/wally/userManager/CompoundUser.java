@@ -62,35 +62,44 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public void getFriends(final FriendsLoadListener friendsLoadListener) {
-        new AsyncTask<Void, Void, List<SocialUser>>() {
-            @Override
-            protected List<SocialUser> doInBackground(Void... params) {
-                final List<SocialUser> result = new ArrayList<>();
-                CountDownLatch latch = new CountDownLatch(socialUsers.size());
-                for (SocialUser user : socialUsers) {
-                    user.getFriends(new FriendsLoadListener() {
-                        @Override
-                        public void onFriendsLoad(List<SocialUser> friends) {
-                            updateFriends(result, friends);
-                        }
-                    });
-                }
-                try {
-                    latch.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return result;
-            }
-
-            @Override
-            protected void onPostExecute(List<SocialUser> result) {
-                super.onPostExecute(socialUsers);
-                friendsLoadListener.onFriendsLoad(result);
-            }
-        };
+    public List<String> getFriends() {
+        final List<String> result = new ArrayList<>();
+        for (SocialUser user : socialUsers) {
+            result.addAll(user.getFriends());
+        }
+        return result;
     }
+
+//    @Override
+//    public void getFriends(final FriendsLoadListener friendsLoadListener) {
+//        new AsyncTask<Void, Void, List<SocialUser>>() {
+//            @Override
+//            protected List<SocialUser> doInBackground(Void... params) {
+//                final List<SocialUser> result = new ArrayList<>();
+//                CountDownLatch latch = new CountDownLatch(socialUsers.size());
+//                for (SocialUser user : socialUsers) {
+//                    user.getFriends(new FriendsLoadListener() {
+//                        @Override
+//                        public void onFriendsLoad(List<SocialUser> friends) {
+//                            updateFriends(result, friends);
+//                        }
+//                    });
+//                }
+//                try {
+//                    latch.await();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//                return result;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(List<SocialUser> result) {
+//                super.onPostExecute(socialUsers);
+//                friendsLoadListener.onFriendsLoad(result);
+//            }
+//        };
+//    }
 
     @Override
     public SocialUser withDisplayName(String name) {
@@ -112,7 +121,8 @@ public class CompoundUser implements SocialUser {
         throw new UnsupportedOperationException();
     }
 
-    private synchronized void updateFriends(List<SocialUser> dest, List<SocialUser> src) {
-        dest.addAll(src);
+    @Override
+    public SocialUser withFriends(List<String> friends) {
+        throw new UnsupportedOperationException();
     }
 }

@@ -3,6 +3,7 @@ package com.wally.wally.userManager;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Xato on 5/20/2016.
@@ -33,8 +34,8 @@ public class DummyUser extends AbstractSocialUser{
     }
 
     @Override
-    public void getFriends(FriendsLoadListener friendsLoadListener) {
-        friendsLoadListener.onFriendsLoad(new ArrayList<SocialUser>());
+    public List<String> getFriends() {
+        return new ArrayList<>();
     }
 
     @Override
@@ -55,5 +56,10 @@ public class DummyUser extends AbstractSocialUser{
     @Override
     public SocialUser withCover(String coverUrl) {
         return this;
+    }
+
+    @Override
+    public SocialUser withFriends(List<String> friends) {
+        return null;
     }
 }

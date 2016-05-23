@@ -3,6 +3,8 @@ package com.wally.wally.userManager;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.wally.wally.datacontroller.user.User;
 
+import java.util.List;
+
 /**
  * Created by Meravici on 5/12/2016.
  */
@@ -13,13 +15,14 @@ public class GoogleUser extends AbstractSocialUser {
     private String mAvatarUrl;
     private String mCoverUrl;
     private String mFirstName;
+    private List<String> mFriends;
 
     protected GoogleUser(User baseUser) {
         super(baseUser);
     }
 
     public String getGoogleId(){
-        return mBaseUser.getGgId();
+        return mBaseUser.getGgId().getId();
     }
 
     @Override
@@ -43,8 +46,8 @@ public class GoogleUser extends AbstractSocialUser {
     }
 
     @Override
-    public void getFriends(FriendsLoadListener friendsLoadListener) {
-        throw new UnsupportedOperationException();
+    public List<String> getFriends() {
+        return mFriends;
     }
 
     @Override
@@ -68,6 +71,12 @@ public class GoogleUser extends AbstractSocialUser {
     @Override
     public SocialUser withCover(String coverUrl) {
         mCoverUrl = coverUrl;
+        return this;
+    }
+
+    @Override
+    public SocialUser withFriends(List<String> friends) {
+        mFriends = friends;
         return this;
     }
 }

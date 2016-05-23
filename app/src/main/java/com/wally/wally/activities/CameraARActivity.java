@@ -30,7 +30,7 @@ import com.wally.wally.userManager.UserManager;
  */
 public abstract class CameraARActivity extends LoginActivity implements OnContentSelectedListener, NewContentDialogFragment.NewContentDialogListener {
     private static final String TAG = CameraARActivity.class.getSimpleName();
-    private static final int RC_SIGN_IN = 1;
+    private static final int RC_SIGN_IN = 100;
 
     private UserManager mUserManager;
     protected DataController mDataController;
@@ -76,7 +76,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
     protected void onResume() {
         super.onResume();
         if (!mUserManager.isLoggedIn()) {
-            showProgress();
+//            showProgress();
             mNewContentBtn.setVisibility(View.VISIBLE);
         } else {
             displayProfileBar(mUserManager.getUser());
@@ -213,6 +213,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
                 .into((ImageView) findViewById(R.id.profile_image));
 
         ((TextView) findViewById(R.id.profile_name)).setText(user.getFirstName());
+
     }
 
     private void showProgress() {

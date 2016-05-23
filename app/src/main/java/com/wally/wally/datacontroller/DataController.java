@@ -9,6 +9,7 @@ import com.wally.wally.datacontroller.queries.*;
 import com.wally.wally.datacontroller.callbacks.*;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 public class DataController {
@@ -51,7 +52,7 @@ public class DataController {
         new UUIDQuery(uuid).fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
-    public void fetchByAuthor(String authorId, FetchResultCallback callback) {
+    public void fetchByAuthor(Id authorId, FetchResultCallback callback) {
         new AuthorQuery(authorId).fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
@@ -73,6 +74,6 @@ public class DataController {
         // .get(0) assumes only one provider (Google)
         String ggId = user.getProviderData().get(0).getUid();
         users.child(id).child("ggId").setValue(ggId);
-        return new User(id).withGgId(ggId);
+        return new User(new Id(Id.PROVIDER_FIREBASE, id)).withGgId(new Id(Id.PROVIDER_GOOGLE, ggId));
     }
 }

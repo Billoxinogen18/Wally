@@ -4,6 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 import java.math.BigInteger;
@@ -22,8 +23,8 @@ public class Utils {
                 .withNote(randomStr(20))
                 .withImageUri("http://" + randomStr(20))
                 .withUuid("uuid: "+ randomStr(10))
-                .withAuthor(new User("t3YIz86JPzb6KRvnLJnmuGpxGSr1")
-                        .withGgId("t3YIz86JPzb6KRvnLJnmuGpxGSr1"))
+                .withAuthor(new User(new Id(Id.PROVIDER_FIREBASE, "t3YIz86JPzb6KRvnLJnmuGpxGSr1"))
+                        .withGgId(new Id(Id.PROVIDER_GOOGLE, "t3YIz86JPzb6KRvnLJnmuGpxGSr1")))
                 .withLocation(new LatLng(random.nextInt(), random.nextInt()))
                 .withVisibility(new Visibility()
                         .withVisiblePreview(random.nextBoolean())

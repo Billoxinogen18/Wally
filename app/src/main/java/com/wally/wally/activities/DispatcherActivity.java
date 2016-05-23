@@ -9,17 +9,7 @@ import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
 
-/**
- * This activity makes decision which activity to start.
- * <br/>
- * Thus it has no UI and finishes it's job very fast.
- * <br/>
- * If user was previously authenticated we start {@link MainActivity}. <br/>
- * Else it starts {@link MainActivity}.
- */
 public class DispatcherActivity extends LoginActivity implements UserManager.UserLoadListener {
-
-//    private static final int RC_SIGN_IN = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +25,11 @@ public class DispatcherActivity extends LoginActivity implements UserManager.Use
         }
     }
 
+    @Override
+    public void onUserLoad(SocialUser user) {
+        continueToNextActivity();
+    }
+
     private void continueToNextActivity(){
         startActivity(ADFChooser.newIntent(this));
         finish();
@@ -48,10 +43,5 @@ public class DispatcherActivity extends LoginActivity implements UserManager.Use
              .addScope(Plus.SCOPE_PLUS_PROFILE)
              .build();
         App.getInstance().getUserManager().loadUser(user, googleApiClient, this);
-    }
-
-    @Override
-    public void onUserLoad(SocialUser user) {
-        continueToNextActivity();
     }
 }

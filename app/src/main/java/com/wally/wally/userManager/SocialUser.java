@@ -15,10 +15,11 @@ public interface SocialUser extends Serializable {
     String getFirstName();
     String getAvatarUrl();
     String getCoverUrl();
-    void getFriends(FriendsLoadListener friendsLoadListener);
+    List<String> getFriends();
 
     SocialUser withDisplayName(String displayName);
     SocialUser withFirstName(String firstName);
     SocialUser withAvatar(String avatarUrl);
     SocialUser withCover(String coverUrl);
+    SocialUser withFriends(List<String> friends);
 }
