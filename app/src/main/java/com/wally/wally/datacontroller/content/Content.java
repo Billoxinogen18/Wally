@@ -82,7 +82,7 @@ public class Content implements Serializable {
     }
 
     public LatLng getLocation() {
-        return location.toLatLng();
+        return location == null ? null : location.toLatLng();
     }
 
     public Content withLocation(LatLng location) {
