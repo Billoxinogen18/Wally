@@ -48,6 +48,7 @@ import java.util.Date;
  * <p/>
  * Created by ioane5 on 4/7/16.
  */
+@SuppressWarnings("ALL")
 public class NewContentDialogFragment extends DialogFragment implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
@@ -90,7 +91,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         initContent(savedInstanceState);
-        mAuthor = App.getInstance().getUser().getBaseUser();
+        mAuthor = App.getInstance().getUserManager().getUser().getBaseUser();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);

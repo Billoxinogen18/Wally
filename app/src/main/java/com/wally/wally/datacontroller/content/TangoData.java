@@ -1,6 +1,5 @@
 package com.wally.wally.datacontroller.content;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.projecttango.rajawali.Pose;
 
 import org.rajawali3d.math.Quaternion;
@@ -9,11 +8,9 @@ import org.rajawali3d.math.vector.Vector3;
 import java.io.Serializable;
 
 public class TangoData implements Serializable {
-    // TODO: fill in with tango data
-
+    private double scale = 1.0;
     private double[] rotation;
     private double[] translation;
-    private double scale = 1.0;
 
     public TangoData() {
 
@@ -73,7 +70,6 @@ public class TangoData implements Serializable {
         return this;
     }
 
-    @JsonIgnore
     public Pose getPose() {
         Pose result;
         Vector3 v = new Vector3(translation[0], translation[1], translation[2]);

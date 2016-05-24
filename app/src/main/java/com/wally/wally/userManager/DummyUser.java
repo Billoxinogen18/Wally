@@ -3,78 +3,64 @@ package com.wally.wally.userManager;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Meravici on 5/12/2016.
+ * Created by Xato on 5/20/2016.
  */
-public class GoogleUser extends AbstractSocialUser {
-    private String mDisplayName;
-    private String mAvatarUrl;
-    private String mCoverUrl;
-    private String mFirstName;
-    private List<Id> mFriends;
-
-    protected GoogleUser(User baseUser) {
+public class DummyUser extends AbstractSocialUser{
+    protected DummyUser(User baseUser) {
         super(baseUser);
-    }
-
-    public String getGoogleId() {
-        return mBaseUser.getGgId().getId();
     }
 
     @Override
     public String getDisplayName() {
-        return mDisplayName;
+        return "";
     }
 
     @Override
     public String getFirstName() {
-        return mDisplayName;
+        return "";
     }
 
     @Override
     public String getAvatarUrl() {
-        return mAvatarUrl;
+        return "";
     }
 
     @Override
     public String getCoverUrl() {
-        return mCoverUrl;
+        return "";
     }
 
     @Override
     public List<Id> getFriends() {
-        return mFriends;
+        return new ArrayList<>();
     }
 
     @Override
     public SocialUser withDisplayName(String displayName) {
-        mDisplayName = displayName;
         return this;
     }
 
     @Override
     public SocialUser withFirstName(String firstName) {
-        mFirstName = firstName;
         return this;
     }
 
     @Override
     public SocialUser withAvatar(String avatarUrl) {
-        mAvatarUrl = avatarUrl;
         return this;
     }
 
     @Override
     public SocialUser withCover(String coverUrl) {
-        mCoverUrl = coverUrl;
         return this;
     }
 
     @Override
     public SocialUser withFriends(List<Id> friends) {
-        mFriends = friends;
-        return this;
+        return null;
     }
 }

@@ -1,9 +1,11 @@
 package com.wally.wally.activities;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +31,12 @@ public class ADFChooser extends AppCompatActivity {
     private static final String TAG = ADFChooser.class.getSimpleName();
     private static final String EXPLORER_PACKAGE_NAME = "com.projecttango.tangoexplorer";
 
+    public static Intent newIntent(Context context) {
+        Intent i = new Intent(context, ADFChooser.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        return i;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +49,7 @@ public class ADFChooser extends AppCompatActivity {
                 requestADFPermission();
             }
         }else{
-            startActivity(MainActivity.newIntent(getBaseContext(), null));
+            startActivity(CameraARStandardActivity.newIntent(getBaseContext()));
         }
     }
 
@@ -153,7 +161,7 @@ public class ADFChooser extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String uuid = mData.get(getAdapterPosition()).first;
-                startActivity(MainActivity.newIntent(getBaseContext(), uuid));
+                startActivity(CameraARTangoActivity.newIntent(getBaseContext(), uuid));
             }
         }
     }

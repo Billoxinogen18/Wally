@@ -261,6 +261,7 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_content);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
                 getGridColumnCount(), StaggeredGridLayoutManager.VERTICAL));
+
         recyclerView.setAdapter(new ContentAdapter());
 
         mContentAdapter = new ContentAdapter();
@@ -271,7 +272,7 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
 
     private void load() {
         App app = App.getInstance();
-        app.getDataController().fetchByAuthor(app.getUser().getBaseUser(), this);
+        app.getDataController().fetchByAuthor(app.getUserManager().getUser().getBaseUser(), this);
 
         mLoadingView.setVisibility(View.VISIBLE);
         mErrorView.setVisibility(View.GONE);

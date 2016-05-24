@@ -4,7 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.wally.wally.datacontroller.DataController;
-import com.wally.wally.userManager.SocialUser;
+import com.wally.wally.userManager.UserManager;
 import com.wally.wally.userManager.SocialUserFactory;
 
 /**
@@ -16,8 +16,7 @@ public class App extends Application {
     private static App sInstance = null;
 
     private DataController dataController;
-    private SocialUserFactory socialUserFactory;
-    private SocialUser mUser;
+    private UserManager userManager;
 
     public static App getInstance() {
         return sInstance;
@@ -30,8 +29,11 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        dataController = DataController.create(this);
-        socialUserFactory = new SocialUserFactory();
+        // TODO: DataController.create()
+        // Is implemented with singleton
+        // Why save the instance here as well?
+        dataController = DataController.create();
+        userManager = new UserManager(new SocialUserFactory(), dataController);
         sInstance = this;
     }
 
@@ -44,15 +46,7 @@ public class App extends Application {
         return dataController;
     }
 
-    public SocialUserFactory getSocialUserFactory() {
-        return socialUserFactory;
-    }
-
-    public SocialUser getUser() {
-        return mUser;
-    }
-
-    public void setUser(SocialUser user) {
-        mUser = user;
+    public UserManager getUserManager() {
+        return userManager;
     }
 }

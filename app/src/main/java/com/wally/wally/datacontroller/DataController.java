@@ -1,36 +1,37 @@
 package com.wally.wally.datacontroller;
 
-import android.content.Context;
-
-import com.firebase.client.AuthData;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.wally.wally.datacontroller.queries.*;
 import com.wally.wally.datacontroller.callbacks.*;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 public class DataController {
-    private static final String FIREBASE_URL = "https://burning-inferno-2566.firebaseio.com/";
-    private static final String DB_PATH = "Develop";
-    private static DataController instance;
-    private Firebase firebaseRoot;
-    private Firebase users;
-    private Firebase contents;
+    public static final String TAG = DataController.class.getSimpleName();
 
-    private DataController(Firebase firebase) {
-        firebaseRoot = firebase;
-        users = firebaseRoot.child("Users");
-        contents = firebaseRoot.child("Contents");
+    private static final String USERS_NODE = "Users";
+    private static final String CONTENTS_NODE = "Contents";
+    private static final String ROOT_NODE = "Firebase-Update";
+
+    private static DataController instance;
+
+    private DatabaseReference users, contents;
+
+    private DataController(DatabaseReference firebase) {
+        users = firebase.child(USERS_NODE);
+        contents = firebase.child(CONTENTS_NODE);
     }
 
-    public static DataController create(Context context) {
+    public static DataController create() {
         if (instance == null) {
-            Firebase.setAndroidContext(context);
-            Firebase firebase = new Firebase(FIREBASE_URL).child(DB_PATH);
-            instance = new DataController(firebase);
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+            instance = new DataController(ref.child(ROOT_NODE));
         }
         return instance;
     }
@@ -51,44 +52,28 @@ public class DataController {
         new UUIDQuery(uuid).fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
-    public void fetchByAuthor(String authorId, FetchResultCallback callback) {
+    public void fetchByAuthor(Id authorId, FetchResultCallback callback) {
         new AuthorQuery(authorId).fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
+    // Hope front end will soon user this method :(
+    @SuppressWarnings("unused")
     public void fetchByAuthor(User author, FetchResultCallback resultCallback) {
         fetchByAuthor(author.getId(), resultCallback);
     }
 
-    public void googleAuth(String accessToken, final Callback<User> callback) {
-        firebaseAuth("google", accessToken, new Callback<AuthData>() {
-            @Override
-            public void onResult(AuthData authData) {
-                String id = authData.getUid();
-                String ggId = (String) authData.getProviderData().get("id");
-                User user = new User(id).withGgId(ggId);
-                users.child(id).child("ggId").setValue(ggId);
-                callback.onResult(user);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
-            }
-        });
+    public void fetchPublicContent(FetchResultCallback callback) {
+        new PublicityQuery(FirebaseContent.PUBLIC)
+                .fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
-    private void firebaseAuth(String provider, String token, final Callback<AuthData> callback) {
-        firebaseRoot.authWithOAuthToken(provider, token, new Firebase.AuthResultHandler() {
-            @Override
-            public void onAuthenticated(AuthData authData) {
-                callback.onResult(authData);
-            }
-
-            @Override
-            public void onAuthenticationError(FirebaseError firebaseError) {
-                callback.onError(firebaseError.toException());
-            }
-        });
+    public User getCurrentUser(){
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return null;
+        String id = user.getUid();
+        // .get(0) assumes only one provider (Google)
+        String ggId = user.getProviderData().get(1).getUid();
+        users.child(id).child("ggId").setValue(ggId);
+        return new User(new Id(Id.PROVIDER_FIREBASE, id)).withGgId(new Id(Id.PROVIDER_GOOGLE, ggId));
     }
-
 }

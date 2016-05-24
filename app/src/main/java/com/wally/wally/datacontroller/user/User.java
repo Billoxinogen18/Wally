@@ -3,34 +3,36 @@ package com.wally.wally.datacontroller.user;
 import java.io.Serializable;
 
 public class User implements Serializable {
-    private String id;
-    private String ggId;
-    private String fbId;
+    private Id id;
+    private Id ggId;
+    private Id fbId;
 
     public User() {}
 
-    public User(String id) {
+    public User(Id id) {
         this.id = id;
     }
 
-    public String getId() {
+    public Id getId() {
         return id;
     }
 
-    public String getGgId() {
+    public Id getGgId() {
         return ggId;
     }
 
-    public String getFbId() {
+    public Id getFbId() {
         return fbId;
     }
 
-    public User withGgId(String ggId) {
+    public User withGgId(Id ggId) {
         this.ggId = ggId;
         return this;
     }
 
-    public User withFbId(String fbId) {
+    // will or will not be used in future
+    @SuppressWarnings("unused")
+    public User withFbId(Id fbId) {
         this.fbId = fbId;
         return this;
     }
