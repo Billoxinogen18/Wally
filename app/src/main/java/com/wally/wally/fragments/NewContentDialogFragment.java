@@ -272,6 +272,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             mImageView.setImageDrawable(null);
             mImageContainer.setVisibility(View.GONE);
         } else {
+            Log.d(TAG, "updateViews: " + mContent.getImageUri());
             Glide.with(getActivity())
                     .load(mContent.getImageUri())
                     .fitCenter()

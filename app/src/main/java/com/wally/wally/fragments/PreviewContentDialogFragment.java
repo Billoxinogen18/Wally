@@ -40,7 +40,6 @@ public class PreviewContentDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Content content = (Content) getArguments().getSerializable("content");
-        Log.d(TAG, "onCreateDialog() called with: " + "content = [" + content + "]");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.preview_content_dialog, null, false);
 
@@ -57,11 +56,11 @@ public class PreviewContentDialogFragment extends DialogFragment {
             mNoteEt.setVisibility(View.VISIBLE);
         }
         if (!TextUtils.isEmpty(content.getImageUri())) {
+            mImageView.setVisibility(View.VISIBLE);
             Glide.with(getActivity())
                     .load(content.getImageUri())
                     .fitCenter()
                     .into(mImageView);
-            mImageView.setVisibility(View.VISIBLE);
         }
 
         builder.setView(dialogView);

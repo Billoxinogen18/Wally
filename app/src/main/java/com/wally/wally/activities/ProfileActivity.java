@@ -2,7 +2,6 @@ package com.wally.wally.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -12,7 +11,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.PopupMenu;
@@ -56,8 +54,8 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
     private ImageView mAvatarImage;
     private ImageView mCoverImage;
     private CollapsingToolbarLayout mCollapseToolbar;
+    private AppBarLayout mAppBarLayout;
     private Toolbar mToolbar;
-    private boolean mIsAvatarShown = true;
 
     private int mMaxScrollSize;
     private ContentAdapter mContentAdapter;
@@ -68,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
     private View mLoadingView;
 
     private SocialUser mUser;
-    private int mSortType;
+    private boolean mIsAvatarShown = true;
     private int mDrawableTintColor = -1;
 
     public static Intent newIntent(Context context, @Nullable SocialUser user) {
@@ -81,12 +79,6 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-
-        if (savedInstanceState != null) {
-            mSortType = savedInstanceState.getInt("mSortType");
-        } else {
-            mSortType = 0;
-        }
 
         extractUserFromBundle(getIntent().getExtras());
         initViews();
@@ -170,7 +162,6 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("mSortType", mSortType);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -184,9 +175,9 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
         mLoadingView = findViewById(R.id.loading_view);
 
         mCollapseToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar_layout);
-        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
-        appBarLayout.addOnOffsetChangedListener(this);
-        mMaxScrollSize = appBarLayout.getTotalScrollRange();
+        mAppBarLayout = (AppBarLayout) findViewById(R.id.appbar);
+        mAppBarLayout.addOnOffsetChangedListener(this);
+        mMaxScrollSize = mAppBarLayout.getTotalScrollRange();
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -228,17 +219,8 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
             case android.R.id.home:
                 onBackPressed();
                 return true;
-            case R.id.action_sort:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle(R.string.sort_dialog_title);
-                builder.setSingleChoiceItems(R.array.sort_options, mSortType, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        mSortType = item;
-                        dialog.dismiss();
-                        mContentAdapter.sort();
-                    }
-                });
-                builder.show();
+            case R.id.action_filter:
+                mAppBarLayout.setExpanded(false, true);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -316,7 +298,7 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
         data.addAll(result);
         // TODO delete dumb data
         data.add(new Content().withId("0").withNote("Hi there my name is...").withTitle("Sample note"));
-        data.add(new Content().withId("5").withNote(getString(R.string.large_text)).withTitle("თქვენ შიგ ხო არ გაქვთ რა ლიმიტი").withImageUri("http://i.imgur.com/RRUe0Mo.png"));
+        data.add(new Content().withId("5").withNote("Some text").withTitle("თქვენ შიგ ხო არ გაქვთ რა ლიმიტი").withImageUri("http://i.imgur.com/RRUe0Mo.png"));
         data.add(new Content().withId("6").withNote(getString(R.string.large_text)).withTitle("Sample note Title here"));
         data.add(new Content().withId("7").withNote("Hi there my name is John").withTitle("Sample note"));
         data.add(new Content().withId("8").withNote("Hi there my name is... I'm programmer here :S"));
@@ -431,16 +413,6 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
             int pos = getItemPosition(content);
             mData.set(pos, content);
             notifyItemChanged(pos);
-        }
-
-        public void sort() {
-            if (mSortType == 0) {
-                // sort by date
-                // TODO sort
-            } else {
-                // sort by location
-                // TODO Meravici
-            }
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {

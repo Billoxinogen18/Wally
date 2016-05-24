@@ -50,7 +50,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:scaleType="centerCrop"
             android:src="@drawable/ic_btn_map_75dp"
             android:visibility="gone"
             tools:visibility="visible" />
