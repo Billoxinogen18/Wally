@@ -7,11 +7,14 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
+import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
+import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
@@ -19,6 +22,8 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoManager;
+import com.wally.wally.tango.VisualContentManager;
+import com.wally.wally.tango.WallyRenderer;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
@@ -75,10 +80,24 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
 
+        Context context = getBaseContext();
+
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         mAdfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
 
-        mTangoManager = new TangoManager(getBaseContext(), mSurfaceView, mTangoUxLayout, mAdfUuid);
+        VisualContentManager visualContentManager = new VisualContentManager();
+
+        WallyRenderer renderer = new WallyRenderer(context, visualContentManager);
+
+        mSurfaceView.setSurfaceRenderer(renderer);
+        TangoUx tangoUx = new TangoUx(context);
+
+        TangoPointCloudManager pointCloudManager = new TangoPointCloudManager();
+
+        tangoUx.setLayout(mTangoUxLayout);
+
+        mTangoManager = new TangoManager(getBaseContext(), mSurfaceView, mTangoUxLayout,
+                pointCloudManager, visualContentManager, renderer, tangoUx, mAdfUuid);
         mTangoManager.setOnContentSelectedListener(this);
         mTangoManager.setOnContentFitListener(this);
         mTangoManager.restoreState(savedInstanceState);

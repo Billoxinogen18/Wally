@@ -73,23 +73,34 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     private OnContentSelectedListener onContentSelectedListener;
     private ContentFitter.OnContentFitListener onContentFitListener;
 
-    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout, String adfUuid) {
+
+    //For testing
+    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout,
+                        TangoPointCloudManager pointCloudManager, VisualContentManager visualContentManager,
+                        WallyRenderer wallyRenderer, TangoUx tangoUx, Tango tango, String adfUuid) {
         mContext = context;
         mSurfaceView = rajawaliSurfaceView;
         mAdfUuid = adfUuid;
+        mVisualContentManager = visualContentManager;
+        mRenderer = wallyRenderer;
+        mTangoUx = tangoUx;
+        mPointCloudManager = pointCloudManager;
+        mTango = tango;
+        mScaleDetector = new ScaleGestureDetector(context, this); //TODO refactor this!
+    }
 
-        mVisualContentManager = new VisualContentManager();
-
-        mRenderer = new WallyRenderer(context, mVisualContentManager);
-        mRenderer.setOnContentSelectListener(this);
-
-        mSurfaceView.setSurfaceRenderer(mRenderer);
-        mTangoUx = new TangoUx(context);
-
-        mPointCloudManager = new TangoPointCloudManager();
-        mScaleDetector = new ScaleGestureDetector(context, this);
-
-        mTangoUx.setLayout(tangoUxLayout);
+    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout,
+                        TangoPointCloudManager pointCloudManager, VisualContentManager visualContentManager,
+                        WallyRenderer wallyRenderer, TangoUx tangoUx, String adfUuid) {
+        mContext = context;
+        mSurfaceView = rajawaliSurfaceView;
+        mAdfUuid = adfUuid;
+        mVisualContentManager = visualContentManager;
+        mRenderer = wallyRenderer;
+        // mRenderer.setOnContentSelectListener(this);
+        mTangoUx = tangoUx;
+        mPointCloudManager = pointCloudManager;
+        mScaleDetector = new ScaleGestureDetector(context, this); //TODO refactor this!
 
         fetchContentForAdf(adfUuid);
     }
