@@ -152,4 +152,7 @@
     </string-array>
 
     <string name="sign_out">Sign out</string>
+    <string name="loading_your_contents">Loading your Contents</string>
+    <string name="try_again">Try again</string>
+    <string name="loading_failed">Loading failed</string>
 </resources>

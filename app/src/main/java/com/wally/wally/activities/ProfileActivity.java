@@ -62,6 +62,11 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
     private int mMaxScrollSize;
     private ContentAdapter mContentAdapter;
 
+    private RecyclerView mRecycler;
+    private View mEmptyView;
+    private View mErrorView;
+    private View mLoadingView;
+
     private SocialUser mUser;
     private int mSortType;
     private int mDrawableTintColor = -1;
@@ -103,7 +108,7 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
             Glide.with(getBaseContext())
                     .load(mUser.getCoverUrl())
                     .asBitmap()
-                    //.override(1500, 1500)
+                    // Colorize according to cover image
                     .listener(new RequestListener<String, Bitmap>() {
                         @Override
                         public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
@@ -112,8 +117,6 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
 
                         @Override
                         public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                            Log.wtf(TAG, "onResourceReady: " + resource.getWidth() + "X" + resource.getHeight());
-
                             int left = resource.getWidth() / 2 - 100;
                             int right = resource.getWidth() / 2 + 100;
                             if (left < 0) {
@@ -174,6 +177,11 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
     private void initViews() {
         mAvatarImage = (ImageView) findViewById(R.id.imageview_avatar);
         mCoverImage = (ImageView) findViewById(R.id.imageview_cover);
+
+        mRecycler = (RecyclerView) findViewById(R.id.recyclerview_content);
+        mEmptyView = findViewById(R.id.empty_view);
+        mErrorView = findViewById(R.id.error_view);
+        mLoadingView = findViewById(R.id.loading_view);
 
         mCollapseToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapse_toolbar_layout);
         AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.appbar);
@@ -268,9 +276,6 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
 
     @SuppressWarnings("ConstantConditions")
     private void initGridView() {
-        App app = App.getInstance();
-        app.getDataController().fetchByAuthor(app.getUser().getBaseUser(), this);
-
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_content);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
                 getGridColumnCount(), StaggeredGridLayoutManager.VERTICAL));
@@ -278,7 +283,18 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
 
         mContentAdapter = new ContentAdapter();
         recyclerView.setAdapter(mContentAdapter);
-        // TODO add loading, tryAgain, empty screen
+
+        load();
+    }
+
+    private void load() {
+        App app = App.getInstance();
+        app.getDataController().fetchByAuthor(app.getUser().getBaseUser(), this);
+
+        mLoadingView.setVisibility(View.VISIBLE);
+        mErrorView.setVisibility(View.GONE);
+        mRecycler.setVisibility(View.GONE);
+        mEmptyView.setVisibility(View.GONE);
     }
 
     /**
@@ -308,17 +324,36 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
         data.add(new Content().withId("10").withTitle("Sample note").withImageUri("http://www.keenthemes.com/preview/metronic/theme/assets/global/plugins/jcrop/demos/demo_files/image1.jpg"));
 
         mContentAdapter.setData(data);
+
+        mLoadingView.setVisibility(View.GONE);
+        mErrorView.setVisibility(View.GONE);
+
+        if (mContentAdapter.getItemCount() == 0) {
+            mRecycler.setVisibility(View.GONE);
+            mEmptyView.setVisibility(View.VISIBLE);
+        } else {
+            mRecycler.setVisibility(View.VISIBLE);
+            mEmptyView.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onError(Exception e) {
-        // TODO get exception and show no internet UI or something.
         Log.e(TAG, "onError: " + e);
+
+        mLoadingView.setVisibility(View.GONE);
+        mErrorView.setVisibility(View.VISIBLE);
+        mRecycler.setVisibility(View.GONE);
+        mEmptyView.setVisibility(View.GONE);
+    }
+
+    public void onTryLoadAgainClicked(View view) {
+        load();
     }
 
     private void onDeleteContent(Content content) {
         mContentAdapter.removeItem(content);
-        // TODO call db
+        App.getInstance().getDataController().delete(content);
     }
 
     private void onEditContent(Content content) {
@@ -329,7 +364,7 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
     public void onContentCreated(Content content, boolean isEditMode) {
         Log.d(TAG, "onContentCreated() called with: " + "content = [" + content + "], isEditMode = [" + isEditMode + "]");
         mContentAdapter.updateItem(content);
-        // TODO call db
+        App.getInstance().getDataController().save(content);
     }
 
     @SuppressWarnings("UnusedParameters")
