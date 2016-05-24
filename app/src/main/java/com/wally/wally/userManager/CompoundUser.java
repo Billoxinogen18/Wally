@@ -2,6 +2,7 @@ package com.wally.wally.userManager;
 
 import android.os.AsyncTask;
 
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.ArrayList;
@@ -62,8 +63,8 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public List<String> getFriends() {
-        final List<String> result = new ArrayList<>();
+    public List<Id> getFriends() {
+        final List<Id> result = new ArrayList<>();
         for (SocialUser user : socialUsers) {
             result.addAll(user.getFriends());
         }
@@ -122,7 +123,7 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public SocialUser withFriends(List<String> friends) {
+    public SocialUser withFriends(List<Id> friends) {
         throw new UnsupportedOperationException();
     }
 }

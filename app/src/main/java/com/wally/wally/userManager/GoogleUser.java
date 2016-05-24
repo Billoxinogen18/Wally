@@ -1,6 +1,7 @@
 package com.wally.wally.userManager;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class GoogleUser extends AbstractSocialUser {
     private String mAvatarUrl;
     private String mCoverUrl;
     private String mFirstName;
-    private List<String> mFriends;
+    private List<Id> mFriends;
 
     protected GoogleUser(User baseUser) {
         super(baseUser);
@@ -46,7 +47,7 @@ public class GoogleUser extends AbstractSocialUser {
     }
 
     @Override
-    public List<String> getFriends() {
+    public List<Id> getFriends() {
         return mFriends;
     }
 
@@ -75,7 +76,7 @@ public class GoogleUser extends AbstractSocialUser {
     }
 
     @Override
-    public SocialUser withFriends(List<String> friends) {
+    public SocialUser withFriends(List<Id> friends) {
         mFriends = friends;
         return this;
     }

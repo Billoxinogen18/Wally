@@ -1,5 +1,6 @@
 package com.wally.wally.userManager;
 
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class DummyUser extends AbstractSocialUser{
     }
 
     @Override
-    public List<String> getFriends() {
+    public List<Id> getFriends() {
         return new ArrayList<>();
     }
 
@@ -59,7 +60,7 @@ public class DummyUser extends AbstractSocialUser{
     }
 
     @Override
-    public SocialUser withFriends(List<String> friends) {
+    public SocialUser withFriends(List<Id> friends) {
         return null;
     }
 }

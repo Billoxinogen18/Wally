@@ -17,7 +17,9 @@ import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,7 +54,7 @@ public class SocialUserFactory {
         }
     }
 
-    private void getGoogleUser(final User baseUser, GoogleApiClient googleApiClient, final UserManager.UserLoadListener userLoadListener) {
+    private void getGoogleUser(final User baseUser, final GoogleApiClient googleApiClient, final UserManager.UserLoadListener userLoadListener) {
         Plus.PeopleApi.load(googleApiClient, baseUser.getGgId().getId()).setResultCallback(
                 new ResultCallback<People.LoadPeopleResult>() {
                     @Override
@@ -60,13 +62,26 @@ public class SocialUserFactory {
                         if (peopleData.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
                             PersonBuffer personBuffer = peopleData.getPersonBuffer();
                             try {
-                                Person person = personBuffer.get(0);
-                                SocialUser googleUser = new GoogleUser(baseUser)
+                                final Person person = personBuffer.get(0);
+                                final SocialUser googleUser = new GoogleUser(baseUser)
                                         .withDisplayName(person.getDisplayName())
                                         .withFirstName(person.getName().getGivenName())
                                         .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
 
-                                userLoadListener.onUserLoad(googleUser);
+//                                Plus.PeopleApi.loadVisible(googleApiClient, null).setResultCallback(
+//                                        new ResultCallback<People.LoadPeopleResult>() {
+//                                            @Override
+//                                            public void onResult(@NonNull People.LoadPeopleResult peopleData) {
+//                                                PersonBuffer personBuffer = peopleData.getPersonBuffer();
+//                                                List<Id> friends = new ArrayList<>();
+//                                                for(Person person : personBuffer){
+//                                                    friends.add(new Id(Id.PROVIDER_GOOGLE, person.getId()));
+//                                                }
+//                                                googleUser.withFriends(friends);
+                                                userLoadListener.onUserLoad(googleUser);
+//                                            }
+//                                        });
+
                             } finally {
                                 personBuffer.release();
                             }

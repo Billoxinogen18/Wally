@@ -1,5 +1,6 @@
 package com.wally.wally.userManager;
 
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 import java.net.URL;
@@ -35,7 +36,7 @@ public class FacebookUser extends AbstractSocialUser {
     }
 
     @Override
-    public List<String> getFriends() {
+    public List<Id> getFriends() {
         throw new UnsupportedOperationException();
     }
 
@@ -60,7 +61,7 @@ public class FacebookUser extends AbstractSocialUser {
     }
 
     @Override
-    public SocialUser withFriends(List<String> friends) {
+    public SocialUser withFriends(List<Id> friends) {
         throw new UnsupportedOperationException();
     }
 }
