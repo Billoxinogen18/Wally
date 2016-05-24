@@ -1,6 +1,5 @@
 package com.wally.wally.userManager;
 
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
@@ -10,8 +9,6 @@ import java.util.List;
  * Created by Meravici on 5/12/2016.
  */
 public class GoogleUser extends AbstractSocialUser {
-    private GoogleApiClient mGoogleApiClient;
-
     private String mDisplayName;
     private String mAvatarUrl;
     private String mCoverUrl;
@@ -22,7 +19,7 @@ public class GoogleUser extends AbstractSocialUser {
         super(baseUser);
     }
 
-    public String getGoogleId(){
+    public String getGoogleId() {
         return mBaseUser.getGgId().getId();
     }
 

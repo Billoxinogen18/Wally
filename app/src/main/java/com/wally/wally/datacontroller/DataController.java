@@ -72,7 +72,7 @@ public class DataController {
         if (user == null) return null;
         String id = user.getUid();
         // .get(0) assumes only one provider (Google)
-        String ggId = user.getProviderData().get(0).getUid();
+        String ggId = user.getProviderData().get(1).getUid();
         users.child(id).child("ggId").setValue(ggId);
         return new User(new Id(Id.PROVIDER_FIREBASE, id)).withGgId(new Id(Id.PROVIDER_GOOGLE, ggId));
     }
