@@ -81,6 +81,7 @@ public class ChoosePhotoActivity extends AppCompatActivity {
         return new Intent(context, ChoosePhotoActivity.class);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

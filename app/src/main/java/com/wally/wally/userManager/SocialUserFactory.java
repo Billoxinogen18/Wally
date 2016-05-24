@@ -1,16 +1,13 @@
 package com.wally.wally.userManager;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.playlog.internal.LogEvent;
 import com.google.android.gms.plus.People;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
@@ -23,9 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Meravici on 5/12/2016.
- */
 public class SocialUserFactory {
     public static final String TAG = SocialUserFactory.class.getSimpleName();
     private static final int DEFAULT_AVATAR_SIZE = 256;

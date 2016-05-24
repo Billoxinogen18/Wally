@@ -113,6 +113,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         if (isEditMode) {
             Button b = (Button) dv.findViewById(R.id.btn_create_post);
             b.setText(R.string.post_update);
+            b = (Button) dv.findViewById(R.id.btn_discard_post);
+            b.setText(R.string.post_cancel_edit);
         }
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -182,7 +184,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_discard_post:
-                if (!postIsEmpty()) {
+                if (!postIsEmpty() && !isEditMode) {
                     DiscardDoubleCheckDialogFragment dialog = new DiscardDoubleCheckDialogFragment();
                     dialog.show(getChildFragmentManager(), DiscardDoubleCheckDialogFragment.TAG);
                 } else {
@@ -276,6 +278,9 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                     .fitCenter()
                     .into(mImageView);
             mImageContainer.setVisibility(View.VISIBLE);
+        }
+        if (mContent.getVisibility() != null && mContent.getVisibility().getSocialVisibility() != null) {
+            mVisibilitySpinner.setSelection(mContent.getVisibility().getSocialVisibility().getMode());
         }
     }
 

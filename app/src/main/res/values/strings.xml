@@ -138,4 +138,21 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="post_cancel_edit">Cancel</string>
+
+    <string name="sort_by_location">By Location</string>
+    <string name="sort_by_date">By Date</string>
+    <string name="sort_dialog_title">Sort Content</string>
+    <string name="sort">Sort</string>
+    <string-array name="sort_options">
+        <item>@string/sort_by_date</item>
+        <item>@string/sort_by_location</item>
+    </string-array>
+
+    <string name="sign_out">Sign out</string>
+    <string name="loading_your_contents">Loading your Contents</string>
+    <string name="try_again">Try again</string>
+    <string name="loading_failed">Loading failed</string>
 </resources>

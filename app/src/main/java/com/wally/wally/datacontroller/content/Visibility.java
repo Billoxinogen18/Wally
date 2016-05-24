@@ -84,7 +84,12 @@ public class Visibility implements Serializable {
             setMode(mode);
         }
 
-        public static String toString(@SocialVisibilityMode int range) {
+
+        public static int getSize() {
+            return 4;
+        }
+
+        public static String getStringRepresentation(@SocialVisibilityMode int range) {
             return App.getContext().getResources().getStringArray(R.array.social_visibility)[range];
         }
 
@@ -105,10 +110,6 @@ public class Visibility implements Serializable {
             }
         }
 
-        public static int getSize() {
-            return 4;
-        }
-
         public
         @SocialVisibilityMode
         int getMode() {
@@ -119,11 +120,17 @@ public class Visibility implements Serializable {
             this.mode = mode;
         }
 
+        @Override
+        public String toString() {
+            return "SocialVisibility{" +
+                    "mode=" + getStringRepresentation(mode) +
+                    '}';
+        }
+
         @IntDef({PRIVATE, PUBLIC, FRIENDS, ANONYMOUS})
         @Retention(RetentionPolicy.SOURCE)
         public @interface SocialVisibilityMode {
         }
-
     }
 
     public static class RangeVisibility implements Serializable {
@@ -144,7 +151,7 @@ public class Visibility implements Serializable {
                     App.getContext().getResources().getStringArray(R.array.visibility_ranges));
         }
 
-        public String toString(@RangeVisibilityMode int range) {
+        public static String getStringRepresentation(@RangeVisibilityMode int range) {
             return App.getContext().getResources().getStringArray(R.array.visibility_ranges)[range];
         }
 
@@ -156,6 +163,13 @@ public class Visibility implements Serializable {
 
         public void setRange(@RangeVisibilityMode int range) {
             this.range = range;
+        }
+
+        @Override
+        public String toString() {
+            return "RangeVisibility{" +
+                    "range=" + RangeVisibility.getStringRepresentation(range) +
+                    '}';
         }
 
         @IntDef({HERE, NEAR, LOCAL, DISTANT, FAR})

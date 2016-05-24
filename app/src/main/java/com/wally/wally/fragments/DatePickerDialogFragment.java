@@ -2,6 +2,7 @@ package com.wally.wally.fragments;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -21,6 +22,7 @@ public class DatePickerDialogFragment extends DialogFragment
         implements DatePickerDialog.OnDateSetListener {
 
     public static final String TAG = DatePickerDialogFragment.class.getSimpleName();
+
     public static DatePickerDialogFragment newInstance() {
         return new DatePickerDialogFragment();
     }
@@ -38,17 +40,21 @@ public class DatePickerDialogFragment extends DialogFragment
         DatePickerDialog dialog = new DatePickerDialog(getActivity(), this, year, month, day);
 
         DatePicker dp = dialog.getDatePicker();
-        CalendarView cv = dp.getCalendarView();
-        // FIX buggy datepicker behaviour
-        // Link to solution http://stackoverflow.com/a/19125686/4183017
-        long cur = cv.getDate();
-        int d = cv.getFirstDayOfWeek();
-        dp.setMinDate(System.currentTimeMillis() - 1000);
-        cv.setDate(cur + 1000L * 60 * 60 * 24 * 40);
-        cv.setFirstDayOfWeek((d + 1) % 7);
-        cv.setDate(cur);
-        cv.setFirstDayOfWeek(d);
-
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+            dp.setMinDate(System.currentTimeMillis() - 1000);
+        } else {
+            // TODO remove this when we upgrade project to target marshmallow
+            CalendarView cv = dp.getCalendarView();
+            // FIX buggy datepicker behaviour
+            // Link to solution http://stackoverflow.com/a/19125686/4183017
+            long cur = cv.getDate();
+            int d = cv.getFirstDayOfWeek();
+            dp.setMinDate(System.currentTimeMillis() - 1000);
+            cv.setDate(cur + 1000L * 60 * 60 * 24 * 40);
+            cv.setFirstDayOfWeek((d + 1) % 7);
+            cv.setDate(cur);
+            cv.setFirstDayOfWeek(d);
+        }
         return dialog;
     }
 

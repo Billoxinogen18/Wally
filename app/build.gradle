@@ -74,6 +74,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:design:23.4.0'
     compile 'com.android.support:cardview-v7:23.4.0'
+    compile 'com.android.support:palette-v7:23.4.0'
     // Android libs
     compile 'com.google.android.gms:play-services-plus:9.0.0'
     compile 'com.google.android.gms:play-services-location:9.0.0'
@@ -84,11 +85,6 @@ dependencies {
     // Firebase
 //    compile 'com.google.firebase:firebase-core:9.0.0'
 //    compile 'com.google.firebase:firebase-storage:9.0.0'
-    // TODO
-    // If i comment out following line this error will go away
-    //      05-19 18:43:34.410 15768-15792/com.wally.wally E/DynamiteModule: Failed to load module descriptor class:
-    //      Didn't find class "com.google.android.gms.dynamite.descriptors.com.google.firebase.auth.ModuleDescriptor" on path:...
-    // But than I won't be able to use firebase auth
     compile 'com.google.firebase:firebase-auth:9.0.0'
     compile 'com.google.firebase:firebase-database:9.0.0'
     compile 'com.firebaseui:firebase-ui-auth:0.4.0'

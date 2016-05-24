@@ -67,7 +67,7 @@ public class AvatarImageBehavior extends CoordinatorLayout.Behavior<ImageView> {
     }
 
     private void bindDimensions() {
-        mAvatarMaxSize = mContext.getResources().getDimension(R.dimen.image_width);
+        mAvatarMaxSize = mContext.getResources().getDimension(R.dimen.app_bar_height);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class AvatarImageBehavior extends CoordinatorLayout.Behavior<ImageView> {
 
         final int maxScrollDistance = (int) (mStartToolbarPosition);
         float expandedPercentageFactor = dependency.getY() / maxScrollDistance;
-        float heightFactor = 1-mInterpolator.getInterpolation(expandedPercentageFactor);;
+        float heightFactor = 1 - mInterpolator.getInterpolation(expandedPercentageFactor);
 
         float distanceXToSubtract = ((mStartXPosition - mFinalXPosition)
                 * heightFactor) + (child.getHeight()/2);
