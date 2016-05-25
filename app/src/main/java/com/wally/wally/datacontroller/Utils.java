@@ -1,16 +1,20 @@
 package com.wally.wally.datacontroller;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.datacontroller.content.Visibility;
-import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.UnknownFormatConversionException;
 
 public class Utils {
     private static SecureRandom random = new SecureRandom();
@@ -19,30 +23,49 @@ public class Utils {
     @SuppressWarnings("unused")
     public static Content  generateRandomContent() {
         return new Content()
-                .withTitle(randomStr(20))
+                .withUuid(randomStr(10))
                 .withNote(randomStr(20))
+                .withTitle(randomStr(20))
                 .withImageUri("http://" + randomStr(20))
-                .withUuid("uuid: "+ randomStr(10))
-                .withAuthor(new User(new Id(Id.PROVIDER_FIREBASE, "t3YIz86JPzb6KRvnLJnmuGpxGSr1"))
-                        .withGgId(new Id(Id.PROVIDER_GOOGLE, "t3YIz86JPzb6KRvnLJnmuGpxGSr1")))
-                .withLocation(new LatLng(random.nextInt(), random.nextInt()))
-                .withVisibility(new Visibility()
-                        .withVisiblePreview(random.nextBoolean())
-                        .withTimeVisibility(null)
-                        .withRangeVisibility(new Visibility.RangeVisibility(Visibility.RangeVisibility.FAR))
-                        .withSocialVisibility(new Visibility.SocialVisibility(
-                                Visibility.SocialVisibility.FRIENDS))
-                ).withTangoData(new TangoData()
-                        .withScale(random.nextInt())
-                        .withRotation(new double[] {
-                                random.nextDouble(),
-                                random.nextDouble(),
-                                random.nextDouble()})
-                        .withTranslation(new double[] {
-                                random.nextDouble(),
-                                random.nextDouble(),
-                                random.nextDouble()})
-                );
+                .withAuthor(
+                        new User("uSlLJUtZqbRDTMeLU4MdcToS8ZZ2")
+                                .withGgId("112058086965911533829")
+                ).withLocation(
+                        new LatLng(
+                                random.nextInt(),
+                                random.nextInt()
+                        )
+                ).withVisibility(
+                        new Visibility()
+                                .withTimeVisibility(null)
+                                .withRangeVisibility(randomRange())
+                                .withSocialVisibility(randomPublicity())
+                                .withVisiblePreview(random.nextBoolean())
+                ).withTangoData(
+                        new TangoData()
+                                .withScale(random.nextInt())
+                                .withRotation(randomDoubleArray())
+                                .withTranslation(randomDoubleArray()));
+    }
+
+    private static Visibility.RangeVisibility randomRange() {
+        //noinspection WrongConstant
+        return new Visibility.RangeVisibility(
+                Math.abs(random.nextInt()) % 5);
+    }
+
+    private static Visibility.SocialVisibility randomPublicity() {
+        //noinspection WrongConstant
+        return new Visibility.SocialVisibility(
+                Math.abs(random.nextInt()) % Visibility.SocialVisibility.getSize());
+    }
+
+    private static double[] randomDoubleArray() {
+        return new double[] {
+                random.nextDouble(),
+                random.nextDouble(),
+                random.nextDouble()
+        };
     }
 
     // Warning: Does not work as u expect
@@ -62,6 +85,42 @@ public class Utils {
             array[i] = list.get(i);
         }
         return array;
+    }
+
+    public static FetchResultCallback debugCallback(final String tag) {
+        return new FetchResultCallback() {
+            @Override
+            public void onResult(Collection<Content> result) {
+                Log.d(tag, "" + result.size());
+                for (Content c : result) {
+                    String publicity = c.getVisibility().getSocialVisibility().toString().substring(22);
+                    Log.d(tag, "{" + c.getTitle().substring(0, 2) + " - " + publicity);
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.d(tag, "Shit gone wrong!");
+            }
+        };
+    }
+
+    public static FetchResultCallback debugCallback() {
+        return debugCallback(DataController.TAG);
+    }
+
+    public static double toDouble(Object obj) {
+
+        if (obj instanceof Double)
+            return (double) obj;
+
+        if (obj instanceof Long)
+            return (double) (long) obj;
+
+        if (obj instanceof Integer)
+            return (double) (int) obj;
+
+        throw new UnknownFormatConversionException("Cannot convert to double");
     }
 
 }
