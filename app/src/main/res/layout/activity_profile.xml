@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     tools:context=".activities.ProfileActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -134,4 +133,70 @@
             android:text="No contents"
             android:textColor="@color/colorPrimary" />
     </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/empty_filter_view"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:visibility="gone"
+        app:layout_anchor="@+id/recyclerview_content"
+        app:layout_anchorGravity="center">
+
+        <TextView
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="No contents found"
+            android:textColor="@color/colorPrimary" />
+    </RelativeLayout>
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/search_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="2dp"
+        android:visibility="gone"
+        app:cardElevation="8dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="2dp">
+
+            <ImageButton
+                android:id="@+id/exit_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:onClick="onHideFilter"
+                android:padding="10dp"
+                android:src="@drawable/ic_arrow_back_black_24dp" />
+
+            <EditText
+                android:id="@+id/search_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/clear_search"
+                android:layout_toRightOf="@+id/exit_search"
+                android:background="@null"
+                android:hint="@string/content_filter_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1" />
+
+            <ImageButton
+                android:id="@+id/clear_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:onClick="onClearFilter"
+                android:padding="10dp"
+                android:src="@drawable/ic_clear_black_24dp" />
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
 </android.support.design.widget.CoordinatorLayout>

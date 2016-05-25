@@ -156,4 +156,5 @@
     <string name="try_again">Try again</string>
     <string name="loading_failed">Loading failed</string>
     <string name="filter">Filter</string>
+    <string name="content_filter_hint">Search Notes</string>
 </resources>
