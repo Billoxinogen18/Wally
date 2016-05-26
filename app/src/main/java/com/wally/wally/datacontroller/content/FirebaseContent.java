@@ -102,6 +102,10 @@ public class FirebaseContent extends HashMap<String, Object> {
         put(K_TANGO_DATA, tangoData);
     }
 
+    private Integer getColor() {
+        return containsKey(K_NOTE_COLOR) ? (int) (long) get(K_NOTE_COLOR) : null;
+    }
+
     private Visibility getVisibility() {
         //noinspection WrongConstant
         return new Visibility()

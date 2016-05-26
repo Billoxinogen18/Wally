@@ -106,6 +106,7 @@ public final class Utils {
         TextView titleTV = (TextView) cv.findViewById(R.id.tv_title);
         TextView noteTV = (TextView) cv.findViewById(R.id.tv_note);
         ImageView imageView = (ImageView) cv.findViewById(R.id.image);
+        View root = cv.findViewById(R.id.root);
 
         titleTV.setText(content.getTitle());
         noteTV.setText(content.getNote());
@@ -127,6 +128,10 @@ public final class Utils {
         } catch (Exception e) {
             e.printStackTrace();
             imageView.setVisibility(View.GONE);
+        }
+
+        if (content.getColor() != null) {
+            root.setBackgroundColor(content.getColor());
         }
 
         Resources res = context.getResources();

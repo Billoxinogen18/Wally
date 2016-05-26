@@ -74,10 +74,9 @@ public class PreviewContentDialogFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        int noteColor = mContent.getColor();
-        if (noteColor != 0) {
+        if (mContent.getColor() != null) {
             View v = (View) mRootView.getParent();
-            v.setBackgroundColor(noteColor);
+            v.setBackgroundColor(mContent.getColor());
         }
     }
 }

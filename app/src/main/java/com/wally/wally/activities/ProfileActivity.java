@@ -460,9 +460,8 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
                 vh.image.setVisibility(View.GONE);
             }
 
-            int noteColor = c.getColor();
-            if (noteColor != 0) {
-                vh.card.setBackgroundColor(noteColor);
+            if (c.getColor() != null) {
+                vh.card.setBackgroundColor(c.getColor());
             }
 
             vh.title.setText(c.getTitle());
