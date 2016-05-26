@@ -53,18 +53,14 @@ public class SocialUserFactory {
         googleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
             @Override
             public void onConnected(@Nullable Bundle bundle) {
-                Log.d(TAG, "GooglePlusPlatform onConnected() called with: " + "bundle = [" + bundle + "]");
                 Plus.PeopleApi.load(googleApiClient, baseUser.getGgId().getId()).setResultCallback(
-//                Plus.PeopleApi.load(googleApiClient, "114669062093261610699").setResultCallback(
                         new ResultCallback<People.LoadPeopleResult>() {
                             @Override
                             public void onResult(@NonNull People.LoadPeopleResult peopleData) {
-                                Log.d(TAG, "GooglePlusPlatform onResult() called with: " + "peopleData = [" + peopleData + "]");
                                 if (peopleData.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
                                     PersonBuffer personBuffer = peopleData.getPersonBuffer();
                                     try {
-                                        final Person person = personBuffer.get(0);
-                                        Log.d(TAG, "onResult: " + person.getId());
+                                        Person person = personBuffer.get(0);
                                         final SocialUser googleUser = new GoogleUser(baseUser)
                                                 .withDisplayName(person.getDisplayName())
                                                 .withFirstName(person.getName().getGivenName())
@@ -87,7 +83,6 @@ public class SocialUserFactory {
                                                         }
                                                     }
                                                 });
-
                                     } finally {
                                         personBuffer.release();
                                     }
@@ -101,7 +96,7 @@ public class SocialUserFactory {
 
             @Override
             public void onConnectionSuspended(int i) {
-                Log.d(TAG, "GooglePlusPlatform onConnectionSuspended() called with: " + "i = [" + i + "]");
+                Log.d(TAG, "onConnectionSuspended() called with: " + "i = [" + i + "]");
             }
         });
 

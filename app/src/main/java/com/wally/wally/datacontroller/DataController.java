@@ -15,9 +15,9 @@ import com.wally.wally.datacontroller.user.User;
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
 
+    private static final String ROOT_NODE = "Develop";
     private static final String USERS_NODE = "Users";
     private static final String CONTENTS_NODE = "Contents";
-    private static final String ROOT_NODE = "Firebase-Update";
 
     private static DataController instance;
 
@@ -45,7 +45,9 @@ public class DataController {
     }
 
     public void fetchByBounds(LatLngBounds bounds, FetchResultCallback callback) {
-        new LatLngQuery(bounds).fetch(contents, new FirebaseFetchResultCallback(callback));
+//        new LatLngQuery(bounds).fetch(contents, new FirebaseFetchResultCallback(callback));
+        // TODO stub implementation
+        fetchPublicContent(callback);
     }
 
     public void fetchByUUID(String uuid, FetchResultCallback callback) {
@@ -56,8 +58,6 @@ public class DataController {
         new AuthorQuery(authorId).fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
-    // Hope front end will soon user this method :(
-    @SuppressWarnings("unused")
     public void fetchByAuthor(User author, FetchResultCallback resultCallback) {
         fetchByAuthor(author.getId(), resultCallback);
     }
@@ -67,13 +67,18 @@ public class DataController {
                 .fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
+    public void fetchAccessibleContent(User user, FetchResultCallback callback) {
+        // TODO Stub implementation
+        fetchPublicContent(callback);
+    }
+
     public User getCurrentUser(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return null;
         String id = user.getUid();
-        // .get(0) assumes only one provider (Google)
+        // .get(1) assumes only one provider (Google)
         String ggId = user.getProviderData().get(1).getUid();
         users.child(id).child("ggId").setValue(ggId);
-        return new User(new Id(Id.PROVIDER_FIREBASE, id)).withGgId(new Id(Id.PROVIDER_GOOGLE, ggId));
+        return new User(id).withGgId(ggId);
     }
 }

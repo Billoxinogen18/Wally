@@ -9,8 +9,8 @@ public class User implements Serializable {
 
     public User() {}
 
-    public User(Id id) {
-        this.id = id;
+    public User(String id) {
+        this.id = new Id(Id.PROVIDER_FIREBASE, id);
     }
 
     public Id getId() {
@@ -25,15 +25,15 @@ public class User implements Serializable {
         return fbId;
     }
 
-    public User withGgId(Id ggId) {
-        this.ggId = ggId;
+    public User withGgId(String ggId) {
+        this.ggId = new Id(Id.PROVIDER_GOOGLE, ggId);
         return this;
     }
 
     // will or will not be used in future
     @SuppressWarnings("unused")
-    public User withFbId(Id fbId) {
-        this.fbId = fbId;
+    public User withFbId(String fbId) {
+        this.fbId = new Id(Id.PROVIDER_FACEBOOK, fbId);
         return this;
     }
 }
