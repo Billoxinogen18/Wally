@@ -7,19 +7,16 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 
-import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
-import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoManager;
 import com.wally.wally.tango.VisualContentManager;
@@ -90,7 +87,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         WallyRenderer renderer = new WallyRenderer(context, visualContentManager);
 
         mSurfaceView.setSurfaceRenderer(renderer);
-        TangoUx tangoUx = new TangoUx(context);
+        WallyTangoUx tangoUx = new WallyTangoUx(context);
 
         TangoPointCloudManager pointCloudManager = new TangoPointCloudManager();
 

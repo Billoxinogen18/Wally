@@ -15,4 +15,5 @@
 
     <color name="cover_dark_tint">#50000000</color>
     <color name="cover_light_tint">#50ffffff</color>
+    <color name="uxOverlayBackgroundColor">#32000000</color>
 </resources>
