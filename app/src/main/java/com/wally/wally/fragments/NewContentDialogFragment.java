@@ -283,11 +283,10 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         mNoteEt.setText(mContent.getNote());
         mTitleEt.setText(mContent.getTitle());
 
-        int noteColor = mContent.getColor();
-        if (noteColor != 0) {
+        if (mContent.getColor() != null) {
             View v = (View) mRootView.getParent();
-            v.setBackgroundColor(noteColor);
-            mBottomPanel.setBackgroundColor(noteColor);
+            v.setBackgroundColor(mContent.getColor());
+            mBottomPanel.setBackgroundColor(mContent.getColor());
         }
 
         if (TextUtils.isEmpty(mContent.getImageUri())) {
