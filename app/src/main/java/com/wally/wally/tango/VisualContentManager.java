@@ -40,10 +40,6 @@ public class VisualContentManager {
         mIsActiveContentRenderedOnScreen = true;
     }
 
-    public synchronized boolean isActiveContentRenderedOnScreen() {
-        return mActiveContent != null;
-    }
-
     public synchronized void removeActiveContent() {
         mActiveContent = null;
         mIsActiveContentRenderedOnScreen = false;
@@ -70,15 +66,11 @@ public class VisualContentManager {
         }
     }
 
-    public synchronized void removeStaticContentToBeRenderedOnScreen(VisualContent visualContent) {
-        mToBeRenderedOnScene.remove(visualContent);
-    }
-
     public synchronized List<VisualContent> getStaticContentToBeRenderedOnScreen() {
         return mToBeRenderedOnScene;
     }
 
-    public synchronized boolean hasStaticContentToBeRendered() {
+    public synchronized boolean isStaticContentToBeRendered() {
         return mToBeRenderedOnScene != null && mToBeRenderedOnScene.size() > 0;
     }
 
@@ -94,15 +86,8 @@ public class VisualContentManager {
         mAlreadyRenderedOnScene.remove(visualContent);
     }
 
-    public synchronized boolean isContentOnScreen(VisualContent visualContent){
-        return mAlreadyRenderedOnScene.contains(visualContent);
-    }
 
     // ------------------------   selected content ------------------------------
-
-    public VisualContent getSelectedContent() {
-        return mSelectedContent;
-    }
 
     public synchronized void setSelectedContent(VisualContent visualContent) {
         mSelectedContent = visualContent;
@@ -148,50 +133,6 @@ public class VisualContentManager {
         }
         return null;
     }
-
-//
-//    public void addActiveContentOnScene(Content content, RajawaliScene scene){
-//        mActiveContent = new ActiveVisualContent(content);
-//        scene.addChild(mActiveContent);
-//        //activeContent.animate(scene);
-//    }
-//
-//    public void removeActiveContentFromScene(RajawaliScene scene){
-//        scene.removeChild(mActiveContent);
-//        mActiveContent = null;
-//    }
-//
-//    public void saveActiveContent(){
-//        mStaticContent.add(mActiveContent);
-//
-//    }
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-
-//
-//
-
-//
-//    public void deselectAll() {
-//        //TODO do better selection deselection algorithm
-//        for (VisualContent vc : mStaticContent) {
-//
-//        }
-//    }
+    
 }
 

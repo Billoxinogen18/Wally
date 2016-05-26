@@ -1,6 +1,7 @@
 package com.wally.wally.tango;
 
 import android.graphics.Bitmap;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.projecttango.rajawali.ContentPlane;
@@ -24,13 +25,14 @@ public class VisualContent {
 
 
 
-    public VisualContent(Content content) {
-        super();
+    public VisualContent(@NonNull Content content) {
         mContent = content;
     }
 
     protected void refreshVisualScale() {
-        mVisual.setScale(mContent.getTangoData().getScale());
+        if (mVisual != null && mContent.getTangoData() != null) {
+            mVisual.setScale(mContent.getTangoData().getScale());
+        }
     }
 
     private Material createMaterial(Bitmap bitmap) {

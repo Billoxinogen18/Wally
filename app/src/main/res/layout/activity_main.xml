@@ -5,14 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    tools:context=".activities.MainActivity">
+    android:animateLayoutChanges="true">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Camera Disabled! No Tango Device!"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:text="Camera Disabled! No Tango Device!" />
 
     <org.rajawali3d.surface.RajawaliSurfaceView
         android:id="@+id/rajawali_surface"
@@ -21,6 +20,26 @@
         android:layout_gravity="center"
         surfaceview:frameRate="60.0"
         surfaceview:renderMode="RENDER_WHEN_DIRTY" />
+
+    <TextView
+        android:id="@+id/pose_invalid"
+        style="@style/TextAppearance.AppCompat.Display1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/uxOverlayBackgroundColor"
+        android:gravity="center"
+        android:text="Hold (the door) Still!"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/not_localized"
+        style="@style/TextAppearance.AppCompat.Display1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/uxOverlayBackgroundColor"
+        android:gravity="center"
+        android:text="Walk around!"
+        android:visibility="gone" />
 
     <include layout="@layout/layout_content_select" />
 
@@ -76,26 +95,26 @@
         android:id="@+id/profile_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="@dimen/watermark_margin"
         android:layout_gravity="top|end"
+        android:layout_margin="@dimen/watermark_margin"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         android:onClick="onShowProfileClick"
-        android:background="?attr/selectableItemBackgroundBorderless"
+        android:orientation="horizontal"
         android:visibility="gone">
+
         <ImageView
             android:id="@+id/profile_image"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_marginEnd="8dp"
-            />
+            android:layout_marginEnd="8dp" />
+
         <TextView
             android:id="@+id/profile_name"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center"/>
+            android:gravity="center" />
     </LinearLayout>
-
 
 
     <!-- Map button -->

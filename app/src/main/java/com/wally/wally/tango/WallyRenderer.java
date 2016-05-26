@@ -114,7 +114,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
     }
 
     private void renderStaticContent() {
-        if (mVisualContentManager.hasStaticContentToBeRendered()) {
+        if (mVisualContentManager.isStaticContentToBeRendered()) {
             while(!mVisualContentManager.getStaticContentToBeRenderedOnScreen().isEmpty()){ //TODO refactor nicely
                 VisualContent visualContent = mVisualContentManager.getStaticContentToBeRenderedOnScreen().get(0);
                 getCurrentScene().addChild(visualContent.getVisual());
@@ -134,7 +134,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
             removeBorder();
             getCurrentScene().addChild(activeVisualContent.getVisual());
             mVisualContentManager.activeContentAlreadyRenderedOnScreen();
-        } else if (mVisualContentManager.isActiveContentRenderedOnScreen()) {
+        } else if (mVisualContentManager.getActiveContent() != null) {
             if (mVisualContentManager.getActiveContent().shouldAnimate()) {
                 mVisualContentManager.getActiveContent().animate(getCurrentScene());
             }
@@ -206,7 +206,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
 
     @Override
     public void onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN && !mVisualContentManager.isActiveContentRenderedOnScreen()) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN && mVisualContentManager.getActiveContent() == null) {
             getObjectAt(event.getX(), event.getY());
         }
     }

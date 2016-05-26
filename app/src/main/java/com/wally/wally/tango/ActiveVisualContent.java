@@ -34,6 +34,8 @@ public class ActiveVisualContent extends VisualContent {
     }
 
     public void animate(RajawaliScene scene) {
+        if (mNewPose == null || mVisual == null)
+            return;
         if (mMoveAnim != null) {
 
             mMoveAnim.pause();

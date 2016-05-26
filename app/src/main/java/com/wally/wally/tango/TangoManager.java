@@ -24,6 +24,7 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.App;
 import com.wally.wally.OnContentSelectedListener;
+import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
@@ -50,7 +51,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     private DeviceExtrinsics mExtrinsics;
     private TangoPointCloudManager mPointCloudManager;
     private Tango mTango;
-    private TangoUx mTangoUx;
+    private WallyTangoUx mTangoUx;
 
     private RajawaliSurfaceView mSurfaceView;
     private WallyRenderer mRenderer;
@@ -73,11 +74,13 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     private OnContentSelectedListener onContentSelectedListener;
     private ContentFitter.OnContentFitListener onContentFitListener;
 
+    private boolean isLocalized;
+
 
     //For testing
     public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout,
                         TangoPointCloudManager pointCloudManager, VisualContentManager visualContentManager,
-                        WallyRenderer wallyRenderer, TangoUx tangoUx, Tango tango, String adfUuid) {
+                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, Tango tango, String adfUuid) {
         mContext = context;
         mSurfaceView = rajawaliSurfaceView;
         mAdfUuid = adfUuid;
@@ -91,17 +94,16 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
 
     public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout,
                         TangoPointCloudManager pointCloudManager, VisualContentManager visualContentManager,
-                        WallyRenderer wallyRenderer, TangoUx tangoUx, String adfUuid) {
+                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, String adfUuid) {
         mContext = context;
         mSurfaceView = rajawaliSurfaceView;
         mAdfUuid = adfUuid;
         mVisualContentManager = visualContentManager;
         mRenderer = wallyRenderer;
-        // mRenderer.setOnContentSelectListener(this);
+        mRenderer.setOnContentSelectListener(this);
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
         mScaleDetector = new ScaleGestureDetector(context, this); //TODO refactor this!
-
         fetchContentForAdf(adfUuid);
     }
 
@@ -172,6 +174,8 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         mTango.disconnect();
         mTangoUx.stop();
 
+        isLocalized = false;
+
         if (mContentFitter != null) {
             mContentFitter.cancel(true);
         }
@@ -182,12 +186,14 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         // in the UI thread.
         if (!mIsConnected) {
             TangoUx.StartParams params = new TangoUx.StartParams();
+            params.showConnectionScreen = false;
             mTangoUx.start(params);
             mTango = new Tango(mContext, new Runnable() {
                 @Override
                 public void run() {
                     try {
                         connectTango();
+                        connectRenderer();
                         mIsConnected = true;
                     } catch (TangoOutOfDateException e) {
                         if (mTangoUx != null) {
@@ -233,9 +239,15 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         mTango.connect(config);
 
         ArrayList<TangoCoordinateFramePair> framePairs = new ArrayList<>();
-        framePairs.add(new TangoCoordinateFramePair(
-                TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
-                TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE));
+        framePairs.add(
+                new TangoCoordinateFramePair(
+                        TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
+                        TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE));
+        framePairs.add(
+                new TangoCoordinateFramePair(
+                        TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE,
+                        TangoPoseData.COORDINATE_FRAME_DEVICE
+                ));
         mTango.connectListener(framePairs, this);
 
         // Get extrinsics from device for use in transforms. This needs
@@ -249,10 +261,20 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         if (mTangoUx != null) {
             mTangoUx.updatePoseStatus(pose.statusCode);
         }
-        if (pose.baseFrame == TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION &&
-                pose.targetFrame == TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE &&
-                pose.statusCode == TangoPoseData.POSE_VALID) {
-            connectRenderer();
+
+        if (pose.statusCode != TangoPoseData.POSE_VALID) {
+            if (mTangoUx != null) {
+                mTangoUx.showCustomMessage("Hold Still");
+            }
+        } else if (pose.baseFrame == TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION && pose.targetFrame == TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE) {
+            isLocalized = true;
+            if (mTangoUx != null) {
+                mTangoUx.hideCustomMessage();
+            }
+        } else if (!isLocalized) {
+            if (mTangoUx != null) {
+                mTangoUx.showCustomMessage("Walk around!");
+            }
         }
     }
 
@@ -278,6 +300,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
 
     @Override
     public void onTangoEvent(TangoEvent event) {
+        Log.d(TAG, "onTangoEvent() called with: " + "event = [" + event.eventKey + "]");
         if (mTangoUx != null) {
             mTangoUx.updateTangoEvent(event);
         }
@@ -464,7 +487,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         float scale = detector.getScaleFactor() != 0 ? detector.getScaleFactor() : 1f;
-        if (mVisualContentManager.isActiveContentRenderedOnScreen()) {
+        if (mVisualContentManager.getActiveContent() != null) {
             mVisualContentManager.getActiveContent().scaleContent(scale);
         } else {
             Log.e(TAG, "onScale() was called but active content is not on screen");
