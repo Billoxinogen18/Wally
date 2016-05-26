@@ -114,7 +114,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
     }
 
     private void renderStaticContent() {
-        if (mVisualContentManager.hasStaticContentToBeRendered()) {
+        if (mVisualContentManager.isStaticContentToBeRendered()) {
             while(!mVisualContentManager.getStaticContentToBeRenderedOnScreen().isEmpty()){ //TODO refactor nicely
                 VisualContent visualContent = mVisualContentManager.getStaticContentToBeRenderedOnScreen().get(0);
                 getCurrentScene().addChild(visualContent.getVisual());
