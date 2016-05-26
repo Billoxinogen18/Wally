@@ -20,6 +20,7 @@ import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -39,6 +40,17 @@ public final class Utils {
 
     @SuppressWarnings("unused")
     private static final String TAG = Utils.class.getSimpleName();
+
+    /**
+     * Hides keyboard from input view. (note that keyboard must be focused on that view)
+     *
+     * @param input   view on which keyboard is open.
+     * @param context context to get the keyboard manager.
+     */
+    public static void hideSoftKeyboard(View input, Context context) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
+    }
 
     /**
      * Permission checking methods should start with 'check' and end with 'permission'

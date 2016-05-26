@@ -37,6 +37,7 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.activities.ChoosePhotoActivity;
+import com.wally.wally.components.ColorPickerPopup;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Visibility;
 import com.wally.wally.datacontroller.user.User;
@@ -58,6 +59,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
     private NewContentDialogListener mListener;
 
+    private View mRootView;
+    private View mBottomPanel;
     private View mImageContainer;
     private ImageView mImageView;
     private EditText mTitleEt;
@@ -103,6 +106,8 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         dv.findViewById(R.id.btn_create_post).setOnClickListener(this);
         dv.findViewById(R.id.btn_more_settings).setOnClickListener(this);
 
+        mRootView = dv.findViewById(R.id.root);
+        mBottomPanel = dv.findViewById(R.id.bottom_panel);
         mImageView = (ImageView) dv.findViewById(R.id.image);
         mImageContainer = dv.findViewById(R.id.image_container);
         mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
@@ -124,7 +129,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                     .addApi(LocationServices.API)
                     .build();
         }
-        updateViews();
         builder.setView(dv);
         Dialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -155,6 +159,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
     public void onStart() {
         super.onStart();
+        updateViews();
         mGoogleApiClient.connect();
         showDialog(mIsDialogShown);
     }
@@ -182,6 +187,9 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
     @Override
     public void onClick(View v) {
+//        Utils.hideSoftKeyboard(mNoteEt, getContext());
+//        Utils.hideSoftKeyboard(mTitleEt, getContext());
+
         switch (v.getId()) {
             case R.id.btn_discard_post:
                 if (!postIsEmpty() && !isEditMode) {
@@ -208,7 +216,13 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 updateViews();
                 break;
             case R.id.btn_pallette:
-                Toast.makeText(getActivity(), "Not yet implemented", Toast.LENGTH_SHORT).show();
+                new ColorPickerPopup().show(new ColorPickerPopup.ColorPickerListener() {
+                    @Override
+                    public void colorPicked(int color) {
+                        mContent.withColor(color);
+                        updateViews();
+                    }
+                }, v);
                 break;
             case R.id.btn_more_settings:
                 showDialog(false);
@@ -268,6 +282,13 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     private void updateViews() {
         mNoteEt.setText(mContent.getNote());
         mTitleEt.setText(mContent.getTitle());
+
+        int noteColor = mContent.getColor();
+        if (noteColor != 0) {
+            View v = (View) mRootView.getParent();
+            v.setBackgroundColor(noteColor);
+            mBottomPanel.setBackgroundColor(noteColor);
+        }
 
         if (TextUtils.isEmpty(mContent.getImageUri())) {
             mImageView.setImageDrawable(null);

@@ -12,6 +12,7 @@ public class Content implements Serializable {
     private String note;
     private String imageUri;
     private String uuid;
+    private int color;
     private TangoData tangoData;
     private SerializableLatLng location;
     private Visibility visibility;
@@ -39,6 +40,15 @@ public class Content implements Serializable {
 
     public Content withUuid(String uuid) {
         this.uuid = uuid;
+        return this;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public Content withColor(int color) {
+        this.color = color;
         return this;
     }
 

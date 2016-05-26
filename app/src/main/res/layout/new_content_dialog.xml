@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_gravity="fill"
@@ -37,11 +38,11 @@
                     android:background="@null"
                     android:ellipsize="end"
                     android:hint="@string/content_title_hint"
-                    android:imeOptions="actionNext"
+                    android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="text"
                     android:lines="1"
                     android:maxLines="1"
-                    android:nextFocusDown="@+id/Note_et"
+                    android:nextFocusDown="@+id/tv_note"
                     android:padding="8dp"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -64,6 +65,7 @@
                 android:background="@null"
                 android:fontFamily="serif"
                 android:hint="@string/note_hint"
+                android:imeOptions="flagNoExtractUi"
                 android:inputType="textMultiLine"
                 android:padding="8dp"
                 android:scrollbars="none"
@@ -81,7 +83,6 @@
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:drawSelectorOnTop="true"
-
                 android:padding="8dp"
                 android:visibility="gone">
 
