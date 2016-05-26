@@ -17,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -360,14 +361,15 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
         Log.d(TAG, "Loaded content size = [" + result.size() + "]");
         ArrayList<Content> data = new ArrayList<>(result.size());
         data.addAll(result);
-        // TODO delete dumb data
-        data.add(new Content().withId("0").withNote("Hi there my name is...").withTitle("Sample note"));
-        data.add(new Content().withId("5").withNote("Some text").withTitle("თქვენ შიგ ხო არ გაქვთ რა ლიმიტი").withImageUri("http://i.imgur.com/RRUe0Mo.png"));
-        data.add(new Content().withId("6").withNote(getString(R.string.large_text)).withTitle("Sample note Title here"));
-        data.add(new Content().withId("7").withNote("Hi there my name is John").withTitle("Sample note"));
-        data.add(new Content().withId("8").withNote("Hi there my name is... I'm programmer here :S"));
-        data.add(new Content().withId("9").withTitle("Sample note Only title"));
-        data.add(new Content().withId("10").withTitle("Sample note").withImageUri("http://www.keenthemes.com/preview/metronic/theme/assets/global/plugins/jcrop/demos/demo_files/image1.jpg"));
+
+//        // TODO delete dumb data
+//        data.add(new Content().withId("0").withNote("Hi there my name is...").withTitle("Sample note"));
+//        data.add(new Content().withId("5").withNote("Some text").withTitle("თქვენ შიგ ხო არ გაქვთ რა ლიმიტი").withImageUri("http://i.imgur.com/RRUe0Mo.png"));
+//        data.add(new Content().withId("6").withNote(getString(R.string.large_text)).withTitle("Sample note Title here"));
+//        data.add(new Content().withId("7").withNote("Hi there my name is John").withTitle("Sample note"));
+//        data.add(new Content().withId("8").withNote("Hi there my name is... I'm programmer here :S"));
+//        data.add(new Content().withId("9").withTitle("Sample note Only title"));
+//        data.add(new Content().withId("10").withTitle("Sample note").withImageUri("http://www.keenthemes.com/preview/metronic/theme/assets/global/plugins/jcrop/demos/demo_files/image1.jpg"));
 
         mContentAdapter.setData(data);
         mLoadingView.setVisibility(View.GONE);
@@ -419,7 +421,6 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
 
     @Override
     public void onContentCreated(Content content, boolean isEditMode) {
-        Log.d(TAG, "onContentCreated() called with: " + "content = [" + content + "], isEditMode = [" + isEditMode + "]");
         mContentAdapter.updateItem(content);
         App.getInstance().getDataController().save(content);
         onDataChanged();
@@ -458,6 +459,12 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
             } else {
                 vh.image.setVisibility(View.GONE);
             }
+
+            int noteColor = c.getColor();
+            if (noteColor != 0) {
+                vh.card.setBackgroundColor(noteColor);
+            }
+
             vh.title.setText(c.getTitle());
             vh.title.setVisibility(TextUtils.isEmpty(c.getTitle()) ? View.GONE : View.VISIBLE);
 
@@ -576,9 +583,11 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
             public TextView note;
             public TextView title;
             public ImageView image;
+            public CardView card;
 
             public ViewHolder(View v) {
                 super(v);
+                card = (CardView) v;
                 note = (TextView) v.findViewById(R.id.tv_note);
                 title = (TextView) v.findViewById(R.id.tv_title);
                 image = (ImageView) v.findViewById(R.id.image_view);

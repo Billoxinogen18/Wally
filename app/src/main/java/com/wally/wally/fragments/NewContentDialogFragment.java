@@ -272,7 +272,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
 
         mContent.withTitle(mTitleEt.getText().toString())
                 .withNote(mNoteEt.getText().toString());
-        mContent.withAuthor(mAuthor);
+        mContent.withAuthorId(mAuthor.getId().getId());
     }
 
     /**

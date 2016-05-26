@@ -22,6 +22,9 @@ public class PreviewContentDialogFragment extends DialogFragment {
 
     public static final String TAG = PreviewContentDialogFragment.class.getSimpleName();
 
+    private Content mContent;
+    private View mRootView;
+
     // Empty constructor required for DialogFragment
     public PreviewContentDialogFragment() {
     }
@@ -39,31 +42,42 @@ public class PreviewContentDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Content content = (Content) getArguments().getSerializable("content");
+        mContent = (Content) getArguments().getSerializable("content");
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.preview_content_dialog, null, false);
 
         ImageView mImageView = (ImageView) dialogView.findViewById(R.id.image);
         TextView mTitleEt = (TextView) dialogView.findViewById(R.id.tv_title);
         TextView mNoteEt = (TextView) dialogView.findViewById(R.id.tv_note);
+        mRootView = dialogView.findViewById(R.id.root);
 
-        if (!TextUtils.isEmpty(content.getTitle())) {
-            mTitleEt.setText(content.getTitle());
+        if (!TextUtils.isEmpty(mContent.getTitle())) {
+            mTitleEt.setText(mContent.getTitle());
             mTitleEt.setVisibility(View.VISIBLE);
         }
-        if (!TextUtils.isEmpty(content.getNote())) {
-            mNoteEt.setText(content.getNote());
+        if (!TextUtils.isEmpty(mContent.getNote())) {
+            mNoteEt.setText(mContent.getNote());
             mNoteEt.setVisibility(View.VISIBLE);
         }
-        if (!TextUtils.isEmpty(content.getImageUri())) {
+        if (!TextUtils.isEmpty(mContent.getImageUri())) {
             mImageView.setVisibility(View.VISIBLE);
             Glide.with(getActivity())
-                    .load(content.getImageUri())
+                    .load(mContent.getImageUri())
                     .fitCenter()
                     .into(mImageView);
         }
 
         builder.setView(dialogView);
         return builder.create();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        int noteColor = mContent.getColor();
+        if (noteColor != 0) {
+            View v = (View) mRootView.getParent();
+            v.setBackgroundColor(noteColor);
+        }
     }
 }

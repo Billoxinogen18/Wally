@@ -7,7 +7,6 @@ import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.datacontroller.content.Visibility;
-import com.wally.wally.datacontroller.user.User;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -21,16 +20,14 @@ public class Utils {
 
     // This method is for debugging purposes
     @SuppressWarnings("unused")
-    public static Content  generateRandomContent() {
+    public static Content generateRandomContent() {
         return new Content()
                 .withUuid(randomStr(10))
                 .withNote(randomStr(20))
                 .withTitle(randomStr(20))
                 .withImageUri("http://" + randomStr(20))
-                .withAuthor(
-                        new User("uSlLJUtZqbRDTMeLU4MdcToS8ZZ2")
-                                .withGgId("112058086965911533829")
-                ).withLocation(
+                .withAuthorId("uSlLJUtZqbRDTMeLU4MdcToS8ZZ2")
+                .withLocation(
                         new LatLng(
                                 random.nextInt(),
                                 random.nextInt()
@@ -61,7 +58,7 @@ public class Utils {
     }
 
     private static double[] randomDoubleArray() {
-        return new double[] {
+        return new double[]{
                 random.nextDouble(),
                 random.nextDouble(),
                 random.nextDouble()

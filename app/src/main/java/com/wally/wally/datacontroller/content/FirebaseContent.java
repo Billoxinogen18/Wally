@@ -40,7 +40,8 @@ public class FirebaseContent extends HashMap<String, Object> {
     @Exclude
     public String id;
 
-    public FirebaseContent() {}
+    public FirebaseContent() {
+    }
 
     public FirebaseContent(Content content) {
         id = content.getId();
@@ -59,36 +60,6 @@ public class FirebaseContent extends HashMap<String, Object> {
         put(K_NOTE_COLOR, c.getColor());
     }
 
-    private void setLocation(Content c) {
-        LatLng loc = c.getLocation();
-        if (loc == null) return;
-        Map<String, Double> location = new HashMap<>();
-        location.put(K_LAT, loc.latitude);
-        location.put(K_LNG, loc.longitude);
-        put(K_LOCATION, location);
-    }
-
-    private void setTangoData(Content c) {
-        TangoData td = c.getTangoData();
-        if (td == null) return;
-        Map<String, Object> tangoData = new HashMap<>();
-        tangoData.put(K_SCALE, td.getScale());
-        List<Double> rotation = Utils.arrayToList(td.getRotation());
-        tangoData.put(K_ROTATION, rotation);
-        List<Double> translation = Utils.arrayToList(td.getTranslation());
-        tangoData.put(K_TRANSLATION, translation);
-        put(K_TANGO_DATA, tangoData);
-    }
-
-    private void setVisibility(Content c) {
-        Visibility visibility = c.getVisibility();
-        if (visibility == null) return;
-        put(K_HAS_PREVIEW, visibility.isPreviewVisible());
-        put(K_VISIBLE_UNTIL,  visibility.getVisibleUntil());
-        put(K_RANGE, visibility.getRangeVisibility().getRange());
-        put(K_PUBLICITY, visibility.getSocialVisibility().getMode());
-    }
-
     private LatLng getLocation() {
         if (!containsKey(K_LOCATION)) return null;
         Map location = (Map) get(K_LOCATION);
@@ -96,6 +67,15 @@ public class FirebaseContent extends HashMap<String, Object> {
                 Utils.toDouble(location.get(K_LAT)),
                 Utils.toDouble(location.get(K_LNG))
         );
+    }
+
+    private void setLocation(Content c) {
+        LatLng loc = c.getLocation();
+        if (loc == null) return;
+        Map<String, Double> location = new HashMap<>();
+        location.put(K_LAT, loc.latitude);
+        location.put(K_LNG, loc.longitude);
+        put(K_LOCATION, location);
     }
 
     @SuppressWarnings("unchecked")
@@ -110,6 +90,18 @@ public class FirebaseContent extends HashMap<String, Object> {
                 .withScale(Utils.toDouble(tangoData.get(K_SCALE)));
     }
 
+    private void setTangoData(Content c) {
+        TangoData td = c.getTangoData();
+        if (td == null) return;
+        Map<String, Object> tangoData = new HashMap<>();
+        tangoData.put(K_SCALE, td.getScale());
+        List<Double> rotation = Utils.arrayToList(td.getRotation());
+        tangoData.put(K_ROTATION, rotation);
+        List<Double> translation = Utils.arrayToList(td.getTranslation());
+        tangoData.put(K_TRANSLATION, translation);
+        put(K_TANGO_DATA, tangoData);
+    }
+
     private Visibility getVisibility() {
         //noinspection WrongConstant
         return new Visibility()
@@ -119,6 +111,15 @@ public class FirebaseContent extends HashMap<String, Object> {
                         new Visibility.RangeVisibility((int) (long) get(K_RANGE)))
                 .withSocialVisibility(
                         new Visibility.SocialVisibility((int) (long) get(K_PUBLICITY)));
+    }
+
+    private void setVisibility(Content c) {
+        Visibility visibility = c.getVisibility();
+        if (visibility == null) return;
+        put(K_HAS_PREVIEW, visibility.isPreviewVisible());
+        put(K_VISIBLE_UNTIL, visibility.getVisibleUntil());
+        put(K_RANGE, visibility.getRangeVisibility().getRange());
+        put(K_PUBLICITY, visibility.getSocialVisibility().getMode());
     }
 
     public void save(DatabaseReference ref) {
@@ -166,6 +167,7 @@ public class FirebaseContent extends HashMap<String, Object> {
                 .withTitle((String) get(K_TITLE))
                 .withImageUri((String) get(K_IMGURI))
                 .withAuthorId((String) get(K_AUTHOR))
+                .withColor((int) (long) get(K_NOTE_COLOR))
                 .withLocation(getLocation())
                 .withTangoData(getTangoData())
                 .withVisibility(getVisibility());
