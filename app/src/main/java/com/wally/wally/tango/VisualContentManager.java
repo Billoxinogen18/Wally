@@ -40,10 +40,6 @@ public class VisualContentManager {
         mIsActiveContentRenderedOnScreen = true;
     }
 
-    public synchronized boolean isActiveContentRenderedOnScreen() {
-        return mActiveContent != null;
-    }
-
     public synchronized void removeActiveContent() {
         mActiveContent = null;
         mIsActiveContentRenderedOnScreen = false;

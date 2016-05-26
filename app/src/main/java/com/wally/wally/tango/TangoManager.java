@@ -97,7 +97,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         mAdfUuid = adfUuid;
         mVisualContentManager = visualContentManager;
         mRenderer = wallyRenderer;
-        // mRenderer.setOnContentSelectListener(this);
+        mRenderer.setOnContentSelectListener(this);
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
         mScaleDetector = new ScaleGestureDetector(context, this); //TODO refactor this!
@@ -464,7 +464,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         float scale = detector.getScaleFactor() != 0 ? detector.getScaleFactor() : 1f;
-        if (mVisualContentManager.isActiveContentRenderedOnScreen()) {
+        if (mVisualContentManager.getActiveContent() != null) {
             mVisualContentManager.getActiveContent().scaleContent(scale);
         } else {
             Log.e(TAG, "onScale() was called but active content is not on screen");
