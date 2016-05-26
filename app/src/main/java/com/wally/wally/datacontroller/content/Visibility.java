@@ -64,11 +64,11 @@ public class Visibility implements Serializable {
 
     @Override
     public String toString() {
-        return "Visibility{" +
-                "socialVisibility=" + socialVisibility +
-                ", rangeVisibility=" + rangeVisibility +
-                ", visibleUntil=" + visibleUntil +
-                ", isPreviewVisible=" + isPreviewVisible +
+        return "{" +
+                "social=" + socialVisibility +
+                ", range=" + rangeVisibility +
+                ", duration=" + visibleUntil +
+                ", hasPreview=" + isPreviewVisible +
                 '}';
     }
 
@@ -122,9 +122,7 @@ public class Visibility implements Serializable {
 
         @Override
         public String toString() {
-            return "SocialVisibility{" +
-                    "mode=" + getStringRepresentation(mode) +
-                    '}';
+            return getStringRepresentation(mode);
         }
 
         @IntDef({PRIVATE, PUBLIC, FRIENDS, ANONYMOUS})
@@ -167,9 +165,7 @@ public class Visibility implements Serializable {
 
         @Override
         public String toString() {
-            return "RangeVisibility{" +
-                    "range=" + RangeVisibility.getStringRepresentation(range) +
-                    '}';
+            return RangeVisibility.getStringRepresentation(range);
         }
 
         @IntDef({HERE, NEAR, LOCAL, DISTANT, FAR})

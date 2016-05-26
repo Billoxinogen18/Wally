@@ -8,23 +8,16 @@ import org.rajawali3d.math.vector.Vector3;
 import java.io.Serializable;
 
 public class TangoData implements Serializable {
-    private double scale = 1.0;
-    private double[] rotation;
-    private double[] translation;
+    private Double scale = 1.0;
+    private Double[] rotation;
+    private Double[] translation;
 
     public TangoData() {
-
-    }
-
-    @SuppressWarnings("unused")
-    public TangoData(double[] rotation, double[] translation) {
-        this.rotation = rotation;
-        this.translation = translation;
     }
 
     public TangoData(Pose pose) {
-        this.rotation = new double[4];
-        this.translation = new double[3];
+        this.rotation = new Double[4];
+        this.translation = new Double[3];
         updatePose(pose);
     }
 
@@ -39,33 +32,37 @@ public class TangoData implements Serializable {
         this.translation[2] = pose.getPosition().z;
     }
 
-    public double getScale() {
+    public Double getScale() {
         return scale;
     }
 
+    @Deprecated
+    /**
+     * @deprecated use {@link #withScale(double)}()} instead.
+     */
     public void setScale(double scale) {
-        this.scale = scale;
+        withScale(scale);
     }
 
-    public TangoData withScale(double scale) {
+    public TangoData withScale(Double scale) {
         this.scale = scale;
         return this;
     }
 
-    public double[] getRotation() {
+    public Double[] getRotation() {
         return rotation;
     }
 
-    public TangoData withRotation(double[] rotation) {
+    public TangoData withRotation(Double[] rotation) {
         this.rotation = rotation;
         return this;
     }
 
-    public double[] getTranslation() {
+    public Double[] getTranslation() {
         return translation;
     }
 
-    public TangoData withTranslation(double[] translation) {
+    public TangoData withTranslation(Double[] translation) {
         this.translation = translation;
         return this;
     }
@@ -76,5 +73,10 @@ public class TangoData implements Serializable {
         Quaternion q = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
         result = new Pose(v, q);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "{...}";
     }
 }

@@ -66,7 +66,7 @@ public class Content implements Serializable {
     }
 
     public Content withTitle(String title) {
-        if (title.length() > MAX_TITLE_LENGTH)
+        if (title != null && title.length() > MAX_TITLE_LENGTH)
             throw new IllegalArgumentException("Title exceeded length limit");
         this.title = title;
         return this;
@@ -120,16 +120,14 @@ public class Content implements Serializable {
 
     @Override
     public String toString() {
-        return "Content{" +
-                "id='" + id + '\'' +
-                ", title='" + title + '\'' +
-                ", note='" + note + '\'' +
-                ", imageUri='" + imageUri + '\'' +
-                ", uuid='" + uuid + '\'' +
-                ", tangoData=" + tangoData +
-                ", location=" + location +
+        return id + ": {uuid=" + uuid +
+                ", note=" + note +
+                ", title=" + title +
+                ", imageUri=" + imageUri +
                 ", visibility=" + visibility +
-                '}';
+                ", location=" + location +
+                ", tangoData=" + tangoData +
+                "}";
     }
 
     @Override
@@ -163,10 +161,7 @@ public class Content implements Serializable {
 
         @Override
         public String toString() {
-            return "SerializableLatLng{" +
-                    "lat=" + lat +
-                    ", lng=" + lng +
-                    '}';
+            return "{" + "lat=" + lat + ", lng=" + lng + "}";
         }
     }
 }

@@ -27,8 +27,8 @@ import java.util.UUID;
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
 
-    private static final String DATABASE_ROOT = "Develop";
-    private static final String STORAGE_ROOT = "Develop";
+    private static final String DATABASE_ROOT = "Test";
+    private static final String STORAGE_ROOT = DATABASE_ROOT;
     private static final String USERS_NODE = "Users";
     private static final String CONTENTS_NODE = "Contents";
 
@@ -41,6 +41,9 @@ public class DataController {
         this.storage = storage;
         users = database.child(USERS_NODE);
         contents = database.child(CONTENTS_NODE);
+        Content c = Utils.generateRandomContent();
+        save(c);
+        fetchByAuthor(new Id(Id.PROVIDER_FIREBASE, c.getAuthorId()), Utils.debugCallback());
     }
 
     public static DataController create() {
@@ -57,7 +60,7 @@ public class DataController {
 
     public void save(final Content c) {
 
-        if (c.getImageUri() == null) {
+        if (c.getImageUri() == null || c.getImageUri().startsWith("http")) {
             new FirebaseContent(c).save(contents);
             return;
         }

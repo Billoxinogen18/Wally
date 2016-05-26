@@ -1,185 +1,163 @@
 package com.wally.wally.datacontroller.content;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Exclude;
-import com.wally.wally.datacontroller.Utils;
-import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.datacontroller.FirebaseObject;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-public class FirebaseContent extends HashMap<String, Object> {
+public class FirebaseContent extends FirebaseObject {
     public static final int PUBLIC = Visibility.SocialVisibility.PUBLIC;
 
-    public static final String K_ROOM = "room";
-    public static final String K_NOTE = "note";
-    public static final String K_TITLE = "title";
-    public static final String K_AUTHOR = "author";
-    public static final String K_IMG_ID = "img_id";
-    public static final String K_IMGURI = "image_uri";
-    public static final String K_NOTE_COLOR = "note_color";
+    // NoteData
+    public static final String K_NOTE           = "note";
+    public static final String K_TITLE          = "title";
+    public static final String K_COLOR          = "color";
+    public static final String K_IMGURI         = "image";
+    public static final String K_IMG_ID         = "img_id";
+    public static final String K_ROOM           = "roomId";
+    public static final String K_AUTHOR         = "authorId";
+    public static final String K_NOTE_DATA      = "NoteData";
 
-    public static final String K_LOCATION = "Location";
-    public static final String K_LAT = "latitude";
-    public static final String K_LNG = "longitude";
+    // Location
+    public static final String K_LAT            = "latitude";
+    public static final String K_LNG            = "longitude";
+    public static final String K_LOCATION       = "Location";
 
-    public static final String K_SCALE = "scale";
-    public static final String K_ROTATION = "rotation";
-    public static final String K_TRANSLATION = "translation";
-    public static final String K_TANGO_DATA = "TangoData";
+    // TangoData
+    public static final String K_SCALE          = "scale";
+    public static final String K_ROTATION       = "rotation";
+    public static final String K_TRANSLATION    = "translation";
+    public static final String K_TANGO_DATA     = "TangoData";
 
-    public static final String K_RANGE = "range";
-    public static final String K_PUBLICITY = "publicity";
-    public static final String K_HAS_PREVIEW = "has_preview";
-    public static final String K_VISIBLE_UNTIL = "visible_until";
-
-    @Exclude
-    public String id;
+    // Visibility
+    public static final String K_RANGE          = "range";
+    public static final String K_PREVIEW        = "preview";
+    public static final String K_DURATION       = "duration";
+    public static final String K_PUBLICITY      = "publicity";
 
     public FirebaseContent() {
     }
 
-    public FirebaseContent(Content content) {
-        id = content.getId();
-        setInfo(content);
-        setLocation(content);
-        setTangoData(content);
-        setVisibility(content);
-    }
-
-    private void setInfo(Content c) {
+    public FirebaseContent(Content c) {
+        id = c.getId();
         put(K_ROOM, c.getUuid());
-        put(K_NOTE, c.getNote());
-        put(K_TITLE, c.getTitle());
-        put(K_IMGURI, c.getImageUri());
         put(K_AUTHOR, c.getAuthorId());
-        put(K_NOTE_COLOR, c.getColor());
+        setNoteData(c);
+        setLocation(c.getLocation());
+        setTangoData(c.getTangoData());
+        setVisibility(c.getVisibility());
     }
 
-    private LatLng getLocation() {
-        if (!containsKey(K_LOCATION)) return null;
-        Map location = (Map) get(K_LOCATION);
-        return new LatLng(
-                Utils.toDouble(location.get(K_LAT)),
-                Utils.toDouble(location.get(K_LNG))
-        );
+
+    public String getRoom() {
+        return getString(K_ROOM);
     }
 
-    private void setLocation(Content c) {
-        LatLng loc = c.getLocation();
-        if (loc == null) return;
-        Map<String, Double> location = new HashMap<>();
-        location.put(K_LAT, loc.latitude);
-        location.put(K_LNG, loc.longitude);
-        put(K_LOCATION, location);
+    public String getNote() {
+        return getChild(K_NOTE_DATA).getString(K_NOTE);
     }
 
-    @SuppressWarnings("unchecked")
-    private TangoData getTangoData() {
+    public String getTitle() {
+        return getChild(K_NOTE_DATA).getString(K_TITLE);
+    }
+
+    public Integer getColor() {
+        return getChild(K_NOTE_DATA).getInteger(K_COLOR);
+    }
+
+    public String getImageUri() {
+        return getChild(K_NOTE_DATA).getString(K_IMGURI);
+    }
+
+    public String getAuthorId() {
+        return getString(K_AUTHOR);
+    }
+
+    public Double getLatitude() {
+        return getChild(K_LOCATION).getDouble(K_LAT);
+    }
+
+    public Double getLongitude() {
+        return getChild(K_LOCATION).getDouble(K_LNG);
+    }
+
+    public LatLng getLocation() {
+        return hasChild(K_LOCATION) ? new LatLng(getLatitude(), getLongitude()) : null;
+    }
+
+    public TangoData getTangoData() {
         if (!containsKey(K_TANGO_DATA)) return null;
-        Map tangoData = (Map) get(K_TANGO_DATA);
-        double[] rotation = Utils.listToArray((List<Double>) tangoData.get(K_ROTATION));
-        double[] translation = Utils.listToArray((List<Double>) tangoData.get(K_TRANSLATION));
+        FirebaseObject tangoData = getChild(K_TANGO_DATA);
         return new TangoData()
-                .withRotation(rotation)
-                .withTranslation(translation)
-                .withScale(Utils.toDouble(tangoData.get(K_SCALE)));
+                .withScale(tangoData.getDouble(K_SCALE))
+                .withRotation(tangoData.getArray(K_ROTATION))
+                .withTranslation(tangoData.getArray(K_TRANSLATION));
     }
 
-    private void setTangoData(Content c) {
-        TangoData td = c.getTangoData();
-        if (td == null) return;
-        Map<String, Object> tangoData = new HashMap<>();
-        tangoData.put(K_SCALE, td.getScale());
-        List<Double> rotation = Utils.arrayToList(td.getRotation());
-        tangoData.put(K_ROTATION, rotation);
-        List<Double> translation = Utils.arrayToList(td.getTranslation());
-        tangoData.put(K_TRANSLATION, translation);
-        put(K_TANGO_DATA, tangoData);
-    }
-
-    private Integer getColor() {
-        return containsKey(K_NOTE_COLOR) ? (int) (long) get(K_NOTE_COLOR) : null;
-    }
-
-    private Visibility getVisibility() {
-        //noinspection WrongConstant
+    public Visibility getVisibility() {
         return new Visibility()
-                .withTimeVisibility((Date) get(K_VISIBLE_UNTIL))
-                .withVisiblePreview((Boolean) get(K_HAS_PREVIEW))
-                .withRangeVisibility(
-                        new Visibility.RangeVisibility((int) (long) get(K_RANGE)))
-                .withSocialVisibility(
-                        new Visibility.SocialVisibility((int) (long) get(K_PUBLICITY)));
+                .withRangeVisibility(getRange())
+                .withSocialVisibility(getPublicity())
+                .withTimeVisibility((Date) get(K_DURATION))
+                .withVisiblePreview((Boolean) getChild(K_NOTE_DATA).get(K_PREVIEW));
     }
 
-    private void setVisibility(Content c) {
-        Visibility visibility = c.getVisibility();
-        if (visibility == null) return;
-        put(K_HAS_PREVIEW, visibility.isPreviewVisible());
-        put(K_VISIBLE_UNTIL, visibility.getVisibleUntil());
-        put(K_RANGE, visibility.getRangeVisibility().getRange());
-        put(K_PUBLICITY, visibility.getSocialVisibility().getMode());
+    @SuppressWarnings("WrongConstant")
+    private Visibility.RangeVisibility getRange() {
+        return new Visibility.RangeVisibility(getInteger(K_RANGE));
     }
 
-    public void save(DatabaseReference ref) {
-        if (id == null) {
-            ref = ref.push();
-            ref.setValue(this);
-            id = ref.getKey();
-        } else {
-            ref.child(id).setValue(this);
-        }
+    @SuppressWarnings("WrongConstant")
+    private Visibility.SocialVisibility getPublicity() {
+        return new Visibility.SocialVisibility(getInteger(K_PUBLICITY));
     }
 
-    @SuppressWarnings("unused")
-    public void save(DatabaseReference ref, final Callback<Boolean> statusCallback) {
-        ref.push().setValue(this, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
-                if (firebaseError == null) {
-                    id = firebase.getKey();
-                }
-                statusCallback.onResult(firebaseError == null);
-            }
-        });
+    private void setNoteData(Content c) {
+        getChild(K_NOTE_DATA)
+                .put(K_NOTE, c.getNote())
+                .put(K_TITLE, c.getTitle())
+                .put(K_IMGURI, c.getImageUri())
+                .put(K_COLOR, c.getColor());
     }
 
-    public void delete(DatabaseReference ref) {
-        ref.child(id).removeValue();
+    private void setLocation(LatLng loc) {
+        if (loc == null) return;
+        getChild(K_LOCATION)
+                .put(K_LAT, loc.latitude)
+                .put(K_LNG, loc.longitude);
     }
 
-    @SuppressWarnings("unused")
-    public void delete(DatabaseReference ref, final Callback<Boolean> statusCallback) {
-        ref.child(id).removeValue(new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
-                statusCallback.onResult(firebaseError == null);
-            }
-        });
+    private void setTangoData(TangoData td) {
+        if (td == null) return;
+        getChild(K_TANGO_DATA)
+                .put(K_SCALE, td.getScale())
+                .putArray(K_ROTATION, td.getRotation())
+                .putArray(K_TRANSLATION, td.getTranslation());
+    }
+
+    private void setVisibility(Visibility v) {
+        if (v == null) return;
+        put(K_DURATION, v.getVisibleUntil());
+        put(K_RANGE, v.getRangeVisibility().getRange());
+        put(K_PUBLICITY, v.getSocialVisibility().getMode());
+        getChild(K_NOTE_DATA).put(K_PREVIEW, v.isPreviewVisible());
     }
 
     public Content toContent() {
         return new Content()
                 .withId(id)
-                .withUuid((String) get(K_ROOM))
-                .withNote((String) get(K_NOTE))
-                .withTitle((String) get(K_TITLE))
-                .withImageUri((String) get(K_IMGURI))
-                .withAuthorId((String) get(K_AUTHOR))
-                .withColor((int) (long) get(K_NOTE_COLOR))
+                .withUuid(getRoom())
+                .withNote(getNote())
+                .withTitle(getTitle())
+                .withColor(getColor())
+                .withImageUri(getImageUri())
+                .withAuthorId(getAuthorId())
                 .withLocation(getLocation())
                 .withTangoData(getTangoData())
                 .withVisibility(getVisibility());
     }
 
-    @Override
-    public FirebaseContent put(String key, Object value) {
-        super.put(key, value);
-        return this;
+    public static FirebaseContent fromContent(Content content) {
+        return new FirebaseContent(content);
     }
 }
