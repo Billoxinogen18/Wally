@@ -6,7 +6,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.wally.wally.datacontroller.Utils;
 import com.wally.wally.datacontroller.callbacks.Callback;
-import com.wally.wally.datacontroller.user.User;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -20,7 +19,9 @@ public class FirebaseContent extends HashMap<String, Object> {
     public static final String K_NOTE = "note";
     public static final String K_TITLE = "title";
     public static final String K_AUTHOR = "author";
+    public static final String K_IMG_ID = "img_id";
     public static final String K_IMGURI = "image_uri";
+    public static final String K_NOTE_COLOR = "note_color";
 
     public static final String K_LOCATION = "Location";
     public static final String K_LAT = "latitude";
@@ -54,7 +55,8 @@ public class FirebaseContent extends HashMap<String, Object> {
         put(K_NOTE, c.getNote());
         put(K_TITLE, c.getTitle());
         put(K_IMGURI, c.getImageUri());
-        put(K_AUTHOR, c.getAuthor().getId().getId());
+        put(K_AUTHOR, c.getAuthorId());
+        put(K_NOTE_COLOR, c.getColor());
     }
 
     private void setLocation(Content c) {
@@ -163,10 +165,15 @@ public class FirebaseContent extends HashMap<String, Object> {
                 .withNote((String) get(K_NOTE))
                 .withTitle((String) get(K_TITLE))
                 .withImageUri((String) get(K_IMGURI))
-                .withAuthor(new User((String) get(K_AUTHOR)))  // TODO should be string not user
+                .withAuthorId((String) get(K_AUTHOR))
                 .withLocation(getLocation())
                 .withTangoData(getTangoData())
                 .withVisibility(getVisibility());
     }
 
+    @Override
+    public FirebaseContent put(String key, Object value) {
+        super.put(key, value);
+        return this;
+    }
 }

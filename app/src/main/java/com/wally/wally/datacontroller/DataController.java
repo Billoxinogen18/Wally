@@ -56,10 +56,16 @@ public class DataController {
     }
 
     public void save(final Content c) {
+
+        if (c.getImageUri() == null) {
+            new FirebaseContent(c).save(contents);
+            return;
+        }
+
         String imgUriString = c.getImageUri().substring(7);
         Uri imgUri = Uri.fromFile(new File(imgUriString));
-        String imageName = UUID.randomUUID().toString();
-        UploadTask imageUploadTask = storage.child(imageName).putFile(imgUri);
+        final String imageId = UUID.randomUUID().toString();
+        UploadTask imageUploadTask = storage.child(imageId).putFile(imgUri);
         Log.d(TAG, imgUriString);
 
         imageUploadTask.addOnSuccessListener(
@@ -70,8 +76,8 @@ public class DataController {
                         if (downloadUri == null) return; // TODO retry upload?
                         Log.d(TAG, downloadUri.toString());
                         c.withImageUri(downloadUri.toString());
-                        new FirebaseContent(c).save(contents);
-                        
+                        new FirebaseContent(c).put(FirebaseContent.K_IMG_ID, imageId).save(contents);
+
                     }
                 }
         ).addOnFailureListener(

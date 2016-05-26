@@ -1,7 +1,6 @@
 package com.wally.wally.datacontroller.content;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.wally.wally.datacontroller.user.User;
 
 import java.io.Serializable;
 
@@ -16,7 +15,7 @@ public class Content implements Serializable {
     private TangoData tangoData;
     private SerializableLatLng location;
     private Visibility visibility;
-    private User author;
+    private String authorId;
 
     public Content() {
     }
@@ -110,12 +109,12 @@ public class Content implements Serializable {
     }
 
 
-    public User getAuthor() {
-        return author;
+    public String getAuthorId() {
+        return authorId;
     }
 
-    public Content withAuthor(User author) {
-        this.author = author;
+    public Content withAuthorId(String authorId) {
+        this.authorId = authorId;
         return this;
     }
 
