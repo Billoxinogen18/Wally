@@ -1,9 +1,13 @@
 package com.wally.wally.tango;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.atap.tangoservice.TangoPoseData;
+import com.projecttango.rajawali.Pose;
+import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.TangoData;
 
 /**
  * Thread that fits content on the wall.
@@ -20,10 +24,12 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     private Content mContent;
     private OnContentFitListener mFittingStatusListener;
     private TangoPoseData lastPose;
+    private VisualContentManager mVisualContentManager;
 
-    public ContentFitter(Content content, TangoManager tangoManager) {
+    public ContentFitter(Content content, TangoManager tangoManager, VisualContentManager visualContentManager) {
         mContent = content;
         mTangoManager = tangoManager;
+        mVisualContentManager = visualContentManager;
     }
 
     public Content getContent() {
@@ -51,7 +57,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
             }
         }
         mFittingStatusListener.onContentFit(null);
-        mTangoManager.setActiveContent(tangoPoseData, getContent());
+        mVisualContentManager.createActiveContent(ScenePoseCalculator.toOpenGLPose(tangoPoseData), getContent());
 
         // Update content timely, while we are cancelled.
         while (true) {
@@ -78,7 +84,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         mFittingStatusListener.onContentFit(newPose);
         lastPose = newPose;
         if (newPose != null) {
-            mTangoManager.updateActiveContent(newPose);
+            mVisualContentManager.updateActiveContent(ScenePoseCalculator.toOpenGLPose(newPose));
         }
 
     }
@@ -102,7 +108,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     public void finishFitting() {
         // Order of this calls matter!!!
         mFittingStatusListener.onContentFittingFinished(getContent());
-        mTangoManager.addActiveToStaticContent();
+        addActiveToStaticContent();
         cancel(true);
     }
 
@@ -123,6 +129,13 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         }
         return null;
     }
+
+    private void addActiveToStaticContent() {
+        mVisualContentManager.activeContentAddingFinished();
+        mTangoManager.removeActiveContent();
+    }
+
+
 
     public interface OnContentFitListener {
         void onContentFit(TangoPoseData pose);

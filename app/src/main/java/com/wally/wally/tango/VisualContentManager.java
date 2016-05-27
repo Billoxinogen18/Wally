@@ -1,6 +1,10 @@
 package com.wally.wally.tango;
 
+import com.google.atap.tangoservice.TangoPoseData;
+import com.projecttango.rajawali.Pose;
+import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.TangoData;
 
 import org.rajawali3d.Object3D;
 
@@ -31,9 +35,16 @@ public class VisualContentManager {
     // ------------------------   active content ------------------------------
 
     //TODO do we need synchronization?
-    public synchronized void setActiveContentToBeRenderedOnScreen(ActiveVisualContent activeContent) {
-        this.mActiveContent = activeContent;
+    public synchronized void createActiveContent(Pose glPose, Content content){
+        content.withTangoData(new TangoData(glPose));
+        this.mActiveContent = new ActiveVisualContent(content);
         mIsActiveContentRenderedOnScreen = false;
+    }
+
+    public void updateActiveContent(Pose newPose) {
+        if (mActiveContent != null) {
+            mActiveContent.setNewPose(newPose);
+        }
     }
 
     public synchronized void activeContentAlreadyRenderedOnScreen() {

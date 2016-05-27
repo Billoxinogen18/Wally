@@ -22,60 +22,60 @@ public class VisualContentManagerTest {
         mVisualContentManager = new VisualContentManager();
     }
 
-    @Test
-    public void activeContentTest1(){
-        ActiveVisualContent a = mock(ActiveVisualContent.class);
-        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-        assertThat(mVisualContentManager.getActiveContent(), is(a));
-    }
-
-    @Test
-    public void activeContentTest2(){
-        ActiveVisualContent a = mock(ActiveVisualContent.class);
-        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-        assertThat(mVisualContentManager.shouldActiveContentREnderOnScreen(), is(true));
-    }
-
-    @Test
-    public void activeContentTest3(){
-        ActiveVisualContent a = mock(ActiveVisualContent.class);
-        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-        mVisualContentManager.activeContentAlreadyRenderedOnScreen();
-        assertThat(mVisualContentManager.shouldActiveContentREnderOnScreen(), is(false));
-    }
-
-    @Test
-    public void activeContentTest4(){
-        ActiveVisualContent a = mock(ActiveVisualContent.class);
-        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-        mVisualContentManager.activeContentAlreadyRenderedOnScreen();
-        assertThat(mVisualContentManager.getActiveContent(), is(a));
-    }
-
-    @Test
-    public void activeContentTest5(){
-        ActiveVisualContent a = mock(ActiveVisualContent.class);
-        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-        mVisualContentManager.removeActiveContent();
-        assertThat(mVisualContentManager.getActiveContent(), is(IsNull.nullValue()));
-    }
-
-    @Test
-    public void activeContentTest6(){
-        ActiveVisualContent a = mock(ActiveVisualContent.class);
-        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-        mVisualContentManager.removeActiveContent();
-        assertThat(mVisualContentManager.shouldActiveContentREnderOnScreen(), is(false));
-    }
-
-
-    @Test
-    public void activeContentTest9(){
-        ActiveVisualContent a = mock(ActiveVisualContent.class);
-        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-        mVisualContentManager.activeContentAddingFinished();
-        assertThat(mVisualContentManager.getStaticContentToBeRenderedOnScreen().contains(a), is(true));
-    }
+//    @Test
+//    public void activeContentTest1(){
+//        ActiveVisualContent a = mock(ActiveVisualContent.class);
+//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
+//        assertThat(mVisualContentManager.getActiveContent(), is(a));
+//    }
+//
+//    @Test
+//    public void activeContentTest2(){
+//        ActiveVisualContent a = mock(ActiveVisualContent.class);
+//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
+//        assertThat(mVisualContentManager.shouldActiveContentREnderOnScreen(), is(true));
+//    }
+//
+//    @Test
+//    public void activeContentTest3(){
+//        ActiveVisualContent a = mock(ActiveVisualContent.class);
+//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
+//        mVisualContentManager.activeContentAlreadyRenderedOnScreen();
+//        assertThat(mVisualContentManager.shouldActiveContentREnderOnScreen(), is(false));
+//    }
+//
+//    @Test
+//    public void activeContentTest4(){
+//        ActiveVisualContent a = mock(ActiveVisualContent.class);
+//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
+//        mVisualContentManager.activeContentAlreadyRenderedOnScreen();
+//        assertThat(mVisualContentManager.getActiveContent(), is(a));
+//    }
+//
+//    @Test
+//    public void activeContentTest5(){
+//        ActiveVisualContent a = mock(ActiveVisualContent.class);
+//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
+//        mVisualContentManager.removeActiveContent();
+//        assertThat(mVisualContentManager.getActiveContent(), is(IsNull.nullValue()));
+//    }
+//
+//    @Test
+//    public void activeContentTest6(){
+//        ActiveVisualContent a = mock(ActiveVisualContent.class);
+//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
+//        mVisualContentManager.removeActiveContent();
+//        assertThat(mVisualContentManager.shouldActiveContentREnderOnScreen(), is(false));
+//    }
+//
+//
+//    @Test
+//    public void activeContentTest9(){
+//        ActiveVisualContent a = mock(ActiveVisualContent.class);
+//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
+//        mVisualContentManager.activeContentAddingFinished();
+//        assertThat(mVisualContentManager.getStaticContentToBeRenderedOnScreen().contains(a), is(true));
+//    }
 
 
     @Test

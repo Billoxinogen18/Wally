@@ -200,7 +200,7 @@ public class TangoManager implements OnVisualContentSelectedListener {
 
         if (mContentFitter != null) {
             if (mContentFitter.isCancelled()) {
-                mContentFitter = new ContentFitter(mContentFitter.getContent(), this);
+                mContentFitter = new ContentFitter(mContentFitter.getContent(), this, mVisualContentManager);
             }
             mContentFitter.setFittingStatusListener(onContentFitListener);
             mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -337,25 +337,6 @@ public class TangoManager implements OnVisualContentSelectedListener {
         return doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread);
     }
 
-    public void setActiveContent(TangoPoseData pose, Content content) {
-        Pose glPose = ScenePoseCalculator.toOpenGLPose(pose);
-        content.withTangoData(new TangoData(glPose));
-
-        ActiveVisualContent activeVisualContent = new ActiveVisualContent(content);
-        mVisualContentManager.setActiveContentToBeRenderedOnScreen(activeVisualContent);
-    }
-
-    public void updateActiveContent(TangoPoseData newPose) {
-        if (mVisualContentManager.getActiveContent() != null) {
-            mVisualContentManager.getActiveContent().setNewPose(ScenePoseCalculator.toOpenGLPose(newPose));
-        }
-    }
-
-    public void addActiveToStaticContent() {
-        mVisualContentManager.activeContentAddingFinished();
-        removeActiveContent();
-    }
-
     public void removeActiveContent() {
         if (mVisualContentManager.getActiveContent() != null) {
             mRenderer.removeActiveContent(mVisualContentManager.getActiveContent());
@@ -439,7 +420,7 @@ public class TangoManager implements OnVisualContentSelectedListener {
             Log.e(TAG, "onContentCreated: called when content was already fitting");
             return;
         }
-        mContentFitter = new ContentFitter(content, this);
+        mContentFitter = new ContentFitter(content, this, mVisualContentManager);
         mContentFitter.setFittingStatusListener(onContentFitListener);
         mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
@@ -451,7 +432,7 @@ public class TangoManager implements OnVisualContentSelectedListener {
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("FITTING_CONTENT")) {
                 Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
-                mContentFitter = new ContentFitter(c, this);
+                mContentFitter = new ContentFitter(c, this, mVisualContentManager);
             }
         }
     }
