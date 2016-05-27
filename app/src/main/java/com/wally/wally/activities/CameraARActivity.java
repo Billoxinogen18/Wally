@@ -1,8 +1,12 @@
 package com.wally.wally.activities;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -11,11 +15,15 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.OnContentSelectedListener;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
@@ -24,28 +32,31 @@ import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
 
 
-
 /**
  * Created by shota on 5/21/16.
  */
-public abstract class CameraARActivity extends LoginActivity implements OnContentSelectedListener, NewContentDialogFragment.NewContentDialogListener {
+public abstract class CameraARActivity extends LoginActivity implements OnContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = CameraARActivity.class.getSimpleName();
+    private static final int REQUEST_CODE_MY_LOCATION = 22;
     private static final int RC_SIGN_IN = 100;
-
-    private UserManager mUserManager;
     protected DataController mDataController;
-
+    private UserManager mUserManager;
     private View mSelectedMenuView;
     private long mLastSelectTime;
     private Content mSelectedContent;
+    private Content mContentToSave;
 
+    private GoogleApiClient mGoogleApiClient;
     private ProgressDialog mProgressDialog;
 
 
     public abstract void onDeleteContent(Content selectedContent);
-    public abstract void onSaveContent(Content selectedContent);
-    public abstract void onCreatedContent(Content contentCreated, boolean isEditMode);
 
+    public abstract void onSaveContent(Content selectedContent);
+
+    // Called When content object is created by user
+    @Override
+    public abstract void onContentCreated(Content content, boolean isEditMode);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +69,32 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
         mUserManager = ((App) getApplicationContext()).getUserManager(); //TODO get LoginManager from the Factory!
         mDataController = ((App) getApplicationContext()).getDataController();
 
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    public void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+
+    }
 
     @Override
     protected void onPause() {
@@ -76,15 +111,37 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
     }
 
     @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_MY_LOCATION) {
+            if (Utils.checkLocationPermission(this)) {
+                saveActiveContent(mContentToSave);
+            }
+        }
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putSerializable("mSelectedContent", mSelectedContent);
+        outState.putSerializable("mContentToSave", mContentToSave);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mSelectedContent = (Content) savedInstanceState.getSerializable("mSelectedContent");
+        mContentToSave = (Content) savedInstanceState.getSerializable("mContentToSave");
         onContentSelected(mSelectedContent);
     }
 
@@ -189,15 +246,25 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
     }
 
     protected void saveActiveContent(Content content) {
-        onSaveContent(content);
-        mDataController.save(content);
+        mContentToSave = content;
+        // Check and set location to content
+        if (Utils.checkLocationPermission(this)) {
+            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+            if (myLocation == null) {
+                Toast.makeText(this, "Couldn't get user location", Toast.LENGTH_SHORT).show();
+            } else {
+                content.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
+            }
+            onSaveContent(content);
+            mDataController.save(content);
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_CODE_MY_LOCATION);
+        }
     }
 
-
-    @Override
-    public void onContentCreated(Content content, boolean isEditMode) {
-        onCreatedContent(content, isEditMode);
-    }
 
     @SuppressWarnings("ConstantConditions")
     private void displayProfileBar(SocialUser user) {

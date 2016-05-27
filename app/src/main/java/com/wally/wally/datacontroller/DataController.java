@@ -115,6 +115,10 @@ public class DataController {
         fetchByAuthor(author.getId(), resultCallback);
     }
 
+    public void fetchUser(String id, Callback<User> callback){
+        //TODO
+    }
+
     public void fetchPublicContent(FetchResultCallback callback) {
         new PublicityQuery(FirebaseContent.PUBLIC)
                 .fetch(contents, new FirebaseFetchResultCallback(callback));

@@ -1,15 +1,12 @@
 package com.wally.wally.fragments;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -26,13 +23,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
@@ -50,12 +42,11 @@ import java.util.Date;
  * Created by ioane5 on 4/7/16.
  */
 @SuppressWarnings("ALL")
-public class NewContentDialogFragment extends DialogFragment implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class NewContentDialogFragment extends DialogFragment implements View.OnClickListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
     private static final int REQUEST_CODE_CHOOSE_PHOTO = 129;
-    private static final int REQUEST_CODE_MY_LOCATION = 22;
 
     private NewContentDialogListener mListener;
 
@@ -70,7 +61,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     private User mAuthor;
     private Content mContent;
     private boolean isEditMode;
-    private GoogleApiClient mGoogleApiClient;
     private boolean mIsDialogShown = true;
 
     // Empty constructor required for DialogFragment
@@ -121,14 +111,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             b = (Button) dv.findViewById(R.id.btn_discard_post);
             b.setText(R.string.post_cancel_edit);
         }
-        // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
         builder.setView(dv);
         Dialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -160,18 +142,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     public void onStart() {
         super.onStart();
         updateViews();
-        mGoogleApiClient.connect();
         showDialog(mIsDialogShown);
-    }
-
-    public void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-
     }
 
     @Override
@@ -200,13 +171,9 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 }
                 break;
             case R.id.btn_create_post:
-                if (Utils.checkLocationPermission(getContext())) {
-                    createPost();
-                } else {
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                            REQUEST_CODE_MY_LOCATION);
-                }
+                dismiss();
+                updateContent();
+                mListener.onContentCreated(mContent, isEditMode);
                 break;
             case R.id.btn_add_image:
                 startActivityForResult(ChoosePhotoActivity.newIntent(getActivity()), REQUEST_CODE_CHOOSE_PHOTO);
@@ -231,21 +198,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             default:
                 Log.e(TAG, "onClick: " + v.getId());
         }
-    }
-
-    @SuppressWarnings("MissingPermission")
-    private void createPost() {
-        dismiss();
-        Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-        if (myLocation == null) {
-            Log.e(TAG, "centerMapOnMyLocation: couldn't get user location");
-            Toast.makeText(getContext(), "Couldn't get user location", Toast.LENGTH_SHORT).show();
-        } else {
-            mContent.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
-        }
-        updateContent();
-        mListener.onContentCreated(mContent, isEditMode);
     }
 
     /**
@@ -332,16 +284,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_MY_LOCATION) {
-            if (Utils.checkLocationPermission(getContext())) {
-                createPost();
-            }
-        }
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         updateContent();
@@ -363,16 +305,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             }
         }
         mIsDialogShown = show;
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     public interface NewContentDialogListener {

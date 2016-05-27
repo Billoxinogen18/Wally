@@ -53,25 +53,6 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     }
 
     @Override
-    public void onDeleteContent(Content selectedContent) {
-        mTangoManager.removeContent(selectedContent);
-    }
-
-    @Override
-    public void onSaveContent(Content content) {
-        content.withUuid(mAdfUuid);
-    }
-
-    @Override
-    public void onCreatedContent(Content contentCreated, boolean isEditMode) {
-        if (isEditMode) {
-            // remove content and start new fitting.
-            mTangoManager.removeContent(contentCreated);
-        }
-        mTangoManager.onContentCreated(contentCreated);
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -118,6 +99,25 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
             requestADFPermission();
         }
+    }
+
+    @Override
+    public void onDeleteContent(Content selectedContent) {
+        mTangoManager.removeContent(selectedContent);
+    }
+
+    @Override
+    public void onSaveContent(Content content) {
+        content.withUuid(mAdfUuid);
+    }
+
+    @Override
+    public void onContentCreated(Content contentCreated, boolean isEditMode) {
+        if (isEditMode) {
+            // remove content and start new fitting.
+            mTangoManager.removeContent(contentCreated);
+        }
+        mTangoManager.onContentCreated(contentCreated);
     }
 
     @Override
