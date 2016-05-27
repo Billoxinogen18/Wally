@@ -1,10 +1,13 @@
 package com.wally.wally.activities;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -47,8 +50,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleApiClient mGoogleApiClient;
     private Set<Content> mContents;
     private Map<Content, Marker> mMarkers;
+    private Content mContent;
 
     private long mLastRequestId;
+
+    public static Intent newIntent(Context context, @Nullable Content content) {
+        Intent i = new Intent(context, MapsActivity.class);
+        i.putExtra("mContent", content);
+        return i;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +67,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mContents = new HashSet<>();
         mMarkers = new HashMap<>();
+
+        mContent = (Content) getIntent().getSerializableExtra("mContent");
 
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -84,7 +96,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
         mMap.setOnCameraChangeListener(this);
         mMap.setOnMarkerClickListener(this);
-        centerMapOnMyLocation();
+        mMap.setPadding(0, (int) getResources().getDimension(R.dimen.map_back_button_height), 0, 0);
+        if (Utils.checkLocationPermission(this)) {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_LOCATION_REQUEST_CODE);
+        }
+
+        if (mContent != null) {
+            centerMapOnContent(mContent);
+        } else {
+            centerMapOnMyLocation();
+        }
     }
 
     @Override
@@ -161,11 +187,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void centerMapOnMyLocation() {
         if (Utils.checkLocationPermission(this)) {
-            if (!mMap.isMyLocationEnabled()) {
-                mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(false);
-            }
-
             Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
             if (myLocation == null) {
@@ -180,6 +201,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_LOCATION_REQUEST_CODE);
         }
+    }
+
+    private void centerMapOnContent(Content content) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(content.getLocation(), 16), 2000, null);
     }
 
     @Override
