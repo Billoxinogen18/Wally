@@ -3,7 +3,6 @@ package com.wally.wally.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.ViewGroup;
 
 import com.wally.wally.R;
@@ -14,7 +13,7 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 /**
  * Created by shota on 5/21/16.
  */
-public class CameraARStandardActivity extends  CameraARActivity{
+public class CameraARStandardActivity extends CameraARActivity {
 
     public static Intent newIntent(Context context) {
         Intent i = new Intent(context, CameraARStandardActivity.class);
@@ -33,7 +32,7 @@ public class CameraARStandardActivity extends  CameraARActivity{
     }
 
     @Override
-    public void onCreatedContent(Content contentCreated, boolean isEditMode) {
+    public void onContentCreated(Content contentCreated, boolean isEditMode) {
 
     }
 
