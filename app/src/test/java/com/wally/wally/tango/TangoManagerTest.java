@@ -9,6 +9,7 @@ import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.projecttango.tangosupport.TangoPointCloudManager;
+import com.wally.wally.components.WallyTangoUx;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class TangoManagerTest {
     private WallyRenderer renderer;
     private VisualContentManager visualContentManager;
     TangoPointCloudManager pointCloudManager;
-    private TangoUx tangoUx;
+    private WallyTangoUx tangoUx;
     private Tango tango;
     private String uid;
 
@@ -52,7 +53,7 @@ public class TangoManagerTest {
         tangoUxLayout = mock(TangoUxLayout.class);
         renderer = mock(WallyRenderer.class);
         visualContentManager = mock(VisualContentManager.class);
-        tangoUx = mock(TangoUx.class);
+        tangoUx = mock(WallyTangoUx.class);
         tango = TangoMock.getTango();
 
     }
