@@ -38,7 +38,7 @@ import java.util.Collection;
 /**
  * Created by shota on 4/21/16.
  */
-public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDetector.OnScaleGestureListener, OnVisualContentSelectedListener {
+public class TangoManager implements OnVisualContentSelectedListener {
     public static final TangoCoordinateFramePair FRAME_PAIR = new TangoCoordinateFramePair(
             TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
             TangoPoseData.COORDINATE_FRAME_DEVICE);
@@ -53,7 +53,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     private Tango mTango;
     private WallyTangoUx mTangoUx;
 
-    private RajawaliSurfaceView mSurfaceView;
     private WallyRenderer mRenderer;
     private VisualContentManager mVisualContentManager;
 
@@ -68,42 +67,41 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
     // Texture rendering related fields
     // NOTE: Naming indicates which thread is in charge of updating this variable
     private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
-    private boolean mIsFrameAvailableTangoThread;
     private double mRgbTimestampGlThread;
 
     private OnContentSelectedListener onContentSelectedListener;
     private ContentFitter.OnContentFitListener onContentFitListener;
 
-    private boolean isLocalized;
+    private TangoUpdater mTangoUpdater;
 
 
     //For testing
-    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout,
+    public TangoManager(Context context, TangoUpdater tangoUpdater, TangoUxLayout tangoUxLayout,
                         TangoPointCloudManager pointCloudManager, VisualContentManager visualContentManager,
-                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, Tango tango, String adfUuid) {
+                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, Tango tango, String adfUuid, ScaleGestureDetector scaleDetector) {
         mContext = context;
-        mSurfaceView = rajawaliSurfaceView;
+        mTangoUpdater = tangoUpdater;
         mAdfUuid = adfUuid;
         mVisualContentManager = visualContentManager;
         mRenderer = wallyRenderer;
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
         mTango = tango;
-        mScaleDetector = new ScaleGestureDetector(context, this); //TODO refactor this!
+        mScaleDetector = scaleDetector;//new ScaleGestureDetector(context, this); //TODO refactor this!
     }
 
-    public TangoManager(Context context, RajawaliSurfaceView rajawaliSurfaceView, TangoUxLayout tangoUxLayout,
+    public TangoManager(Context context, TangoUpdater tangoUpdater, TangoUxLayout tangoUxLayout,
                         TangoPointCloudManager pointCloudManager, VisualContentManager visualContentManager,
-                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, String adfUuid) {
+                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, String adfUuid, ScaleGestureDetector scaleDetector) {
         mContext = context;
-        mSurfaceView = rajawaliSurfaceView;
+        mTangoUpdater = tangoUpdater;
         mAdfUuid = adfUuid;
         mVisualContentManager = visualContentManager;
         mRenderer = wallyRenderer;
         mRenderer.setOnContentSelectListener(this);
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
-        mScaleDetector = new ScaleGestureDetector(context, this); //TODO refactor this!
+        mScaleDetector = scaleDetector;//new ScaleGestureDetector(context, this); //TODO refactor this!
         fetchContentForAdf(adfUuid);
     }
 
@@ -152,10 +150,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         });
     }
 
-    public VisualContentManager getVisualContentManager() {
-        return mVisualContentManager;
-    }
-
 
     public synchronized void onPause() {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
@@ -174,7 +168,7 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         mTango.disconnect();
         mTangoUx.stop();
 
-        isLocalized = false;
+        mTangoUpdater.setTangoLocalization(false);
 
         if (mContentFitter != null) {
             mContentFitter.cancel(true);
@@ -248,62 +242,12 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
                         TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE,
                         TangoPoseData.COORDINATE_FRAME_DEVICE
                 ));
-        mTango.connectListener(framePairs, this);
+        mTango.connectListener(framePairs, mTangoUpdater);
 
         // Get extrinsics from device for use in transforms. This needs
         // to be done after connecting Tango and listeners.
         mExtrinsics = setupExtrinsics(mTango);
         mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-    }
-
-    @Override
-    public void onPoseAvailable(TangoPoseData pose) {
-        if (mTangoUx != null) {
-            mTangoUx.updatePoseStatus(pose.statusCode);
-        }
-
-        if (pose.statusCode != TangoPoseData.POSE_VALID) {
-            if (mTangoUx != null) {
-                mTangoUx.showCustomMessage("Hold Still");
-            }
-        } else if (pose.baseFrame == TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION && pose.targetFrame == TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE) {
-            isLocalized = true;
-            if (mTangoUx != null) {
-                mTangoUx.hideCustomMessage();
-            }
-        } else if (!isLocalized) {
-            if (mTangoUx != null) {
-                mTangoUx.showCustomMessage("Walk around!");
-            }
-        }
-    }
-
-    @Override
-    public void onFrameAvailable(int cameraId) {
-        // Check if the frame available is for the camera we want and update its frame
-        // on the view.
-        if (cameraId == TangoCameraIntrinsics.TANGO_CAMERA_COLOR) {
-            // Mark a camera frame is available for rendering in the OpenGL thread
-            mIsFrameAvailableTangoThread = true;
-            mSurfaceView.requestRender();
-        }
-    }
-
-    @Override
-    public void onXyzIjAvailable(TangoXyzIjData xyzIj) {
-        if (mTangoUx != null) {
-            mTangoUx.updateXyzCount(xyzIj.xyzCount);
-        }
-        // Save the cloud and point data for later use.
-        mPointCloudManager.updateXyzIj(xyzIj);
-    }
-
-    @Override
-    public void onTangoEvent(TangoEvent event) {
-        Log.d(TAG, "onTangoEvent() called with: " + "event = [" + event.eventKey + "]");
-        if (mTangoUx != null) {
-            mTangoUx.updateTangoEvent(event);
-        }
     }
 
     /**
@@ -344,10 +288,10 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
                     }
 
                     // If there is a new RGB camera frame available, update the texture with it
-                    if (mIsFrameAvailableTangoThread) {
+                    if (mTangoUpdater.isFrameAvailableTangoThread()) {
                         mRgbTimestampGlThread =
                                 mTango.updateTexture(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-                        mIsFrameAvailableTangoThread = false;
+                        mTangoUpdater.setFrameAvailableTangoThread(false);
                     }
 
                     // If a new RGB frame has been rendered, update the camera pose to match.
@@ -482,27 +426,6 @@ public class TangoManager implements Tango.OnTangoUpdateListener, ScaleGestureDe
         if (mContentFitter != null) {
             outState.putSerializable("FITTING_CONTENT", mContentFitter.getContent());
         }
-    }
-
-    @Override
-    public boolean onScale(ScaleGestureDetector detector) {
-        float scale = detector.getScaleFactor() != 0 ? detector.getScaleFactor() : 1f;
-        if (mVisualContentManager.getActiveContent() != null) {
-            mVisualContentManager.getActiveContent().scaleContent(scale);
-        } else {
-            Log.e(TAG, "onScale() was called but active content is not on screen");
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onScaleBegin(ScaleGestureDetector detector) {
-        return true;
-    }
-
-    @Override
-    public void onScaleEnd(ScaleGestureDetector detector) {
-
     }
 
     @Override

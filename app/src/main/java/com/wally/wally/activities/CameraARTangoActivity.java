@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
 import com.google.atap.tango.ux.TangoUxLayout;
@@ -17,8 +18,10 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoManager;
+import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.VisualContentManager;
 import com.wally.wally.tango.WallyRenderer;
 
@@ -93,8 +96,12 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
         tangoUx.setLayout(mTangoUxLayout);
 
-        mTangoManager = new TangoManager(getBaseContext(), mSurfaceView, mTangoUxLayout,
-                pointCloudManager, visualContentManager, renderer, tangoUx, mAdfUuid);
+        TangoUpdater tangoUpdater = new TangoUpdater(tangoUx,mSurfaceView,pointCloudManager);
+        ScaleGestureDetector scaleDetector = new ScaleGestureDetector(getBaseContext(),
+                new ActiveContentScaleGestureDetector(visualContentManager));
+
+        mTangoManager = new TangoManager(getBaseContext(), tangoUpdater, mTangoUxLayout,
+                pointCloudManager, visualContentManager, renderer, tangoUx, mAdfUuid, scaleDetector);
         mTangoManager.setOnContentSelectedListener(this);
         mTangoManager.setOnContentFitListener(this);
         mTangoManager.restoreState(savedInstanceState);
