@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 public class FirebaseObject extends HashMap<String, Object> {
-    Map<String, FirebaseObject> children;
+    private Map<String, FirebaseObject> children;
 
     @Exclude
     public String id;
-
 
     public FirebaseObject() {
         children = new HashMap<>();
@@ -74,13 +73,8 @@ public class FirebaseObject extends HashMap<String, Object> {
     }
 
     public void save(DatabaseReference ref) {
-        if (id == null) {
-            ref = ref.push();
-            ref.setValue(this);
-            id = ref.getKey();
-        } else {
-            ref.child(id).setValue(this);
-        }
+        id = ref.getKey();
+        ref.setValue(this);
     }
 
     public void delete(DatabaseReference ref) {
