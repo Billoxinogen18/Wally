@@ -3,16 +3,18 @@ package com.wally.wally.datacontroller;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.datacontroller.user.*;
 import com.wally.wally.datacontroller.queries.*;
 import com.wally.wally.datacontroller.callbacks.*;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
-import com.wally.wally.datacontroller.user.Id;
-import com.wally.wally.datacontroller.user.User;
 
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
@@ -24,6 +26,7 @@ public class DataController {
 
     private static DataController instance;
 
+    private User currentUser;
     private StorageReference storage;
     private DatabaseReference users, contents;
 
@@ -31,16 +34,14 @@ public class DataController {
         this.storage = storage;
         users = database.child(USERS_NODE);
         contents = database.child(CONTENTS_NODE);
-//        save(Utils.generateRandomContent());
     }
 
     public static DataController create() {
         if (instance == null) {
-            DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-            StorageReference storage = FirebaseStorage.getInstance().getReference();
             instance = new DataController(
-                    database.child(DATABASE_ROOT),
-                    storage.child(STORAGE_ROOT));
+                    FirebaseDatabase.getInstance().getReference().child(DATABASE_ROOT),
+                    FirebaseStorage.getInstance().getReference().child(STORAGE_ROOT)
+            );
         }
         return instance;
     }
@@ -105,10 +106,6 @@ public class DataController {
         fetchByAuthor(author.getId(), resultCallback);
     }
 
-    public void fetchUser(String id, Callback<User> callback) {
-        //TODO
-    }
-
     public void fetchPublicContent(FetchResultCallback callback) {
         new PublicityQuery(FirebaseContent.PUBLIC)
                 .fetch(contents, new FirebaseFetchResultCallback(callback));
@@ -120,12 +117,28 @@ public class DataController {
     }
 
     public User getCurrentUser() {
+        if (currentUser != null) return currentUser;
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return null;
         String id = user.getUid();
         // .get(1) assumes only one provider (Google)
         String ggId = user.getProviderData().get(1).getUid();
-        users.child(id).child("ggId").setValue(ggId);
-        return new User(id).withGgId(ggId);
+        currentUser = new User(id).withGgId(ggId);
+        users.child(id).setValue(currentUser);
+        return currentUser;
+    }
+
+    public void fetchUser(String id, final Callback<User> callback) {
+        users.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                callback.onResult(dataSnapshot.getValue(User.class));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
     }
 }

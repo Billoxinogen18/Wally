@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UnknownFormatConversionException;
 
 public class Utils {
+    public static final String DEBUG_USER_ID = "uSlLJUtZqbRDTMeLU4MdcToS8ZZ2";
     private static SecureRandom random = new SecureRandom();
 
     // This method is for debugging purposes
@@ -28,7 +29,7 @@ public class Utils {
                 .withTitle(randomStr(7))
                 .withColor(random.nextInt())
                 .withImageUri("http://" + randomStr(10))
-                .withAuthorId("uSlLJUtZqbRDTMeLU4MdcToS8ZZ2")
+                .withAuthorId(DEBUG_USER_ID)
                 .withLocation(
                         new LatLng(
                                 random.nextInt(),
