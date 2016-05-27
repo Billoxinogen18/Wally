@@ -615,11 +615,14 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
                     public boolean onMenuItemClick(MenuItem item) {
                         Content content = mData.get(getAdapterPosition());
                         switch (item.getItemId()) {
-                            case R.id.delete:
-                                onDeleteContent(content);
+                            case R.id.show_on_map:
+                                // startActivity(MapsActivity.getIntent(getBaseContext(), content));
                                 break;
                             case R.id.edit:
                                 onEditContent(content);
+                                break;
+                            case R.id.delete:
+                                onDeleteContent(content);
                                 break;
                         }
                         return false;
