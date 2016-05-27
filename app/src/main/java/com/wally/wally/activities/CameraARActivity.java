@@ -28,6 +28,8 @@ import com.wally.wally.components.CircleTransform;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
+import com.wally.wally.tango.OnVisualContentSelectedListener;
+import com.wally.wally.tango.VisualContent;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
 
@@ -35,7 +37,7 @@ import com.wally.wally.userManager.UserManager;
 /**
  * Created by shota on 5/21/16.
  */
-public abstract class CameraARActivity extends LoginActivity implements OnContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public abstract class CameraARActivity extends LoginActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int REQUEST_CODE_MY_LOCATION = 22;
     private static final int RC_SIGN_IN = 100;
@@ -145,8 +147,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
         onContentSelected(mSelectedContent);
     }
 
-    @Override
-    public void onContentSelected(Content content) {
+    private void onContentSelected(Content content){
         mSelectedContent = content;
         runOnUiThread(new Runnable() {
             @SuppressWarnings("ConstantConditions")
@@ -167,6 +168,15 @@ public abstract class CameraARActivity extends LoginActivity implements OnConten
                 }, 3000);
             }
         });
+    }
+
+    @Override
+    public void onVisualContentSelected(VisualContent visualContent) {
+        Content content = null;
+        if (visualContent != null) {
+            content = visualContent.getContent();
+        }
+        onContentSelected(content);
     }
 
 

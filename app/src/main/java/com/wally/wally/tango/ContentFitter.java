@@ -26,19 +26,17 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     private TangoPoseData lastPose;
     private VisualContentManager mVisualContentManager;
 
-    public ContentFitter(Content content, TangoManager tangoManager, VisualContentManager visualContentManager) {
+    public ContentFitter(Content content, TangoManager tangoManager, VisualContentManager visualContentManager, OnContentFitListener fittingStatusListener) {
         mContent = content;
         mTangoManager = tangoManager;
         mVisualContentManager = visualContentManager;
+        mFittingStatusListener = fittingStatusListener;
     }
 
     public Content getContent() {
         return mContent;
     }
 
-    public void setFittingStatusListener(OnContentFitListener fittingStatusListener) {
-        this.mFittingStatusListener = fittingStatusListener;
-    }
 
     @Override
     protected Void doInBackground(Void... params) {
@@ -108,7 +106,8 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     public void finishFitting() {
         // Order of this calls matter!!!
         mFittingStatusListener.onContentFittingFinished(getContent());
-        addActiveToStaticContent();
+        mVisualContentManager.activeContentAddingFinished();
+        mTangoManager.removeActiveContent();
         cancel(true);
     }
 
@@ -129,13 +128,6 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         }
         return null;
     }
-
-    private void addActiveToStaticContent() {
-        mVisualContentManager.activeContentAddingFinished();
-        mTangoManager.removeActiveContent();
-    }
-
-
 
     public interface OnContentFitListener {
         void onContentFit(TangoPoseData pose);

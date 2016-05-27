@@ -2,6 +2,7 @@ package com.wally.wally.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -45,6 +46,10 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     private List<View> mNonFittingModeViews;
 
 
+    private ContentFitter mContentFitter;
+    private VisualContentManager mVisualContentManager;
+
+
     public static Intent newIntent(Context context, @Nullable String uuid) {
         Intent i = new Intent(context, CameraARTangoActivity.class);
         i.putExtra(ARG_ADF_UUID, uuid);
@@ -66,9 +71,10 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         mAdfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
 
-        VisualContentManager visualContentManager = new VisualContentManager();
+        mVisualContentManager = new VisualContentManager();
 
-        WallyRenderer renderer = new WallyRenderer(context, visualContentManager);
+        final WallyRenderer renderer = new WallyRenderer(context, mVisualContentManager);
+        renderer.setOnContentSelectListener(this);
 
         mSurfaceView.setSurfaceRenderer(renderer);
         WallyTangoUx tangoUx = new WallyTangoUx(context);
@@ -78,19 +84,20 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         tangoUx.setLayout(mTangoUxLayout);
 
         TangoUpdater tangoUpdater = new TangoUpdater(tangoUx,mSurfaceView,pointCloudManager);
-        ScaleGestureDetector scaleDetector = new ScaleGestureDetector(getBaseContext(),
-                new ActiveContentScaleGestureDetector(visualContentManager));
-
         mTangoManager = new TangoManager(getBaseContext(), tangoUpdater, mTangoUxLayout,
-                pointCloudManager, visualContentManager, renderer, tangoUx, mAdfUuid, scaleDetector);
-        mTangoManager.setOnContentSelectedListener(this);
-        mTangoManager.setOnContentFitListener(this);
-        mTangoManager.restoreState(savedInstanceState);
+                pointCloudManager, mVisualContentManager, renderer, tangoUx, mAdfUuid);
+        restoreState(savedInstanceState);
+
+
+        final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(getBaseContext(),
+                new ActiveContentScaleGestureDetector(mVisualContentManager));
 
         mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                mTangoManager.onSurfaceTouch(event);
+                //TODO check!
+                scaleDetector.onTouchEvent(event);
+                renderer.onTouchEvent(event);
                 return true;
             }
         });
@@ -98,6 +105,16 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         if (!Utils.hasADFPermissions(getBaseContext())) {
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
             requestADFPermission();
+        }
+    }
+
+    private void restoreState(Bundle savedInstanceState) {
+        // Restore states here
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("FITTING_CONTENT")) {
+                Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
+                mContentFitter = new ContentFitter(c, mTangoManager, mVisualContentManager, this);
+            }
         }
     }
 
@@ -117,25 +134,47 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
             // remove content and start new fitting.
             mTangoManager.removeContent(contentCreated);
         }
-        mTangoManager.onContentCreated(contentCreated);
+        if (mContentFitter != null) {
+            Log.e(TAG, "onContentCreated: called when content was already fitting");
+            return;
+        }
+        mContentFitter = new ContentFitter(contentCreated, mTangoManager, mVisualContentManager, this);
+        mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        onFitStatusChange(true);
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mTangoManager.onPause();
+
+        if (mContentFitter != null) {
+            mContentFitter.cancel(true);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mTangoManager.onResume();
+
+        if (mContentFitter != null) {
+            if (mContentFitter.isCancelled()) {
+                mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager, mVisualContentManager,this);
+            }
+            mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            onFitStatusChange(true);
+        }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mTangoManager.onSaveInstanceState(outState);
+        if (mContentFitter != null) {
+            outState.putSerializable("FITTING_CONTENT", mContentFitter.getContent());
+        }
     }
 
 
@@ -163,11 +202,16 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     }
 
     public void onCancelFittingClick(View view) {
-        mTangoManager.cancelFitting();
+        mContentFitter.cancel(true);
+        mContentFitter = null;
+
+        onFitStatusChange(false);
     }
 
     public void onFinishFittingClick(View view) {
-        mTangoManager.finishFitting();
+        mContentFitter.finishFitting();
+        mContentFitter = null;
+        onFitStatusChange(false);
     }
 
     private void requestADFPermission() {

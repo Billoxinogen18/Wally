@@ -38,7 +38,7 @@ import java.util.Collection;
 /**
  * Created by shota on 4/21/16.
  */
-public class TangoManager implements OnVisualContentSelectedListener {
+public class TangoManager {
     public static final TangoCoordinateFramePair FRAME_PAIR = new TangoCoordinateFramePair(
             TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
             TangoPoseData.COORDINATE_FRAME_DEVICE);
@@ -56,9 +56,6 @@ public class TangoManager implements OnVisualContentSelectedListener {
     private WallyRenderer mRenderer;
     private VisualContentManager mVisualContentManager;
 
-    private ContentFitter mContentFitter;
-    private ScaleGestureDetector mScaleDetector;
-
     private String mAdfUuid;
     private double mCameraPoseTimestamp = 0;
 
@@ -69,16 +66,13 @@ public class TangoManager implements OnVisualContentSelectedListener {
     private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
     private double mRgbTimestampGlThread;
 
-    private OnContentSelectedListener onContentSelectedListener;
-    private ContentFitter.OnContentFitListener onContentFitListener;
-
     private TangoUpdater mTangoUpdater;
 
 
     //For testing
     public TangoManager(Context context, TangoUpdater tangoUpdater, TangoUxLayout tangoUxLayout,
                         TangoPointCloudManager pointCloudManager, VisualContentManager visualContentManager,
-                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, Tango tango, String adfUuid, ScaleGestureDetector scaleDetector) {
+                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, Tango tango, String adfUuid) {
         mContext = context;
         mTangoUpdater = tangoUpdater;
         mAdfUuid = adfUuid;
@@ -87,21 +81,18 @@ public class TangoManager implements OnVisualContentSelectedListener {
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
         mTango = tango;
-        mScaleDetector = scaleDetector;//new ScaleGestureDetector(context, this); //TODO refactor this!
     }
 
     public TangoManager(Context context, TangoUpdater tangoUpdater, TangoUxLayout tangoUxLayout,
                         TangoPointCloudManager pointCloudManager, VisualContentManager visualContentManager,
-                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, String adfUuid, ScaleGestureDetector scaleDetector) {
+                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, String adfUuid) {
         mContext = context;
         mTangoUpdater = tangoUpdater;
         mAdfUuid = adfUuid;
         mVisualContentManager = visualContentManager;
         mRenderer = wallyRenderer;
-        mRenderer.setOnContentSelectListener(this);
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
-        mScaleDetector = scaleDetector;//new ScaleGestureDetector(context, this); //TODO refactor this!
         fetchContentForAdf(adfUuid);
     }
 
@@ -170,9 +161,6 @@ public class TangoManager implements OnVisualContentSelectedListener {
 
         mTangoUpdater.setTangoLocalization(false);
 
-        if (mContentFitter != null) {
-            mContentFitter.cancel(true);
-        }
     }
 
     public synchronized void onResume() {
@@ -198,14 +186,18 @@ public class TangoManager implements OnVisualContentSelectedListener {
             });
         }
 
-        if (mContentFitter != null) {
-            if (mContentFitter.isCancelled()) {
-                mContentFitter = new ContentFitter(mContentFitter.getContent(), this, mVisualContentManager);
-            }
-            mContentFitter.setFittingStatusListener(onContentFitListener);
-            mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            onContentFitListener.onFitStatusChange(true);
-        }
+    }
+
+
+    public boolean isConnected() {
+        return mIsConnected;
+    }
+
+    /**
+     * Finds plane pose in the middle of the screen.
+     */
+    public TangoPoseData findPlaneInMiddle() {
+        return doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread);
     }
 
     /**
@@ -326,35 +318,6 @@ public class TangoManager implements OnVisualContentSelectedListener {
         });
     }
 
-    public boolean isConnected() {
-        return mIsConnected;
-    }
-
-    /**
-     * Finds plane pose in the middle of the screen.
-     */
-    public TangoPoseData findPlaneInMiddle() {
-        return doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread);
-    }
-
-    public void removeActiveContent() {
-        if (mVisualContentManager.getActiveContent() != null) {
-            mRenderer.removeActiveContent(mVisualContentManager.getActiveContent());
-        } else {
-            Log.e(TAG, "removeActiveContent() : There was no active content to remove");
-        }
-    }
-
-    public void removeContent(Content content) {
-        VisualContent vc = mVisualContentManager.findVisualContentByContent(content);
-        if (vc != null) {
-            mRenderer.removeStaticContent(vc);
-        } else {
-            Log.d(TAG, "removeContent() called with: " + "content = [" + content + "]  VisualContent not found");
-        }
-
-    }
-
     /**
      * Use the TangoSupport library with point cloud data to calculate the plane
      * of the world feature pointed at the location the camera is looking.
@@ -390,65 +353,22 @@ public class TangoManager implements OnVisualContentSelectedListener {
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
     }
 
-    public void setOnContentSelectedListener(OnContentSelectedListener onContentSelectedListener) {
-        this.onContentSelectedListener = onContentSelectedListener;
-    }
-
-    public void onSurfaceTouch(MotionEvent event) {
-        mScaleDetector.onTouchEvent(event);
-        mRenderer.onTouchEvent(event);
-    }
-
-    public void setOnContentFitListener(ContentFitter.OnContentFitListener onContentFitListener) {
-        this.onContentFitListener = onContentFitListener;
-    }
-
-    public void onSaveInstanceState(Bundle outState) {
-        if (mContentFitter != null) {
-            outState.putSerializable("FITTING_CONTENT", mContentFitter.getContent());
+//TODO should be removed from here!
+    public void removeActiveContent() {
+        if (mVisualContentManager.getActiveContent() != null) {
+            mRenderer.removeActiveContent(mVisualContentManager.getActiveContent());
+        } else {
+            Log.e(TAG, "removeActiveContent() : There was no active content to remove");
         }
     }
 
-    @Override
-    public void onVisualContentSelected(VisualContent c) {
-        onContentSelectedListener.onContentSelected(c != null ? c.getContent() : null);
-
-    }
-
-    public void onContentCreated(Content content) {
-        if (mContentFitter != null) {
-            Log.e(TAG, "onContentCreated: called when content was already fitting");
-            return;
+    public void removeContent(Content content) {
+        VisualContent vc = mVisualContentManager.findVisualContentByContent(content);
+        if (vc != null) {
+            mRenderer.removeStaticContent(vc);
+        } else {
+            Log.d(TAG, "removeContent() called with: " + "content = [" + content + "]  VisualContent not found");
         }
-        mContentFitter = new ContentFitter(content, this, mVisualContentManager);
-        mContentFitter.setFittingStatusListener(onContentFitListener);
-        mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-        onContentFitListener.onFitStatusChange(true);
     }
-
-    public void restoreState(Bundle savedInstanceState) {
-        // Restore states here
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("FITTING_CONTENT")) {
-                Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
-                mContentFitter = new ContentFitter(c, this, mVisualContentManager);
-            }
-        }
-    }
-
-    public void cancelFitting() {
-        mContentFitter.cancel(true);
-        mContentFitter = null;
-
-        onContentFitListener.onFitStatusChange(false);
-    }
-
-    public void finishFitting() {
-        mContentFitter.finishFitting();
-        mContentFitter = null;
-        onContentFitListener.onFitStatusChange(false);
-    }
-
-
 }
