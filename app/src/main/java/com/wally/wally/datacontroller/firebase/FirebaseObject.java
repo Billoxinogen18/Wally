@@ -1,10 +1,8 @@
 package com.wally.wally.datacontroller.firebase;
 
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 import com.wally.wally.datacontroller.Utils;
-import com.wally.wally.datacontroller.callbacks.Callback;
 
 import java.util.HashMap;
 import java.util.List;
@@ -69,40 +67,17 @@ public class FirebaseObject extends HashMap<String, Object> {
         return child;
     }
 
+    @Deprecated
     public boolean hasChild(String key) {
         return containsKey(key);
     }
 
     public void save(DatabaseReference ref) {
-        id = ref.getKey();
-        ref.setValue(this);
+        id = FirebaseUtils.save(ref, this);
     }
 
     public void delete(DatabaseReference ref) {
-        ref.child(id).removeValue();
-    }
-
-    @SuppressWarnings("unused")
-    public void delete(DatabaseReference ref, final Callback<Boolean> statusCallback) {
-        ref.child(id).removeValue(new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
-                statusCallback.onResult(firebaseError == null);
-            }
-        });
-    }
-
-    @SuppressWarnings("unused")
-    public void save(DatabaseReference ref, final Callback<Boolean> statusCallback) {
-        ref.push().setValue(this, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
-                if (firebaseError == null) {
-                    id = firebase.getKey();
-                }
-                statusCallback.onResult(firebaseError == null);
-            }
-        });
+        id = FirebaseUtils.delete(ref, this);
     }
 
 }
