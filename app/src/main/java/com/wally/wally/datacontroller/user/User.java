@@ -7,7 +7,8 @@ public class User implements Serializable {
     private Id ggId;
     private Id fbId;
 
-    public User() {}
+    public User() {
+    }
 
     public User(String id) {
         this.id = new Id(Id.PROVIDER_FIREBASE, id);
@@ -36,4 +37,14 @@ public class User implements Serializable {
         this.fbId = new Id(Id.PROVIDER_FACEBOOK, fbId);
         return this;
     }
+
+    @Override
+    public String toString() {
+        return new StringBuilder().append("{")
+                .append("id: ").append(id.getId())
+                .append(", ggId: ").append(getGgId().getId())
+                .append(", fbId: ").append(getFbId())
+                .append("}").toString();
+    }
+
 }

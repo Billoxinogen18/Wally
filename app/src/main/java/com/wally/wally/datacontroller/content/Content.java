@@ -5,6 +5,8 @@ import com.google.android.gms.maps.model.LatLng;
 import java.io.Serializable;
 
 public class Content implements Serializable {
+    public static final String UPLOAD_URI_PREFIX = "file://";
+
     private static final int MAX_TITLE_LENGTH = 150;
     private String id;
     private String title;
