@@ -1,7 +1,7 @@
 package com.wally.wally.datacontroller.content;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.wally.wally.datacontroller.FirebaseObject;
+import com.wally.wally.datacontroller.firebase.FirebaseObject;
 
 import java.util.Date;
 

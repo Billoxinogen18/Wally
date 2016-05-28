@@ -1,4 +1,4 @@
-package com.wally.wally.datacontroller;
+package com.wally.wally.datacontroller.firebase;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;

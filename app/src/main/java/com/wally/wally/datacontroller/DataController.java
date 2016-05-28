@@ -10,6 +10,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.datacontroller.firebase.FirebaseUtils;
 import com.wally.wally.datacontroller.user.*;
 import com.wally.wally.datacontroller.queries.*;
 import com.wally.wally.datacontroller.callbacks.*;

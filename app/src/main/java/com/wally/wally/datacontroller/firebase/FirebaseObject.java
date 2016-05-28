@@ -1,8 +1,9 @@
-package com.wally.wally.datacontroller;
+package com.wally.wally.datacontroller.firebase;
 
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
+import com.wally.wally.datacontroller.Utils;
 import com.wally.wally.datacontroller.callbacks.Callback;
 
 import java.util.HashMap;
