@@ -14,7 +14,7 @@ import com.wally.wally.datacontroller.callbacks.Callback;
 import java.io.File;
 import java.util.UUID;
 
-public class FirebaseUtils {
+public class FirebaseDAL {
 
     public static void uploadFile(StorageReference storage, String localPath,
                                   final Callback<String> resultCallback) {

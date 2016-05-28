@@ -73,11 +73,11 @@ public class FirebaseObject extends HashMap<String, Object> {
     }
 
     public void save(DatabaseReference ref) {
-        id = FirebaseUtils.save(ref, this);
+        id = FirebaseDAL.save(ref, this);
     }
 
     public void delete(DatabaseReference ref) {
-        id = FirebaseUtils.delete(ref, this);
+        id = FirebaseDAL.delete(ref, this);
     }
 
 }

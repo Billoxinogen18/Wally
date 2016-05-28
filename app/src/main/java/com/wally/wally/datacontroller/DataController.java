@@ -10,7 +10,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.wally.wally.datacontroller.firebase.FirebaseUtils;
+import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.user.*;
 import com.wally.wally.datacontroller.queries.*;
 import com.wally.wally.datacontroller.callbacks.*;
@@ -50,7 +50,7 @@ public class DataController {
     private void uploadImage(String imagePath, String folder, final Callback<String> callback) {
         if (imagePath != null && imagePath.startsWith(Content.UPLOAD_URI_PREFIX)) {
             String imgUriString = imagePath.substring(Content.UPLOAD_URI_PREFIX.length());
-            FirebaseUtils.uploadFile(storage.child(folder), imgUriString, callback);
+            FirebaseDAL.uploadFile(storage.child(folder), imgUriString, callback);
         } else {
             callback.onResult(imagePath);
         }
