@@ -67,11 +67,6 @@ public class FirebaseObject extends HashMap<String, Object> {
         return child;
     }
 
-    @Deprecated
-    public boolean hasChild(String key) {
-        return containsKey(key);
-    }
-
     public void save(DatabaseReference ref) {
         id = FirebaseDAL.save(ref, this);
     }

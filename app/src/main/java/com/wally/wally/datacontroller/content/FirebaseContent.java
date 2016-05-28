@@ -13,7 +13,6 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_TITLE          = "title";
     public static final String K_COLOR          = "color";
     public static final String K_IMGURI         = "image";
-    public static final String K_IMG_ID         = "img_id";
     public static final String K_ROOM           = "roomId";
     public static final String K_AUTHOR         = "authorId";
     public static final String K_NOTE_DATA      = "NoteData";
@@ -82,7 +81,7 @@ public class FirebaseContent extends FirebaseObject {
     }
 
     public LatLng getLocation() {
-        return hasChild(K_LOCATION) ? new LatLng(getLatitude(), getLongitude()) : null;
+        return containsKey(K_LOCATION) ? new LatLng(getLatitude(), getLongitude()) : null;
     }
 
     public TangoData getTangoData() {
@@ -155,9 +154,5 @@ public class FirebaseContent extends FirebaseObject {
                 .withLocation(getLocation())
                 .withTangoData(getTangoData())
                 .withVisibility(getVisibility());
-    }
-
-    public static FirebaseContent fromContent(Content content) {
-        return new FirebaseContent(content);
     }
 }
