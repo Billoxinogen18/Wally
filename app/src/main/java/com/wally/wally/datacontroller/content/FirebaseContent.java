@@ -3,8 +3,6 @@ package com.wally.wally.datacontroller.content;
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;
 
-import java.util.Date;
-
 public class FirebaseContent extends FirebaseObject {
     public static final int PUBLIC = Visibility.SocialVisibility.PUBLIC;
 
@@ -49,35 +47,35 @@ public class FirebaseContent extends FirebaseObject {
 
 
     public String getRoom() {
-        return getString(K_ROOM);
+        return get(K_ROOM).toString();
     }
 
     public String getNote() {
-        return getChild(K_NOTE_DATA).getString(K_NOTE);
+        return getChild(K_NOTE_DATA).get(K_NOTE).toString();
     }
 
     public String getTitle() {
-        return getChild(K_NOTE_DATA).getString(K_TITLE);
+        return getChild(K_NOTE_DATA).get(K_TITLE).toString();
     }
 
     public Integer getColor() {
-        return getChild(K_NOTE_DATA).getInteger(K_COLOR);
+        return getChild(K_NOTE_DATA).get(K_COLOR).toInteger();
     }
 
     public String getImageUri() {
-        return getChild(K_NOTE_DATA).getString(K_IMGURI);
+        return getChild(K_NOTE_DATA).get(K_IMGURI).toString();
     }
 
     public String getAuthorId() {
-        return getString(K_AUTHOR);
+        return get(K_AUTHOR).toString();
     }
 
     public Double getLatitude() {
-        return getChild(K_LOCATION).getDouble(K_LAT);
+        return getChild(K_LOCATION).get(K_LAT).toDouble();
     }
 
     public Double getLongitude() {
-        return getChild(K_LOCATION).getDouble(K_LNG);
+        return getChild(K_LOCATION).get(K_LNG).toDouble();
     }
 
     public LatLng getLocation() {
@@ -88,27 +86,27 @@ public class FirebaseContent extends FirebaseObject {
         if (!containsKey(K_TANGO_DATA)) return null;
         FirebaseObject tangoData = getChild(K_TANGO_DATA);
         return new TangoData()
-                .withScale(tangoData.getDouble(K_SCALE))
-                .withRotation(tangoData.getArray(K_ROTATION))
-                .withTranslation(tangoData.getArray(K_TRANSLATION));
+                .withScale(tangoData.get(K_SCALE).toDouble())
+                .withRotation(tangoData.get(K_ROTATION).toDoubleArray())
+                .withTranslation(tangoData.get(K_TRANSLATION).toDoubleArray());
     }
 
     public Visibility getVisibility() {
         return new Visibility()
                 .withRangeVisibility(getRange())
                 .withSocialVisibility(getPublicity())
-                .withTimeVisibility((Date) get(K_DURATION))
-                .withVisiblePreview((Boolean) getChild(K_NOTE_DATA).get(K_PREVIEW));
+                .withTimeVisibility(get(K_DURATION).toData())
+                .withVisiblePreview(getChild(K_NOTE_DATA).get(K_PREVIEW).toBoolean());
     }
 
     @SuppressWarnings("WrongConstant")
     private Visibility.RangeVisibility getRange() {
-        return new Visibility.RangeVisibility(getInteger(K_RANGE));
+        return new Visibility.RangeVisibility(get(K_RANGE).toInteger());
     }
 
     @SuppressWarnings("WrongConstant")
     private Visibility.SocialVisibility getPublicity() {
-        return new Visibility.SocialVisibility(getInteger(K_PUBLICITY));
+        return new Visibility.SocialVisibility(get(K_PUBLICITY).toInteger());
     }
 
     private void setNoteData(Content c) {
@@ -130,8 +128,8 @@ public class FirebaseContent extends FirebaseObject {
         if (td == null) return;
         getChild(K_TANGO_DATA)
                 .put(K_SCALE, td.getScale())
-                .putArray(K_ROTATION, td.getRotation())
-                .putArray(K_TRANSLATION, td.getTranslation());
+                .put(K_ROTATION, td.getRotation())
+                .put(K_TRANSLATION, td.getTranslation());
     }
 
     private void setVisibility(Visibility v) {
@@ -154,5 +152,16 @@ public class FirebaseContent extends FirebaseObject {
                 .withLocation(getLocation())
                 .withTangoData(getTangoData())
                 .withVisibility(getVisibility());
+    }
+
+    @Override
+    protected FirebaseObject getChild(String key) {
+        FirebaseObject child = super.getChild(key);
+        if (!containsKey(key)) {
+            put(key, child);
+        } else {
+            child.putAll(get(key).toStringMap());
+        }
+        return child;
     }
 }
