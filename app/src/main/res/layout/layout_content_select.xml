@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:layout_margin="48dp"
     android:orientation="vertical"
+    android:animateLayoutChanges="true"
     tools:visibility="visible">
 
     <RelativeLayout
@@ -15,14 +16,14 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:background="@drawable/owner_info_background"
+        android:animateLayoutChanges="true"
         android:paddingRight="16dp">
 
         <ImageView
             android:id="@+id/owner_image"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:layout_marginRight="16dp"
-            android:src="@drawable/sample_user_image" />
+            android:layout_marginRight="16dp"/>
 
         <TextView
             android:id="@+id/owner_name"
@@ -31,8 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_toRightOf="@+id/owner_image"
-            android:text="Giorgi Gogiashvili"
             android:textColor="#ffffff"
+            android:animateLayoutChanges="true"
             tools:text="Giorgi Gogiashvili" />
 
         <TextView

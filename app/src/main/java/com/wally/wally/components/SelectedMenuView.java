@@ -56,8 +56,12 @@ public class SelectedMenuView extends RelativeLayout {
     @Override
     public void setVisibility(int visibility) {
         super.setVisibility(visibility);
-        if (visibility == GONE)
+        if (visibility == GONE) {
             mContentControlPanel.setVisibility(GONE);
+            mNoteDate.setText("");
+            mOwnerImage.setImageBitmap(null);
+            mOwnerName.setText("");
+        }
     }
 
     public void setContent(Content content, GoogleApiClient googleApiClient) {
@@ -82,6 +86,7 @@ public class SelectedMenuView extends RelativeLayout {
     public void setOnSelectedMenuActionListener(OnSelectedMenuActionListener onSelectedMenuActionListener) {
         mOnSelectedMenuActionListener = onSelectedMenuActionListener;
     }
+
 
     private void init() {
         inflate(getContext(), R.layout.layout_content_select, this);
@@ -122,17 +127,15 @@ public class SelectedMenuView extends RelativeLayout {
         });
     }
 
-
     private void setAuthorData(SocialUser user) {
         Log.d(TAG, "setAuthorData() called with: " + "user = [" + user.getDisplayName() + "]");
         mContentAuthor = user;
         Glide.with(getContext())
                 .load(user.getAvatarUrl())
+                .transform(new CircleTransform(getContext()))
                 .into(mOwnerImage);
         mOwnerName.setText(user.getDisplayName());
     }
-
-
 
     private void loadAndSetAuthorData(String authorId) {
         getUser(authorId, new UserManager.UserLoadListener() {
