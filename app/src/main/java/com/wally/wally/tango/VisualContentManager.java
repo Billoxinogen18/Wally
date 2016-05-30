@@ -161,7 +161,7 @@ public class VisualContentManager implements LocalizationListener{
             }        }
     }
 
-    public void removePendingStaticContent(VisualContent visualContent){
+    private void removePendingStaticContent(VisualContent visualContent){
         synchronized (mStaticContentLock){
             visualContent.setStatus(RenderStatus.PendingRemove);
             int index = mStaticContent.indexOf(visualContent);
@@ -171,6 +171,23 @@ public class VisualContentManager implements LocalizationListener{
                 mStaticContent.set(index, visualContent);
             }
         }
+    }
+
+    public void removePendingStaticContent(Content content) {
+        synchronized (mStaticContentLock) {
+            VisualContent vc = findVisualContentByContent(content);
+            removePendingStaticContent(vc);
+        }
+    }
+
+    private VisualContent findVisualContentByContent(Content content) {
+        // TODO make with hashmap to get better performance
+        for (VisualContent vc : mStaticContent) {
+            if (vc.getContent().equals(content)) {
+                return vc;
+            }
+        }
+        return null;
     }
 
     public void setStaticContentAdded(VisualContent visualContent){

@@ -15,21 +15,24 @@ import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
+import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.WallyTangoUx;
+import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoManager;
 import com.wally.wally.tango.TangoUpdater;
-import com.wally.wally.tango.VisualContentManager3;
+import com.wally.wally.tango.VisualContentManager;
 import com.wally.wally.tango.WallyRenderer;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -48,7 +51,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
 
     private ContentFitter mContentFitter;
-    private VisualContentManager3 mVisualContentManager;
+    private VisualContentManager mVisualContentManager;
 
 
     public static Intent newIntent(Context context, @Nullable String uuid) {
@@ -72,7 +75,8 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         mAdfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
 
-        mVisualContentManager = new VisualContentManager3();
+        mVisualContentManager = new VisualContentManager();
+        fetchContentForAdf(context,mAdfUuid);
 
         final WallyRenderer renderer = new WallyRenderer(context, mVisualContentManager);
         renderer.setOnContentSelectListener(this);
@@ -86,8 +90,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
         TangoUpdater tangoUpdater = new TangoUpdater(tangoUx,mSurfaceView,pointCloudManager);
         TangoFactory tangoFactory = new TangoFactory(context);
-        mTangoManager = new TangoManager(context, tangoUpdater, pointCloudManager,
-                mVisualContentManager, renderer, tangoUx, tangoFactory, mAdfUuid);
+        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, mAdfUuid);
         restoreState(savedInstanceState);
 
 
@@ -110,6 +113,21 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         }
     }
 
+    private void fetchContentForAdf(Context context, String adfUuid) {
+        ((App) context.getApplicationContext()).getDataController().fetchByUUID(adfUuid, new FetchResultCallback() {
+
+            @Override
+            public void onResult(final Collection<Content> result) {
+                mVisualContentManager.createStaticContent(result);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                // TODO write error
+            }
+        });
+    }
+
     private void restoreState(Bundle savedInstanceState) {
         // Restore states here
         if (savedInstanceState != null) {
@@ -122,7 +140,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
     @Override
     public void onDeleteContent(Content selectedContent) {
-        mTangoManager.removeContent(selectedContent);
+        mVisualContentManager.removePendingStaticContent(selectedContent);
     }
 
     @Override
@@ -134,7 +152,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     public void onContentCreated(Content contentCreated, boolean isEditMode) {
         if (isEditMode) {
             // remove content and start new fitting.
-            mTangoManager.removeContent(contentCreated);
+            mVisualContentManager.removePendingStaticContent(contentCreated);
         }
         if (mContentFitter != null) {
             Log.e(TAG, "onContentCreated: called when content was already fitting");

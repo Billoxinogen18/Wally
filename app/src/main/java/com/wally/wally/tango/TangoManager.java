@@ -35,8 +35,6 @@ public class TangoManager {
     private static final String TAG = TangoManager.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
 
-    private Context mContext;
-
     private TangoCameraIntrinsics mIntrinsics;
     private DeviceExtrinsics mExtrinsics;
     private TangoPointCloudManager mPointCloudManager;
@@ -44,7 +42,6 @@ public class TangoManager {
     private WallyTangoUx mTangoUx;
 
     private WallyRenderer mRenderer;
-    private VisualContentManager mVisualContentManager;
 
     private String mAdfUuid;
     private double mCameraPoseTimestamp = 0;
@@ -59,18 +56,14 @@ public class TangoManager {
     private TangoUpdater mTangoUpdater;
     private TangoFactory mTangoFactory;
 
-    public TangoManager(Context context, TangoUpdater tangoUpdater, TangoPointCloudManager pointCloudManager,
-                        VisualContentManager visualContentManager, WallyRenderer wallyRenderer,
+    public TangoManager(TangoUpdater tangoUpdater, TangoPointCloudManager pointCloudManager, WallyRenderer wallyRenderer,
                         WallyTangoUx tangoUx, TangoFactory tangoFactory, String adfUuid) {
-        mContext = context;
         mTangoUpdater = tangoUpdater;
         mAdfUuid = adfUuid;
-        mVisualContentManager = visualContentManager;
         mRenderer = wallyRenderer;
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
         mTangoFactory = tangoFactory;
-        fetchContentForAdf(adfUuid);
     }
 
     /**
@@ -93,21 +86,6 @@ public class TangoManager {
         TangoPoseData imuTdepthPose = tango.getPoseAtTime(0.0, framePair);
 
         return new DeviceExtrinsics(imuTdevicePose, imuTrgbPose, imuTdepthPose);
-    }
-
-    private void fetchContentForAdf(String adfUuid) {
-        ((App) mContext.getApplicationContext()).getDataController().fetchByUUID(adfUuid, new FetchResultCallback() {
-
-            @Override
-            public void onResult(final Collection<Content> result) {
-                mVisualContentManager.createStaticContent(result);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                // TODO write error
-            }
-        });
     }
 
 
@@ -320,5 +298,5 @@ public class TangoManager {
                 intersectionPointPlaneModelPair.intersectionPoint,
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
     }
-    
+
 }
