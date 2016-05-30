@@ -1,13 +1,10 @@
 package com.wally.wally.tango;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.atap.tangoservice.TangoPoseData;
-import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.TangoData;
 
 /**
  * Thread that fits content on the wall.
@@ -55,7 +52,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
             }
         }
         mFittingStatusListener.onContentFit(null);
-        mVisualContentManager.createActiveContent(ScenePoseCalculator.toOpenGLPose(tangoPoseData), getContent());
+        mVisualContentManager.addPendingActiveContent(ScenePoseCalculator.toOpenGLPose(tangoPoseData), getContent());
 
         // Update content timely, while we are cancelled.
         while (true) {
@@ -94,20 +91,20 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        mTangoManager.removeActiveContent();
+        mVisualContentManager.removePendingActiveContent();
     }
 
     @Override
     protected void onPostExecute(Void v) {
         super.onPostExecute(v);
-        mTangoManager.removeActiveContent();
+        mVisualContentManager.removePendingActiveContent();
     }
 
     public void finishFitting() {
         // Order of this calls matter!!!
         mFittingStatusListener.onContentFittingFinished(getContent());
-        mVisualContentManager.activeContentAddingFinished();
-        mTangoManager.removeActiveContent();
+        mVisualContentManager.setActiveContentAdded();
+        mVisualContentManager.removePendingActiveContent();
         cancel(true);
     }
 

@@ -24,7 +24,7 @@ import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoManager;
 import com.wally.wally.tango.TangoUpdater;
-import com.wally.wally.tango.VisualContentManager;
+import com.wally.wally.tango.VisualContentManager3;
 import com.wally.wally.tango.WallyRenderer;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -48,7 +48,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
 
     private ContentFitter mContentFitter;
-    private VisualContentManager mVisualContentManager;
+    private VisualContentManager3 mVisualContentManager;
 
 
     public static Intent newIntent(Context context, @Nullable String uuid) {
@@ -72,7 +72,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         mAdfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
 
-        mVisualContentManager = new VisualContentManager();
+        mVisualContentManager = new VisualContentManager3();
 
         final WallyRenderer renderer = new WallyRenderer(context, mVisualContentManager);
         renderer.setOnContentSelectListener(this);

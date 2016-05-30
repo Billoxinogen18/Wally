@@ -18,15 +18,20 @@ import org.rajawali3d.materials.textures.Texture;
  * Created by shota on 4/29/16.
  */
 public class VisualContent {
+    public enum RenderStatus {None, PendingRender, PendingRemove, Rendered}
+
     private static final String TAG = VisualContent.class.getSimpleName();
     private static final float PLANE_WIDTH = 1f;
+    private RenderStatus mStatus;
     protected ContentPlane mVisual;
     protected Content mContent;
 
 
 
+
     public VisualContent(@NonNull Content content) {
         mContent = content;
+        mStatus = RenderStatus.None;
     }
 
     protected void refreshVisualScale() {
@@ -73,6 +78,14 @@ public class VisualContent {
 
     public Content getContent() {
         return mContent;
+    }
+
+    public RenderStatus getStatus(){
+        return mStatus;
+    }
+    
+    public void setStatus(RenderStatus status){
+        this.mStatus = status;
     }
 
 }

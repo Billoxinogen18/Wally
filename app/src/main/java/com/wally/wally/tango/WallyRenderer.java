@@ -35,6 +35,8 @@ import org.rajawali3d.renderer.RajawaliRenderer;
 import org.rajawali3d.util.ObjectColorPicker;
 import org.rajawali3d.util.OnObjectPickedListener;
 
+import java.util.Iterator;
+
 import javax.microedition.khronos.opengles.GL10;
 
 /**
@@ -113,31 +115,49 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
         mPicker.getObjectAt(x, y);
     }
 
-    private void renderStaticContent() {
-        if (mVisualContentManager.isStaticContentToBeRendered()) {
-            while(!mVisualContentManager.getStaticContentToBeRenderedOnScreen().isEmpty()){ //TODO refactor nicely
-                VisualContent visualContent = mVisualContentManager.getStaticContentToBeRenderedOnScreen().get(0);
-                getCurrentScene().addChild(visualContent.getVisual());
-                mVisualContentManager.addStaticContentAlreadyRenderedOnScreen(visualContent);
-                mPicker.registerObject(visualContent.getVisual());
+
+    private void renderActiveContent() {
+        ActiveVisualContent activeVisualContent = mVisualContentManager.getActiveContent();
+        if (activeVisualContent == null) return;
+        if (mVisualContentManager.shouldActiveContentRenderOnScreen()) {
+            addActiveContent(activeVisualContent);
+        } else if (mVisualContentManager.shouldActiveContentRemoveFromScreen()){
+            removeActiveContent(activeVisualContent);
+        } else {
+            if (activeVisualContent.shouldAnimate()) {
+                activeVisualContent.animate(getCurrentScene());
             }
         }
     }
 
-    private void renderActiveContent() {
-        if (mVisualContentManager.shouldActiveContentREnderOnScreen()) {
-            ActiveVisualContent activeVisualContent = mVisualContentManager.getActiveContent();
-            if (activeVisualContent == null) {
-                Log.e(TAG, "Error in logic activeVisualContent should not be null");
-                return;
-            }
+    private void addActiveContent(ActiveVisualContent activeVisualContent){
+        removeBorder();
+        getCurrentScene().addChild(activeVisualContent.getVisual());
+        mVisualContentManager.setActiveContentAdded();
+    }
+
+    private void removeActiveContent(ActiveVisualContent activeVisualContent) {
+        getCurrentScene().removeChild(activeVisualContent.getVisual());
+        mVisualContentManager.setActiveContentRemoved();
+        mOnContentSelectedListener.onVisualContentSelected(null);
+    }
+
+    private void renderStaticContent(){
+        Iterator<VisualContent> removeIt = mVisualContentManager.getStaticVisualContentToRemove();
+        while(removeIt.hasNext()){
+            VisualContent vc = removeIt.next();
+            getCurrentScene().removeChild(vc.getVisual());
+            mVisualContentManager.setStaticContentRemoved(vc);
+            mOnContentSelectedListener.onVisualContentSelected(null);
             removeBorder();
-            getCurrentScene().addChild(activeVisualContent.getVisual());
-            mVisualContentManager.activeContentAlreadyRenderedOnScreen();
-        } else if (mVisualContentManager.getActiveContent() != null) {
-            if (mVisualContentManager.getActiveContent().shouldAnimate()) {
-                mVisualContentManager.getActiveContent().animate(getCurrentScene());
-            }
+        }
+
+        Iterator<VisualContent> addIt = mVisualContentManager.getStaticVisualContentToAdd();
+        while(addIt.hasNext()){
+            VisualContent vc = addIt.next();
+            getCurrentScene().addChild(vc.getVisual());
+            mVisualContentManager.setStaticContentAdded(vc);
+            mPicker.registerObject(vc.getVisual());
         }
     }
 
@@ -223,19 +243,6 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
             getCurrentScene().addChild(VisualContentBorder.getInstance());
             mVisualContentManager.setBorderOnScreen(true);
         }
-    }
-
-    public void removeActiveContent(ActiveVisualContent activeVisualContent) {
-        getCurrentScene().removeChild(activeVisualContent.getVisual());
-        mVisualContentManager.removeActiveContent();
-        mOnContentSelectedListener.onVisualContentSelected(null);
-    }
-
-    public void removeStaticContent(VisualContent visualContent) {
-        getCurrentScene().removeChild(visualContent.getVisual());
-        mVisualContentManager.removeStaticContentAlreadyRenderedOnScreen(visualContent);
-        mOnContentSelectedListener.onVisualContentSelected(null);
-        removeBorder();
     }
 
     public void setOnContentSelectListener(OnVisualContentSelectedListener mContentSelectListener) {

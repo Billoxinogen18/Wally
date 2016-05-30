@@ -5,7 +5,6 @@ package com.wally.wally.tango;
 import android.content.Context;
 import android.test.suitebuilder.annotation.SmallTest;
 
-import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.projecttango.tangosupport.TangoPointCloudManager;
@@ -13,15 +12,9 @@ import com.wally.wally.components.WallyTangoUx;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import static junit.framework.Assert.assertNull;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
 
@@ -38,7 +31,7 @@ public class TangoManagerTest {
     private RajawaliSurfaceView rajawaliSurfaceView;
     private TangoUxLayout tangoUxLayout;
     private WallyRenderer renderer;
-    private VisualContentManager visualContentManager;
+    private VisualContentManager3 visualContentManager;
     TangoPointCloudManager pointCloudManager;
     private WallyTangoUx tangoUx;
     private Tango tango;
@@ -52,7 +45,7 @@ public class TangoManagerTest {
         rajawaliSurfaceView = mock(RajawaliSurfaceView.class);
         tangoUxLayout = mock(TangoUxLayout.class);
         renderer = mock(WallyRenderer.class);
-        visualContentManager = mock(VisualContentManager.class);
+        visualContentManager = mock(VisualContentManager3.class);
         tangoUx = mock(WallyTangoUx.class);
         tango = TangoMock.getTango();
 

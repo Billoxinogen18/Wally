@@ -1,24 +1,17 @@
 package com.wally.wally.tango;
 
 import android.content.Context;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 
 import com.google.atap.tango.ux.TangoUx;
-import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoConfig;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
-import com.google.atap.tangoservice.TangoEvent;
 import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
-import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
@@ -26,10 +19,8 @@ import com.wally.wally.App;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.TangoData;
 
 import org.rajawali3d.scene.ASceneFrameCallback;
-import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -109,10 +100,7 @@ public class TangoManager {
 
             @Override
             public void onResult(final Collection<Content> result) {
-                for (Content c : result) {
-                    Log.d(TAG, c.toString());
-                    mVisualContentManager.addStaticContentToBeRenderedOnScreen(new VisualContent(c));
-                }
+                mVisualContentManager.createStaticContent(result);
             }
 
             @Override
@@ -332,23 +320,5 @@ public class TangoManager {
                 intersectionPointPlaneModelPair.intersectionPoint,
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
     }
-
-//TODO should be removed from here!
-    public void removeActiveContent() {
-        if (mVisualContentManager.getActiveContent() != null) {
-            mRenderer.removeActiveContent(mVisualContentManager.getActiveContent());
-        } else {
-            Log.e(TAG, "removeActiveContent() : There was no active content to remove");
-        }
-    }
-
-    public void removeContent(Content content) {
-        VisualContent vc = mVisualContentManager.findVisualContentByContent(content);
-        if (vc != null) {
-            mRenderer.removeStaticContent(vc);
-        } else {
-            Log.d(TAG, "removeContent() called with: " + "content = [" + content + "]  VisualContent not found");
-        }
-
-    }
+    
 }

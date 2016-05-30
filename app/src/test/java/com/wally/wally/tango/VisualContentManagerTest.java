@@ -5,7 +5,6 @@ import com.wally.wally.datacontroller.content.Content;
 
 import org.hamcrest.core.IsNull;
 import org.junit.*;
-import org.rajawali3d.Object3D;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.*;
@@ -15,11 +14,11 @@ import static org.mockito.Mockito.*;
  * Created by shota on 5/26/16.
  */
 public class VisualContentManagerTest {
-    private VisualContentManager mVisualContentManager;
+    private VisualContentManager3 mVisualContentManager;
 
     @Before
     public void init(){
-        mVisualContentManager = new VisualContentManager();
+        mVisualContentManager = new VisualContentManager3();
     }
 
 //    @Test
