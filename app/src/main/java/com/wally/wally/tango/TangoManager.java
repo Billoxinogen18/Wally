@@ -23,7 +23,6 @@ import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.App;
-import com.wally.wally.OnContentSelectedListener;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
@@ -67,12 +66,11 @@ public class TangoManager {
     private double mRgbTimestampGlThread;
 
     private TangoUpdater mTangoUpdater;
+    private TangoFactory mTangoFactory;
 
-
-    //For testing
-    public TangoManager(Context context, TangoUpdater tangoUpdater, TangoUxLayout tangoUxLayout,
-                        TangoPointCloudManager pointCloudManager, VisualContentManager visualContentManager,
-                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, Tango tango, String adfUuid) {
+    public TangoManager(Context context, TangoUpdater tangoUpdater, TangoPointCloudManager pointCloudManager,
+                        VisualContentManager visualContentManager, WallyRenderer wallyRenderer,
+                        WallyTangoUx tangoUx, TangoFactory tangoFactory, String adfUuid) {
         mContext = context;
         mTangoUpdater = tangoUpdater;
         mAdfUuid = adfUuid;
@@ -80,19 +78,7 @@ public class TangoManager {
         mRenderer = wallyRenderer;
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
-        mTango = tango;
-    }
-
-    public TangoManager(Context context, TangoUpdater tangoUpdater, TangoUxLayout tangoUxLayout,
-                        TangoPointCloudManager pointCloudManager, VisualContentManager visualContentManager,
-                        WallyRenderer wallyRenderer, WallyTangoUx tangoUx, String adfUuid) {
-        mContext = context;
-        mTangoUpdater = tangoUpdater;
-        mAdfUuid = adfUuid;
-        mVisualContentManager = visualContentManager;
-        mRenderer = wallyRenderer;
-        mTangoUx = tangoUx;
-        mPointCloudManager = pointCloudManager;
+        mTangoFactory = tangoFactory;
         fetchContentForAdf(adfUuid);
     }
 
@@ -123,15 +109,10 @@ public class TangoManager {
 
             @Override
             public void onResult(final Collection<Content> result) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (Content c : result) {
-                            Log.d(TAG, c.toString());
-                            mVisualContentManager.addStaticContentToBeRenderedOnScreen(new VisualContent(c));
-                        }
-                    }
-                }).start();
+                for (Content c : result) {
+                    Log.d(TAG, c.toString());
+                    mVisualContentManager.addStaticContentToBeRenderedOnScreen(new VisualContent(c));
+                }
             }
 
             @Override
@@ -160,7 +141,6 @@ public class TangoManager {
         mTangoUx.stop();
 
         mTangoUpdater.setTangoLocalization(false);
-
     }
 
     public synchronized void onResume() {
@@ -170,7 +150,7 @@ public class TangoManager {
             TangoUx.StartParams params = new TangoUx.StartParams();
             params.showConnectionScreen = false;
             mTangoUx.start(params);
-            mTango = new Tango(mContext, new Runnable() {
+            mTango = mTangoFactory.getTango(new Runnable() {
                 @Override
                 public void run() {
                     try {

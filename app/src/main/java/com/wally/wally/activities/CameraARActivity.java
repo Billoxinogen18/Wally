@@ -21,7 +21,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
-import com.wally.wally.OnContentSelectedListener;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;

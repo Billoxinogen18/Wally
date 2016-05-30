@@ -21,6 +21,7 @@ import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
+import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoManager;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.VisualContentManager;
@@ -84,8 +85,9 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         tangoUx.setLayout(mTangoUxLayout);
 
         TangoUpdater tangoUpdater = new TangoUpdater(tangoUx,mSurfaceView,pointCloudManager);
-        mTangoManager = new TangoManager(getBaseContext(), tangoUpdater, mTangoUxLayout,
-                pointCloudManager, mVisualContentManager, renderer, tangoUx, mAdfUuid);
+        TangoFactory tangoFactory = new TangoFactory(context);
+        mTangoManager = new TangoManager(context, tangoUpdater, pointCloudManager,
+                mVisualContentManager, renderer, tangoUx, tangoFactory, mAdfUuid);
         restoreState(savedInstanceState);
 
 
