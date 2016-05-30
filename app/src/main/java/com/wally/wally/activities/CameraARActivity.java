@@ -214,7 +214,6 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
 
     public void onProfileClick(SocialUser user){
         startActivity(ProfileActivity.newIntent(this, user));
-        finish();
     }
 
     protected void saveActiveContent(Content content) {
