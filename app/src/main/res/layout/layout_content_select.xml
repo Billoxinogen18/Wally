@@ -6,8 +6,6 @@
     android:layout_height="match_parent"
     android:layout_margin="48dp"
     android:orientation="vertical"
-    android:visibility="gone"
-    tools:context=".activities.MainActivity"
     tools:visibility="visible">
 
     <RelativeLayout
@@ -58,14 +56,15 @@
         android:background="@drawable/control_panel_background"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="2dp">
+        android:padding="2dp"
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <ImageButton
             android:id="@+id/btn_delete_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:onClick="onDeleteSelectedContentClick"
             android:padding="10dp"
             android:src="@drawable/ic_delete_white_24dp" />
 
@@ -75,7 +74,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:onClick="onEditSelectedContentClick"
             android:padding="10dp"
             android:src="@drawable/ic_edit_white_24dp" />
     </LinearLayout>

@@ -42,6 +42,6 @@ public class DispatcherActivity extends LoginActivity implements UserManager.Use
              .addScope(Plus.SCOPE_PLUS_LOGIN)
              .addScope(Plus.SCOPE_PLUS_PROFILE)
              .build();
-        App.getInstance().getUserManager().loadUser(user, googleApiClient, this);
+        App.getInstance().getUserManager().loadLoggedInUser(user, googleApiClient, this);
     }
 }

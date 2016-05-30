@@ -61,6 +61,7 @@ public class SocialUserFactory {
                                     PersonBuffer personBuffer = peopleData.getPersonBuffer();
                                     try {
                                         Person person = personBuffer.get(0);
+                                        Log.d(TAG, "onResult: " + person.getDisplayName());
                                         final SocialUser googleUser = new GoogleUser(baseUser)
                                                 .withDisplayName(person.getDisplayName())
                                                 .withFirstName(person.getName().getGivenName())
