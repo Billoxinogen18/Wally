@@ -19,7 +19,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
-import com.wally.wally.OnContentSelectedListener;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
@@ -150,10 +149,12 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
             startActivityForResult(
                     AuthUI.getInstance()
                             .createSignInIntentBuilder()
+                            .setTheme(R.style.CustomFirebaseAuth)
                             .setProviders(AuthUI.GOOGLE_PROVIDER)
                             .build(),
                     RC_SIGN_IN);
         } else {
+            Log.d(TAG, "onNewContentClick() called with: " + "v = [" + v + "]");
             NewContentDialogFragment.newInstance()
                     .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
         }
@@ -163,11 +164,13 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
+                Log.d(TAG, "onActivityResult() called with: " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
                 // user is signed in!
                 mUserManager.loadLoggedInUser(getGoogleApiClient(), new UserManager.UserLoadListener() {
                     @Override
                     public void onUserLoad(SocialUser user) {
                         displayProfileBar(user);
+                        Log.d(TAG, "onUserLoad() called with: " + "user = [" + user + "]");
                         NewContentDialogFragment.newInstance()
                                 .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
                     }
@@ -198,6 +201,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
             Log.e(TAG, "editSelectedContent: when mSelectedContent is NULL");
             return;
         }
+        Log.d(TAG, "onEditSelectedContentClick() called with: " + "content = [" + content + "]");
         NewContentDialogFragment.newInstance(content)
                 .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
     }
@@ -212,7 +216,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         onDeleteContent(content);
     }
 
-    public void onProfileClick(SocialUser user){
+    public void onProfileClick(SocialUser user) {
         startActivity(ProfileActivity.newIntent(this, user));
     }
 
@@ -247,7 +251,6 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
                 .into((ImageView) findViewById(R.id.profile_image));
 
         ((TextView) findViewById(R.id.profile_name)).setText(user.getFirstName());
-
     }
 
 

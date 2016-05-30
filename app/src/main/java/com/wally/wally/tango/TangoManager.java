@@ -1,11 +1,7 @@
 package com.wally.wally.tango;
 
 import android.content.Context;
-import android.os.AsyncTask;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
@@ -13,24 +9,20 @@ import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoConfig;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
-import com.google.atap.tangoservice.TangoEvent;
+import com.google.atap.tangoservice.TangoException;
 import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
-import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.App;
-import com.wally.wally.OnContentSelectedListener;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.TangoData;
 
 import org.rajawali3d.scene.ASceneFrameCallback;
-import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -289,13 +281,17 @@ public class TangoManager {
                     // If a new RGB frame has been rendered, update the camera pose to match.
                     if (mRgbTimestampGlThread > mCameraPoseTimestamp) {
                         // Calculate the device pose at the camera frame update time.
-                        TangoPoseData lastFramePose = mTango.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR);
-                        if (lastFramePose.statusCode == TangoPoseData.POSE_VALID) {
-                            // Update the camera pose from the renderer
-                            mRenderer.updateRenderCameraPose(lastFramePose, mExtrinsics);
-                            mCameraPoseTimestamp = lastFramePose.timestamp;
-                        } else {
-                            Log.w(TAG, "Can't get device pose at time: " + mRgbTimestampGlThread);
+                        try {
+                            TangoPoseData lastFramePose = mTango.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR);
+                            if (lastFramePose.statusCode == TangoPoseData.POSE_VALID) {
+                                // Update the camera pose from the renderer
+                                mRenderer.updateRenderCameraPose(lastFramePose, mExtrinsics);
+                                mCameraPoseTimestamp = lastFramePose.timestamp;
+                            } else {
+                                Log.v(TAG, "Can't get device pose at time: " + mRgbTimestampGlThread);
+                            }
+                        } catch (TangoException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -353,7 +349,7 @@ public class TangoManager {
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
     }
 
-//TODO should be removed from here!
+    //TODO should be removed from here!
     public void removeActiveContent() {
         if (mVisualContentManager.getActiveContent() != null) {
             mRenderer.removeActiveContent(mVisualContentManager.getActiveContent());

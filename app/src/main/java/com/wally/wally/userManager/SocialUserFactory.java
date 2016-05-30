@@ -1,8 +1,6 @@
 package com.wally.wally.userManager;
 
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -50,58 +48,46 @@ public class SocialUserFactory {
     }
 
     private void getGoogleUser(final User baseUser, final GoogleApiClient googleApiClient, final UserManager.UserLoadListener userLoadListener) {
-        googleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-            @Override
-            public void onConnected(@Nullable Bundle bundle) {
-                Plus.PeopleApi.load(googleApiClient, baseUser.getGgId().getId()).setResultCallback(
-                        new ResultCallback<People.LoadPeopleResult>() {
-                            @Override
-                            public void onResult(@NonNull People.LoadPeopleResult peopleData) {
-                                if (peopleData.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
-                                    PersonBuffer personBuffer = peopleData.getPersonBuffer();
-                                    try {
-                                        Person person = personBuffer.get(0);
-                                        Log.d(TAG, "onResult: " + person.getDisplayName());
-                                        final SocialUser googleUser = new GoogleUser(baseUser)
-                                                .withDisplayName(person.getDisplayName())
-                                                .withFirstName(person.getName().getGivenName())
-                                                .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
+        Plus.PeopleApi.load(googleApiClient, baseUser.getGgId().getId()).setResultCallback(
+                new ResultCallback<People.LoadPeopleResult>() {
+                    @Override
+                    public void onResult(@NonNull People.LoadPeopleResult peopleData) {
+                        if (peopleData.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
+                            PersonBuffer personBuffer = peopleData.getPersonBuffer();
+                            try {
+                                Person person = personBuffer.get(0);
+                                Log.d(TAG, "onResult: " + person.getDisplayName());
+                                final SocialUser googleUser = new GoogleUser(baseUser)
+                                        .withDisplayName(person.getDisplayName())
+                                        .withFirstName(person.getName().getGivenName())
+                                        .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
 
-                                        Plus.PeopleApi.loadVisible(googleApiClient, null).setResultCallback(
-                                                new ResultCallback<People.LoadPeopleResult>() {
-                                                    @Override
-                                                    public void onResult(@NonNull People.LoadPeopleResult peopleData) {
-                                                        PersonBuffer personBuffer = peopleData.getPersonBuffer();
-                                                        try {
-                                                            List<Id> friends = new ArrayList<>();
-                                                            for (Person person : personBuffer) {
-                                                                friends.add(new Id(Id.PROVIDER_GOOGLE, person.getId()));
-                                                            }
-                                                            googleUser.withFriends(friends);
-                                                            userLoadListener.onUserLoad(googleUser);
-                                                        } finally {
-                                                            personBuffer.release();
-                                                        }
+                                Plus.PeopleApi.loadVisible(googleApiClient, null).setResultCallback(
+                                        new ResultCallback<People.LoadPeopleResult>() {
+                                            @Override
+                                            public void onResult(@NonNull People.LoadPeopleResult peopleData) {
+                                                PersonBuffer personBuffer = peopleData.getPersonBuffer();
+                                                try {
+                                                    List<Id> friends = new ArrayList<>();
+                                                    for (Person person : personBuffer) {
+                                                        friends.add(new Id(Id.PROVIDER_GOOGLE, person.getId()));
                                                     }
-                                                });
-                                    } finally {
-                                        personBuffer.release();
-                                    }
-                                } else {
-                                    Log.e(TAG, "onResult: Error requesting people data" + peopleData.getStatus());
-                                    userLoadListener.onUserLoad(new DummyUser(baseUser));
-                                }
+                                                    googleUser.withFriends(friends);
+                                                    userLoadListener.onUserLoad(googleUser);
+                                                } finally {
+                                                    personBuffer.release();
+                                                }
+                                            }
+                                        });
+                            } finally {
+                                personBuffer.release();
                             }
-                        });
-            }
-
-            @Override
-            public void onConnectionSuspended(int i) {
-                Log.d(TAG, "onConnectionSuspended() called with: " + "i = [" + i + "]");
-            }
-        });
-
-        googleApiClient.connect();
-
+                        } else {
+                            Log.e(TAG, "onResult: Error requesting people data" + peopleData.getStatus());
+                            // TODO delete this WTF :D
+                            userLoadListener.onUserLoad(new DummyUser(baseUser));
+                        }
+                    }
+                });
     }
 }
