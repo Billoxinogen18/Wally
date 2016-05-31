@@ -20,7 +20,6 @@ public class Content implements Serializable {
     private SerializableLatLng location;
     private Visibility visibility;
     private String authorId;
-    private List<Id> sharedWith;
 
     public Content() {
     }
@@ -149,15 +148,6 @@ public class Content implements Serializable {
     @Override
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
-    }
-
-    public List<Id> getSharedWith() {
-        return sharedWith;
-    }
-
-    public Content withSharedWith(List<Id> sharedWith) {
-        this.sharedWith = sharedWith;
-        return this;
     }
 
     private static class SerializableLatLng implements Serializable {

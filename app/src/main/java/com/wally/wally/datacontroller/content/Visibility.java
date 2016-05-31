@@ -5,6 +5,7 @@ import android.support.annotation.IntDef;
 
 import com.wally.wally.App;
 import com.wally.wally.R;
+import com.wally.wally.datacontroller.user.Id;
 
 import java.io.Serializable;
 import java.lang.annotation.Retention;
@@ -79,6 +80,7 @@ public class Visibility implements Serializable {
         public static final int ANONYMOUS = 3;
 
         private int mode;
+        private List<Id> sharedWith;
 
         public SocialVisibility(@SocialVisibilityMode int mode) {
             setMode(mode);
@@ -103,8 +105,8 @@ public class Visibility implements Serializable {
                     return R.drawable.ic_public_visibility_24dp;
                 case FRIENDS:
                     return R.drawable.ic_friends_visibility_black_24dp;
-                case ANONYMOUS:
-                    return R.drawable.ic_anonymous_visibility_black_24dp;
+//                case ANONYMOUS:
+//                    return R.drawable.ic_anonymous_visibility_black_24dp;
                 default:
                     throw new IllegalArgumentException("Unsupported image");
             }
@@ -128,6 +130,15 @@ public class Visibility implements Serializable {
         @IntDef({PRIVATE, PUBLIC, FRIENDS, ANONYMOUS})
         @Retention(RetentionPolicy.SOURCE)
         public @interface SocialVisibilityMode {
+        }
+
+        public List<Id> getSharedWith() {
+            return sharedWith;
+        }
+
+        public SocialVisibility withSharedWith(List<Id> sharedWith) {
+            this.sharedWith = sharedWith;
+            return this;
         }
     }
 
