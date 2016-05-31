@@ -97,14 +97,15 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     @Override
     protected void onPostExecute(Void v) {
         super.onPostExecute(v);
-        mVisualContentManager.removePendingActiveContent();
+        //mVisualContentManager.removePendingActiveContent();
     }
 
     public void finishFitting() {
         // Order of this calls matter!!!
         mFittingStatusListener.onContentFittingFinished(getContent());
-        mVisualContentManager.setActiveContentAdded();
-        mVisualContentManager.removePendingActiveContent();
+        //mVisualContentManager.setActiveContentAdded();
+        mVisualContentManager.setActiveContentFinishFitting();
+        //mVisualContentManager.removePendingActiveContent();
         cancel(true);
     }
 
