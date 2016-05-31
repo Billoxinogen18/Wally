@@ -31,8 +31,10 @@ import com.wally.wally.components.ColorPickerPopup;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Visibility;
 import com.wally.wally.datacontroller.user.User;
+import com.wally.wally.userManager.SocialUser;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * New Post dialog, that manages adding new content.
@@ -293,9 +295,8 @@ public class NewContentDialogFragment extends DialogFragment implements
         showDialog(true);
     }
 
-    // TODO add params
     @Override
-    public void onPeopleChosen() {
+    public void onPeopleChosen(List<SocialUser> users) {
         showDialog(true);
     }
 

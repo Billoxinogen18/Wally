@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="128dp"
+    android:layout_height="128dp"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/avatar_image_view"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_centerHorizontal="true"
+        android:padding="4dp"
+        tools:src="@drawable/sample_user_image" />
+
+    <ImageView
+        android:id="@+id/tick_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/avatar_image_view"
+        android:layout_alignTop="@id/avatar_image_view"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:src="@drawable/ic_tick_blue_48px" />
+
+    <TextView
+        android:id="@+id/name_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/avatar_image_view"
+        android:textAlignment="center"
+        tools:text="Gio Gogiashvili" />
+</RelativeLayout>

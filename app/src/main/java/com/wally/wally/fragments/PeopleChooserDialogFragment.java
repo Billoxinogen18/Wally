@@ -6,13 +6,19 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.wally.wally.App;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
+import com.wally.wally.components.CircleUserView;
+import com.wally.wally.components.GridAutofitLayoutManager;
+import com.wally.wally.userManager.SocialUser;
 
 import java.util.List;
 
@@ -45,14 +51,18 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
     private void initViews(View v) {
         v.findViewById(R.id.btn_dismiss).setOnClickListener(this);
-
-
         mRecycler = (RecyclerView) v.findViewById(R.id.recyclerview_people);
-        mRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecycler.setLayoutManager(new GridLayoutManager(getContext(), getGridColumnCount()));
+        mRecycler.setAdapter(new PeopleListAdapter(App.getInstance().getUserManager().getUser().getFriends()));
     }
 
-    // TODO add data params here here
-    private void finishWithData() {
+    private int getGridColumnCount() {
+        // This is optimal quantity based on rotation.
+        return (int) (Utils.getScreenWidthDpi(getContext()) / 100);
+    }
+
+
+    private void finishWithData(List<SocialUser> users) {
         PeopleChooserListener listener;
         if (getParentFragment() instanceof PeopleChooserListener) {
             listener = (PeopleChooserListener) getParentFragment();
@@ -63,7 +73,7 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
         }
 
         // TODO pass data here
-        listener.onPeopleChosen();
+        listener.onPeopleChosen(users);
         dismiss();
     }
 
@@ -72,37 +82,34 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
         switch (v.getId()) {
             case R.id.btn_dismiss:
                 // TODO pass data
-                finishWithData();
+                finishWithData(null);
                 break;
         }
     }
 
     public interface PeopleChooserListener {
-        // TODO add params here
-        void onPeopleChosen();
+        void onPeopleChosen(List<SocialUser> users);
     }
 
     private class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.VH> {
 
-        private List<String> mData;
+        private List<SocialUser> mData;
 
-        // TODO change with your data type
-        public PeopleListAdapter(List<String> data) {
+        public PeopleListAdapter(List<SocialUser> data) {
             mData = data;
         }
 
         @SuppressLint("InflateParams")
         @Override
         public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            // TODO use your layout for row item
-            View v = LayoutInflater.from(getContext()).inflate(R.layout.gallery_item, null);
+            CircleUserView v = new CircleUserView(getContext());
             return new VH(v);
         }
 
 
         @Override
         public void onBindViewHolder(VH holder, int position) {
-            // TODO bind data to row
+            holder.userView.setUser(mData.get(position));
         }
 
         @Override
@@ -111,12 +118,12 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
         }
 
         public class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
-            // TODO add vies here to later bind data
+            CircleUserView userView;
 
-            public VH(View itemView) {
+            public VH(CircleUserView itemView) {
                 super(itemView);
+                userView = itemView;
                 itemView.setOnClickListener(this);
-                // TODO init VH views
             }
 
             @Override
