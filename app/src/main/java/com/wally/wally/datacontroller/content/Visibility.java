@@ -77,7 +77,6 @@ public class Visibility implements Serializable {
         public static final int PRIVATE = 0;
         public static final int PUBLIC = 1;
         public static final int PEOPLE = 2;
-        public static final int ANONYMOUS = 3;
 
         private int mode;
         private List<Id> sharedWith;
@@ -88,7 +87,7 @@ public class Visibility implements Serializable {
 
 
         public static int getSize() {
-            return 4;
+            return 3;
         }
 
         public static String getStringRepresentation(@SocialVisibilityMode int range) {
@@ -105,8 +104,6 @@ public class Visibility implements Serializable {
                     return R.drawable.ic_public_visibility_24dp;
                 case PEOPLE:
                     return R.drawable.ic_people_visibility_black;
-                case ANONYMOUS:
-                    return R.drawable.ic_anonymous_visibility_black_24dp;
                 default:
                     throw new IllegalArgumentException("Unsupported image");
             }
@@ -127,11 +124,6 @@ public class Visibility implements Serializable {
             return getStringRepresentation(mode);
         }
 
-        @IntDef({PRIVATE, PUBLIC, PEOPLE, ANONYMOUS})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface SocialVisibilityMode {
-        }
-
         public List<Id> getSharedWith() {
             return sharedWith;
         }
@@ -139,6 +131,11 @@ public class Visibility implements Serializable {
         public SocialVisibility withSharedWith(List<Id> sharedWith) {
             this.sharedWith = sharedWith;
             return this;
+        }
+
+        @IntDef({PRIVATE, PUBLIC, PEOPLE})
+        @Retention(RetentionPolicy.SOURCE)
+        public @interface SocialVisibilityMode {
         }
     }
 
