@@ -5,6 +5,7 @@ import android.support.annotation.IntDef;
 
 import com.wally.wally.App;
 import com.wally.wally.R;
+import com.wally.wally.datacontroller.user.Id;
 
 import java.io.Serializable;
 import java.lang.annotation.Retention;
@@ -75,10 +76,10 @@ public class Visibility implements Serializable {
     public static class SocialVisibility implements Serializable {
         public static final int PRIVATE = 0;
         public static final int PUBLIC = 1;
-        public static final int FRIENDS = 2;
-        public static final int ANONYMOUS = 3;
+        public static final int PEOPLE = 2;
 
         private int mode;
+        private List<Id> sharedWith;
 
         public SocialVisibility(@SocialVisibilityMode int mode) {
             setMode(mode);
@@ -86,7 +87,7 @@ public class Visibility implements Serializable {
 
 
         public static int getSize() {
-            return 4;
+            return 3;
         }
 
         public static String getStringRepresentation(@SocialVisibilityMode int range) {
@@ -101,10 +102,8 @@ public class Visibility implements Serializable {
                     return R.drawable.ic_private_visibility_black_24dp;
                 case PUBLIC:
                     return R.drawable.ic_public_visibility_24dp;
-                case FRIENDS:
-                    return R.drawable.ic_friends_visibility_black_24dp;
-                case ANONYMOUS:
-                    return R.drawable.ic_anonymous_visibility_black_24dp;
+                case PEOPLE:
+                    return R.drawable.ic_people_visibility_black;
                 default:
                     throw new IllegalArgumentException("Unsupported image");
             }
@@ -125,7 +124,16 @@ public class Visibility implements Serializable {
             return getStringRepresentation(mode);
         }
 
-        @IntDef({PRIVATE, PUBLIC, FRIENDS, ANONYMOUS})
+        public List<Id> getSharedWith() {
+            return sharedWith;
+        }
+
+        public SocialVisibility withSharedWith(List<Id> sharedWith) {
+            this.sharedWith = sharedWith;
+            return this;
+        }
+
+        @IntDef({PRIVATE, PUBLIC, PEOPLE})
         @Retention(RetentionPolicy.SOURCE)
         public @interface SocialVisibilityMode {
         }

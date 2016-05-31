@@ -126,4 +126,11 @@ public class CompoundUser implements SocialUser {
     public SocialUser withFriends(List<Id> friends) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public String toString() {
+        return "CompoundUser{" +
+                "socialUsers=" + socialUsers +
+                '}';
+    }
 }

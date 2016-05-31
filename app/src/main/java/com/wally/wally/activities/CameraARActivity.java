@@ -1,7 +1,6 @@
 package com.wally.wally.activities;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -15,7 +14,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -24,6 +22,7 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
+import com.wally.wally.components.SelectedMenuView;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
@@ -36,19 +35,18 @@ import com.wally.wally.userManager.UserManager;
 /**
  * Created by shota on 5/21/16.
  */
-public abstract class CameraARActivity extends LoginActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public abstract class CameraARActivity extends LoginActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, SelectedMenuView.OnSelectedMenuActionListener {
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int REQUEST_CODE_MY_LOCATION = 22;
     private static final int RC_SIGN_IN = 100;
     protected DataController mDataController;
     private UserManager mUserManager;
-    private View mSelectedMenuView;
+    private SelectedMenuView mSelectedMenuView;
     private long mLastSelectTime;
-    private Content mSelectedContent;
+    private Content mSelectedContent; //TODO may be needed to remove
     private Content mContentToSave;
 
     private GoogleApiClient mGoogleApiClient;
-    private ProgressDialog mProgressDialog;
 
 
     public abstract void onDeleteContent(Content selectedContent);
@@ -64,43 +62,17 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSelectedMenuView = findViewById(R.id.layout_content_select);
-
+        mSelectedMenuView = (SelectedMenuView) findViewById(R.id.selected_menu_view);
+        mSelectedMenuView.setOnSelectedMenuActionListener(this);
         // Initialize managers
         mUserManager = ((App) getApplicationContext()).getUserManager(); //TODO get LoginManager from the Factory!
         mDataController = ((App) getApplicationContext()).getDataController();
-
-        // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    public void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
-
-
-    @Override
-    public void onConnected(Bundle connectionHint) {
-
+//        getGoogleApiClient();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        hideProgress();
     }
 
     @Override
@@ -109,16 +81,6 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         if (mUserManager.isLoggedIn()) {
             displayProfileBar(mUserManager.getUser());
         }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     @Override
@@ -146,27 +108,30 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         onContentSelected(mSelectedContent);
     }
 
-    private void onContentSelected(Content content){
+    public void onContentSelected(final Content content) {
         mSelectedContent = content;
-        runOnUiThread(new Runnable() {
-            @SuppressWarnings("ConstantConditions")
-            @Override
-            public void run() {
-                mSelectedMenuView.setVisibility(mSelectedContent == null ? View.GONE : View.VISIBLE);
-                mLastSelectTime = System.currentTimeMillis();
+        if (App.getInstance().getUserManager().isLoggedIn()) {
+            runOnUiThread(new Runnable() {
+                @SuppressWarnings("ConstantConditions")
+                @Override
+                public void run() {
+                    mSelectedMenuView.setVisibility(content == null ? View.GONE : View.VISIBLE);
+                    mSelectedMenuView.setContent(content, getGoogleApiClient());
+                    mLastSelectTime = System.currentTimeMillis();
 
-                mSelectedMenuView.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Hide iff user didn't click after
-                        if (mLastSelectTime + 3000 <= System.currentTimeMillis()) {
-                            mSelectedMenuView.setVisibility(View.GONE);
-                            mSelectedContent = null;
+                    mSelectedMenuView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Hide iff user didn't click after
+                            if (mLastSelectTime + 3000 <= System.currentTimeMillis()) {
+                                mSelectedMenuView.setVisibility(View.GONE);
+                                mSelectedContent = null;
+                            }
                         }
-                    }
-                }, 3000);
-            }
-        });
+                    }, 3000);
+                }
+            });
+        }
     }
 
     @Override
@@ -184,10 +149,12 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
             startActivityForResult(
                     AuthUI.getInstance()
                             .createSignInIntentBuilder()
+                            .setTheme(R.style.CustomFirebaseAuth)
                             .setProviders(AuthUI.GOOGLE_PROVIDER)
                             .build(),
                     RC_SIGN_IN);
         } else {
+            Log.d(TAG, "onNewContentClick() called with: " + "v = [" + v + "]");
             NewContentDialogFragment.newInstance()
                     .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
         }
@@ -197,17 +164,13 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
+                Log.d(TAG, "onActivityResult() called with: " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
                 // user is signed in!
-                GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
-                        .enableAutoManage(this, this)
-                        .addApi(Plus.API)
-                        .addScope(Plus.SCOPE_PLUS_LOGIN)
-                        .addScope(Plus.SCOPE_PLUS_PROFILE)
-                        .build();
-                mUserManager.loadUser(googleApiClient, new UserManager.UserLoadListener() {
+                mUserManager.loadLoggedInUser(getGoogleApiClient(), new UserManager.UserLoadListener() {
                     @Override
                     public void onUserLoad(SocialUser user) {
                         displayProfileBar(user);
+                        Log.d(TAG, "onUserLoad() called with: " + "user = [" + user + "]");
                         NewContentDialogFragment.newInstance()
                                 .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
                     }
@@ -233,32 +196,35 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
     }
 
 
-    public void onEditSelectedContentClick(View view) {
-        Log.d(TAG, "editSelectedContent() called with: " + "view = [" + view + "]");
-        if (mSelectedContent == null) {
+    public void onEditSelectedContentClick(Content content) {
+        if (content == null) {
             Log.e(TAG, "editSelectedContent: when mSelectedContent is NULL");
             return;
         }
-        NewContentDialogFragment.newInstance(mSelectedContent)
+        Log.d(TAG, "onEditSelectedContentClick() called with: " + "content = [" + content + "]");
+        NewContentDialogFragment.newInstance(content)
                 .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
     }
 
-    public void onDeleteSelectedContentClick(View view) {
-        Log.d(TAG, "deleteSelectedContent() called with: " + "view = [" + view + "]");
-        if (mSelectedContent == null) {
+    public void onDeleteSelectedContentClick(Content content) {
+        if (content == null) {
             Log.e(TAG, "deleteSelectedContent: when mSelectedContent is NULL");
             return;
         }
         //delete content on the server
-        mDataController.delete(mSelectedContent);
-        onDeleteContent(mSelectedContent);
+        mDataController.delete(content);
+        onDeleteContent(content);
+    }
+
+    public void onProfileClick(SocialUser user) {
+        startActivity(ProfileActivity.newIntent(this, user));
     }
 
     protected void saveActiveContent(Content content) {
         mContentToSave = content;
         // Check and set location to content
         if (Utils.checkLocationPermission(this)) {
-            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(getGoogleApiClient());
 
             if (myLocation == null) {
                 Toast.makeText(this, "Couldn't get user location", Toast.LENGTH_SHORT).show();
@@ -285,19 +251,21 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
                 .into((ImageView) findViewById(R.id.profile_image));
 
         ((TextView) findViewById(R.id.profile_name)).setText(user.getFirstName());
-
     }
 
-    private void showProgress() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.dismiss();
-        }
-        mProgressDialog = ProgressDialog.show(this, null, getString(R.string.loading_message), true);
-    }
 
-    private void hideProgress() {
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
+    private GoogleApiClient getGoogleApiClient() {
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .enableAutoManage(this, this)
+                    .addOnConnectionFailedListener(this)
+                    .addScope(Plus.SCOPE_PLUS_LOGIN)
+                    .addScope(Plus.SCOPE_PLUS_PROFILE)
+                    .addApi(Plus.API)
+                    .addApi(LocationServices.API)
+                    .build();
+
         }
+        return mGoogleApiClient;
     }
 }

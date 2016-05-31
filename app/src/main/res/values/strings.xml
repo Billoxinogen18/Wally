@@ -37,7 +37,7 @@
     <string-array name="social_visibility">
         <item>Private</item>
         <item>Public</item>
-        <item>Friends</item>
+        <item>People</item>
         <item>Anonymous</item>
     </string-array>
 
@@ -158,4 +158,6 @@
     <string name="filter">Filter</string>
     <string name="content_filter_hint">Search Notes</string>
     <string name="show_on_map">Show on Map</string>
+    <string name="photo_chooser_dialog_title">Select photo</string>
+    <string name="people_chooser_dialog_title">Share with</string>
 </resources>

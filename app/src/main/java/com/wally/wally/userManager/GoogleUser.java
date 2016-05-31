@@ -77,4 +77,15 @@ public class GoogleUser extends AbstractSocialUser {
         mFriends = friends;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "GoogleUser{" +
+                "mDisplayName='" + mDisplayName + '\'' +
+                ", mAvatarUrl='" + mAvatarUrl + '\'' +
+                ", mCoverUrl='" + mCoverUrl + '\'' +
+                ", mFirstName='" + mFirstName + '\'' +
+                ", mFriends=" + mFriends +
+                '}';
+    }
 }

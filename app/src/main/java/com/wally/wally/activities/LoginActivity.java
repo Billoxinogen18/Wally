@@ -18,5 +18,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.d(TAG, "onConnectionFailed() called with: " + "connectionResult = [" + connectionResult + "]");
+        switch (connectionResult.getErrorCode()) {
+            case ConnectionResult.SIGN_IN_FAILED:
+            case ConnectionResult.SIGN_IN_REQUIRED:
+                // cleear datacontroller.
+                break;
+        }
     }
 }

@@ -6,7 +6,7 @@
         android:title="Private" />
     <item
         android:id="@+id/visibility_friends"
-        android:icon="@drawable/ic_friends_visibility_black_24dp"
+        android:icon="@drawable/ic_people_visibility_black"
         android:title="Friends" />
     <item
         android:id="@+id/visibility_public"

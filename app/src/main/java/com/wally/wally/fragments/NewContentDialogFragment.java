@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -28,7 +27,6 @@ import com.bumptech.glide.Glide;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.activities.ChoosePhotoActivity;
 import com.wally.wally.components.ColorPickerPopup;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Visibility;
@@ -42,7 +40,11 @@ import java.util.Date;
  * Created by ioane5 on 4/7/16.
  */
 @SuppressWarnings("ALL")
-public class NewContentDialogFragment extends DialogFragment implements View.OnClickListener {
+public class NewContentDialogFragment extends DialogFragment implements
+        View.OnClickListener,
+        PhotoChooserDialogFragment.PhotoChooserListener,
+        PeopleChooserDialogFragment.PeopleChooserListener,
+        AdapterView.OnItemSelectedListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
@@ -104,6 +106,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
         mVisibilitySpinner = (Spinner) dv.findViewById(R.id.spinner_visibility_status);
         mVisibilitySpinner.setAdapter(new VisibilityAdapter(getContext()));
+        mVisibilitySpinner.setOnItemSelectedListener(this);
 
         if (isEditMode) {
             Button b = (Button) dv.findViewById(R.id.btn_create_post);
@@ -160,7 +163,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     public void onClick(View v) {
 //        Utils.hideSoftKeyboard(mNoteEt, getContext());
 //        Utils.hideSoftKeyboard(mTitleEt, getContext());
-
+        updateContent();
         switch (v.getId()) {
             case R.id.btn_discard_post:
                 if (!postIsEmpty() && !isEditMode) {
@@ -172,11 +175,11 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
                 break;
             case R.id.btn_create_post:
                 dismiss();
-                updateContent();
                 mListener.onContentCreated(mContent, isEditMode);
                 break;
             case R.id.btn_add_image:
-                startActivityForResult(ChoosePhotoActivity.newIntent(getActivity()), REQUEST_CODE_CHOOSE_PHOTO);
+                showDialog(false);
+                PhotoChooserDialogFragment.newInstance().show(getChildFragmentManager(), PhotoChooserDialogFragment.TAG);
                 break;
             case R.id.btn_remove_image:
                 mContent.withImageUri(null);
@@ -269,21 +272,6 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_CHOOSE_PHOTO) {
-            if (resultCode == Activity.RESULT_OK) {
-                mContent.withImageUri(data.getDataString());
-                // TODO maybe save image in local cache?
-                updateViews();
-            } else {
-                // TODO user canceled or error happened.
-                Log.i(TAG, "onActivityResult: canceled");
-            }
-        }
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         updateContent();
@@ -296,6 +284,21 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         showDialog(true);
     }
 
+    @Override
+    public void onPhotoChosen(String uri) {
+        if (!TextUtils.isEmpty(uri)) {
+            mContent.withImageUri(uri);
+        }
+        updateViews();
+        showDialog(true);
+    }
+
+    // TODO add params
+    @Override
+    public void onPeopleChosen() {
+        showDialog(true);
+    }
+
     public void showDialog(boolean show) {
         if (getDialog() != null) {
             if (!show) {
@@ -305,6 +308,23 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             }
         }
         mIsDialogShown = show;
+    }
+
+
+    /**
+     * Called when Visibility Item is selected
+     */
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Visibility.SocialVisibility socialVisibility =
+                new Visibility.SocialVisibility((Integer) position);
+        mContent.getVisibility().withSocialVisibility(socialVisibility);
+        PeopleChooserDialogFragment.newInstance().show(getChildFragmentManager(), PeopleChooserDialogFragment.TAG);
+        showDialog(false);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
     }
 
     public interface NewContentDialogListener {

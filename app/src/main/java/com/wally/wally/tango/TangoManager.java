@@ -8,6 +8,7 @@ import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoConfig;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
+import com.google.atap.tangoservice.TangoException;
 import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
@@ -235,13 +236,17 @@ public class TangoManager {
                     // If a new RGB frame has been rendered, update the camera pose to match.
                     if (mRgbTimestampGlThread > mCameraPoseTimestamp) {
                         // Calculate the device pose at the camera frame update time.
-                        TangoPoseData lastFramePose = mTango.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR);
-                        if (lastFramePose.statusCode == TangoPoseData.POSE_VALID) {
-                            // Update the camera pose from the renderer
-                            mRenderer.updateRenderCameraPose(lastFramePose, mExtrinsics);
-                            mCameraPoseTimestamp = lastFramePose.timestamp;
-                        } else {
-                            Log.w(TAG, "Can't get device pose at time: " + mRgbTimestampGlThread);
+                        try {
+                            TangoPoseData lastFramePose = mTango.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR);
+                            if (lastFramePose.statusCode == TangoPoseData.POSE_VALID) {
+                                // Update the camera pose from the renderer
+                                mRenderer.updateRenderCameraPose(lastFramePose, mExtrinsics);
+                                mCameraPoseTimestamp = lastFramePose.timestamp;
+                            } else {
+                                Log.v(TAG, "Can't get device pose at time: " + mRgbTimestampGlThread);
+                            }
+                        } catch (TangoException e) {
+                            e.printStackTrace();
                         }
                     }
                 }
@@ -298,5 +303,4 @@ public class TangoManager {
                 intersectionPointPlaneModelPair.intersectionPoint,
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
     }
-
 }

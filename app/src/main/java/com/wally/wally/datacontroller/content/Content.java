@@ -1,8 +1,10 @@
 package com.wally.wally.datacontroller.content;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.datacontroller.user.Id;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Content implements Serializable {
     public static final String UPLOAD_URI_PREFIX = "file://";

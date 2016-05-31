@@ -1,7 +1,8 @@
 package com.wally.wally.userManager;
 
+import android.util.Log;
+
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.wally.wally.App;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.user.User;
 
@@ -12,6 +13,7 @@ import com.wally.wally.datacontroller.user.User;
  * ReCreated by meravici on 5/21/16.
  */
 public class UserManager {
+    private static final String TAG = "UserManager";
     SocialUserFactory mSocialUserFactory;
     DataController mDataController;
     SocialUser mUser;
@@ -27,6 +29,7 @@ public class UserManager {
     }
 
     public SocialUser getUser(){
+        Log.d(TAG, "getUser: " + mUser);
         return mUser;
     }
 
@@ -42,21 +45,26 @@ public class UserManager {
      *      .addScope(Plus.SCOPE_PLUS_PROFILE)
      *      .build();
      */
-    public void loadUser(GoogleApiClient googleApiClient, final UserLoadListener userLoadListener) {
+    public void loadLoggedInUser(GoogleApiClient googleApiClient, final UserLoadListener userLoadListener) {
         User user = mDataController.getCurrentUser();
 
-        loadUser(user, googleApiClient, userLoadListener);
+        loadLoggedInUser(user, googleApiClient, userLoadListener);
     }
 
 
-    public void loadUser(User user, GoogleApiClient googleApiClient, final UserLoadListener userLoadListener) {
-        mSocialUserFactory.getSocialUser(user, googleApiClient, new UserLoadListener() {
+    public void loadLoggedInUser(User user, GoogleApiClient googleApiClient, final UserLoadListener userLoadListener) {
+        loadUser(user, googleApiClient, new UserLoadListener() {
             @Override
             public void onUserLoad(SocialUser user) {
                 UserManager.this.setUser(user);
                 userLoadListener.onUserLoad(user);
             }
         });
+    }
+
+
+    public void loadUser(User user, GoogleApiClient googleApiClient, UserLoadListener userLoadListener){
+        mSocialUserFactory.getSocialUser(user, googleApiClient, userLoadListener);
     }
 
     public interface UserLoadListener {
