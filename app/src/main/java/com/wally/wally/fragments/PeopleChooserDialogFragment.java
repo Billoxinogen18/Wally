@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +16,9 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleUserView;
-import com.wally.wally.components.GridAutofitLayoutManager;
 import com.wally.wally.userManager.SocialUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +29,7 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
     public static final String TAG = PeopleChooserDialogFragment.class.getSimpleName();
 
     private RecyclerView mRecycler;
+    private PeopleListAdapter mAdapter;
 
     public static PeopleChooserDialogFragment newInstance() {
         return new PeopleChooserDialogFragment();
@@ -51,9 +51,13 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
     private void initViews(View v) {
         v.findViewById(R.id.btn_dismiss).setOnClickListener(this);
+
+        mAdapter = new PeopleListAdapter(App.getInstance().getUserManager().getUser().getFriends());
+
         mRecycler = (RecyclerView) v.findViewById(R.id.recyclerview_people);
         mRecycler.setLayoutManager(new GridLayoutManager(getContext(), getGridColumnCount()));
-        mRecycler.setAdapter(new PeopleListAdapter(App.getInstance().getUserManager().getUser().getFriends()));
+        mRecycler.setAdapter(mAdapter);
+
     }
 
     private int getGridColumnCount() {
@@ -72,7 +76,6 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
             throw new IllegalStateException("No activity or parent fragment were Photo chooser listeners");
         }
 
-        // TODO pass data here
         listener.onPeopleChosen(users);
         dismiss();
     }
@@ -81,8 +84,7 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_dismiss:
-                // TODO pass data
-                finishWithData(null);
+                finishWithData(mAdapter.getSelectedUsers());
                 break;
         }
     }
@@ -94,9 +96,15 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
     private class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.VH> {
 
         private List<SocialUser> mData;
+        private List<SocialUser> mSelectedUsers;
 
         public PeopleListAdapter(List<SocialUser> data) {
             mData = data;
+            mSelectedUsers = new ArrayList<>(); //TODO maybe hashSet
+        }
+
+        public List<SocialUser> getSelectedUsers(){
+            return mSelectedUsers;
         }
 
         @SuppressLint("InflateParams")
@@ -110,6 +118,9 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
         @Override
         public void onBindViewHolder(VH holder, int position) {
             holder.userView.setUser(mData.get(position));
+            if(mSelectedUsers.contains(mData.get(position))){
+                holder.userView.setChecked(true);
+            }
         }
 
         @Override
@@ -128,7 +139,13 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
             @Override
             public void onClick(View v) {
-                // TODO maybe call some method in PeopleChooserDialogFragment
+                if(userView.isChecked()){
+                    userView.setChecked(false);
+                    mSelectedUsers.remove(userView.getUser());
+                }else{
+                    userView.setChecked(true);
+                    mSelectedUsers.add(userView.getUser());
+                }
             }
         }
     }
