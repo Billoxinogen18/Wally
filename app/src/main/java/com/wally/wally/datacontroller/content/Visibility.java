@@ -76,7 +76,7 @@ public class Visibility implements Serializable {
     public static class SocialVisibility implements Serializable {
         public static final int PRIVATE = 0;
         public static final int PUBLIC = 1;
-        public static final int FRIENDS = 2;
+        public static final int PEOPLE = 2;
         public static final int ANONYMOUS = 3;
 
         private int mode;
@@ -103,10 +103,10 @@ public class Visibility implements Serializable {
                     return R.drawable.ic_private_visibility_black_24dp;
                 case PUBLIC:
                     return R.drawable.ic_public_visibility_24dp;
-                case FRIENDS:
-                    return R.drawable.ic_friends_visibility_black_24dp;
-//                case ANONYMOUS:
-//                    return R.drawable.ic_anonymous_visibility_black_24dp;
+                case PEOPLE:
+                    return R.drawable.ic_people_visibility_black;
+                case ANONYMOUS:
+                    return R.drawable.ic_anonymous_visibility_black_24dp;
                 default:
                     throw new IllegalArgumentException("Unsupported image");
             }
@@ -127,7 +127,7 @@ public class Visibility implements Serializable {
             return getStringRepresentation(mode);
         }
 
-        @IntDef({PRIVATE, PUBLIC, FRIENDS, ANONYMOUS})
+        @IntDef({PRIVATE, PUBLIC, PEOPLE, ANONYMOUS})
         @Retention(RetentionPolicy.SOURCE)
         public @interface SocialVisibilityMode {
         }

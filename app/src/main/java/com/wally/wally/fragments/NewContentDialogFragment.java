@@ -40,7 +40,11 @@ import java.util.Date;
  * Created by ioane5 on 4/7/16.
  */
 @SuppressWarnings("ALL")
-public class NewContentDialogFragment extends DialogFragment implements View.OnClickListener, PhotoChooserDialogFragment.PhotoChooserListener {
+public class NewContentDialogFragment extends DialogFragment implements
+        View.OnClickListener,
+        PhotoChooserDialogFragment.PhotoChooserListener,
+        PeopleChooserDialogFragment.PeopleChooserListener,
+        AdapterView.OnItemSelectedListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
@@ -102,6 +106,7 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
         mVisibilitySpinner = (Spinner) dv.findViewById(R.id.spinner_visibility_status);
         mVisibilitySpinner.setAdapter(new VisibilityAdapter(getContext()));
+        mVisibilitySpinner.setOnItemSelectedListener(this);
 
         if (isEditMode) {
             Button b = (Button) dv.findViewById(R.id.btn_create_post);
@@ -288,6 +293,12 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
         showDialog(true);
     }
 
+    // TODO add params
+    @Override
+    public void onPeopleChosen() {
+        showDialog(true);
+    }
+
     public void showDialog(boolean show) {
         if (getDialog() != null) {
             if (!show) {
@@ -297,6 +308,23 @@ public class NewContentDialogFragment extends DialogFragment implements View.OnC
             }
         }
         mIsDialogShown = show;
+    }
+
+
+    /**
+     * Called when Visibility Item is selected
+     */
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Visibility.SocialVisibility socialVisibility =
+                new Visibility.SocialVisibility((Integer) position);
+        mContent.getVisibility().withSocialVisibility(socialVisibility);
+        PeopleChooserDialogFragment.newInstance().show(getChildFragmentManager(), PeopleChooserDialogFragment.TAG);
+        showDialog(false);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
     }
 
     public interface NewContentDialogListener {
