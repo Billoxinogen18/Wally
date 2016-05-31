@@ -62,6 +62,10 @@ public class SocialUserFactory {
                                         .withFirstName(person.getName().getGivenName())
                                         .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
 
+                                if(person.hasCover() && person.getCover().hasCoverPhoto()){
+                                    googleUser.withCover(person.getCover().getCoverPhoto().getUrl());
+                                }
+
                                 Plus.PeopleApi.loadVisible(googleApiClient, null).setResultCallback(
                                         new ResultCallback<People.LoadPeopleResult>() {
                                             @Override
