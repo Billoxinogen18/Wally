@@ -1,8 +1,10 @@
 package com.wally.wally.datacontroller.content;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.datacontroller.user.Id;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Content implements Serializable {
     public static final String UPLOAD_URI_PREFIX = "file://";
@@ -18,6 +20,7 @@ public class Content implements Serializable {
     private SerializableLatLng location;
     private Visibility visibility;
     private String authorId;
+    private List<Id> sharedWith;
 
     public Content() {
     }
@@ -146,6 +149,15 @@ public class Content implements Serializable {
     @Override
     public int hashCode() {
         return id != null ? id.hashCode() : 0;
+    }
+
+    public List<Id> getSharedWith() {
+        return sharedWith;
+    }
+
+    public Content withSharedWith(List<Id> sharedWith) {
+        this.sharedWith = sharedWith;
+        return this;
     }
 
     private static class SerializableLatLng implements Serializable {
