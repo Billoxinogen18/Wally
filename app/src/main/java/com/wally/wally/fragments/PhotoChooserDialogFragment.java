@@ -135,10 +135,7 @@ public class PhotoChooserDialogFragment extends DialogFragment implements View.O
         Intent chooser = Intent.createChooser(intent, getString(R.string.title_activity_choose_photo));
         startActivityForResult(chooser, ACTION_REQUEST_EXTERNAL_GALLERY);
     }
-
-
-    // TODO dismiss button
-
+    
     private void finishWithResult(String path) {
         PhotoChooserListener listener;
         if (getParentFragment() instanceof PhotoChooserListener) {
