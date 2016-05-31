@@ -13,7 +13,7 @@ public class GoogleUser extends AbstractSocialUser {
     private String mAvatarUrl;
     private String mCoverUrl;
     private String mFirstName;
-    private List<Id> mFriends;
+    private List<SocialUser> mFriends;
 
     protected GoogleUser(User baseUser) {
         super(baseUser);
@@ -44,7 +44,7 @@ public class GoogleUser extends AbstractSocialUser {
     }
 
     @Override
-    public List<Id> getFriends() {
+    public List<SocialUser> getFriends() {
         return mFriends;
     }
 
@@ -73,7 +73,7 @@ public class GoogleUser extends AbstractSocialUser {
     }
 
     @Override
-    public SocialUser withFriends(List<Id> friends) {
+    public SocialUser withFriends(List<SocialUser> friends) {
         mFriends = friends;
         return this;
     }

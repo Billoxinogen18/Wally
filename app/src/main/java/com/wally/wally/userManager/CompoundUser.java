@@ -63,8 +63,8 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public List<Id> getFriends() {
-        final List<Id> result = new ArrayList<>();
+    public List<SocialUser> getFriends() {
+        final List<SocialUser> result = new ArrayList<>();
         for (SocialUser user : socialUsers) {
             result.addAll(user.getFriends());
         }
@@ -123,7 +123,7 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public SocialUser withFriends(List<Id> friends) {
+    public SocialUser withFriends(List<SocialUser> friends) {
         throw new UnsupportedOperationException();
     }
 

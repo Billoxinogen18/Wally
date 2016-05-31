@@ -57,14 +57,7 @@ public class SocialUserFactory {
                             try {
                                 Person person = personBuffer.get(0);
                                 Log.d(TAG, "onResult: " + person.getDisplayName());
-                                final SocialUser googleUser = new GoogleUser(baseUser)
-                                        .withDisplayName(person.getDisplayName())
-                                        .withFirstName(person.getName().getGivenName())
-                                        .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
-
-                                if(person.hasCover() && person.getCover().hasCoverPhoto()){
-                                    googleUser.withCover(person.getCover().getCoverPhoto().getUrl());
-                                }
+                                final SocialUser googleUser = toSocialUser(person);
 
                                 Plus.PeopleApi.loadVisible(googleApiClient, null).setResultCallback(
                                         new ResultCallback<People.LoadPeopleResult>() {
@@ -72,9 +65,9 @@ public class SocialUserFactory {
                                             public void onResult(@NonNull People.LoadPeopleResult peopleData) {
                                                 PersonBuffer personBuffer = peopleData.getPersonBuffer();
                                                 try {
-                                                    List<Id> friends = new ArrayList<>();
+                                                    List<SocialUser> friends = new ArrayList<>();
                                                     for (Person person : personBuffer) {
-                                                        friends.add(new Id(Id.PROVIDER_GOOGLE, person.getId()));
+                                                        friends.add(toSocialUser(person));
                                                     }
                                                     googleUser.withFriends(friends);
                                                     userLoadListener.onUserLoad(googleUser);
@@ -93,5 +86,18 @@ public class SocialUserFactory {
                         }
                     }
                 });
+    }
+
+    private SocialUser toSocialUser(Person person){
+        SocialUser googleUser = new GoogleUser(null)
+                .withDisplayName(person.getDisplayName())
+                .withFirstName(person.getName().getGivenName())
+                .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
+
+        if(person.hasCover() && person.getCover().hasCoverPhoto()){
+            googleUser.withCover(person.getCover().getCoverPhoto().getUrl());
+        }
+
+        return googleUser;
     }
 }
