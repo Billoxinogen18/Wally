@@ -1,28 +1,25 @@
-package com.wally.wally.activities;
+package com.wally.wally.fragments;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
+import android.app.Dialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.wally.wally.R;
@@ -31,13 +28,19 @@ import com.wally.wally.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChoosePhotoActivity extends AppCompatActivity {
+/**
+ * Dialog Photo chooser.
+ * Parent fragment or activity must implement {@link PhotoChooserListener}
+ * </p>
+ * Note that caller should check for read access permissions
+ */
+public class PhotoChooserDialogFragment extends DialogFragment implements View.OnClickListener {
 
     @SuppressWarnings("unused")
-    public static final String TAG = ChoosePhotoActivity.class.getSimpleName();
-    private static final int REQUEST_READ_PERMISSION = 121;
+    public static final String TAG = PhotoChooserDialogFragment.class.getSimpleName();
     private static final int ACTION_REQUEST_EXTERNAL_GALLERY = 102;
     private ImagesRecyclerViewAdapter mAdapter;
+    private String mExternalChosenImage;
     private AsyncTask<Void, Void, List<ImageData>> mLoadImageData = new AsyncTask<Void, Void, List<ImageData>>() {
 
         @Override
@@ -54,7 +57,7 @@ public class ChoosePhotoActivity extends AppCompatActivity {
                     MediaStore.Images.ImageColumns.DATA};
 
             ArrayList<ImageData> images = new ArrayList<>();
-            Cursor c = MediaStore.Images.Media.query(getContentResolver(),
+            Cursor c = MediaStore.Images.Media.query(getContext().getContentResolver(),
                     uri, projection, null, MediaStore.Images.ImageColumns.DATE_MODIFIED + " DESC");
             if (c != null) {
                 while (c.moveToNext()) {
@@ -77,59 +80,52 @@ public class ChoosePhotoActivity extends AppCompatActivity {
         }
     };
 
-    public static Intent newIntent(Context context) {
-        return new Intent(context, ChoosePhotoActivity.class);
+    public static PhotoChooserDialogFragment newInstance() {
+        return new PhotoChooserDialogFragment();
     }
 
-    @SuppressWarnings("ConstantConditions")
+    @NonNull
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_choose_photo);
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        View dv = LayoutInflater.from(getContext())
+                .inflate(R.layout.photo_chooser_dialog, null, false);
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view_images);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, getGridColumnCount()));
+        dv.findViewById(R.id.btn_dismiss).setOnClickListener(this);
+        RecyclerView recyclerView = (RecyclerView) dv.findViewById(R.id.recycler_view_images);
+        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), getGridColumnCount()));
         mAdapter = new ImagesRecyclerViewAdapter();
         recyclerView.setAdapter(mAdapter);
+        mLoadImageData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-        if (!Utils.checkExternalStorageReadPermission(getBaseContext())) {
-            ActivityCompat.requestPermissions(ChoosePhotoActivity.this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_PERMISSION);
-        } else {
-            mLoadImageData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
+        builder.setView(dv);
+        AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        return dialog;
     }
+
 
     private int getGridColumnCount() {
         // This is optimal quantity based on rotation.
-        return (int) (Utils.getScreenWidthDpi(this) / 170);
+        return (int) (Utils.getScreenWidthDpi(getContext()) / 170);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == ACTION_REQUEST_EXTERNAL_GALLERY) {
-            if (resultCode == Activity.RESULT_OK) {
-                setResult(RESULT_OK, data);
-                finish();
+            if (resultCode == Activity.RESULT_OK && data.getData() != null) {
+                mExternalChosenImage = data.getData().toString();
             }
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_READ_PERMISSION) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                mLoadImageData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            } else {
-                finish();
-                Toast.makeText(this, R.string.error_gallery_storage_denied, Toast.LENGTH_LONG).show();
-            }
+    public void onResume() {
+        super.onResume();
+        if (!TextUtils.isEmpty(mExternalChosenImage)) {
+            finishWithResult(mExternalChosenImage);
+
         }
     }
 
@@ -140,13 +136,33 @@ public class ChoosePhotoActivity extends AppCompatActivity {
         startActivityForResult(chooser, ACTION_REQUEST_EXTERNAL_GALLERY);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-            return true;
+
+    // TODO dismiss button
+
+    private void finishWithResult(String path) {
+        PhotoChooserListener listener;
+        if (getParentFragment() instanceof PhotoChooserListener) {
+            listener = (PhotoChooserListener) getParentFragment();
+        } else if (getActivity() instanceof PhotoChooserListener) {
+            listener = (PhotoChooserListener) getActivity();
+        } else {
+            throw new IllegalStateException("No activity or parent fragment were Photo chooser listeners");
         }
-        return super.onOptionsItemSelected(item);
+        listener.onPhotoChosen(path);
+        dismiss();
+    }
+
+    // Dismiss button
+    @Override
+    public void onClick(View v) {
+        finishWithResult(null);
+    }
+
+    /**
+     * Interface for getting result data
+     */
+    public interface PhotoChooserListener {
+        void onPhotoChosen(String uri);
     }
 
     public static class ImageData {
@@ -173,7 +189,7 @@ public class ChoosePhotoActivity extends AppCompatActivity {
         @SuppressLint("InflateParams")
         @Override
         public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            View v = getLayoutInflater().inflate(R.layout.gallery_item, null);
+            View v = LayoutInflater.from(getContext()).inflate(R.layout.gallery_item, null);
             return new VH(v);
         }
 
@@ -182,18 +198,18 @@ public class ChoosePhotoActivity extends AppCompatActivity {
             holder.imageView.setImageDrawable(null);
             holder.imageView.setBackground(null);
             if (position == 0) {
-                holder.imageView.setBackgroundResource(R.drawable.background_frame);
+//                holder.imageView.setBackgroundResource(R.drawable.background_frame);
                 holder.imageView.setImageResource(R.drawable.ic_external_gallery);
                 holder.dateView.setVisibility(View.INVISIBLE);
             } else {
                 position -= 1;
                 ImageData data = mData.get(position);
-                Glide.with(getBaseContext())
+                Glide.with(getContext())
                         .load(data.path)
                         .centerCrop()
                         .into(holder.imageView);
 
-                holder.dateView.setText(Utils.formatDateSmart(getBaseContext(), data.date));
+                holder.dateView.setText(Utils.formatDateSmart(getContext(), data.date));
                 holder.dateView.setVisibility(View.VISIBLE);
             }
         }
@@ -226,10 +242,7 @@ public class ChoosePhotoActivity extends AppCompatActivity {
                     startExternalGallery();
                 } else {
                     ImageData imageData = mData.get(getAdapterPosition() - 1);
-                    Intent result = new Intent();
-                    result.setData(Uri.parse(imageData.path));
-                    setResult(RESULT_OK, result);
-                    finish();
+                    finishWithResult(imageData.path);
                 }
             }
         }

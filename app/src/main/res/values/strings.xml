@@ -158,4 +158,5 @@
     <string name="filter">Filter</string>
     <string name="content_filter_hint">Search Notes</string>
     <string name="show_on_map">Show on Map</string>
+    <string name="photo_chooser_dialog_title">Select photo</string>
 </resources>
