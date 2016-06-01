@@ -107,8 +107,13 @@ public class DataController {
         fetchByAuthor(author.getId(), callback);
     }
 
-    public void fetchShared(User user, FetchResultCallback callback) {
+    public void fetchShared(Id userId, FetchResultCallback callback) {
+        new SharedWithQuery(userId)
+                .fetch(contents, new FirebaseFetchResultCallback(callback));
+    }
 
+    public void fetchShared(User user, FetchResultCallback callback) {
+        fetchShared(user.getId(), callback);
     }
 
     public void fetchPublicContent(FetchResultCallback callback) {

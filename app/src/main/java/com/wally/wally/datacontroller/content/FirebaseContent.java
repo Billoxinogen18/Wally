@@ -156,7 +156,9 @@ public class FirebaseContent extends FirebaseObject {
                 .put(Id.PROVIDER_FIREBASE, new FirebaseObject())
                 .put(Id.PROVIDER_FACEBOOK, new FirebaseObject())
                 .put(Id.PROVIDER_GOOGLE, new FirebaseObject());
-        for (Id id : v.getSocialVisibility().getSharedWith()) {
+        List<Id> sharedWith = v.getSocialVisibility().getSharedWith();
+        if (sharedWith == null) return;
+        for (Id id : sharedWith ) {
             shared.get(id.getProvider()).toFirebaseObject().put(id.getId(), true);
         }
     }
