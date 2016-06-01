@@ -18,6 +18,7 @@ import com.wally.wally.Utils;
 import com.wally.wally.components.CircleUserView;
 import com.wally.wally.userManager.SocialUser;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,10 +44,24 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
                 .inflate(R.layout.people_chooser_dialog, null, false);
 
         initViews(dv);
+
+        if(savedInstanceState != null && savedInstanceState.containsKey("selectedUsers")){
+            List<SocialUser> selectedUsers = (List<SocialUser>)savedInstanceState.getSerializable("selectedUsers");
+            mAdapter.setSelectedUsers(selectedUsers);
+        }else{
+            mAdapter.setSelectedUsers(new ArrayList<SocialUser>());
+        }
+
         builder.setView(dv);
         AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
         return dialog;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable("selectedUsers", (Serializable) mAdapter.getSelectedUsers());
     }
 
     private void initViews(View v) {
@@ -100,7 +115,10 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
         public PeopleListAdapter(List<SocialUser> data) {
             mData = data;
-            mSelectedUsers = new ArrayList<>(); //TODO maybe hashSet
+        }
+
+        public void setSelectedUsers(List<SocialUser> selectedUsers){
+            mSelectedUsers = selectedUsers;
         }
 
         public List<SocialUser> getSelectedUsers(){
