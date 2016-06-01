@@ -16,6 +16,7 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleUserView;
+import com.wally.wally.components.FilterRecyclerViewAdapter;
 import com.wally.wally.userManager.SocialUser;
 
 import java.io.Serializable;
@@ -29,7 +30,6 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
     public static final String TAG = PeopleChooserDialogFragment.class.getSimpleName();
 
-    private RecyclerView mRecycler;
     private PeopleListAdapter mAdapter;
 
     public static PeopleChooserDialogFragment newInstance() {
@@ -40,15 +40,18 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        @SuppressLint("InflateParams")
         View dv = LayoutInflater.from(getContext())
                 .inflate(R.layout.people_chooser_dialog, null, false);
 
         initViews(dv);
 
-        if(savedInstanceState != null && savedInstanceState.containsKey("selectedUsers")){
-            List<SocialUser> selectedUsers = (List<SocialUser>)savedInstanceState.getSerializable("selectedUsers");
+        if (savedInstanceState != null && savedInstanceState.containsKey("selectedUsers")) {
+            @SuppressWarnings("unchecked")
+            List<SocialUser> selectedUsers = (List<SocialUser>) savedInstanceState
+                    .getSerializable("selectedUsers");
             mAdapter.setSelectedUsers(selectedUsers);
-        }else{
+        } else {
             mAdapter.setSelectedUsers(new ArrayList<SocialUser>());
         }
 
@@ -67,9 +70,10 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
     private void initViews(View v) {
         v.findViewById(R.id.btn_dismiss).setOnClickListener(this);
 
-        mAdapter = new PeopleListAdapter(App.getInstance().getUserManager().getUser().getFriends());
+        mAdapter = new PeopleListAdapter();
+        mAdapter.setData(App.getInstance().getUserManager().getUser().getFriends());
 
-        mRecycler = (RecyclerView) v.findViewById(R.id.recyclerview_people);
+        RecyclerView mRecycler = (RecyclerView) v.findViewById(R.id.recyclerview_people);
         mRecycler.setLayoutManager(new GridLayoutManager(getContext(), getGridColumnCount()));
         mRecycler.setAdapter(mAdapter);
 
@@ -108,62 +112,55 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
         void onPeopleChosen(List<SocialUser> users);
     }
 
-    private class PeopleListAdapter extends RecyclerView.Adapter<PeopleListAdapter.VH> {
-
-        private List<SocialUser> mData;
+    private class PeopleListAdapter extends FilterRecyclerViewAdapter<PeopleListAdapter.ViewHolder, SocialUser> implements View.OnClickListener {
         private List<SocialUser> mSelectedUsers;
 
-        public PeopleListAdapter(List<SocialUser> data) {
-            mData = data;
-        }
-
-        public void setSelectedUsers(List<SocialUser> selectedUsers){
+        public void setSelectedUsers(List<SocialUser> selectedUsers) {
             mSelectedUsers = selectedUsers;
         }
 
-        public List<SocialUser> getSelectedUsers(){
+        public List<SocialUser> getSelectedUsers() {
             return mSelectedUsers;
         }
 
-        @SuppressLint("InflateParams")
         @Override
-        public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            CircleUserView v = new CircleUserView(getContext());
-            return new VH(v);
+        protected List<SocialUser> filterData(String query) {
+            return null;
         }
 
+        @Override
+        public PeopleListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            CircleUserView v = new CircleUserView(getContext());
+            v.setOnClickListener(this);
+            return new PeopleListAdapter.ViewHolder(v);
+        }
 
         @Override
-        public void onBindViewHolder(VH holder, int position) {
-            holder.userView.setUser(mData.get(position));
-            if(mSelectedUsers.contains(mData.get(position))){
+        public void onBindViewHolder(PeopleListAdapter.ViewHolder holder, int position) {
+            holder.userView.setUser(getFilteredData().get(position));
+            if (mSelectedUsers.contains(getFilteredData().get(position))) {
                 holder.userView.setChecked(true);
             }
         }
 
         @Override
-        public int getItemCount() {
-            return mData == null ? 0 : mData.size();
+        public void onClick(View v) {
+            CircleUserView userView = (CircleUserView) v;
+            if (userView.isChecked()) {
+                userView.setChecked(false);
+                mSelectedUsers.remove(userView.getUser());
+            } else {
+                userView.setChecked(true);
+                mSelectedUsers.add(userView.getUser());
+            }
         }
 
-        public class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public class ViewHolder extends RecyclerView.ViewHolder {
             CircleUserView userView;
 
-            public VH(CircleUserView itemView) {
+            public ViewHolder(CircleUserView itemView) {
                 super(itemView);
                 userView = itemView;
-                itemView.setOnClickListener(this);
-            }
-
-            @Override
-            public void onClick(View v) {
-                if(userView.isChecked()){
-                    userView.setChecked(false);
-                    mSelectedUsers.remove(userView.getUser());
-                }else{
-                    userView.setChecked(true);
-                    mSelectedUsers.add(userView.getUser());
-                }
             }
         }
     }
