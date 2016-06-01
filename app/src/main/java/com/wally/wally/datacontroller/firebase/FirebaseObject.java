@@ -25,7 +25,7 @@ public class FirebaseObject extends HashMap<String, Object> {
         return new FirebaseField(super.get(key));
     }
 
-    protected FirebaseObject getChild(String key) {
+    public FirebaseObject getChild(String key) {
         if (!children.containsKey(key))
             children.put(key, new FirebaseObject());
         return children.get(key);

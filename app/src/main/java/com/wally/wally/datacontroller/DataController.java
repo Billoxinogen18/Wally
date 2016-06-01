@@ -103,8 +103,12 @@ public class DataController {
         new AuthorQuery(authorId).fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
-    public void fetchByAuthor(User author, FetchResultCallback resultCallback) {
-        fetchByAuthor(author.getId(), resultCallback);
+    public void fetchByAuthor(User author, FetchResultCallback callback) {
+        fetchByAuthor(author.getId(), callback);
+    }
+
+    public void fetchShared(User user, FetchResultCallback callback) {
+
     }
 
     public void fetchPublicContent(FetchResultCallback callback) {

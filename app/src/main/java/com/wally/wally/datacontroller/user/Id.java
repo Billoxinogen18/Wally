@@ -2,32 +2,34 @@ package com.wally.wally.datacontroller.user;
 
 import java.io.Serializable;
 
-/**
- * Created by Meravici on 5/23/2016.
- */
 public class Id implements Serializable{
-    public static final int PROVIDER_FIREBASE = 0;
-    public static final int PROVIDER_GOOGLE = 1;
-    public static final int PROVIDER_FACEBOOK = 2;
+    public static final String PROVIDER_GOOGLE = "google";
+    public static final String PROVIDER_FIREBASE = "firebase";
+    public static final String PROVIDER_FACEBOOK = "facebook";
 
-    private int provider;
+    private String provider;
     private String id;
 
     public Id(){
 
     }
 
-    public Id(int provider, String id){
+    public Id(String provider, String id){
         // TODO validate
         this.provider = provider;
         this.id = id;
     }
 
-    public int getProvider() {
+    public String getProvider() {
         return provider;
     }
 
     public String getId() {
         return id;
+    }
+
+    @Override
+    public String toString() {
+        return provider + ":" + id;
     }
 }
