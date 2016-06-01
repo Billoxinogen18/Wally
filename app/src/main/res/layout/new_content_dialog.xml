@@ -23,7 +23,7 @@
             android:minHeight="250dp"
             android:orientation="vertical">
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/top_panel"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -32,9 +32,10 @@
                 <EditText
                     android:id="@+id/tv_title"
                     style="@style/TextAppearance.AppCompat.Headline"
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_toLeftOf="@+id/spinner_visibility_status"
+                    android:layout_toLeftOf="@+id/btn_social_visibility"
+                    android:layout_weight="1"
                     android:background="@null"
                     android:ellipsize="end"
                     android:hint="@string/content_title_hint"
@@ -47,14 +48,18 @@
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
-                <Spinner
-                    android:id="@+id/spinner_visibility_status"
-                    android:layout_width="wrap_content"
+                <Button
+                    android:id="@+id/btn_social_visibility"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true" />
+                    android:drawablePadding="4dp"
+                    android:padding="8dp"
+                    android:textAllCaps="false"
+                    tools:drawableLeft="@drawable/ic_public_visibility_24dp"
+                    tools:text="Public" />
 
-            </RelativeLayout>
+            </LinearLayout>
 
             <EditText
                 android:id="@+id/tv_note"

@@ -90,8 +90,8 @@ public class Visibility implements Serializable {
             return 3;
         }
 
-        public static String getStringRepresentation(@SocialVisibilityMode int range) {
-            return App.getContext().getResources().getStringArray(R.array.social_visibility)[range];
+        public static String getStringRepresentation(@SocialVisibilityMode int mode) {
+            return App.getContext().getResources().getStringArray(R.array.social_visibility)[mode];
         }
 
         public static
