@@ -122,8 +122,11 @@ public class DataController {
     }
 
     public void fetchAccessibleContent(User user, FetchResultCallback callback) {
-        // TODO Stub implementation
-        fetchPublicContent(callback);
+        AggregatorCallback aggregator =
+                new AggregatorCallback(callback).withExpectedCallbacks(3);
+        fetchPublicContent(aggregator);
+        fetchByAuthor(user, aggregator);
+        fetchShared(user, aggregator);
     }
 
     public User getCurrentUser() {
