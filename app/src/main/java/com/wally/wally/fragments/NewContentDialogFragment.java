@@ -31,9 +31,11 @@ import com.wally.wally.components.ColorPickerPopup;
 import com.wally.wally.components.SocialVisibilityPopup;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -174,11 +176,16 @@ public class NewContentDialogFragment extends DialogFragment implements
             case R.id.btn_social_visibility:
                 new SocialVisibilityPopup().show(v, new SocialVisibilityPopup.SocialVisibilityListener() {
                     @Override
-                    public void onVisibilityChosen(Visibility.SocialVisibility sv) {
-                        mContent.getVisibility().withSocialVisibility(sv);
-                        setDataOnSocialVisibilityButton(sv);
-                        if (sv.getMode() == Visibility.SocialVisibility.PEOPLE) {
-                            PeopleChooserDialogFragment.newInstance().show(getChildFragmentManager(), PeopleChooserDialogFragment.TAG);
+                    public void onVisibilityChosen(int socialVisibilityMode) {
+                        if (mContent.getVisibility().getSocialVisibility() == null) {
+                            mContent.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PRIVATE));
+                        }
+
+                        mContent.getVisibility().getSocialVisibility().setMode(socialVisibilityMode);
+                        setDataOnSocialVisibilityButton(mContent.getVisibility().getSocialVisibility());
+                        if (socialVisibilityMode == Visibility.SocialVisibility.PEOPLE) {
+                            List<SocialUser> sharedWith = toSocialUserList(mContent.getVisibility().getSocialVisibility().getSharedWith());
+                            PeopleChooserDialogFragment.newInstance(sharedWith).show(getChildFragmentManager(), PeopleChooserDialogFragment.TAG);
                             showDialog(false);
                         }
                     }
@@ -220,6 +227,23 @@ public class NewContentDialogFragment extends DialogFragment implements
             default:
                 Log.e(TAG, "onClick: " + v.getId());
         }
+    }
+
+    //TODO very bad very bad
+    private List<SocialUser> toSocialUserList(List<Id> sharedWith) {
+        List<SocialUser> friendList = App.getInstance().getUserManager().getUser().getFriends();
+        List<SocialUser> result = new ArrayList<>();
+
+        for (Id id : sharedWith) {
+            if (id.getProvider().equals(Id.PROVIDER_GOOGLE)) {
+                for (SocialUser current : friendList) {
+                    if (current.getBaseUser().getGgId().equals(id))
+                        result.add(current);
+                }
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -304,6 +328,13 @@ public class NewContentDialogFragment extends DialogFragment implements
     @Override
     public void onPeopleChosen(List<SocialUser> users) {
         // TODO update status
+        List<Id> sharedWith = new ArrayList<>();
+        for (SocialUser current : users) {
+            if (current.getBaseUser().getGgId() != null) {
+                sharedWith.add(current.getBaseUser().getGgId());
+            }
+        }
+        mContent.getVisibility().getSocialVisibility().withSharedWith(sharedWith);
         showDialog(true);
     }
 

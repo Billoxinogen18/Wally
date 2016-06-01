@@ -21,11 +21,11 @@ import com.wally.wally.Utils;
 import com.wally.wally.components.CircleUserView;
 import com.wally.wally.components.FilterRecyclerViewAdapter;
 import com.wally.wally.components.UserSelectListener;
-import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,10 +38,18 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
     private PeopleListAdapter mAdapter;
     private ChipsView mChipsView;
 
-    public static PeopleChooserDialogFragment newInstance() {
-        return new PeopleChooserDialogFragment();
+    public static PeopleChooserDialogFragment newInstance(List<SocialUser> sharedWith) {
+        PeopleChooserDialogFragment dialogFragment = new PeopleChooserDialogFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("selectedUsers", (Serializable) sharedWith);
+
+        dialogFragment.setArguments(bundle);
+
+        return dialogFragment;
     }
 
+    @SuppressWarnings({"unchecked", "ConstantConditions"})
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -52,16 +60,20 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
         initViews(dv);
 
-        if (savedInstanceState != null && savedInstanceState.containsKey("selectedUsers")) {
-            @SuppressWarnings("unchecked")
-            List<SocialUser> selectedUsers = (List<SocialUser>) savedInstanceState
-                    .getSerializable("selectedUsers");
-            mAdapter.setSelectedUsers(selectedUsers);
-            for(SocialUser user : selectedUsers){
-                mChipsView.addChip(user.getDisplayName(), user.getAvatarUrl(), user);
-            }
-        } else {
-            mAdapter.setSelectedUsers(new ArrayList<SocialUser>());
+        List<SocialUser> selectedUsers = Collections.emptyList();
+
+        if(getArguments() != null && getArguments().containsKey("selectedUsers")){
+            selectedUsers = (List<SocialUser>) getArguments().getSerializable("selectedUsers");
+        }else if (savedInstanceState != null && savedInstanceState.containsKey("selectedUsers")) {
+
+            selectedUsers = (List<SocialUser>) savedInstanceState.getSerializable("selectedUsers");
+
+        }
+
+        mAdapter.setSelectedUsers(selectedUsers);
+
+        for(SocialUser user : selectedUsers){
+            mChipsView.addChip(user.getDisplayName(), user.getAvatarUrl(), user);
         }
 
         builder.setView(dv);
@@ -135,7 +147,7 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
     @Override
     public void onChipAdded(ChipsView.Chip chip) {
-        //TODO not needed
+        //not needed
     }
 
     @Override
@@ -168,7 +180,7 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
         public void deselectUser(SocialUser user){
             Log.d(TAG, "deselectUser() called with: " + "user = [" + user + "]");
             mSelectedUsers.remove(user);
-            notifyItemChanged(getFilteredData().indexOf(user)); //TODO not optimal. should update view manually
+            notifyItemChanged(getFilteredData().indexOf(user));
         }
 
         public void setUserSelectListener(UserSelectListener userSelectListener){

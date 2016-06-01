@@ -46,16 +46,16 @@ public class SocialVisibilityPopup implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        Visibility.SocialVisibility sv;
+        int sv;
         switch (v.getId()) {
             case R.id.public_visibility:
-                sv = new Visibility.SocialVisibility(Visibility.SocialVisibility.PUBLIC);
+                sv = Visibility.SocialVisibility.PUBLIC;
                 break;
             case R.id.private_visibility:
-                sv = new Visibility.SocialVisibility(Visibility.SocialVisibility.PRIVATE);
+                sv = Visibility.SocialVisibility.PRIVATE;
                 break;
             case R.id.people_visibility:
-                sv = new Visibility.SocialVisibility(Visibility.SocialVisibility.PEOPLE);
+                sv = Visibility.SocialVisibility.PEOPLE;
                 break;
             default:
                 throw new IllegalArgumentException("Unknown visibility " + v);
@@ -65,6 +65,6 @@ public class SocialVisibilityPopup implements View.OnClickListener {
     }
 
     public interface SocialVisibilityListener {
-        void onVisibilityChosen(Visibility.SocialVisibility sv);
+        void onVisibilityChosen(int socialVisibilityMode);
     }
 }
