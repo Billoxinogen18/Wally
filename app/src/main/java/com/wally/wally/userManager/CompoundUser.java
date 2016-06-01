@@ -133,4 +133,20 @@ public class CompoundUser implements SocialUser {
                 "socialUsers=" + socialUsers +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CompoundUser that = (CompoundUser) o;
+
+        return socialUsers.equals(that.socialUsers);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return socialUsers.hashCode();
+    }
 }

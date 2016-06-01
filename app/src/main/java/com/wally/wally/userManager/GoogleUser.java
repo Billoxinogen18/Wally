@@ -88,4 +88,20 @@ public class GoogleUser extends AbstractSocialUser {
                 ", mFriends=" + mFriends +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        GoogleUser that = (GoogleUser) o;
+
+        return getBaseUser().getGgId() != null ? getBaseUser().getGgId().equals(that.getBaseUser().getGgId()) : that.getBaseUser().getGgId() == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getBaseUser().getGgId() != null ? getBaseUser().getGgId().hashCode() : 0;
+    }
 }

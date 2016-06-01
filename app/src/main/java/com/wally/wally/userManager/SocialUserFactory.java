@@ -67,7 +67,7 @@ public class SocialUserFactory {
                                                 try {
                                                     List<SocialUser> friends = new ArrayList<>();
                                                     for (Person person : personBuffer) {
-                                                        friends.add(toSocialUser(null, person));
+                                                        friends.add(toSocialUser(new User(null).withGgId(person.getId()), person));
                                                     }
                                                     googleUser.withFriends(friends);
                                                     userLoadListener.onUserLoad(googleUser);
