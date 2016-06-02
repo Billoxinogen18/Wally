@@ -34,6 +34,13 @@ public class VisualContent {
         mStatus = RenderStatus.None;
     }
 
+    public VisualContent cloneContent(){
+        VisualContent res = new VisualContent(mContent);
+        res.setStatus(mStatus);
+        //res.setVisual(mVisual);
+        return res;
+    }
+
     protected void refreshVisualScale() {
         if (mVisual != null && mContent.getTangoData() != null) {
             mVisual.setScale(mContent.getTangoData().getScale());
@@ -74,6 +81,10 @@ public class VisualContent {
             refreshVisualScale();
         }
         return mVisual;
+    }
+
+    public void setVisual(ContentPlane visual){
+        mVisual = visual;
     }
 
     public Content getContent() {

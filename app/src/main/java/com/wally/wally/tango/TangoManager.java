@@ -243,7 +243,7 @@ public class TangoManager {
                                 mRenderer.updateRenderCameraPose(lastFramePose, mExtrinsics);
                                 mCameraPoseTimestamp = lastFramePose.timestamp;
                             } else {
-                                Log.v(TAG, "Can't get device pose at time: " + mRgbTimestampGlThread);
+                                //Log.v(TAG, "Can't get device pose at time: " + mRgbTimestampGlThread);
                             }
                         } catch (TangoException e) {
                             e.printStackTrace();

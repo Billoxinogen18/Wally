@@ -25,12 +25,14 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private boolean mIsFrameAvailableTangoThread;
     private RajawaliSurfaceView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
+    private LocalizationListener mLocalizator;
 
 
-    public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager){
+    public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager, LocalizationListener localizator){
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
+        mLocalizator = localizator;
     }
 
     @Override
@@ -91,11 +93,18 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         mIsFrameAvailableTangoThread = available;
     }
 
-    public synchronized boolean isTangoLocalized(){
+    private synchronized boolean isTangoLocalized(){
         return isLocalized;
     }
 
     public synchronized void setTangoLocalization(boolean localization){
-        isLocalized = localization;
+        if (isLocalized != localization) {
+            isLocalized = localization;
+            if (isLocalized) {
+                mLocalizator.localized();
+            } else {
+                mLocalizator.notLocalized();
+            }
+        }
     }
 }

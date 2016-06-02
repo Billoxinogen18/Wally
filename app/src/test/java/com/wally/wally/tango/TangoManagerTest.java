@@ -31,7 +31,7 @@ public class TangoManagerTest {
     private RajawaliSurfaceView rajawaliSurfaceView;
     private TangoUxLayout tangoUxLayout;
     private WallyRenderer renderer;
-    private VisualContentManager3 visualContentManager;
+    private VisualContentManager visualContentManager;
     TangoPointCloudManager pointCloudManager;
     private WallyTangoUx tangoUx;
     private Tango tango;
@@ -45,7 +45,7 @@ public class TangoManagerTest {
         rajawaliSurfaceView = mock(RajawaliSurfaceView.class);
         tangoUxLayout = mock(TangoUxLayout.class);
         renderer = mock(WallyRenderer.class);
-        visualContentManager = mock(VisualContentManager3.class);
+        visualContentManager = mock(VisualContentManager.class);
         tangoUx = mock(WallyTangoUx.class);
         tango = TangoMock.getTango();
 
