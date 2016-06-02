@@ -57,14 +57,7 @@ public class SocialUserFactory {
                             try {
                                 Person person = personBuffer.get(0);
                                 Log.d(TAG, "onResult: " + person.getDisplayName());
-                                final SocialUser googleUser = new GoogleUser(baseUser)
-                                        .withDisplayName(person.getDisplayName())
-                                        .withFirstName(person.getName().getGivenName())
-                                        .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
-
-                                if(person.hasCover() && person.getCover().hasCoverPhoto()){
-                                    googleUser.withCover(person.getCover().getCoverPhoto().getUrl());
-                                }
+                                final SocialUser googleUser = toSocialUser(baseUser, person);
 
                                 Plus.PeopleApi.loadVisible(googleApiClient, null).setResultCallback(
                                         new ResultCallback<People.LoadPeopleResult>() {
@@ -72,9 +65,9 @@ public class SocialUserFactory {
                                             public void onResult(@NonNull People.LoadPeopleResult peopleData) {
                                                 PersonBuffer personBuffer = peopleData.getPersonBuffer();
                                                 try {
-                                                    List<Id> friends = new ArrayList<>();
+                                                    List<SocialUser> friends = new ArrayList<>();
                                                     for (Person person : personBuffer) {
-                                                        friends.add(new Id(Id.PROVIDER_GOOGLE, person.getId()));
+                                                        friends.add(toSocialUser(new User(null).withGgId(person.getId()), person));
                                                     }
                                                     googleUser.withFriends(friends);
                                                     userLoadListener.onUserLoad(googleUser);
@@ -88,10 +81,26 @@ public class SocialUserFactory {
                             }
                         } else {
                             Log.e(TAG, "onResult: Error requesting people data" + peopleData.getStatus());
-                            // TODO delete this WTF :D
                             userLoadListener.onUserLoad(new DummyUser(baseUser));
                         }
                     }
                 });
+    }
+
+    private SocialUser toSocialUser(User baseUser, Person person){
+        Log.d(TAG, "toSocialUser() called with: " + "person = [" + person.getDisplayName() + "]");
+        SocialUser socialUser = new GoogleUser(baseUser)
+                .withDisplayName(person.getDisplayName())
+                .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
+
+        if(person.hasCover() && person.getCover().hasCoverPhoto()){
+            socialUser.withCover(person.getCover().getCoverPhoto().getUrl());
+        }
+
+        if(person.hasName()){
+            socialUser.withFirstName(person.getName().getGivenName());
+        }
+
+        return socialUser;
     }
 }

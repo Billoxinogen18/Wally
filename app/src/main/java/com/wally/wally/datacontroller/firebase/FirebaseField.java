@@ -12,7 +12,7 @@ public class FirebaseField {
 
     public FirebaseField(Object value) {
         if (value instanceof Double[]) {
-            value = arrayToList((Double[])value);
+            value = arrayToList((Double[]) value);
         }
         this.value = value;
     }
@@ -74,4 +74,7 @@ public class FirebaseField {
         return array;
     }
 
+    public FirebaseObject toFirebaseObject() {
+        return (FirebaseObject) value;
+    }
 }

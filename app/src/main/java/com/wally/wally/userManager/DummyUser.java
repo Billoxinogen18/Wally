@@ -35,7 +35,7 @@ public class DummyUser extends AbstractSocialUser{
     }
 
     @Override
-    public List<Id> getFriends() {
+    public List<SocialUser> getFriends() {
         return new ArrayList<>();
     }
 
@@ -60,7 +60,7 @@ public class DummyUser extends AbstractSocialUser{
     }
 
     @Override
-    public SocialUser withFriends(List<Id> friends) {
+    public SocialUser withFriends(List<SocialUser> friends) {
         return null;
     }
 }

@@ -43,6 +43,7 @@ import com.wally.wally.R;
 import com.wally.wally.TextWatchAdapter;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
+import com.wally.wally.components.FilterRecyclerViewAdapter;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
@@ -432,10 +433,24 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
         pd.show(getSupportFragmentManager(), PreviewContentDialogFragment.TAG);
     }
 
-    private class ContentAdapter extends RecyclerView.Adapter<ContentAdapter.ViewHolder> {
+    private class ContentAdapter extends FilterRecyclerViewAdapter<ContentAdapter.ViewHolder, Content>{
 
-        private List<Content> mData;
-        private List<Content> mBackedData;
+        @Override
+        protected List<Content> filterData(String query) {
+            ArrayList<Content> filtered = new ArrayList<>();
+            if (!TextUtils.isEmpty(query)) {
+                query = query.toLowerCase();
+                for (Content content : getFullData()) {
+                    if ((content.getTitle() != null && content.getTitle().toLowerCase().contains(query)) ||
+                            (content.getNote() != null && content.getNote().toLowerCase().contains(query))) {
+                        filtered.add(content);
+                    }
+                }
+            } else {
+                filtered.addAll(getFullData());
+            }
+            return filtered;
+        }
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -446,7 +461,7 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
 
         @Override
         public void onBindViewHolder(ViewHolder vh, int position) {
-            Content c = mData.get(position);
+            Content c = getFilteredData().get(position);
             vh.image.setImageDrawable(null);
             vh.image.setBackground(null);
             if (!TextUtils.isEmpty(c.getImageUri())) {
@@ -469,112 +484,6 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
 
             vh.note.setText(c.getNote());
             vh.note.setVisibility(TextUtils.isEmpty(c.getNote()) ? View.GONE : View.VISIBLE);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mData == null ? 0 : mData.size();
-        }
-
-        public void setData(List<Content> data) {
-            mData = data;
-            mBackedData = new ArrayList<>(data);
-            // this thing adds insert animation and updates data
-            notifyItemRangeInserted(0, getItemCount());
-        }
-
-        public void removeItem(Content content) {
-            mBackedData.remove(content);
-            removeItem(mData.indexOf(content));
-        }
-
-        public void updateItem(Content content) {
-            int dataPos = mData.indexOf(content);
-            int backedPos = mBackedData.indexOf(content);
-
-            if (dataPos >= 0) {
-                mData.set(dataPos, content);
-                notifyItemChanged(dataPos);
-            }
-            if (backedPos >= 0) {
-                mBackedData.set(backedPos, content);
-            }
-        }
-
-        public void filter(@Nullable String query) {
-            if (mBackedData == null) {
-                return;
-            }
-            Log.d(TAG, "filter() called with: " + "query = [" + query + "]");
-            ArrayList<Content> filtered = new ArrayList<>();
-            if (!TextUtils.isEmpty(query)) {
-                query = query.toLowerCase();
-                for (Content content : mBackedData) {
-                    if ((content.getTitle() != null && content.getTitle().toLowerCase().contains(query)) ||
-                            (content.getNote() != null && content.getNote().toLowerCase().contains(query))) {
-                        filtered.add(content);
-                    }
-                }
-            } else {
-                filtered.addAll(mBackedData);
-            }
-            Log.wtf(TAG, "filter: " + filtered);
-            animateTo(filtered);
-        }
-
-        /**
-         * Filter Logic
-         **/
-        public void animateTo(List<Content> data) {
-            applyAndAnimateRemovals(data);
-            applyAndAnimateAdditions(data);
-            applyAndAnimateMovedItems(data);
-
-        }
-
-        private void applyAndAnimateRemovals(List<Content> newData) {
-            for (int i = mData.size() - 1; i >= 0; i--) {
-                final Content model = mData.get(i);
-                if (!newData.contains(model)) {
-                    removeItem(i);
-                }
-            }
-        }
-
-        private void applyAndAnimateAdditions(List<Content> newData) {
-            for (int i = 0, count = newData.size(); i < count; i++) {
-                final Content model = newData.get(i);
-                if (!mData.contains(model)) {
-                    addItem(i, model);
-                }
-            }
-        }
-
-        private void applyAndAnimateMovedItems(List<Content> newData) {
-            for (int toPosition = newData.size() - 1; toPosition >= 0; toPosition--) {
-                final Content model = newData.get(toPosition);
-                final int fromPosition = mData.indexOf(model);
-                if (fromPosition >= 0 && fromPosition != toPosition) {
-                    moveItem(fromPosition, toPosition);
-                }
-            }
-        }
-
-        public Content removeItem(int position) {
-            final Content model = mData.remove(position);
-            notifyItemRemoved(position);
-            return model;
-        }
-
-        public void addItem(int position, Content model) {
-            mData.add(position, model);
-            notifyItemInserted(position);
-        }
-
-        public void moveItem(int fromPosition, int toPosition) {
-            final Content model = mData.remove(fromPosition);
-            mData.add(toPosition, model);
-            notifyItemMoved(fromPosition, toPosition);
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder {
@@ -600,7 +509,7 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
                 v.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Content content = mData.get(getAdapterPosition());
+                        Content content = getFilteredData().get(getAdapterPosition());
                         onContentClicked(content, v);
                     }
                 });
@@ -613,7 +522,7 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        Content content = mData.get(getAdapterPosition());
+                        Content content = getFilteredData().get(getAdapterPosition());
                         switch (item.getItemId()) {
                             case R.id.show_on_map:
                                 startActivity(MapsActivity.newIntent(getBaseContext(), content));

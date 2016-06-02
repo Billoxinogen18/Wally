@@ -28,11 +28,16 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.ColorPickerPopup;
+import com.wally.wally.components.SocialVisibilityPopup;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
+import com.wally.wally.userManager.SocialUser;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * New Post dialog, that manages adding new content.
@@ -43,8 +48,7 @@ import java.util.Date;
 public class NewContentDialogFragment extends DialogFragment implements
         View.OnClickListener,
         PhotoChooserDialogFragment.PhotoChooserListener,
-        PeopleChooserDialogFragment.PeopleChooserListener,
-        AdapterView.OnItemSelectedListener {
+        PeopleChooserDialogFragment.PeopleChooserListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
@@ -58,7 +62,7 @@ public class NewContentDialogFragment extends DialogFragment implements
     private ImageView mImageView;
     private EditText mTitleEt;
     private EditText mNoteEt;
-    private Spinner mVisibilitySpinner;
+    private Button mSocialVisibilityBtn;
 
     private User mAuthor;
     private Content mContent;
@@ -91,6 +95,8 @@ public class NewContentDialogFragment extends DialogFragment implements
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
 
+
+        dv.findViewById(R.id.btn_social_visibility).setOnClickListener(this);
         dv.findViewById(R.id.btn_add_image).setOnClickListener(this);
         dv.findViewById(R.id.btn_remove_image).setOnClickListener(this);
         dv.findViewById(R.id.btn_pallette).setOnClickListener(this);
@@ -104,9 +110,7 @@ public class NewContentDialogFragment extends DialogFragment implements
         mImageContainer = dv.findViewById(R.id.image_container);
         mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
         mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
-        mVisibilitySpinner = (Spinner) dv.findViewById(R.id.spinner_visibility_status);
-        mVisibilitySpinner.setAdapter(new VisibilityAdapter(getContext()));
-        mVisibilitySpinner.setOnItemSelectedListener(this);
+        mSocialVisibilityBtn = (Button) dv.findViewById(R.id.btn_social_visibility);
 
         if (isEditMode) {
             Button b = (Button) dv.findViewById(R.id.btn_create_post);
@@ -140,6 +144,10 @@ public class NewContentDialogFragment extends DialogFragment implements
         if (mContent.getVisibility() == null) {
             mContent.withVisibility(new Visibility());
         }
+        if (mContent.getVisibility().getSocialVisibility() == null) {
+            mContent.getVisibility().withSocialVisibility(
+                    new Visibility.SocialVisibility(Visibility.SocialVisibility.PUBLIC));
+        }
     }
 
     public void onStart() {
@@ -165,6 +173,24 @@ public class NewContentDialogFragment extends DialogFragment implements
 //        Utils.hideSoftKeyboard(mTitleEt, getContext());
         updateContent();
         switch (v.getId()) {
+            case R.id.btn_social_visibility:
+                new SocialVisibilityPopup().show(v, new SocialVisibilityPopup.SocialVisibilityListener() {
+                    @Override
+                    public void onVisibilityChosen(int socialVisibilityMode) {
+                        if (mContent.getVisibility().getSocialVisibility() == null) {
+                            mContent.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PRIVATE));
+                        }
+
+                        mContent.getVisibility().getSocialVisibility().setMode(socialVisibilityMode);
+                        setDataOnSocialVisibilityButton(mContent.getVisibility().getSocialVisibility());
+                        if (socialVisibilityMode == Visibility.SocialVisibility.PEOPLE) {
+                            List<SocialUser> sharedWith = toSocialUserList(mContent.getVisibility().getSocialVisibility().getSharedWith());
+                            PeopleChooserDialogFragment.newInstance(sharedWith).show(getChildFragmentManager(), PeopleChooserDialogFragment.TAG);
+                            showDialog(false);
+                        }
+                    }
+                });
+                break;
             case R.id.btn_discard_post:
                 if (!postIsEmpty() && !isEditMode) {
                     DiscardDoubleCheckDialogFragment dialog = new DiscardDoubleCheckDialogFragment();
@@ -203,6 +229,23 @@ public class NewContentDialogFragment extends DialogFragment implements
         }
     }
 
+    //TODO very bad very bad
+    private List<SocialUser> toSocialUserList(List<Id> sharedWith) {
+        List<SocialUser> friendList = App.getInstance().getUserManager().getUser().getFriends();
+        List<SocialUser> result = new ArrayList<>();
+
+        for (Id id : sharedWith) {
+            if (id.getProvider().equals(Id.PROVIDER_GOOGLE)) {
+                for (SocialUser current : friendList) {
+                    if (current.getBaseUser().getGgId().equals(id))
+                        result.add(current);
+                }
+            }
+        }
+
+        return result;
+    }
+
     /**
      * Called when user finally discarded post.
      * Now you should clear all caches and destroy self.
@@ -216,15 +259,6 @@ public class NewContentDialogFragment extends DialogFragment implements
      * Updates model from views.
      */
     private void updateContent() {
-        if (mContent.getVisibility() == null) {
-            mContent.withVisibility(new Visibility());
-        }
-        //noinspection WrongConstant
-        Visibility.SocialVisibility socialVisibility =
-                new Visibility.SocialVisibility((Integer) mVisibilitySpinner.getSelectedItem());
-
-        mContent.getVisibility().withSocialVisibility(socialVisibility);
-
         mContent.withTitle(mTitleEt.getText().toString())
                 .withNote(mNoteEt.getText().toString());
         mContent.withAuthorId(mAuthor.getId().getId());
@@ -255,9 +289,7 @@ public class NewContentDialogFragment extends DialogFragment implements
                     .into(mImageView);
             mImageContainer.setVisibility(View.VISIBLE);
         }
-        if (mContent.getVisibility() != null && mContent.getVisibility().getSocialVisibility() != null) {
-            mVisibilitySpinner.setSelection(mContent.getVisibility().getSocialVisibility().getMode());
-        }
+        setDataOnSocialVisibilityButton(mContent.getVisibility().getSocialVisibility());
     }
 
     /**
@@ -293,10 +325,23 @@ public class NewContentDialogFragment extends DialogFragment implements
         showDialog(true);
     }
 
-    // TODO add params
     @Override
-    public void onPeopleChosen() {
+    public void onPeopleChosen(List<SocialUser> users) {
+        // TODO update status
+        List<Id> sharedWith = new ArrayList<>();
+        for (SocialUser current : users) {
+            if (current.getBaseUser().getGgId() != null) {
+                sharedWith.add(current.getBaseUser().getGgId());
+            }
+        }
+        mContent.getVisibility().getSocialVisibility().withSharedWith(sharedWith);
         showDialog(true);
+    }
+
+    private void setDataOnSocialVisibilityButton(Visibility.SocialVisibility visibility) {
+        int mode = visibility.getMode();
+        mSocialVisibilityBtn.setText(Visibility.SocialVisibility.getStringRepresentation(mode));
+        mSocialVisibilityBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(Visibility.SocialVisibility.toDrawableRes(mode), 0, 0, 0);
     }
 
     public void showDialog(boolean show) {
@@ -308,23 +353,6 @@ public class NewContentDialogFragment extends DialogFragment implements
             }
         }
         mIsDialogShown = show;
-    }
-
-
-    /**
-     * Called when Visibility Item is selected
-     */
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Visibility.SocialVisibility socialVisibility =
-                new Visibility.SocialVisibility((Integer) position);
-        mContent.getVisibility().withSocialVisibility(socialVisibility);
-        PeopleChooserDialogFragment.newInstance().show(getChildFragmentManager(), PeopleChooserDialogFragment.TAG);
-        showDialog(false);
-    }
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
     }
 
     public interface NewContentDialogListener {

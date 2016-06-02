@@ -10,6 +10,7 @@ import com.wally.wally.datacontroller.user.Id;
 import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -82,6 +83,7 @@ public class Visibility implements Serializable {
         private List<Id> sharedWith;
 
         public SocialVisibility(@SocialVisibilityMode int mode) {
+            sharedWith = new ArrayList<>();
             setMode(mode);
         }
 
@@ -90,8 +92,8 @@ public class Visibility implements Serializable {
             return 3;
         }
 
-        public static String getStringRepresentation(@SocialVisibilityMode int range) {
-            return App.getContext().getResources().getStringArray(R.array.social_visibility)[range];
+        public static String getStringRepresentation(@SocialVisibilityMode int mode) {
+            return App.getContext().getResources().getStringArray(R.array.social_visibility)[mode];
         }
 
         public static

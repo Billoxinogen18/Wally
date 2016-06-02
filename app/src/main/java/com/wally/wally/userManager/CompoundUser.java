@@ -63,8 +63,8 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public List<Id> getFriends() {
-        final List<Id> result = new ArrayList<>();
+    public List<SocialUser> getFriends() {
+        final List<SocialUser> result = new ArrayList<>();
         for (SocialUser user : socialUsers) {
             result.addAll(user.getFriends());
         }
@@ -123,7 +123,7 @@ public class CompoundUser implements SocialUser {
     }
 
     @Override
-    public SocialUser withFriends(List<Id> friends) {
+    public SocialUser withFriends(List<SocialUser> friends) {
         throw new UnsupportedOperationException();
     }
 
@@ -132,5 +132,21 @@ public class CompoundUser implements SocialUser {
         return "CompoundUser{" +
                 "socialUsers=" + socialUsers +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CompoundUser that = (CompoundUser) o;
+
+        return socialUsers.equals(that.socialUsers);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return socialUsers.hashCode();
     }
 }

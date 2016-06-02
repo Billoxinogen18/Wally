@@ -16,11 +16,11 @@ public interface SocialUser extends Serializable {
     String getFirstName();
     String getAvatarUrl();
     String getCoverUrl();
-    List<Id> getFriends();
+    List<SocialUser> getFriends();
 
     SocialUser withDisplayName(String displayName);
     SocialUser withFirstName(String firstName);
     SocialUser withAvatar(String avatarUrl);
     SocialUser withCover(String coverUrl);
-    SocialUser withFriends(List<Id> friends);
+    SocialUser withFriends(List<SocialUser> friends);
 }

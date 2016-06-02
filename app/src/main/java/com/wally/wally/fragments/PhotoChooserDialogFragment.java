@@ -101,6 +101,7 @@ public class PhotoChooserDialogFragment extends DialogFragment implements View.O
         builder.setView(dv);
         AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
+        setCancelable(false);
         return dialog;
     }
 
@@ -135,7 +136,7 @@ public class PhotoChooserDialogFragment extends DialogFragment implements View.O
         Intent chooser = Intent.createChooser(intent, getString(R.string.title_activity_choose_photo));
         startActivityForResult(chooser, ACTION_REQUEST_EXTERNAL_GALLERY);
     }
-    
+
     private void finishWithResult(String path) {
         PhotoChooserListener listener;
         if (getParentFragment() instanceof PhotoChooserListener) {

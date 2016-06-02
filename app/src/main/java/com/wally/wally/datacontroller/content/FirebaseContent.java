@@ -2,6 +2,10 @@ package com.wally.wally.datacontroller.content;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;
+import com.wally.wally.datacontroller.user.Id;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FirebaseContent extends FirebaseObject {
     public static final int PUBLIC = Visibility.SocialVisibility.PUBLIC;
@@ -31,6 +35,7 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_PREVIEW        = "preview";
     public static final String K_DURATION       = "duration";
     public static final String K_PUBLICITY      = "publicity";
+    public static final String K_SHARED         = "Shared";
 
     public FirebaseContent() {
     }
@@ -106,7 +111,15 @@ public class FirebaseContent extends FirebaseObject {
 
     @SuppressWarnings("WrongConstant")
     private Visibility.SocialVisibility getPublicity() {
-        return new Visibility.SocialVisibility(get(K_PUBLICITY).toInteger());
+        List<Id> sharedWith = new ArrayList<>();
+        FirebaseObject shared = getChild(K_SHARED);
+        for (String provider : shared.keySet()) {
+            for (String id : shared.get(provider).toStringMap().keySet()) {
+                sharedWith.add(new Id(provider, id));
+            }
+        }
+        return new Visibility.SocialVisibility(get(K_PUBLICITY).toInteger())
+                .withSharedWith(sharedWith);
     }
 
     private void setNoteData(Content c) {
@@ -138,6 +151,16 @@ public class FirebaseContent extends FirebaseObject {
         put(K_RANGE, v.getRangeVisibility().getRange());
         put(K_PUBLICITY, v.getSocialVisibility().getMode());
         getChild(K_NOTE_DATA).put(K_PREVIEW, v.isPreviewVisible());
+        // TODO generalize creation of "shared" object
+        FirebaseObject shared = getChild(K_SHARED)
+                .put(Id.PROVIDER_FIREBASE, new FirebaseObject())
+                .put(Id.PROVIDER_FACEBOOK, new FirebaseObject())
+                .put(Id.PROVIDER_GOOGLE, new FirebaseObject());
+        List<Id> sharedWith = v.getSocialVisibility().getSharedWith();
+        if (sharedWith == null) return;
+        for (Id id : sharedWith ) {
+            shared.get(id.getProvider()).toFirebaseObject().put(id.getId(), true);
+        }
     }
 
     public Content toContent() {
@@ -155,7 +178,7 @@ public class FirebaseContent extends FirebaseObject {
     }
 
     @Override
-    protected FirebaseObject getChild(String key) {
+    public FirebaseObject getChild(String key) {
         FirebaseObject child = super.getChild(key);
         if (!containsKey(key)) {
             put(key, child);

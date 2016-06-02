@@ -103,8 +103,17 @@ public class DataController {
         new AuthorQuery(authorId).fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
-    public void fetchByAuthor(User author, FetchResultCallback resultCallback) {
-        fetchByAuthor(author.getId(), resultCallback);
+    public void fetchByAuthor(User author, FetchResultCallback callback) {
+        fetchByAuthor(author.getId(), callback);
+    }
+
+    public void fetchShared(Id userId, FetchResultCallback callback) {
+        new SharedWithQuery(userId)
+                .fetch(contents, new FirebaseFetchResultCallback(callback));
+    }
+
+    public void fetchShared(User user, FetchResultCallback callback) {
+        fetchShared(user.getId(), callback);
     }
 
     public void fetchPublicContent(FetchResultCallback callback) {
@@ -113,8 +122,11 @@ public class DataController {
     }
 
     public void fetchAccessibleContent(User user, FetchResultCallback callback) {
-        // TODO Stub implementation
-        fetchPublicContent(callback);
+        AggregatorCallback aggregator =
+                new AggregatorCallback(callback).withExpectedCallbacks(3);
+        fetchPublicContent(aggregator);
+        fetchByAuthor(user, aggregator);
+        fetchShared(user, aggregator);
     }
 
     public User getCurrentUser() {

@@ -34,11 +34,14 @@
     <string name="empty_note_time_visibility">Click to set delete Date</string>
     <string name="note_time_visibility">The note will be deleted at: %s</string>
 
+    <string name="public_visibility">Public</string>
+    <string name="private_visibility">Private</string>
+    <string name="people_visibility">People</string>
+
     <string-array name="social_visibility">
-        <item>Private</item>
-        <item>Public</item>
-        <item>People</item>
-        <item>Anonymous</item>
+        <item>@string/public_visibility</item>
+        <item>@string/private_visibility</item>
+        <item>@string/people_visibility</item>
     </string-array>
 
     <string-array name="visibility_ranges">
