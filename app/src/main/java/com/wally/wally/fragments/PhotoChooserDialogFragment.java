@@ -229,7 +229,7 @@ public class PhotoChooserDialogFragment extends DialogFragment implements View.O
 
             public VH(View itemView) {
                 super(itemView);
-                imageView = (ImageView) itemView.findViewById(R.id.image_view);
+                imageView = (ImageView) itemView.findViewById(R.id.iv_note_image);
                 dateView = (TextView) itemView.findViewById(R.id.date_view);
                 itemView.setOnClickListener(this);
             }

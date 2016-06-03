@@ -1,6 +1,7 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,62 +12,31 @@
         android:layout_height="match_parent"
         tools:context=".activities.MapsActivity" />
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/search_layout"
+    <ImageButton
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:onClick="onBtnCameraClick"
+        android:padding="8dp"
+        android:src="@drawable/ic_arrow_back_black_24dp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:cardElevation="8dp">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="4dp">
-
-            <ImageButton
-                android:id="@+id/back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:onClick="onBtnCameraClick"
-                android:padding="4dp"
-                android:src="@drawable/ic_arrow_back_black_24dp" />
-
-            <EditText
-                android:id="@+id/search_field"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toRightOf="@+id/back"
-                android:layout_alignParentRight="true"
-                android:background="@null"
-                android:hint="@string/content_filter_hint"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:maxLines="1" />
-            <!--TODO Filter-->
-            <!--<ImageButton-->
-                <!--android:id="@+id/filter"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_alignParentEnd="true"-->
-                <!--android:background="?attr/selectableItemBackgroundBorderless"-->
-                <!--android:onClick="onBtnCameraClick"-->
-                <!--android:padding="4dp"-->
-                <!--android:src="@drawable/ic_tune_black_24dp" />-->
-        </RelativeLayout>
-    </android.support.v7.widget.CardView>
+        android:minHeight="30dp"
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/my_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
+        android:layout_gravity="bottom|right"
         android:layout_margin="@dimen/fab_margin"
         android:background="@android:color/background_light"
+        android:elevation="12dp"
         android:onClick="onMyLocationClick"
         android:src="@drawable/ic_my_location_black_24dp" />
-
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

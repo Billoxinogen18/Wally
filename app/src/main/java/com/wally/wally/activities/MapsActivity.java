@@ -1,6 +1,7 @@
 package com.wally.wally.activities;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,12 +9,21 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -26,15 +36,22 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.fragments.PreviewContentDialogFragment;
+import com.wally.wally.userManager.SocialUser;
+import com.wally.wally.userManager.UserManager;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,6 +71,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private long mLastRequestId;
 
+    private RecyclerView mRecycler;
+    private MapsRecyclerAdapter mAdapter;
+    private BottomSheetBehavior mBottomSheetBehavior;
+
+
     public static Intent newIntent(Context context, @Nullable Content content) {
         Intent i = new Intent(context, MapsActivity.class);
         i.putExtra("mContent", content);
@@ -70,12 +92,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mContent = (Content) getIntent().getSerializableExtra("mContent");
 
+        initRecyclerView();
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .enableAutoManage(this, this)
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
+                    .addScope(Plus.SCOPE_PLUS_PROFILE)
+                    .addApi(Plus.API)
                     .build();
         }
 
@@ -86,17 +112,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.setRetainInstance(true);
     }
 
+    private void initRecyclerView() {
+        mRecycler = (RecyclerView) findViewById(R.id.recyclerview);
+        mRecycler.setLayoutManager(new LinearLayoutManager(getBaseContext()));
+        mAdapter = new MapsRecyclerAdapter(null);
+        mRecycler.setAdapter(mAdapter);
+
+        if (findViewById(R.id.coordinator) != null) {
+            mBottomSheetBehavior = BottomSheetBehavior.from(mRecycler);
+        }
+
+        setMapPadding();
+    }
+
     public void onMyLocationClick(View v) {
         centerMapOnMyLocation();
     }
 
+
+    public void setMapPadding() {
+        if (mMap != null) {
+            if (mBottomSheetBehavior != null) {
+                mMap.setPadding(0, (int) getResources().getDimension(R.dimen.map_back_button_height), 0, 0);
+            } else {
+                mMap.setPadding(0, 0, 0, 0);
+            }
+        }
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnCameraChangeListener(this);
         mMap.setOnMarkerClickListener(this);
-        mMap.setPadding(0, (int) getResources().getDimension(R.dimen.map_back_button_height), 0, 0);
+
         if (Utils.checkLocationPermission(this)) {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -141,6 +190,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mLastRequestId = System.currentTimeMillis();
             app.getDataController().fetchByBounds(bounds, new EnumCallback(mLastRequestId) {
 
+                // TODO this must return list, because we have ordering here. (Also some paging stuff)
                 @Override
                 public void onResult(Collection<Content> result) {
                     if (mLastRequestId == getId()) {
@@ -166,6 +216,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        for (Content cur : mMarkers.keySet())
 //            if (!mContents.contains(cur))
 //                mMarkers.remove(cur);
+        Log.d(TAG, "showContents() called with: " + "");
+        mContents.add(new Content().withLocation(new LatLng(41.72151, 44.8271)).withId("0").withNote("Hi there my name is...").withTitle("Sample note"));
+        mContents.add(new Content().withLocation(new LatLng(41.721565, 44.82812)).withId("5").withNote("Some text").withTitle("თქვენ შიგ ხო არ გაქვთ რა ლიმიტი").withImageUri("http://i.imgur.com/RRUe0Mo.png"));
+        mContents.add(new Content().withLocation(new LatLng(41.72120, 44.8255)).withId("6").withNote(getString(R.string.large_text)).withTitle("Sample note Title here"));
+        mContents.add(new Content().withLocation(new LatLng(41.72180, 44.8270)).withId("7").withNote("Hi there my name is John").withTitle("Sample note"));
+        mContents.add(new Content().withLocation(new LatLng(41.72159, 44.8273)).withId("8").withNote("Hi there my name is... I'm programmer here :S"));
+        mContents.add(new Content().withLocation(new LatLng(41.72159, 44.8269)).withId("9").withTitle("Sample note Only title"));
+        mContents.add(new Content().withLocation(new LatLng(41.72161, 44.8276)).withId("10").withTitle("Sample note").withImageUri("http://www.keenthemes.com/preview/metronic/theme/assets/global/plugins/jcrop/demos/demo_files/image1.jpg"));
+        // TODO data controller must return list!
+        mAdapter.setData(new ArrayList<>(mContents));
+        if (mBottomSheetBehavior != null) {
+            mBottomSheetBehavior.setPeekHeight(300);
+        }
 
         for (Content content : mContents) {
             if (!mMarkers.keySet().contains(content)) {
@@ -246,5 +309,134 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void onBtnCameraClick(View view) {
         onBackPressed();
+    }
+
+    private class MapsRecyclerAdapter extends RecyclerView.Adapter<MapsRecyclerAdapter.VH> {
+        private List<Content> mData;
+
+        public MapsRecyclerAdapter(List<Content> data) {
+            setData(data);
+        }
+
+        public void setData(List<Content> data) {
+            mData = data;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater
+                    .from(getBaseContext()).inflate(R.layout.maps_content_list_item, parent, false);
+            return new VH(v);
+        }
+
+        @Override
+        public void onBindViewHolder(final VH vh, @SuppressLint("RecyclerView") final int position) {
+            Content c = mData.get(position);
+            Log.wtf(TAG, "onBindViewHolder: " + c.getId());
+
+            vh.ownerImage.setImageDrawable(null);
+            vh.ownerImage.setBackground(null);
+            vh.noteImage.setImageDrawable(null);
+            vh.noteImage.setBackground(null);
+
+            vh.ownerName.setVisibility(View.GONE);
+
+            if (!TextUtils.isEmpty(c.getImageUri())) {
+                Glide.with(getBaseContext())
+                        .load(c.getImageUri())
+                        .fitCenter()
+                        .into(vh.noteImage);
+
+                vh.noteImage.setVisibility(View.VISIBLE);
+            } else {
+                vh.noteImage.setVisibility(View.GONE);
+            }
+
+            if (c.getColor() != null) {
+                vh.card.setBackgroundColor(c.getColor());
+            }
+            vh.title.setText(c.getTitle());
+            vh.title.setVisibility(TextUtils.isEmpty(c.getTitle()) ? View.GONE : View.VISIBLE);
+
+            vh.note.setText(c.getNote());
+            vh.note.setVisibility(TextUtils.isEmpty(c.getNote()) ? View.GONE : View.VISIBLE);
+
+            if (TextUtils.isEmpty(c.getAuthorId())) {
+                vh.ownerImage.setVisibility(View.GONE);
+                vh.ownerName.setVisibility(View.GONE);
+                return;
+            }
+            App.getInstance().getDataController().fetchUser(c.getAuthorId(), new Callback<User>() {
+                @Override
+                public void onResult(User result) {
+                    if (vh.getAdapterPosition() != position) {
+                        return;
+                    }
+                    App.getInstance().getUserManager().loadUser(result, mGoogleApiClient,
+                            new UserManager.UserLoadListener() {
+                                @Override
+                                public void onUserLoad(SocialUser user) {
+                                    // if not recycled
+                                    if (vh.getAdapterPosition() != position) {
+                                        return;
+                                    }
+                                    if (!TextUtils.isEmpty(user.getAvatarUrl())) {
+                                        vh.ownerImage.setVisibility(View.VISIBLE);
+                                        Glide.with(getBaseContext())
+                                                .load(user.getAvatarUrl())
+                                                .fitCenter()
+                                                .into(vh.ownerImage);
+                                    }
+                                    vh.ownerName.setVisibility(View.VISIBLE);
+                                    vh.ownerName.setText(user.getDisplayName());
+                                }
+                            });
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e(TAG, "onError: ", e);
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return mData == null ? 0 : mData.size();
+        }
+
+        public class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
+            public View card;
+            public ImageView ownerImage;
+            public TextView ownerName;
+
+            public ImageView noteImage;
+            public TextView title;
+            public TextView note;
+
+            public VH(View itemView) {
+                super(itemView);
+                card = itemView.findViewById(R.id.card);
+
+                ownerImage = (ImageView) itemView.findViewById(R.id.iv_owner_image);
+                ownerName = (TextView) itemView.findViewById(R.id.tv_owner_name);
+
+                noteImage = (ImageView) itemView.findViewById(R.id.iv_note_image);
+                title = (TextView) itemView.findViewById(R.id.tv_title);
+                note = (TextView) itemView.findViewById(R.id.tv_note);
+
+                itemView.setOnClickListener(this);
+            }
+
+            @Override
+            public void onClick(View v) {
+                Content c = mData.get(getAdapterPosition());
+                if (mBottomSheetBehavior != null) {
+                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+                centerMapOnContent(c);
+            }
+        }
     }
 }

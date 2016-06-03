@@ -33,11 +33,6 @@
             android:hardwareAccelerated="false"
             android:label="@string/title_activity_maps" />
         <activity
-            android:name=".activities.ChoosePhotoActivity"
-            android:hardwareAccelerated="false"
-            android:label="@string/title_activity_choose_photo"
-            android:theme="@style/AppTheme.Transparent" />
-        <activity
             android:name=".activities.ADFChooser"
             android:hardwareAccelerated="false"
             android:label="@string/title_activity_adfchooser" />

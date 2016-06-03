@@ -90,7 +90,7 @@ public class SelectedMenuView extends RelativeLayout {
 
     private void init() {
         inflate(getContext(), R.layout.layout_content_select, this);
-        mOwnerImage = (ImageView) findViewById(R.id.owner_image);
+        mOwnerImage = (ImageView) findViewById(R.id.iv_owner_image);
         mOwnerName = (TextView) findViewById(R.id.owner_name);
         mNoteDate = (TextView) findViewById(R.id.note_date);
         mContentControlPanel = findViewById(R.id.content_control_panel);

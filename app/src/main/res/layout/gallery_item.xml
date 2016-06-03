@@ -6,7 +6,7 @@
     android:padding="@dimen/gallery_image_padding">
 
     <ImageView
-        android:id="@+id/image_view"
+        android:id="@+id/iv_note_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="center" />

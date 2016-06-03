@@ -253,18 +253,16 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         ((TextView) findViewById(R.id.profile_name)).setText(user.getFirstName());
     }
 
-
     private GoogleApiClient getGoogleApiClient() {
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .enableAutoManage(this, this)
+//                    .enableAutoManage(this, this)
                     .addOnConnectionFailedListener(this)
                     .addScope(Plus.SCOPE_PLUS_LOGIN)
                     .addScope(Plus.SCOPE_PLUS_PROFILE)
                     .addApi(Plus.API)
                     .addApi(LocationServices.API)
                     .build();
-
         }
         return mGoogleApiClient;
     }

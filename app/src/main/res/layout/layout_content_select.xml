@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="48dp"
-    android:orientation="vertical"
     android:animateLayoutChanges="true"
+    android:orientation="vertical"
     tools:visibility="visible">
 
     <RelativeLayout
@@ -15,12 +15,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/owner_info_background"
         android:animateLayoutChanges="true"
+        android:background="@drawable/owner_info_background"
         android:paddingRight="16dp">
 
         <ImageView
-            android:id="@+id/owner_image"
+            android:id="@+id/iv_owner_image"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_marginRight="16dp"/>
@@ -31,9 +31,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:layout_toRightOf="@+id/owner_image"
-            android:textColor="#ffffff"
+            android:layout_toRightOf="@+id/iv_owner_image"
             android:animateLayoutChanges="true"
+            android:textColor="#ffffff"
             tools:text="Giorgi Gogiashvili" />
 
         <TextView

@@ -42,5 +42,4 @@
         android:paddingLeft="16dp"
         android:paddingRight="24dp"
         android:text="@string/people_visibility" />
-
 </LinearLayout>
