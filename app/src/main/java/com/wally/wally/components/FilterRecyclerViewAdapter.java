@@ -10,51 +10,51 @@ import java.util.List;
  * Created by Meravici on 6/1/2016.
  */
 public abstract class FilterRecyclerViewAdapter<ViewHolderT extends RecyclerView.ViewHolder, DataT> extends RecyclerView.Adapter<ViewHolderT> {
+    private List<DataT> mFilteredData;
     private List<DataT> mData;
-    private List<DataT> mBackedData;
 
     protected abstract List<DataT> filterData(String query);
 
     public List<DataT> getFilteredData(){
-        return mData;
+        return mFilteredData;
     }
 
     public List<DataT> getFullData(){
-        return mBackedData;
+        return mData;
     }
 
     @Override
     public int getItemCount() {
-        return mData == null ? 0 : mData.size();
+        return mFilteredData == null ? 0 : mFilteredData.size();
     }
 
     public void setData(List<DataT> data) {
-        mData = data;
-        mBackedData = new ArrayList<>(data);
+        mFilteredData = data;
+        mData = new ArrayList<>(data);
         // this thing adds insert animation and updates data
         notifyItemRangeInserted(0, getItemCount());
     }
 
     public void removeItem(DataT item) {
-        mBackedData.remove(item);
-        removeItem(mData.indexOf(item));
+        mData.remove(item);
+        removeItem(mFilteredData.indexOf(item));
     }
 
     public void updateItem(DataT item) {
-        int dataPos = mData.indexOf(item);
-        int backedPos = mBackedData.indexOf(item);
+        int dataPos = mFilteredData.indexOf(item);
+        int backedPos = mData.indexOf(item);
 
         if (dataPos >= 0) {
-            mData.set(dataPos, item);
+            mFilteredData.set(dataPos, item);
             notifyItemChanged(dataPos);
         }
         if (backedPos >= 0) {
-            mBackedData.set(backedPos, item);
+            mData.set(backedPos, item);
         }
     }
 
     public void filter(@Nullable String query) {
-        if (mBackedData == null) {
+        if (mData == null) {
             return;
         }
         List<DataT> filtered = filterData(query);
@@ -72,8 +72,8 @@ public abstract class FilterRecyclerViewAdapter<ViewHolderT extends RecyclerView
     }
 
     private void applyAndAnimateRemovals(List<DataT> newData) {
-        for (int i = mData.size() - 1; i >= 0; i--) {
-            DataT model = mData.get(i);
+        for (int i = mFilteredData.size() - 1; i >= 0; i--) {
+            DataT model = mFilteredData.get(i);
             if (!newData.contains(model)) {
                 removeItem(i);
             }
@@ -83,7 +83,7 @@ public abstract class FilterRecyclerViewAdapter<ViewHolderT extends RecyclerView
     private void applyAndAnimateAdditions(List<DataT> newData) {
         for (int i = 0, count = newData.size(); i < count; i++) {
             DataT model = newData.get(i);
-            if (!mData.contains(model)) {
+            if (!mFilteredData.contains(model)) {
                 addItem(i, model);
             }
         }
@@ -92,7 +92,7 @@ public abstract class FilterRecyclerViewAdapter<ViewHolderT extends RecyclerView
     private void applyAndAnimateMovedItems(List<DataT> newData) {
         for (int toPosition = newData.size() - 1; toPosition >= 0; toPosition--) {
             DataT model = newData.get(toPosition);
-            final int fromPosition = mData.indexOf(model);
+            final int fromPosition = mFilteredData.indexOf(model);
             if (fromPosition >= 0 && fromPosition != toPosition) {
                 moveItem(fromPosition, toPosition);
             }
@@ -100,19 +100,19 @@ public abstract class FilterRecyclerViewAdapter<ViewHolderT extends RecyclerView
     }
 
     private DataT removeItem(int position) {
-        DataT model = mData.remove(position);
+        DataT model = mFilteredData.remove(position);
         notifyItemRemoved(position);
         return model;
     }
 
     private void addItem(int position, DataT model) {
-        mData.add(position, model);
+        mFilteredData.add(position, model);
         notifyItemInserted(position);
     }
 
     private void moveItem(int fromPosition, int toPosition) {
-        DataT model = mData.remove(fromPosition);
-        mData.add(toPosition, model);
+        DataT model = mFilteredData.remove(fromPosition);
+        mFilteredData.add(toPosition, model);
         notifyItemMoved(fromPosition, toPosition);
     }
 }
