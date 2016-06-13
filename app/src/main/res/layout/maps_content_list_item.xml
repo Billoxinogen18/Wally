@@ -5,6 +5,7 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="8dp"
     android:foreground="?attr/selectableItemBackground"
     android:stateListAnimator="@anim/raise"
     app:cardElevation="2dp"
@@ -14,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="18dp">
+        android:padding="12dp">
 
         <ImageView
             android:id="@+id/iv_owner_image"
@@ -59,13 +60,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_title"
+            android:layout_marginBottom="8dp"
             android:ellipsize="end"
             android:fontFamily="serif"
             android:maxLines="2"
             android:scrollbars="none"
             android:textSize="14sp"
             android:visibility="gone"
-            tools:text="Note maybe big text maybe"
+            tools:text="Note maybe big text here "
             tools:visibility="visible" />
 
         <ImageView
@@ -75,7 +77,6 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/tv_note"
             android:layout_centerVertical="true"
-            android:layout_marginTop="8dp"
             android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_btn_map_75dp"

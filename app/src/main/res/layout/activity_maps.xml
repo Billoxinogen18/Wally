@@ -22,12 +22,69 @@
         android:padding="8dp"
         android:src="@drawable/ic_arrow_back_black_24dp" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview"
+    <FrameLayout
+        android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         android:minHeight="30dp"
-        app:layout_behavior="android.support.design.widget.BottomSheetBehavior" />
+        app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <RelativeLayout
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="100dp"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="No contents"
+                android:textColor="@color/colorPrimary" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/loading_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="100dp"
+            android:gravity="center"
+            android:visibility="gone"
+            app:layout_anchor="@+id/recyclerview_content"
+            app:layout_anchorGravity="center">
+
+            <TextView
+                android:id="@+id/loading_text"
+                style="@style/TextAppearance.AppCompat.Body1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="@string/loading" />
+
+            <ProgressBar
+                android:id="@+id/progressbar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/loading_text"
+                android:layout_alignRight="@+id/loading_text"
+                android:layout_below="@+id/loading_text"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:indeterminate="true" />
+        </RelativeLayout>
+    </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/my_location"

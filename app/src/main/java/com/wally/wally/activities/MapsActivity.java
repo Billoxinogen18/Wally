@@ -40,6 +40,7 @@ import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.components.CircleTransform;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.user.User;
@@ -72,6 +73,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private long mLastRequestId;
 
     private RecyclerView mRecycler;
+    private View mEmptyContentView;
+    private View mLoadingContentView;
+
     private MapsRecyclerAdapter mAdapter;
     private BottomSheetBehavior mBottomSheetBehavior;
 
@@ -118,8 +122,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mAdapter = new MapsRecyclerAdapter(null);
         mRecycler.setAdapter(mAdapter);
 
-        if (findViewById(R.id.coordinator) != null) {
-            mBottomSheetBehavior = BottomSheetBehavior.from(mRecycler);
+        mEmptyContentView = findViewById(R.id.empty_view);
+        mLoadingContentView = findViewById(R.id.loading_view);
+
+        View bottomSheet = findViewById(R.id.bottom_sheet);
+        if (bottomSheet != null) {
+            mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         }
 
         setMapPadding();
@@ -188,11 +196,22 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             Log.d(TAG, bounds.toString());
             markersSetVisible(true);
             mLastRequestId = System.currentTimeMillis();
+
+            mLoadingContentView.setVisibility(View.VISIBLE);
+            mEmptyContentView.setVisibility(View.GONE);
+            mRecycler.setVisibility(View.GONE);
             app.getDataController().fetchByBounds(bounds, new EnumCallback(mLastRequestId) {
 
                 // TODO this must return list, because we have ordering here. (Also some paging stuff)
                 @Override
                 public void onResult(Collection<Content> result) {
+                    mLoadingContentView.setVisibility(View.GONE);
+
+                    if (result.size() > 0) {
+                        mRecycler.setVisibility(View.VISIBLE);
+                    } else {
+                        mEmptyContentView.setVisibility(View.VISIBLE);
+                    }
                     if (mLastRequestId == getId()) {
                         mContents.clear();
                         mContents.addAll(result);
@@ -202,6 +221,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 @Override
                 public void onError(Exception e) {
+                    mLoadingContentView.setVisibility(View.GONE);
+                    // TODO show error
                     Log.e(TAG, e.getMessage(), e);
                     Toast.makeText(getApplicationContext(), getString(R.string.error_fetch_failed),
                             Toast.LENGTH_LONG).show();
@@ -333,14 +354,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onBindViewHolder(final VH vh, @SuppressLint("RecyclerView") final int position) {
             Content c = mData.get(position);
-            Log.wtf(TAG, "onBindViewHolder: " + c.getId());
-
+            // Free up old images
             vh.ownerImage.setImageDrawable(null);
             vh.ownerImage.setBackground(null);
             vh.noteImage.setImageDrawable(null);
             vh.noteImage.setBackground(null);
-
-            vh.ownerName.setVisibility(View.GONE);
 
             if (!TextUtils.isEmpty(c.getImageUri())) {
                 Glide.with(getBaseContext())
@@ -383,9 +401,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     }
                                     if (!TextUtils.isEmpty(user.getAvatarUrl())) {
                                         vh.ownerImage.setVisibility(View.VISIBLE);
+                                        // TODO optimize size
                                         Glide.with(getBaseContext())
                                                 .load(user.getAvatarUrl())
                                                 .fitCenter()
+                                                .transform(new CircleTransform(getBaseContext()))
                                                 .into(vh.ownerImage);
                                     }
                                     vh.ownerName.setVisibility(View.VISIBLE);
