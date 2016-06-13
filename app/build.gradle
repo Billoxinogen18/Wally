@@ -102,11 +102,11 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.0.0'
     compile(name: 'android-material-chips-1.1.0-release', ext: 'aar')
     // Firebase
-//    compile 'com.google.firebase:firebase-core:9.0.0'
-    compile 'com.google.firebase:firebase-storage:9.0.0'
-    compile 'com.google.firebase:firebase-auth:9.0.0'
-    compile 'com.google.firebase:firebase-database:9.0.0'
-    compile 'com.firebaseui:firebase-ui-auth:0.4.0'
+//    compile 'com.google.firebase:firebase-core:9.0.2'
+    compile 'com.google.firebase:firebase-storage:9.0.2'
+    compile 'com.google.firebase:firebase-auth:9.0.2'
+    compile 'com.google.firebase:firebase-database:9.0.2'
+    compile 'com.firebaseui:firebase-ui-auth:0.4.1'
 }
 
 apply plugin: 'com.google.gms.google-services'
