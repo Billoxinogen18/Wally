@@ -9,7 +9,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -77,8 +76,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private View mLoadingContentView;
 
     private MapsRecyclerAdapter mAdapter;
-    private BottomSheetBehavior mBottomSheetBehavior;
-
 
     public static Intent newIntent(Context context, @Nullable Content content) {
         Intent i = new Intent(context, MapsActivity.class);
@@ -124,29 +121,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mEmptyContentView = findViewById(R.id.empty_view);
         mLoadingContentView = findViewById(R.id.loading_view);
+    }
 
-        View bottomSheet = findViewById(R.id.bottom_sheet);
-        if (bottomSheet != null) {
-            mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        }
-
-        setMapPadding();
+    private void onContentClicked(Content content) {
+        startActivity(ContentDetailsActivity.newIntent(this, content));
     }
 
     public void onMyLocationClick(View v) {
         centerMapOnMyLocation();
     }
 
-
-    public void setMapPadding() {
-        if (mMap != null) {
-            if (mBottomSheetBehavior != null) {
-                mMap.setPadding(0, (int) getResources().getDimension(R.dimen.map_back_button_height), 0, 0);
-            } else {
-                mMap.setPadding(0, 0, 0, 0);
-            }
-        }
-    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -247,9 +231,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mContents.add(new Content().withLocation(new LatLng(41.72161, 44.8276)).withId("10").withTitle("Sample note").withImageUri("http://www.keenthemes.com/preview/metronic/theme/assets/global/plugins/jcrop/demos/demo_files/image1.jpg"));
         // TODO data controller must return list!
         mAdapter.setData(new ArrayList<>(mContents));
-        if (mBottomSheetBehavior != null) {
-            mBottomSheetBehavior.setPeekHeight(300);
-        }
 
         for (Content content : mContents) {
             if (!mMarkers.keySet().contains(content)) {
@@ -360,10 +341,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             vh.noteImage.setImageDrawable(null);
             vh.noteImage.setBackground(null);
 
+            vh.ownerName.setText(null);
+
             if (!TextUtils.isEmpty(c.getImageUri())) {
                 Glide.with(getBaseContext())
                         .load(c.getImageUri())
+                        .thumbnail(0.1f)
                         .fitCenter()
+                        .crossFade()
+                        .placeholder(R.drawable.ic_image_placeholer)
                         .into(vh.noteImage);
 
                 vh.noteImage.setVisibility(View.VISIBLE);
@@ -385,6 +371,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 vh.ownerName.setVisibility(View.GONE);
                 return;
             }
+            vh.ownerImage.setVisibility(View.VISIBLE);
+            vh.ownerName.setVisibility(View.VISIBLE);
             App.getInstance().getDataController().fetchUser(c.getAuthorId(), new Callback<User>() {
                 @Override
                 public void onResult(User result) {
@@ -404,7 +392,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                         // TODO optimize size
                                         Glide.with(getBaseContext())
                                                 .load(user.getAvatarUrl())
+                                                .crossFade()
                                                 .fitCenter()
+                                                .thumbnail(0.1f)
+                                                .placeholder(R.drawable.ic_account_circle_black_24dp)
                                                 .transform(new CircleTransform(getBaseContext()))
                                                 .into(vh.ownerImage);
                                     }
@@ -456,11 +447,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onClick(View v) {
-                Content c = mData.get(getAdapterPosition());
-                if (mBottomSheetBehavior != null) {
-                    mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                }
-                centerMapOnContent(c);
+                onContentClicked(mData.get(getAdapterPosition()));
             }
         }
     }
