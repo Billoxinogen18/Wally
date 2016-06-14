@@ -122,6 +122,7 @@ public class NewContentDialogFragment extends DialogFragment implements
         Dialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         dialog.setCanceledOnTouchOutside(false);
+        setCancelable(false);
         return dialog;
     }
 

@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -17,9 +16,9 @@ import android.view.ViewGroup;
 import com.doodle.android.chips.ChipsView;
 import com.wally.wally.App;
 import com.wally.wally.R;
-import com.wally.wally.Utils;
 import com.wally.wally.components.CircleUserView;
 import com.wally.wally.components.FilterRecyclerViewAdapter;
+import com.wally.wally.components.GridAutofitLayoutManager;
 import com.wally.wally.components.UserSelectListener;
 import com.wally.wally.userManager.SocialUser;
 
@@ -62,9 +61,9 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
         List<SocialUser> selectedUsers = Collections.emptyList();
 
-        if(getArguments() != null && getArguments().containsKey("selectedUsers")){
+        if (getArguments() != null && getArguments().containsKey("selectedUsers")) {
             selectedUsers = (List<SocialUser>) getArguments().getSerializable("selectedUsers");
-        }else if (savedInstanceState != null && savedInstanceState.containsKey("selectedUsers")) {
+        } else if (savedInstanceState != null && savedInstanceState.containsKey("selectedUsers")) {
 
             selectedUsers = (List<SocialUser>) savedInstanceState.getSerializable("selectedUsers");
 
@@ -72,13 +71,14 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
         mAdapter.setSelectedUsers(selectedUsers);
 
-        for(SocialUser user : selectedUsers){
+        for (SocialUser user : selectedUsers) {
             mChipsView.addChip(user.getDisplayName(), user.getAvatarUrl(), user);
         }
 
         builder.setView(dv);
         AlertDialog dialog = builder.create();
         dialog.setCanceledOnTouchOutside(false);
+        setCancelable(false);
         return dialog;
     }
 
@@ -96,18 +96,14 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
         mAdapter.setUserSelectListener(this);
 
         RecyclerView mRecycler = (RecyclerView) v.findViewById(R.id.recyclerview_people);
-        mRecycler.setLayoutManager(new GridLayoutManager(getContext(), getGridColumnCount()));
+        mRecycler.setLayoutManager(new GridAutofitLayoutManager(getContext(),
+                getResources().getDimensionPixelSize(R.dimen.person_grid_width)));
         mRecycler.setAdapter(mAdapter);
 
         mChipsView = (ChipsView) v.findViewById(R.id.people_chips_view);
 
         mChipsView.setChipsListener(this);
 
-    }
-
-    private int getGridColumnCount() {
-        // This is optimal quantity based on rotation.
-        return (int) (Utils.getScreenWidthDpi(getContext()) / 100);
     }
 
 
@@ -169,21 +165,21 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
         private List<SocialUser> mSelectedUsers;
         private UserSelectListener mUserSelectListener;
 
-        public void setSelectedUsers(List<SocialUser> selectedUsers) {
-            mSelectedUsers = selectedUsers;
-        }
-
         public List<SocialUser> getSelectedUsers() {
             return mSelectedUsers;
         }
 
-        public void deselectUser(SocialUser user){
+        public void setSelectedUsers(List<SocialUser> selectedUsers) {
+            mSelectedUsers = selectedUsers;
+        }
+
+        public void deselectUser(SocialUser user) {
             Log.d(TAG, "deselectUser() called with: " + "user = [" + user + "]");
             mSelectedUsers.remove(user);
             notifyItemChanged(getFilteredData().indexOf(user));
         }
 
-        public void setUserSelectListener(UserSelectListener userSelectListener){
+        public void setUserSelectListener(UserSelectListener userSelectListener) {
             mUserSelectListener = userSelectListener;
         }
 

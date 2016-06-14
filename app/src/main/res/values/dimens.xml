@@ -23,4 +23,5 @@
     <dimen name="picker_color_item_padding">12dp</dimen>
     <dimen name="picker_color_item_margin">4dp</dimen>
     <dimen name="map_back_button_height">56dp</dimen>
+    <dimen name="person_grid_width">120dp</dimen>
 </resources>
