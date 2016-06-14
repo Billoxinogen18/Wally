@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -38,7 +37,6 @@ import com.wally.wally.userManager.UserManager;
 public abstract class CameraARActivity extends LoginActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, SelectedMenuView.OnSelectedMenuActionListener {
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int REQUEST_CODE_MY_LOCATION = 22;
-    private static final int RC_SIGN_IN = 100;
     protected DataController mDataController;
     private UserManager mUserManager;
     private SelectedMenuView mSelectedMenuView;
@@ -145,44 +143,10 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
 
 
     public void onNewContentClick(View v) {
-        if (!mUserManager.isLoggedIn()) {
-            startActivityForResult(
-                    AuthUI.getInstance()
-                            .createSignInIntentBuilder()
-                            .setTheme(R.style.CustomFirebaseAuth)
-                            .setProviders(AuthUI.GOOGLE_PROVIDER)
-                            .build(),
-                    RC_SIGN_IN);
-        } else {
-            Log.d(TAG, "onNewContentClick() called with: " + "v = [" + v + "]");
-            NewContentDialogFragment.newInstance()
-                    .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
-        }
-    }
+        Log.d(TAG, "onNewContentClick() called with: " + "v = [" + v + "]");
+        NewContentDialogFragment.newInstance()
+                .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            if (resultCode == RESULT_OK) {
-                Log.d(TAG, "onActivityResult() called with: " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-                // user is signed in!
-                mUserManager.loadLoggedInUser(getGoogleApiClient(), new UserManager.UserLoadListener() {
-                    @Override
-                    public void onUserLoad(SocialUser user) {
-                        displayProfileBar(user);
-                        Log.d(TAG, "onUserLoad() called with: " + "user = [" + user + "]");
-                        NewContentDialogFragment.newInstance()
-                                .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
-                    }
-                });
-
-            } else {
-                // user is not signed in. Maybe just wait for the user to press
-                // "sign in" again, or show a message
-                //TODO
-                Toast.makeText(this, "User could not login!!!", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     public void onBtnMapClick(View v) {
