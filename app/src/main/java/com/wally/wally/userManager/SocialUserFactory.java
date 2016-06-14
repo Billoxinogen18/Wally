@@ -43,6 +43,11 @@ public class SocialUserFactory {
                     userCache.put(baseUser.getId(), compoundUser);
                     userLoadListener.onUserLoad(compoundUser);
                 }
+
+                @Override
+                public void onUserLoadFailed() {
+                    userLoadListener.onUserLoadFailed();
+                }
             });
         }
     }
@@ -81,7 +86,7 @@ public class SocialUserFactory {
                             }
                         } else {
                             Log.e(TAG, "onResult: Error requesting people data" + peopleData.getStatus());
-                            userLoadListener.onUserLoad(new DummyUser(baseUser));
+                            userLoadListener.onUserLoadFailed();
                         }
                     }
                 });

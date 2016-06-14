@@ -411,6 +411,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     vh.ownerName.setVisibility(View.VISIBLE);
                                     vh.ownerName.setText(user.getDisplayName());
                                 }
+
+                                @Override
+                                public void onUserLoadFailed() {
+                                    //TODO implementation missing
+                                }
                             });
                 }
 

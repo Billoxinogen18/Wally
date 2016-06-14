@@ -88,6 +88,11 @@ public class DispatcherActivity extends LoginActivity implements UserManager.Use
         continueToNextActivity();
     }
 
+    @Override
+    public void onUserLoadFailed() {
+        //TODO implementation missing
+    }
+
     private void continueToNextActivity() {
         Intent i = ADFChooser.newIntent(this);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

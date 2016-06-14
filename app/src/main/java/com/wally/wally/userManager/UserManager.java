@@ -59,6 +59,11 @@ public class UserManager {
                 UserManager.this.setUser(user);
                 userLoadListener.onUserLoad(user);
             }
+
+            @Override
+            public void onUserLoadFailed() {
+                userLoadListener.onUserLoadFailed();
+            }
         });
     }
 
@@ -69,6 +74,6 @@ public class UserManager {
 
     public interface UserLoadListener {
         void onUserLoad(SocialUser user);
-
+        void onUserLoadFailed();
     }
 }

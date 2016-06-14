@@ -143,6 +143,11 @@ public class SelectedMenuView extends RelativeLayout {
             public void onUserLoad(SocialUser user) {
                 setAuthorData(user);
             }
+
+            @Override
+            public void onUserLoadFailed() {
+                //TODO implementation missing
+            }
         });
     }
 
