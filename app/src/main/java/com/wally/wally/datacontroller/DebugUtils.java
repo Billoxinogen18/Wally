@@ -7,14 +7,14 @@ import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
+import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class DebugUtils {
     public static final Id DEBUG_USER_ID =
@@ -23,7 +23,6 @@ public class DebugUtils {
     private static SecureRandom random = new SecureRandom();
 
     // This method is for debugging purposes
-    @SuppressWarnings("unused")
     public static Content generateRandomContent() {
         return new Content()
                 .withUuid(randomStr(5))
@@ -33,9 +32,13 @@ public class DebugUtils {
                 .withImageUri("http://" + randomStr(10))
                 .withAuthorId(DEBUG_USER_ID.getId())
                 .withLocation(
+//                        new LatLng(
+//                                random.nextInt(),
+//                                random.nextInt()
+//                        )
                         new LatLng(
-                                random.nextInt(),
-                                random.nextInt()
+                                random.nextDouble(),
+                                random.nextDouble()
                         )
                 ).withVisibility(
                         new Visibility()
@@ -48,6 +51,16 @@ public class DebugUtils {
                                 .withScale((double) random.nextInt())
                                 .withRotation(randomDoubleArray())
                                 .withTranslation(randomDoubleArray()));
+    }
+
+    public static void generateRandomContents(int n, DataController controller) {
+        for (int i = 0; i < n; i++) {
+            controller.save(generateRandomContent());
+        }
+    }
+
+    public static void generateRandomContents(DataController controller) {
+        generateRandomContents(100, controller);
     }
 
     private static Visibility.RangeVisibility randomRange() {
@@ -81,7 +94,7 @@ public class DebugUtils {
             public void onResult(Collection<Content> result) {
                 Log.d(tag, "" + result.size());
                 for (Content c : result) {
-                    Log.d(tag, c.toString());
+                    logContent(c, tag);
                 }
             }
 
@@ -90,6 +103,13 @@ public class DebugUtils {
                 Log.d(tag, "Shit gone wrong!");
             }
         };
+    }
+
+    private static void logContent(Content c, String tag) {
+//        Log.d(tag, c.toString());
+        double diff = GeoUtils.distance(new LatLng(0,0), c.getLocation());
+        LatLng l = c.getLocation();
+        Log.d(tag, new GeoHash(l.latitude, l.longitude).getGeoHashString() + ": " + diff);
     }
 
     public static FetchResultCallback debugCallback() {

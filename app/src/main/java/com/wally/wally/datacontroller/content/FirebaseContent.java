@@ -2,6 +2,7 @@ package com.wally.wally.datacontroller.content;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;
+import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
 import com.wally.wally.datacontroller.user.Id;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_NOTE_DATA      = "NoteData";
 
     // Location
+    public static final String K_HASH           = "hash";
     public static final String K_LAT            = "latitude";
     public static final String K_LNG            = "longitude";
     public static final String K_LOCATION       = "Location";
@@ -132,7 +134,9 @@ public class FirebaseContent extends FirebaseObject {
 
     private void setLocation(LatLng loc) {
         if (loc == null) return;
+        String geoHash = new GeoHash(loc.latitude, loc.longitude).getGeoHashString();
         getChild(K_LOCATION)
+                .put(K_HASH, geoHash)
                 .put(K_LAT, loc.latitude)
                 .put(K_LNG, loc.longitude);
     }
