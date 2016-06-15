@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -359,6 +360,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             if (c.getColor() != null) {
                 vh.card.setBackgroundColor(c.getColor());
+            } else {
+                vh.card.setBackgroundColor(Color.WHITE);
             }
             vh.title.setText(c.getTitle());
             vh.title.setVisibility(TextUtils.isEmpty(c.getTitle()) ? View.GONE : View.VISIBLE);
@@ -377,6 +380,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onResult(User result) {
                     if (vh.getAdapterPosition() != position) {
+                        return;
+                    }
+                    if (result == null) {
+                        vh.ownerImage.setVisibility(View.GONE);
+                        vh.ownerName.setVisibility(View.GONE);
                         return;
                     }
                     App.getInstance().getUserManager().loadUser(result, mGoogleApiClient,
