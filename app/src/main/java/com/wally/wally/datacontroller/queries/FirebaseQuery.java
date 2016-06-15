@@ -9,10 +9,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.FirebaseContent;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class FirebaseQuery {
 
@@ -23,7 +23,7 @@ public abstract class FirebaseQuery {
 
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                Set<FirebaseContent> result = new HashSet<>();
+                List<FirebaseContent> result = new ArrayList<>();
                 for (DataSnapshot contentSnapshot : snapshot.getChildren()) {
                     FirebaseContent content = new FirebaseContent();
                     GenericTypeIndicator<Map<String, Object>> indicator =
