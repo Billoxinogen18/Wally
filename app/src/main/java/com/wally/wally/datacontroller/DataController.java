@@ -1,5 +1,8 @@
 package com.wally.wally.datacontroller;
 
+import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -11,11 +14,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
+import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
+import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
 import com.wally.wally.datacontroller.user.*;
 import com.wally.wally.datacontroller.queries.*;
 import com.wally.wally.datacontroller.callbacks.*;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
+
+import java.util.Set;
 
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
@@ -35,6 +42,13 @@ public class DataController {
         this.storage = storage;
         users = database.child(USERS_NODE);
         contents = database.child(CONTENTS_NODE);
+        sanityCheck();
+    }
+
+    private void sanityCheck() {
+//        contents.removeValue();
+//        DebugUtils.generateRandomContents(1000, this);
+        fetchAtLocation(new LatLng(0, 0), 10, DebugUtils.debugCallback());
     }
 
     public static DataController create() {
@@ -90,9 +104,22 @@ public class DataController {
     }
 
     public void fetchByBounds(LatLngBounds bounds, FetchResultCallback callback) {
-//        new LatLngQuery(bounds).fetch(contents, new FirebaseFetchResultCallback(callback));
-        // TODO stub implementation
-        fetchPublicContent(callback);
+        fetchAtLocation(bounds.getCenter(), 10, callback);
+    }
+
+    private void fetchAtLocation(final LatLng center, double radiusKm, FetchResultCallback callback) {
+        final double radius = radiusKm * 1000; // Convert to meters
+        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
+        final AggregatorCallback aggregator =
+                new AggregatorCallback(callback).withExpectedCallbacks(queries.size());
+        Log.d(TAG, "fetching...");
+        for (GeoHashQuery query : queries) {
+            new LocationQuery(query).fetch(contents, new FirebaseFetchResultCallback(aggregator));
+        }
+    }
+
+    private boolean locationIsInRange(LatLng location, LatLng center, double radius) {
+        return GeoUtils.distance(location, center) <= radius;
     }
 
     public void fetchByUUID(String uuid, FetchResultCallback callback) {
@@ -121,7 +148,7 @@ public class DataController {
                 .fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
-    public void fetchAccessibleContent(User user, FetchResultCallback callback) {
+    private void fetchAccessibleContent(User user, FetchResultCallback callback) {
         AggregatorCallback aggregator =
                 new AggregatorCallback(callback).withExpectedCallbacks(3);
         fetchPublicContent(aggregator);
