@@ -185,11 +185,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mLoadingContentView.setVisibility(View.VISIBLE);
             mEmptyContentView.setVisibility(View.GONE);
             mRecycler.setVisibility(View.GONE);
-            app.getDataController().fetchByBounds(bounds, new EnumCallback(mLastRequestId) {
+            // TODO move to fetch by bounds...
+            app.getDataController().fetchPublicContent(new EnumCallback(mLastRequestId) {
 
                 // TODO this must return list, because we have ordering here. (Also some paging stuff)
                 @Override
                 public void onResult(Collection<Content> result) {
+                    Log.d(TAG, "onResult() called with: " + "result = [" + result + "]");
                     mLoadingContentView.setVisibility(View.GONE);
 
                     if (result.size() > 0) {
