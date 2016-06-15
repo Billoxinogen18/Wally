@@ -62,7 +62,6 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
         setContentView(R.layout.activity_content_details);
 
         mContent = (Content) getIntent().getSerializableExtra(KEY_CONTENT);
-
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -149,19 +148,18 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
         mNote.setText(mContent.getNote());
         mNote.setVisibility(TextUtils.isEmpty(mContent.getNote()) ? View.GONE : View.VISIBLE);
 
-        if (TextUtils.isEmpty(mContent.getAuthorId())) {
-            mOwnerImage.setVisibility(View.GONE);
-            mOwnerName.setVisibility(View.GONE);
-            return;
-        }
         if (mIsOwnPost) {
             onUserLoaded(App.getInstance().getUserManager().getUser());
             return;
         }
-
-        if (mContent.getVisibility().isAuthorAnonymous()) {
+        if (mContent.getVisibility() != null && mContent.getVisibility().isAuthorAnonymous()) {
             mOwnerImage.setImageResource(R.drawable.ic_account_circle_black_24dp);
             mOwnerName.setText(R.string.anonymous);
+            return;
+        }
+        if (TextUtils.isEmpty(mContent.getAuthorId())) {
+            mOwnerImage.setVisibility(View.GONE);
+            mOwnerName.setVisibility(View.GONE);
             return;
         }
         // Load user if is other than current

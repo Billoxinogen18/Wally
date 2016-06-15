@@ -37,7 +37,7 @@ public class Visibility implements Serializable {
         return this;
     }
 
-    public Visibility withAuthorAnonymous(boolean isAuthorAnonymous) {
+    public Visibility withAnonymousAuthor(boolean isAuthorAnonymous) {
         this.isAuthorAnonymous = isAuthorAnonymous;
         return this;
     }
