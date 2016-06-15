@@ -17,6 +17,7 @@ import java.security.SecureRandom;
 import java.util.Collection;
 
 public class DebugUtils {
+    public static final int CONTENT_PRE_PAGE = 5;
     public static final Id DEBUG_USER_ID =
             new Id(Id.PROVIDER_FIREBASE, "uSlLJUtZqbRDTMeLU4MdcToS8ZZ2");
     public static final User DEBUG_USER = new User(DEBUG_USER_ID.getId()).withGgId("");
@@ -99,33 +100,15 @@ public class DebugUtils {
     }
 
     private static void logContent(Content c, String tag) {
-//        Log.d(tag, c.toString());
-        double diff = GeoUtils.distance(new LatLng(0,0), c.getLocation());
-        LatLng l = c.getLocation();
-        Log.d(tag, new GeoHash(l.latitude, l.longitude).getGeoHashString() + ": " + diff);
+        Log.d(tag, c.getId());
+
+//        double diff = GeoUtils.distance(new LatLng(0,0), c.getLocation());
+//        LatLng l = c.getLocation();
+//        Log.d(tag, new GeoHash(l.latitude, l.longitude).getGeoHashString() + ": " + diff);
+
     }
 
     public static FetchResultCallback debugCallback() {
         return debugCallback(DataController.TAG);
     }
-
-//    private void testFetchAccesibleContent() {
-//
-//        Content my = DebugUtils.generateRandomContent()
-//                .withAuthorId(DebugUtils.DEBUG_USER_ID.getId());
-//        save(my);
-//
-//        Content friends = DebugUtils.generateRandomContent().withAuthorId("friends author id");
-//        List<Id> sharedWithMe = new ArrayList<>();
-//        sharedWithMe.add(DebugUtils.DEBUG_USER_ID);
-//        friends.getVisibility().getSocialVisibility().withSharedWith(sharedWithMe);
-//        save(friends);
-//
-//        Content publc = DebugUtils.generateRandomContent().withAuthorId("Somone else");
-//        publc.getVisibility().getSocialVisibility().setMode(Visibility.SocialVisibility.PUBLIC);
-//        save(publc);
-//
-//        fetchAccessibleContent(DebugUtils.DEBUG_USER, DebugUtils.debugCallback());
-//    }
-
 }

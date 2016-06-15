@@ -12,6 +12,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.datacontroller.fetchers.ContentFetcher;
+import com.wally.wally.datacontroller.fetchers.PublicContentFetcher;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
 import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
@@ -158,6 +160,10 @@ public class DataController {
     public void fetchPublicContent(FetchResultCallback callback) {
         new PublicityQuery(FirebaseContent.PUBLIC)
                 .fetch(contents, new FirebaseFetchResultCallback(callback));
+    }
+
+    public ContentFetcher createPublicContentFetcher() {
+        return new PublicContentFetcher(contents);
     }
 
     public User getCurrentUser() {
