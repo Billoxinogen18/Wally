@@ -43,7 +43,6 @@ public class DebugUtils {
                 ).withVisibility(
                         new Visibility()
                                 .withTimeVisibility(null)
-                                .withRangeVisibility(randomRange())
                                 .withSocialVisibility(randomPublicity())
                                 .withVisiblePreview(random.nextBoolean())
                 ).withTangoData(
@@ -61,12 +60,6 @@ public class DebugUtils {
 
     public static void generateRandomContents(DataController controller) {
         generateRandomContents(100, controller);
-    }
-
-    private static Visibility.RangeVisibility randomRange() {
-        //noinspection WrongConstant
-        return new Visibility.RangeVisibility(
-                Math.abs(random.nextInt()) % 5);
     }
 
     private static Visibility.SocialVisibility randomPublicity() {

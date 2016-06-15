@@ -57,8 +57,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recyclerview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:minHeight="30dp" />
+                android:layout_height="match_parent" />
 
             <RelativeLayout
                 android:id="@+id/empty_view"
@@ -83,9 +82,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginBottom="100dp"
                 android:gravity="center"
-                android:visibility="gone"
-                app:layout_anchor="@+id/recyclerview_content"
-                app:layout_anchorGravity="center">
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/loading_text"

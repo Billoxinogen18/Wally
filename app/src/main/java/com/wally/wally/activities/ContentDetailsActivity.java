@@ -158,6 +158,12 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
             onUserLoaded(App.getInstance().getUserManager().getUser());
             return;
         }
+
+        if (mContent.getVisibility().isAuthorAnonymous()) {
+            mOwnerImage.setImageResource(R.drawable.ic_account_circle_black_24dp);
+            mOwnerName.setText(R.string.anonymous);
+            return;
+        }
         // Load user if is other than current
         App.getInstance().getDataController().fetchUser(mContent.getAuthorId(), new Callback<User>() {
             @Override

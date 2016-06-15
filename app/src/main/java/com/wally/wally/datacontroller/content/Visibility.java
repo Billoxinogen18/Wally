@@ -11,21 +11,20 @@ import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class Visibility implements Serializable {
 
     private SocialVisibility socialVisibility;
-    private RangeVisibility rangeVisibility;
     private Date visibleUntil;
+    private boolean isAuthorAnonymous;
     private boolean isPreviewVisible;
 
     public Visibility() {
         socialVisibility = new SocialVisibility(SocialVisibility.PUBLIC);
-        rangeVisibility = new RangeVisibility(RangeVisibility.DISTANT);
         isPreviewVisible = true;
+        isAuthorAnonymous = false;
     }
 
     public Visibility withSocialVisibility(SocialVisibility socialVisibility) {
@@ -33,13 +32,13 @@ public class Visibility implements Serializable {
         return this;
     }
 
-    public Visibility withRangeVisibility(RangeVisibility rangeVisibility) {
-        this.rangeVisibility = rangeVisibility;
+    public Visibility withTimeVisibility(Date visibleUntil) {
+        this.visibleUntil = visibleUntil;
         return this;
     }
 
-    public Visibility withTimeVisibility(Date visibleUntil) {
-        this.visibleUntil = visibleUntil;
+    public Visibility withAuthorAnonymous(boolean isAuthorAnonymous) {
+        this.isAuthorAnonymous = isAuthorAnonymous;
         return this;
     }
 
@@ -52,12 +51,12 @@ public class Visibility implements Serializable {
         return socialVisibility;
     }
 
-    public RangeVisibility getRangeVisibility() {
-        return rangeVisibility;
-    }
-
     public Date getVisibleUntil() {
         return visibleUntil;
+    }
+
+    public boolean isAuthorAnonymous() {
+        return isAuthorAnonymous;
     }
 
     public boolean isPreviewVisible() {
@@ -66,11 +65,11 @@ public class Visibility implements Serializable {
 
     @Override
     public String toString() {
-        return "{" +
-                "social=" + socialVisibility +
-                ", range=" + rangeVisibility +
-                ", duration=" + visibleUntil +
-                ", hasPreview=" + isPreviewVisible +
+        return "Visibility{" +
+                "socialVisibility=" + socialVisibility +
+                ", visibleUntil=" + visibleUntil +
+                ", isAuthorAnonymous=" + isAuthorAnonymous +
+                ", isPreviewVisible=" + isPreviewVisible +
                 '}';
     }
 
@@ -138,49 +137,6 @@ public class Visibility implements Serializable {
         @IntDef({PRIVATE, PUBLIC, PEOPLE})
         @Retention(RetentionPolicy.SOURCE)
         public @interface SocialVisibilityMode {
-        }
-    }
-
-    public static class RangeVisibility implements Serializable {
-        public static final int HERE = 0;
-        public static final int NEAR = 1;
-        public static final int LOCAL = 2;
-        public static final int DISTANT = 3;
-        public static final int FAR = 4;
-
-        private int range;
-
-        public RangeVisibility(@RangeVisibilityMode int range) {
-            setRange(range);
-        }
-
-        public static List<String> toList() {
-            return Arrays.asList(
-                    App.getContext().getResources().getStringArray(R.array.visibility_ranges));
-        }
-
-        public static String getStringRepresentation(@RangeVisibilityMode int range) {
-            return App.getContext().getResources().getStringArray(R.array.visibility_ranges)[range];
-        }
-
-        public
-        @RangeVisibilityMode
-        int getRange() {
-            return range;
-        }
-
-        public void setRange(@RangeVisibilityMode int range) {
-            this.range = range;
-        }
-
-        @Override
-        public String toString() {
-            return RangeVisibility.getStringRepresentation(range);
-        }
-
-        @IntDef({HERE, NEAR, LOCAL, DISTANT, FAR})
-        @Retention(RetentionPolicy.SOURCE)
-        public @interface RangeVisibilityMode {
         }
     }
 }

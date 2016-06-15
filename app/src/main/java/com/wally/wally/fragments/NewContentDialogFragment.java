@@ -13,14 +13,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -396,7 +393,6 @@ public class NewContentDialogFragment extends DialogFragment implements
     }
 
     public static class MetaInfoDialogFragment extends DialogFragment implements
-            AdapterView.OnItemSelectedListener,
             DatePickerDialogFragment.DatePickListener {
 
         public static final String TAG = MetaInfoDialogFragment.class.getSimpleName();
@@ -449,15 +445,6 @@ public class NewContentDialogFragment extends DialogFragment implements
                 }
             });
 
-            // Init range visibility
-            Spinner rangeSpinner = (Spinner) v.findViewById(R.id.spinner_range_visibility);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
-                    android.R.layout.simple_spinner_item, Visibility.RangeVisibility.toList());
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-            rangeSpinner.setAdapter(adapter);
-            rangeSpinner.setOnItemSelectedListener(this);
-
             // init map preview
             final CheckBox checkBoxMapPreview = (CheckBox) v.findViewById(R.id.checkbox_map_preview);
             checkBoxMapPreview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -493,9 +480,6 @@ public class NewContentDialogFragment extends DialogFragment implements
             // Init views from model
             Visibility visibility = mCont.getVisibility();
 
-            if (visibility.getRangeVisibility() != null) {
-                rangeSpinner.setSelection(visibility.getRangeVisibility().getRange());
-            }
             checkBoxMapPreview.setChecked(visibility.isPreviewVisible());
             updateTimeVisibilityView();
         }
@@ -505,17 +489,6 @@ public class NewContentDialogFragment extends DialogFragment implements
             super.onDismiss(dialog);
             NewContentDialogFragment frag = (NewContentDialogFragment) getParentFragment();
             frag.onMetaInfoDialogDismiss(mCont);
-        }
-
-        // called when visibility item is selected.
-        @Override
-        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-            mCont.getVisibility().withRangeVisibility(new Visibility.RangeVisibility(position));
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-
         }
 
         @Override

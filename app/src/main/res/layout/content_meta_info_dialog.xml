@@ -41,37 +41,6 @@
             android:textColor="@color/colorPrimary" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-            <TextView
-                style="@style/TextAppearance.AppCompat.Body1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Note is visible" />
-
-            <Spinner
-                android:id="@+id/spinner_range_visibility"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="24dp"
-                android:layout_marginRight="8dp" />
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="8dp"
-            android:background="@color/dividerColor" />
-
-        <LinearLayout
             android:id="@+id/layout_map_preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

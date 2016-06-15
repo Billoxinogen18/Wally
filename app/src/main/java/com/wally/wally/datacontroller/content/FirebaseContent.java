@@ -33,7 +33,6 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_TANGO_DATA     = "TangoData";
 
     // Visibility
-    public static final String K_RANGE          = "range";
     public static final String K_PREVIEW        = "preview";
     public static final String K_DURATION       = "duration";
     public static final String K_PUBLICITY      = "publicity";
@@ -89,6 +88,15 @@ public class FirebaseContent extends FirebaseObject {
         return containsKey(K_LOCATION) ? new LatLng(getLatitude(), getLongitude()) : null;
     }
 
+    private void setLocation(LatLng loc) {
+        if (loc == null) return;
+        String geoHash = new GeoHash(loc.latitude, loc.longitude).getGeoHashString();
+        getChild(K_LOCATION)
+                .put(K_HASH, geoHash)
+                .put(K_LAT, loc.latitude)
+                .put(K_LNG, loc.longitude);
+    }
+
     public TangoData getTangoData() {
         if (!containsKey(K_TANGO_DATA)) return null;
         FirebaseObject tangoData = getChild(K_TANGO_DATA);
@@ -98,17 +106,36 @@ public class FirebaseContent extends FirebaseObject {
                 .withTranslation(tangoData.get(K_TRANSLATION).toDoubleArray());
     }
 
+    private void setTangoData(TangoData td) {
+        if (td == null) return;
+        getChild(K_TANGO_DATA)
+                .put(K_SCALE, td.getScale())
+                .put(K_ROTATION, td.getRotation())
+                .put(K_TRANSLATION, td.getTranslation());
+    }
+
     public Visibility getVisibility() {
         return new Visibility()
-                .withRangeVisibility(getRange())
                 .withSocialVisibility(getPublicity())
                 .withTimeVisibility(get(K_DURATION).toData())
                 .withVisiblePreview(getChild(K_NOTE_DATA).get(K_PREVIEW).toBoolean());
     }
 
-    @SuppressWarnings("WrongConstant")
-    private Visibility.RangeVisibility getRange() {
-        return new Visibility.RangeVisibility(get(K_RANGE).toInteger());
+    private void setVisibility(Visibility v) {
+        if (v == null) return;
+        put(K_DURATION, v.getVisibleUntil());
+        put(K_PUBLICITY, v.getSocialVisibility().getMode());
+        getChild(K_NOTE_DATA).put(K_PREVIEW, v.isPreviewVisible());
+        // TODO generalize creation of "shared" object
+        FirebaseObject shared = getChild(K_SHARED)
+                .put(Id.PROVIDER_FIREBASE, new FirebaseObject())
+                .put(Id.PROVIDER_FACEBOOK, new FirebaseObject())
+                .put(Id.PROVIDER_GOOGLE, new FirebaseObject());
+        List<Id> sharedWith = v.getSocialVisibility().getSharedWith();
+        if (sharedWith == null) return;
+        for (Id id : sharedWith) {
+            shared.get(id.getProvider()).toFirebaseObject().put(id.getId(), true);
+        }
     }
 
     @SuppressWarnings("WrongConstant")
@@ -130,41 +157,6 @@ public class FirebaseContent extends FirebaseObject {
                 .put(K_TITLE, c.getTitle())
                 .put(K_IMGURI, c.getImageUri())
                 .put(K_COLOR, c.getColor());
-    }
-
-    private void setLocation(LatLng loc) {
-        if (loc == null) return;
-        String geoHash = new GeoHash(loc.latitude, loc.longitude).getGeoHashString();
-        getChild(K_LOCATION)
-                .put(K_HASH, geoHash)
-                .put(K_LAT, loc.latitude)
-                .put(K_LNG, loc.longitude);
-    }
-
-    private void setTangoData(TangoData td) {
-        if (td == null) return;
-        getChild(K_TANGO_DATA)
-                .put(K_SCALE, td.getScale())
-                .put(K_ROTATION, td.getRotation())
-                .put(K_TRANSLATION, td.getTranslation());
-    }
-
-    private void setVisibility(Visibility v) {
-        if (v == null) return;
-        put(K_DURATION, v.getVisibleUntil());
-        put(K_RANGE, v.getRangeVisibility().getRange());
-        put(K_PUBLICITY, v.getSocialVisibility().getMode());
-        getChild(K_NOTE_DATA).put(K_PREVIEW, v.isPreviewVisible());
-        // TODO generalize creation of "shared" object
-        FirebaseObject shared = getChild(K_SHARED)
-                .put(Id.PROVIDER_FIREBASE, new FirebaseObject())
-                .put(Id.PROVIDER_FACEBOOK, new FirebaseObject())
-                .put(Id.PROVIDER_GOOGLE, new FirebaseObject());
-        List<Id> sharedWith = v.getSocialVisibility().getSharedWith();
-        if (sharedWith == null) return;
-        for (Id id : sharedWith ) {
-            shared.get(id.getProvider()).toFirebaseObject().put(id.getId(), true);
-        }
     }
 
     public Content toContent() {
