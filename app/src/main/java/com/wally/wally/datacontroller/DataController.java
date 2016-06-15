@@ -3,7 +3,6 @@ package com.wally.wally.datacontroller;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -48,7 +47,7 @@ public class DataController {
     private void sanityCheck() {
 //        contents.removeValue();
 //        DebugUtils.generateRandomContents(1000, this);
-        fetchAtLocation(new LatLng(0, 0), 10, DebugUtils.debugCallback());
+//        fetchAtLocation(new LatLng(0, 0), 10, DebugUtils.debugCallback());
     }
 
     public static DataController create() {
@@ -103,10 +102,6 @@ public class DataController {
         new FirebaseContent(c).delete(contents);
     }
 
-    public void fetchByBounds(LatLngBounds bounds, FetchResultCallback callback) {
-        fetchAtLocation(bounds.getCenter(), 10, callback);
-    }
-
     private void fetchAtLocation(final LatLng center, double radiusKm, FetchResultCallback callback) {
         final double radius = radiusKm * 1000; // Convert to meters
         Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
@@ -122,38 +117,38 @@ public class DataController {
         return GeoUtils.distance(location, center) <= radius;
     }
 
+    /**
+     * No alternative sadly, this method may crash badly
+     */
+    @Deprecated
     public void fetchByUUID(String uuid, FetchResultCallback callback) {
         new UUIDQuery(uuid).fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
+    /**
+     * No alternative sadly, this method may crash badly
+     */
+    @Deprecated
     public void fetchByAuthor(Id authorId, FetchResultCallback callback) {
         new AuthorQuery(authorId).fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
+    /**
+     * No alternative sadly, this method may crash badly
+     */
+    @Deprecated
     public void fetchByAuthor(User author, FetchResultCallback callback) {
         fetchByAuthor(author.getId(), callback);
     }
 
-    public void fetchShared(Id userId, FetchResultCallback callback) {
-        new SharedWithQuery(userId)
-                .fetch(contents, new FirebaseFetchResultCallback(callback));
-    }
-
-    public void fetchShared(User user, FetchResultCallback callback) {
-        fetchShared(user.getId(), callback);
-    }
-
+    /**
+     * Fetches all public content without pagination.
+     * @deprecated use {@link #createPublicContentFetcher()} instead.
+     */
+    @Deprecated
     public void fetchPublicContent(FetchResultCallback callback) {
         new PublicityQuery(FirebaseContent.PUBLIC)
                 .fetch(contents, new FirebaseFetchResultCallback(callback));
-    }
-
-    private void fetchAccessibleContent(User user, FetchResultCallback callback) {
-        AggregatorCallback aggregator =
-                new AggregatorCallback(callback).withExpectedCallbacks(3);
-        fetchPublicContent(aggregator);
-        fetchByAuthor(user, aggregator);
-        fetchShared(user, aggregator);
     }
 
     public User getCurrentUser() {
