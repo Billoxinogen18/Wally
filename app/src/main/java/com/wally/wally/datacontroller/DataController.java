@@ -70,14 +70,23 @@ public class DataController {
     }
 
     public void save(final Content c) {
-        final DatabaseReference ref;
+        DatabaseReference target;
 
-        if (c.getId() == null) {
-            ref = contents.push();
+        if (c.isPublic()) {
+            target = contents.child("Public");
+        } else if (c.isPrivate()) {
+            target = contents.child(c.getAuthorId()).child("Private");
         } else {
-            ref = contents.child(c.getId());
+            target = contents.child(c.getAuthorId()).child("Shared");
         }
 
+        if (c.getId() == null) {
+            target = target.push();
+        } else {
+            target = target.child(c.getId());
+        }
+
+        final DatabaseReference ref = target;
         uploadImage(
                 c.getImageUri(),
                 ref.getKey(),
