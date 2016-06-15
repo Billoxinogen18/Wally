@@ -152,6 +152,14 @@ public class Content implements Serializable {
         return id != null ? id.hashCode() : 0;
     }
 
+    public boolean isPublic() {
+        return visibility.getSocialVisibility().getMode() == Visibility.SocialVisibility.PUBLIC;
+    }
+
+    public boolean isPrivate() {
+        return visibility.getSocialVisibility().getMode() == Visibility.SocialVisibility.PRIVATE;
+    }
+
     private static class SerializableLatLng implements Serializable {
         private double lat;
         private double lng;
