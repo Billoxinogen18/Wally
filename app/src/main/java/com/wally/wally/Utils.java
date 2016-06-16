@@ -25,6 +25,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.atap.tangoservice.Tango;
 import com.wally.wally.datacontroller.content.Content;
 
@@ -216,5 +218,23 @@ public final class Utils {
         Drawable mutated = drawable.mutate();
         mutated.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         return mutated;
+    }
+
+
+    public static double getRadius(LatLngBounds bounds) {
+        LatLng center = bounds.getCenter();
+        LatLng ne = bounds.northeast;
+
+// r = radius of the earth in statute miles
+        double r = 3963.0;
+
+// Convert lat or lng from decimal degrees into radians (divide by 57.2958)
+        double lat1 = center.latitude / 57.2958;
+        double lon1 = center.longitude / 57.2958;
+        double lat2 = ne.latitude / 57.2958;
+        double lon2 = ne.longitude / 57.2958;
+
+// distance = circle radius from center to Northeast corner of bounds
+        return r * Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
     }
 }

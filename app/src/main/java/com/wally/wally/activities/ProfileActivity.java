@@ -525,7 +525,7 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
                         Content content = getFilteredData().get(getAdapterPosition());
                         switch (item.getItemId()) {
                             case R.id.show_on_map:
-                                startActivity(MapsActivity.newIntent(getBaseContext(), content));
+                                startActivity(MapsActivity.newIntent(getBaseContext(),  null));
                                 break;
                             case R.id.edit:
                                 onEditContent(content);

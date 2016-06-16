@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,7 +20,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
@@ -33,54 +31,41 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
+import com.wally.wally.ContentPagingRetriever;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
+import com.wally.wally.components.ContentListView;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.user.User;
-import com.wally.wally.fragments.PreviewContentDialogFragment;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        GoogleMap.OnCameraChangeListener, GoogleMap.OnMarkerClickListener {
+        GoogleMap.OnCameraChangeListener, ContentPagingRetriever.ContentPageRetrieveListener {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     private static final int MY_LOCATION_REQUEST_CODE = 22;
 
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
-    private Set<Content> mContents;
-    private Map<Content, Marker> mMarkers;
-    private Content mContent;
 
-    private long mLastRequestId;
 
-    private RecyclerView mRecycler;
-    private View mEmptyContentView;
-    private View mLoadingContentView;
+    private ContentListView mContentListView;
+
 
     private MapsRecyclerAdapter mAdapter;
+    private ContentPagingRetriever mContentRetriever;
 
-    public static Intent newIntent(Context context, @Nullable Content content) {
+    public static Intent newIntent(Context context, @Nullable SocialUser user) {
         Intent i = new Intent(context, MapsActivity.class);
-        i.putExtra("mContent", content);
+        i.putExtra("mUser", user);
         return i;
     }
 
@@ -89,39 +74,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        mContents = new HashSet<>();
-        mMarkers = new HashMap<>();
+        SocialUser user = (SocialUser) getIntent().getSerializableExtra("user");
 
-        mContent = (Content) getIntent().getSerializableExtra("mContent");
 
-        initRecyclerView();
-        // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .enableAutoManage(this, this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .addScope(Plus.SCOPE_PLUS_PROFILE)
-                    .addApi(Plus.API)
-                    .build();
-        }
+        ContentFetcher contentFetcher = App.getInstance().getDataController().createPublicContentFetcher();
+
+        mContentRetriever = new ContentPagingRetriever(contentFetcher);
+        mContentListView = (ContentListView) findViewById(R.id.content_list_view);
+        mAdapter = new MapsRecyclerAdapter(mContentRetriever);
+        mContentListView.setAdapter(mAdapter);
+
+        mContentRetriever.registerLoadListener(this);
+
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .addScope(Plus.SCOPE_PLUS_PROFILE)
+                .addApi(Plus.API)
+                .build();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        MapFragment mapFragment = (MapFragment) getFragmentManager()
-                .findFragmentById(R.id.map);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         mapFragment.setRetainInstance(true);
-    }
-
-    private void initRecyclerView() {
-        mRecycler = (RecyclerView) findViewById(R.id.recyclerview);
-        mRecycler.setLayoutManager(new LinearLayoutManager(getBaseContext()));
-        mAdapter = new MapsRecyclerAdapter(null);
-        mRecycler.setAdapter(mAdapter);
-
-        mEmptyContentView = findViewById(R.id.empty_view);
-        mLoadingContentView = findViewById(R.id.loading_view);
     }
 
     private void onContentClicked(Content content) {
@@ -137,7 +115,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnCameraChangeListener(this);
-        mMap.setOnMarkerClickListener(this);
 
         if (Utils.checkLocationPermission(this)) {
             mMap.setMyLocationEnabled(true);
@@ -147,111 +124,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_LOCATION_REQUEST_CODE);
         }
+        //TODO what to do when in profile
+        centerMapOnMyLocation();
+    }
 
-        if (mContent != null) {
-            centerMapOnContent(mContent);
-        } else {
-            centerMapOnMyLocation();
-        }
+    public void onBtnCameraClick(View view) {
+        onBackPressed();
     }
 
     @Override
-    public boolean onMarkerClick(Marker marker) {
-        Content content = null;
-        for (Content curr : mMarkers.keySet()) {
-            if (mMarkers.get(curr).equals(marker)) {
-                content = curr;
-                break;
-            }
-        }
-        if (content != null) {
-            PreviewContentDialogFragment dialog = PreviewContentDialogFragment.newInstance(content);
-            dialog.show(getSupportFragmentManager(), PreviewContentDialogFragment.TAG);
-        }
+    public void onPageLoaded() {
+        //TODO make markers
+    }
 
-        return true;
+    @Override
+    public void onPageFailed() {
+        //TODO make markers
     }
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         Log.d(TAG, cameraPosition.toString());
-        if (cameraPosition.zoom > 15) {
-            App app = (App) getApplicationContext();
-            LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
-            Log.d(TAG, bounds.toString());
-            markersSetVisible(true);
-            mLastRequestId = System.currentTimeMillis();
-
-            mLoadingContentView.setVisibility(View.VISIBLE);
-            mEmptyContentView.setVisibility(View.GONE);
-            mRecycler.setVisibility(View.GONE);
-            // TODO move to fetch by bounds...
-            app.getDataController().fetchPublicContent(new EnumCallback(mLastRequestId) {
-
-                // TODO this must return list, because we have ordering here. (Also some paging stuff)
-                @Override
-                public void onResult(Collection<Content> result) {
-                    Log.d(TAG, "onResult() called with: " + "result = [" + result + "]");
-                    mLoadingContentView.setVisibility(View.GONE);
-
-                    if (result.size() > 0) {
-                        mRecycler.setVisibility(View.VISIBLE);
-                    } else {
-                        mEmptyContentView.setVisibility(View.VISIBLE);
-                    }
-                    if (mLastRequestId == getId()) {
-                        mContents.clear();
-                        mContents.addAll(result);
-                        showContents();
-                    }
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    mLoadingContentView.setVisibility(View.GONE);
-                    // TODO show error
-                    Log.e(TAG, e.getMessage(), e);
-                    Toast.makeText(getApplicationContext(), getString(R.string.error_fetch_failed),
-                            Toast.LENGTH_LONG).show();
-                }
-            });
-        } else {
-            markersSetVisible(false);
-        }
+        double radius = Utils.getRadius(mMap.getProjection().getVisibleRegion().latLngBounds);
+        ContentFetcher contentFetcher = App.getInstance().getDataController().createPublicContentFetcher();
+        mContentRetriever.setContentFetcher(contentFetcher);
     }
-
-    private void showContents() {
-//        for (Content cur : mMarkers.keySet())
-//            if (!mContents.contains(cur))
-//                mMarkers.remove(cur);
-        Log.d(TAG, "showContents() called with: " + "");
-        mContents.add(new Content().withLocation(new LatLng(41.72151, 44.8271)).withId("0").withNote("Hi there my name is...").withTitle("Sample note"));
-        mContents.add(new Content().withLocation(new LatLng(41.721565, 44.82812)).withId("5").withNote("Some text").withTitle("თქვენ შიგ ხო არ გაქვთ რა ლიმიტი").withImageUri("http://i.imgur.com/RRUe0Mo.png"));
-        mContents.add(new Content().withLocation(new LatLng(41.72120, 44.8255)).withId("6").withNote(getString(R.string.large_text)).withTitle("Sample note Title here"));
-        mContents.add(new Content().withLocation(new LatLng(41.72180, 44.8270)).withId("7").withNote("Hi there my name is John").withTitle("Sample note"));
-        mContents.add(new Content().withLocation(new LatLng(41.72159, 44.8273)).withId("8").withNote("Hi there my name is... I'm programmer here :S"));
-        mContents.add(new Content().withLocation(new LatLng(41.72159, 44.8269)).withId("9").withTitle("Sample note Only title"));
-        mContents.add(new Content().withLocation(new LatLng(41.72161, 44.8276)).withId("10").withTitle("Sample note").withImageUri("http://www.keenthemes.com/preview/metronic/theme/assets/global/plugins/jcrop/demos/demo_files/image1.jpg"));
-        // TODO data controller must return list!
-        mAdapter.setData(new ArrayList<>(mContents));
-
-        for (Content content : mContents) {
-            if (!mMarkers.keySet().contains(content)) {
-                Marker m = mMap.addMarker(new MarkerOptions()
-                        .position(content.getLocation())
-                        .title(content.getTitle())
-                );
-                mMarkers.put(content, m);
-            }
-        }
-    }
-
-    private void markersSetVisible(boolean visible) {
-        for (Marker m : mMarkers.values()) {
-            m.setVisible(visible);
-        }
-    }
-
 
     private void centerMapOnMyLocation() {
         if (Utils.checkLocationPermission(this)) {
@@ -271,13 +168,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void centerMapOnContent(Content content) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(content.getLocation(), 16), 2000, null);
-    }
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if (requestCode == MY_LOCATION_REQUEST_CODE) {
             if (permissions.length == 1 &&
                     permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
@@ -312,19 +204,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    public void onBtnCameraClick(View view) {
-        onBackPressed();
-    }
+    private class MapsRecyclerAdapter extends RecyclerView.Adapter<MapsRecyclerAdapter.VH> implements ContentPagingRetriever.ContentPageRetrieveListener {
+        private ContentPagingRetriever mRetriever;
 
-    private class MapsRecyclerAdapter extends RecyclerView.Adapter<MapsRecyclerAdapter.VH> {
-        private List<Content> mData;
-
-        public MapsRecyclerAdapter(List<Content> data) {
-            setData(data);
+        public MapsRecyclerAdapter(ContentPagingRetriever retriever) {
+            setRetriever(retriever);
+            mRetriever.registerLoadListener(this);
         }
 
-        public void setData(List<Content> data) {
-            mData = data;
+        public void setRetriever(ContentPagingRetriever retriever) {
+            mRetriever = retriever;
             notifyDataSetChanged();
         }
 
@@ -337,7 +226,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         @Override
         public void onBindViewHolder(final VH vh, @SuppressLint("RecyclerView") final int position) {
-            Content c = mData.get(position);
+            Content c = mRetriever.get(position);
             // Free up old images
             vh.ownerImage.setImageDrawable(null);
             vh.ownerImage.setBackground(null);
@@ -429,7 +318,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         @Override
         public int getItemCount() {
-            return mData == null ? 0 : mData.size();
+            int size = mRetriever == null ? 0 : mRetriever.size();
+            Log.d(TAG, "getItemCount: " + size);
+            return size;
+        }
+
+        @Override
+        public void onPageLoaded() {
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public void onPageFailed() {
+//            mContentListView.setLoadingViewVisibility(View.GONE);
+//            mContentListView.setListVisibility(View.VISIBLE);
         }
 
         public class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -457,7 +359,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onClick(View v) {
-                onContentClicked(mData.get(getAdapterPosition()));
+                onContentClicked(mRetriever.get(getAdapterPosition()));
             }
         }
     }
