@@ -12,6 +12,34 @@
         android:layout_toRightOf="@+id/list"
         tools:context=".activities.MapsActivity" />
 
+    <LinearLayout
+        android:id="@+id/owner_profile_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/map"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/map"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_owner_image"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginRight="16dp"
+            tools:src="@drawable/sample_user_image" />
+
+        <TextView
+            android:id="@+id/tv_owner_name"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            tools:text="Gio Gogiashvili" />
+    </LinearLayout>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/my_location"
         android:layout_width="wrap_content"

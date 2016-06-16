@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
+    android:background="@color/note_color_white"
     android:foreground="?attr/selectableItemBackground"
     android:stateListAnimator="@anim/raise"
     app:cardElevation="2dp"
@@ -17,33 +18,39 @@
         android:orientation="vertical"
         android:padding="12dp">
 
-        <ImageView
-            android:id="@+id/iv_owner_image"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginBottom="16dp"
-            android:layout_marginRight="16dp"
-            tools:src="@drawable/sample_user_image" />
-
-        <TextView
-            android:id="@+id/tv_owner_name"
-            style="@style/TextAppearance.AppCompat.Title"
+        <LinearLayout
+            android:id="@+id/owner_profile_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/iv_owner_image"
-            android:layout_alignTop="@+id/iv_owner_image"
-            android:layout_toRightOf="@+id/iv_owner_image"
-            android:ellipsize="end"
+            android:layout_marginBottom="16dp"
+            android:background="?attr/selectableItemBackground"
             android:gravity="center_vertical"
-            android:maxLines="1"
-            tools:text="Giorgi Gogiashvili" />
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/iv_owner_image"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginRight="12dp"
+                tools:src="@drawable/sample_user_image" />
+
+            <TextView
+                android:id="@+id/tv_owner_name"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                tools:text="Giorgi Gogiashvili" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_title"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/iv_owner_image"
+            android:layout_below="@id/owner_profile_info"
             android:layout_marginBottom="8dp"
             android:ellipsize="end"
             android:lines="1"
@@ -78,7 +85,6 @@
             android:layout_below="@+id/tv_note"
             android:layout_centerVertical="true"
             android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
             android:src="@drawable/ic_btn_map_75dp"
             android:visibility="gone"
             tools:visibility="visible" />

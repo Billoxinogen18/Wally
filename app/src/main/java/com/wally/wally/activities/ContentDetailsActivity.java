@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -48,7 +49,7 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
     private ImageView mNoteImage;
     private TextView mNoteTitle;
     private TextView mNote;
-    private View mCard;
+    private CardView mCard;
 
     public static Intent newIntent(Context from, Content content) {
         Intent i = new Intent(from, ContentDetailsActivity.class);
@@ -119,7 +120,7 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
         mNote = (TextView) findViewById(R.id.tv_note);
         mNoteTitle = (TextView) findViewById(R.id.tv_title);
         mNoteImage = (ImageView) findViewById(R.id.iv_note_image);
-        mCard = findViewById(R.id.card);
+        mCard = (CardView) findViewById(R.id.card);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -140,7 +141,7 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
         }
 
         if (mContent.getColor() != null) {
-            mCard.setBackgroundColor(mContent.getColor());
+            mCard.setCardBackgroundColor(mContent.getColor());
         }
         mNoteTitle.setText(mContent.getTitle());
         mNoteTitle.setVisibility(TextUtils.isEmpty(mContent.getTitle()) ? View.GONE : View.VISIBLE);

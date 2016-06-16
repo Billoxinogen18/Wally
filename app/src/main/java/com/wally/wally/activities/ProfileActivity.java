@@ -54,7 +54,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
+// TODO remove this class
+@Deprecated
 public class ProfileActivity extends AppCompatActivity implements FetchResultCallback, NewContentDialogFragment.NewContentDialogListener, AppBarLayout.OnOffsetChangedListener, TextWatchAdapter.SearchWatch {
 
     private static final String TAG = ProfileActivity.class.getSimpleName();
@@ -525,7 +526,8 @@ public class ProfileActivity extends AppCompatActivity implements FetchResultCal
                         Content content = getFilteredData().get(getAdapterPosition());
                         switch (item.getItemId()) {
                             case R.id.show_on_map:
-                                startActivity(MapsActivity.newIntent(getBaseContext(),  null));
+
+                                /// / startActivity(MapsActivity.newIntent(getBaseContext(), content));
                                 break;
                             case R.id.edit:
                                 onEditContent(content);

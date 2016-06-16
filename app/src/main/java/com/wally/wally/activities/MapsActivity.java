@@ -9,9 +9,9 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -51,8 +51,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         GoogleMap.OnCameraChangeListener, ContentPagingRetriever.ContentPageRetrieveListener {
 
     private static final String TAG = MapsActivity.class.getSimpleName();
+    private static final String KEY_USER = "USER";
     private static final int MY_LOCATION_REQUEST_CODE = 22;
 
+    private SocialUser mUserProfile;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
 
@@ -63,9 +65,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MapsRecyclerAdapter mAdapter;
     private ContentPagingRetriever mContentRetriever;
 
-    public static Intent newIntent(Context context, @Nullable SocialUser user) {
-        Intent i = new Intent(context, MapsActivity.class);
-        i.putExtra("mUser", user);
+    /**
+     * Start to see user profile
+     */
+    public static Intent newIntent(Context from, SocialUser user) {
+        Intent i = new Intent(from, MapsActivity.class);
+        i.putExtra(KEY_USER, user);
         return i;
     }
 
@@ -74,8 +79,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        SocialUser user = (SocialUser) getIntent().getSerializableExtra("user");
-
+        mUserProfile = (SocialUser) getIntent().getSerializableExtra(KEY_USER);
+        initUserProfileView();
 
         ContentFetcher contentFetcher = App.getInstance().getDataController().createPublicContentFetcher();
 
@@ -102,8 +107,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.setRetainInstance(true);
     }
 
+    @SuppressWarnings("ConstantConditions")
+    private void initUserProfileView() {
+        ImageView ownerImage = (ImageView) findViewById(R.id.iv_owner_image);
+        TextView ownerName = (TextView) findViewById(R.id.tv_owner_name);
+
+        if (mUserProfile != null) {
+            Glide.with(getBaseContext())
+                    .load(mUserProfile.getAvatarUrl())
+                    .crossFade()
+                    .fitCenter()
+                    .thumbnail(0.1f)
+                    .placeholder(R.drawable.ic_account_circle_black_24dp)
+                    .transform(new CircleTransform(getBaseContext()))
+                    .into(ownerImage);
+
+            ownerImage.setVisibility(View.VISIBLE);
+            ownerName.setText(mUserProfile.getDisplayName());
+        } else {
+            findViewById(R.id.owner_profile_info).setVisibility(View.GONE);
+        }
+    }
+
     private void onContentClicked(Content content) {
         startActivity(ContentDetailsActivity.newIntent(this, content));
+    }
+
+    private void onUserClicked(SocialUser user) {
+        startActivity(MapsActivity.newIntent(this, user));
     }
 
     public void onMyLocationClick(View v) {
@@ -181,6 +212,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        mGoogleApiClient.unregisterConnectionCallbacks(this);
         centerMapOnMyLocation();
     }
 
@@ -232,8 +264,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             vh.ownerImage.setBackground(null);
             vh.noteImage.setImageDrawable(null);
             vh.noteImage.setBackground(null);
-
             vh.ownerName.setText(null);
+            vh.ownerInfo.setTag(null);
 
             if (!TextUtils.isEmpty(c.getImageUri())) {
                 Glide.with(getBaseContext())
@@ -250,9 +282,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
 
             if (c.getColor() != null) {
-                vh.card.setBackgroundColor(c.getColor());
+                vh.card.setCardBackgroundColor(c.getColor());
             } else {
-                vh.card.setBackgroundColor(Color.WHITE);
+                vh.card.setCardBackgroundColor(Color.WHITE);
             }
             vh.title.setText(c.getTitle());
             vh.title.setVisibility(TextUtils.isEmpty(c.getTitle()) ? View.GONE : View.VISIBLE);
@@ -282,6 +314,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                             new UserManager.UserLoadListener() {
                                 @Override
                                 public void onUserLoad(SocialUser user) {
+                                    vh.ownerInfo.setTag(user);
                                     // if not recycled
                                     if (vh.getAdapterPosition() != position) {
                                         return;
@@ -335,7 +368,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         public class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
-            public View card;
+            public CardView card;
             public ImageView ownerImage;
             public TextView ownerName;
 
@@ -343,9 +376,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public TextView title;
             public TextView note;
 
+            public View ownerInfo;
+
             public VH(View itemView) {
                 super(itemView);
-                card = itemView.findViewById(R.id.card);
+                card = (CardView) itemView.findViewById(R.id.card);
 
                 ownerImage = (ImageView) itemView.findViewById(R.id.iv_owner_image);
                 ownerName = (TextView) itemView.findViewById(R.id.tv_owner_name);
@@ -354,12 +389,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 title = (TextView) itemView.findViewById(R.id.tv_title);
                 note = (TextView) itemView.findViewById(R.id.tv_note);
 
+                ownerInfo = itemView.findViewById(R.id.owner_profile_info);
+
                 itemView.setOnClickListener(this);
+                ownerInfo.setOnClickListener(this);
             }
 
             @Override
             public void onClick(View v) {
-                onContentClicked(mRetriever.get(getAdapterPosition()));
+                if (v.getId() == R.id.owner_profile_info) {
+                    if (v.getTag() != null) {
+                        onUserClicked((SocialUser) v.getTag());
+                    }
+                } else {
+                    onContentClicked(mRetriever.get(getAdapterPosition()));
+                }
             }
         }
     }
