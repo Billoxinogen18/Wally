@@ -12,16 +12,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
+import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
+import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
+import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.PublicContentFetcher;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
 import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
-import com.wally.wally.datacontroller.user.*;
-import com.wally.wally.datacontroller.queries.*;
-import com.wally.wally.datacontroller.callbacks.*;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.FirebaseContent;
+import com.wally.wally.datacontroller.queries.AuthorQuery;
+import com.wally.wally.datacontroller.queries.LocationQuery;
+import com.wally.wally.datacontroller.queries.PublicityQuery;
+import com.wally.wally.datacontroller.queries.UUIDQuery;
+import com.wally.wally.datacontroller.user.Id;
+import com.wally.wally.datacontroller.user.User;
 
 import java.util.Set;
 
@@ -46,12 +53,6 @@ public class DataController {
         sanityCheck();
     }
 
-    private void sanityCheck() {
-//        contents.removeValue();
-//        DebugUtils.generateRandomContents(1000, this);
-//        fetchAtLocation(new LatLng(0, 0), 10, DebugUtils.debugCallback());
-    }
-
     public static DataController create() {
         if (instance == null) {
             instance = new DataController(
@@ -60,6 +61,12 @@ public class DataController {
             );
         }
         return instance;
+    }
+
+    private void sanityCheck() {
+//        contents.removeValue();
+//        DebugUtils.generateRandomContents(1000, this);
+//        fetchAtLocation(new LatLng(0, 0), 10, DebugUtils.debugCallback());
     }
 
     private void uploadImage(String imagePath, String folder, final Callback<String> callback) {
@@ -96,7 +103,7 @@ public class DataController {
                     @Override
                     public void onResult(String result) {
                         c.withImageUri(result);
-                        new FirebaseContent(c).save(ref);
+                        c.withId(new FirebaseContent(c).save(ref));
                     }
 
                     @Override
@@ -154,6 +161,7 @@ public class DataController {
 
     /**
      * Fetches all public content without pagination.
+     *
      * @deprecated use {@link #createPublicContentFetcher()} instead.
      */
     @Deprecated
