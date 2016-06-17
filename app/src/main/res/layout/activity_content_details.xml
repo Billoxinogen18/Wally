@@ -28,29 +28,10 @@
                 android:padding="12dp"
                 android:src="@drawable/ic_arrow_back_black_24dp" />
 
-            <LinearLayout
+            <com.wally.wally.components.UserInfoView
+                android:id="@+id/user_info_view"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/iv_owner_image"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="16dp"
-                    tools:src="@drawable/sample_user_image" />
-
-                <TextView
-                    android:id="@+id/tv_owner_name"
-                    style="@style/TextAppearance.AppCompat.Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    tools:text="Gio Gogiashvili" />
-            </LinearLayout>
+                android:layout_height="wrap_content" />
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
 

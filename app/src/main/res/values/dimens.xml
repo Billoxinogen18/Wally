@@ -10,6 +10,12 @@
     <dimen name="content_dialog_min_width">300dp</dimen>
     <dimen name="content_view">400px</dimen>
 
+    <dimen name="small_profile_picture_size">30dp</dimen>
+    <dimen name="normal_profile_picture_size">36dp</dimen>
+
+    <dimen name="small_profile_text_size">14sp</dimen>
+    <dimen name="normal_profile_text_size">18dp</dimen>
+
     <dimen name="wall_content_max_width">350dp</dimen>
     <dimen name="drawable_padding">8dp</dimen>
     <dimen name="app_bar_height">280dp</dimen>

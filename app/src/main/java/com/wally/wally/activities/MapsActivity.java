@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
@@ -47,14 +48,12 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.ContentListView;
-import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.components.UserInfoView;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Visibility;
 import com.wally.wally.datacontroller.content.Visibility.SocialVisibility;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
-import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
-import com.wally.wally.userManager.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -163,7 +162,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void onContentClicked(Content content) {
-        startActivity(ContentDetailsActivity.newIntent(this, content));
+        if (content.getVisibility().isPreviewVisible()) {
+            startActivity(ContentDetailsActivity.newIntent(this, content));
+        } else {
+            Toast.makeText(MapsActivity.this, R.string.content_not_visible_note, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void onUserClicked(SocialUser user) {
@@ -366,16 +369,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onBindViewHolder(final VH vh, @SuppressLint("RecyclerView") final int position) {
             Content c = mRetriever.get(position);
-            // Free up old images
-            vh.ownerImage.setImageDrawable(null);
-            vh.ownerImage.setBackground(null);
-            vh.noteImage.setImageDrawable(null);
-            vh.noteImage.setBackground(null);
-            vh.ownerName.setText(null);
-            vh.ownerInfo.setTag(null);
+            vh.clearViews();
 
             vh.contentPosition.setText(String.format("%d", position + 1));
 
+            // Do not show profile info when in profile already.
+            // Because all the contents are from the user.
+            // Also this thing avoids us to cycle (User->User->User)
+            if (mUserProfile != null) {
+                vh.userInfoView.setVisibility(View.GONE);
+            } else {
+                vh.userInfoView.loadAndSetUser(
+                        c.getAuthorId(),
+                        c.getVisibility().isAuthorAnonymous(),
+                        mGoogleApiClient);
+            }
+
+            if (!c.getVisibility().isPreviewVisible()) {
+                vh.card.setCardBackgroundColor(
+                        ContextCompat.getColor(MapsActivity.this, R.color.content_not_visible_color));
+                vh.title.setText(R.string.content_not_visible_title);
+                vh.note.setText(R.string.content_not_visible_note);
+                vh.noteImage.setVisibility(View.GONE);
+                return;
+            }
             if (!TextUtils.isEmpty(c.getImageUri())) {
                 Glide.with(getBaseContext())
                         .load(c.getImageUri())
@@ -400,62 +417,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             vh.note.setText(c.getNote());
             vh.note.setVisibility(TextUtils.isEmpty(c.getNote()) ? View.GONE : View.VISIBLE);
-
-            if (TextUtils.isEmpty(c.getAuthorId())) {
-                vh.ownerImage.setVisibility(View.GONE);
-                vh.ownerName.setVisibility(View.GONE);
-                return;
-            }
-            vh.ownerImage.setVisibility(View.VISIBLE);
-            vh.ownerName.setVisibility(View.VISIBLE);
-            App.getInstance().getDataController().fetchUser(c.getAuthorId(), new Callback<User>() {
-                @Override
-                public void onResult(User result) {
-                    if (vh.getAdapterPosition() != position) {
-                        return;
-                    }
-                    if (result == null) {
-                        vh.ownerImage.setVisibility(View.GONE);
-                        vh.ownerName.setVisibility(View.GONE);
-                        return;
-                    }
-                    App.getInstance().getUserManager().loadUser(result, mGoogleApiClient,
-                            new UserManager.UserLoadListener() {
-                                @Override
-                                public void onUserLoad(SocialUser user) {
-                                    vh.ownerInfo.setTag(user);
-                                    // if not recycled
-                                    if (vh.getAdapterPosition() != position) {
-                                        return;
-                                    }
-                                    if (!TextUtils.isEmpty(user.getAvatarUrl())) {
-                                        vh.ownerImage.setVisibility(View.VISIBLE);
-                                        // TODO optimize size
-                                        Glide.with(getBaseContext())
-                                                .load(user.getAvatarUrl())
-                                                .crossFade()
-                                                .fitCenter()
-                                                .thumbnail(0.1f)
-                                                .placeholder(R.drawable.ic_account_circle_black_24dp)
-                                                .transform(new CircleTransform(getBaseContext()))
-                                                .into(vh.ownerImage);
-                                    }
-                                    vh.ownerName.setVisibility(View.VISIBLE);
-                                    vh.ownerName.setText(user.getDisplayName());
-                                }
-
-                                @Override
-                                public void onUserLoadFailed() {
-                                    //TODO implementation missing
-                                }
-                            });
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e(TAG, "onError: ", e);
-                }
-            });
         }
 
         @Override
@@ -493,39 +454,48 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         public class VH extends RecyclerView.ViewHolder implements View.OnClickListener {
             public CardView card;
-            public ImageView ownerImage;
-            public TextView ownerName;
+            public UserInfoView userInfoView;
 
             public ImageView noteImage;
             public TextView title;
             public TextView note;
             public TextView contentPosition;
 
-            public View ownerInfo;
-
             public VH(View itemView) {
                 super(itemView);
                 card = (CardView) itemView.findViewById(R.id.card);
 
-                ownerImage = (ImageView) itemView.findViewById(R.id.iv_owner_image);
-                ownerName = (TextView) itemView.findViewById(R.id.tv_owner_name);
-
+                userInfoView = (UserInfoView) itemView.findViewById(R.id.user_info_view);
                 noteImage = (ImageView) itemView.findViewById(R.id.iv_note_image);
                 title = (TextView) itemView.findViewById(R.id.tv_title);
                 note = (TextView) itemView.findViewById(R.id.tv_note);
-
                 contentPosition = (TextView) itemView.findViewById(R.id.tv_content_position);
-                ownerInfo = itemView.findViewById(R.id.owner_profile_info);
 
                 itemView.setOnClickListener(this);
-                ownerInfo.setOnClickListener(this);
+                userInfoView.setOnClickListener(this);
+            }
+
+            public void clearViews() {
+                card.setCardBackgroundColor(Color.WHITE);
+
+                noteImage.setImageDrawable(null);
+                noteImage.setBackground(null);
+                noteImage.setVisibility(View.VISIBLE);
+
+                title.setText(null);
+                title.setVisibility(View.VISIBLE);
+                note.setText(null);
+                note.setVisibility(View.VISIBLE);
+                contentPosition.setText(null);
+
+                userInfoView.clearUser();
             }
 
             @Override
             public void onClick(View v) {
-                if (v.getId() == R.id.owner_profile_info) {
-                    if (v.getTag() != null) {
-                        onUserClicked((SocialUser) v.getTag());
+                if (v instanceof UserInfoView) {
+                    if (userInfoView.getUser() != null) {
+                        onUserClicked(userInfoView.getUser());
                     }
                 } else {
                     onContentClicked(mRetriever.get(getAdapterPosition()));

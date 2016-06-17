@@ -18,7 +18,7 @@ import java.util.Collection;
 public class DebugUtils {
     public static final int CONTENT_PRE_PAGE = 5;
     public static final Id DEBUG_USER_ID =
-            new Id(Id.PROVIDER_FIREBASE, "uSlLJUtZqbRDTMeLU4MdcToS8ZZ2");
+            new Id(Id.PROVIDER_FIREBASE, "bPwMCPf2MWbebkLQrUuXKw3kYjW2");
     public static final User DEBUG_USER = new User(DEBUG_USER_ID.getId()).withGgId("");
     private static final String TAG = DebugUtils.class.getSimpleName();
     private static SecureRandom random = new SecureRandom();
@@ -44,6 +44,7 @@ public class DebugUtils {
                                 .withTimeVisibility(null)
                                 .withSocialVisibility(randomPublicity())
                                 .withVisiblePreview(random.nextBoolean())
+                                .withAnonymousAuthor(random.nextBoolean())
                 ).withTangoData(
                         new TangoData()
                                 .withScale((double) random.nextInt())
@@ -70,7 +71,7 @@ public class DebugUtils {
     }
 
     public static void generateRandomContentsNearOffice(DataController controller) {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 50; i++) {
             controller.save(generateRandomContent()
                     .withImageUri(null)
                     .withLocation(randomLatLngNearPoint(OFFICE_LAT_LNG)));

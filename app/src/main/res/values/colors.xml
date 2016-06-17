@@ -32,4 +32,5 @@
     <color name="public_content_marker_color">#388E3C</color>
     <color name="private_content_marker_color">#7B1FA2</color>
     <color name="people_content_marker_color">#D32F2F</color>
+    <color name="content_not_visible_color">#eae9e9</color>
 </resources>
