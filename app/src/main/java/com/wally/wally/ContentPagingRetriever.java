@@ -1,5 +1,7 @@
 package com.wally.wally;
 
+import android.util.Log;
+
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
@@ -12,6 +14,8 @@ import java.util.List;
  * Created by Meravici on 6/15/2016.
  */
 public class ContentPagingRetriever {
+    private static final String TAG = ContentPagingRetriever.class.getSimpleName();
+
     private int pageLength;
 
     private ContentFetcher contentFetcher;
@@ -22,8 +26,11 @@ public class ContentPagingRetriever {
 
     private List<ContentPageRetrieveListener> observers;
 
-    private boolean hasNext = true;
-    private boolean hasPrevious = false;
+//    private boolean hasNext = true;
+//    private boolean hasPrevious = false;
+
+    private boolean lastNextOne = true;
+    private boolean lastNextTwo = true;
 
     public ContentPagingRetriever(ContentFetcher contentFetcher, int pageLenght) {
 
@@ -59,40 +66,50 @@ public class ContentPagingRetriever {
     }
 
     public void loadNext() {
-        if(hasNext) {
-            hasPrevious = true;
+//        if (hasNext) {
+//            hasPrevious = true;
             loadNext(pageLength);
-        }
+//        }
     }
 
-    private void loadNext(int num) {
+    private void loadNext(final int num) {
         contentFetcher.fetchNext(num, new FetchResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
-                if (result.size() != 0) {
-                    List<Content> contents;
-                    if (result instanceof List) {
-                        contents = (List<Content>) result;
-                    } else {
-                        contents = new ArrayList<>(result);
-                    }
-
-                    previous = current;
-                    current = next;
-                    next = contents;
-                    for (ContentPageRetrieveListener observer : observers) {
-                        observer.onNextPageLoaded();}
+                if (!lastNextOne) {
+                    lastNextOne = true;
+                    loadNext(num);
+                } else if (!lastNextTwo) {
+                    lastNextTwo = true;
+                    loadNext(num);
                 } else {
-                    hasNext = false;
-                    for (ContentPageRetrieveListener observer : observers) {
-                        observer.onNextPageFailed();
+                    if (result.size() != 0) {
+                        List<Content> contents;
+                        if (result instanceof List) {
+                            contents = (List<Content>) result;
+                        } else {
+                            contents = new ArrayList<>(result);
+                        }
+
+                        previous = current;
+                        current = next;
+                        next = contents;
+                        for (ContentPageRetrieveListener observer : observers) {
+                            observer.onNextPageLoaded();
+                        }
+                        Log.d(TAG, "onResult: next " + ContentPagingRetriever.this.toString());
+                    } else {
+//                        hasNext = false;
+                        for (ContentPageRetrieveListener observer : observers) {
+                            observer.onNextPageFailed();
+                        }
                     }
                 }
             }
 
             @Override
             public void onError(Exception e) {
-                hasNext = false;
+//                hasNext = false;
                 for (ContentPageRetrieveListener observer : observers) {
                     observer.onNextPageFailed();
                 }
@@ -101,40 +118,51 @@ public class ContentPagingRetriever {
     }
 
     public void loadPrevious() {
-        if(hasPrevious){
-            hasNext = true;
+//        if (hasPrevious) {
+//            hasNext = true;
             loadPrevious(pageLength);
-        }
+//        }
     }
-    public void loadPrevious(int num){
+
+    public void loadPrevious(final int num) {
         contentFetcher.fetchPrev(num, new FetchResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
-                if (result.size() != 0) {
-                    List<Content> contents;
-                    if (result instanceof List) {
-                        contents = (List<Content>) result;
-                    } else {
-                        contents = new ArrayList<>(result);
-                    }
-
-                    next = current;
-                    current = previous;
-                    previous = contents;
-                    for (ContentPageRetrieveListener observer : observers) {
-                        observer.onPreviousPageLoaded();
-                    }
+                if (lastNextOne) {
+                    lastNextOne = false;
+                    loadPrevious(num);
+                }else if(lastNextTwo){
+                    lastNextTwo = false;
+                    loadPrevious(num);
                 } else {
-                    hasPrevious = false;
-                    for (ContentPageRetrieveListener observer : observers) {
-                        observer.onPreviousPageFailed();
+                    if (result.size() != 0) {
+                        List<Content> contents;
+                        if (result instanceof List) {
+                            contents = (List<Content>) result;
+                        } else {
+                            contents = new ArrayList<>(result);
+                        }
+
+                        next = current;
+                        current = previous;
+                        previous = contents;
+
+                        for (ContentPageRetrieveListener observer : observers) {
+                            observer.onPreviousPageLoaded();
+                        }
+                        Log.d(TAG, "onResult: prev " + ContentPagingRetriever.this.toString());
+                    } else {
+//                        hasPrevious = false;
+                        for (ContentPageRetrieveListener observer : observers) {
+                            observer.onPreviousPageFailed();
+                        }
                     }
                 }
             }
 
             @Override
             public void onError(Exception e) {
-                hasPrevious = false;
+//                hasPrevious = false;
                 for (ContentPageRetrieveListener observer : observers) {
                     observer.onPreviousPageFailed();
                 }
@@ -158,7 +186,9 @@ public class ContentPagingRetriever {
                     } else {
                         contents = new ArrayList<>(result);
                     }
-                    previous.clear(); current.clear(); next.clear();
+                    previous.clear();
+                    current.clear();
+                    next.clear();
                     int i = 0;
                     for (; i < Math.min(contents.size(), pageLength); i++)
                         previous.add(contents.get(i));
@@ -192,12 +222,30 @@ public class ContentPagingRetriever {
         observers.add(contentPageRetrieveListener);
     }
 
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Content content : previous) {
+            sb.append(content.getTitle()).append(",");
+        }
+
+        for (Content content : current) {
+            sb.append(content.getTitle()).append(",");
+        }
+
+        for (Content content : next) {
+            sb.append(content.getTitle()).append(",");
+        }
+
+        return sb.toString();
+    }
 
     public interface ContentPageRetrieveListener {
         void onNextPageLoaded();
+
         void onPreviousPageLoaded();
 
         void onNextPageFailed();
+
         void onPreviousPageFailed();
     }
 }

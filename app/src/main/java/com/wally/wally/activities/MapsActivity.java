@@ -467,17 +467,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onNextPageLoaded() {
             notifyItemRemoved(0);
-            notifyItemRemoved(1);
+            notifyItemRemoved(0);
             notifyItemInserted(getItemCount()-1);
             notifyItemInserted(getItemCount()-1);
         }
 
         @Override
         public void onPreviousPageLoaded() {
+            notifyItemRemoved(getItemCount());
+            notifyItemRemoved(getItemCount());
             notifyItemInserted(0);
             notifyItemInserted(0);
-            notifyItemRemoved(getItemCount()-1);
-            notifyItemRemoved(getItemCount()-2);
         }
 
         @Override
