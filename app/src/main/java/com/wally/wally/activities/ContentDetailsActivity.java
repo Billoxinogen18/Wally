@@ -167,6 +167,9 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
         App.getInstance().getDataController().fetchUser(mContent.getAuthorId(), new Callback<User>() {
             @Override
             public void onResult(User result) {
+                if (result == null) {
+                    return;
+                }
                 App.getInstance().getUserManager().loadUser(result, mGoogleApiClient,
                         new UserManager.UserLoadListener() {
                             @Override

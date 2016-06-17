@@ -7,8 +7,6 @@ import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.datacontroller.content.Visibility;
-import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
-import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
@@ -21,7 +19,10 @@ public class DebugUtils {
     public static final Id DEBUG_USER_ID =
             new Id(Id.PROVIDER_FIREBASE, "uSlLJUtZqbRDTMeLU4MdcToS8ZZ2");
     public static final User DEBUG_USER = new User(DEBUG_USER_ID.getId()).withGgId("");
+    private static final String TAG = DebugUtils.class.getSimpleName();
     private static SecureRandom random = new SecureRandom();
+
+    private static LatLng OFFICE_LAT_LNG = new LatLng(41.8057582f, 44.7681694f);
 
     // This method is for debugging purposes
     public static Content generateRandomContent() {
@@ -33,10 +34,6 @@ public class DebugUtils {
                 .withImageUri("http://" + randomStr(10))
                 .withAuthorId(DEBUG_USER_ID.getId())
                 .withLocation(
-//                        new LatLng(
-//                                random.nextInt(),
-//                                random.nextInt()
-//                        )
                         new LatLng(
                                 random.nextDouble(),
                                 random.nextDouble()
@@ -63,6 +60,14 @@ public class DebugUtils {
         generateRandomContents(100, controller);
     }
 
+    public static void generateRandomContentsNearOffice(DataController controller) {
+        for (int i = 0; i < 100; i++) {
+            controller.save(generateRandomContent()
+                    .withImageUri(null)
+                    .withLocation(randomLatLngNearPoint(OFFICE_LAT_LNG)));
+        }
+    }
+
     private static Visibility.SocialVisibility randomPublicity() {
         //noinspection WrongConstant
         return new Visibility.SocialVisibility(
@@ -75,6 +80,17 @@ public class DebugUtils {
                 random.nextDouble(),
                 random.nextDouble()
         };
+    }
+
+    private static LatLng randomLatLngNearPoint(LatLng point) {
+        return new LatLng(
+                point.latitude + nextSign() * (random.nextDouble() % 100) / 500,
+                point.longitude + nextSign() * (random.nextDouble() % 100) / 500
+        );
+    }
+
+    private static int nextSign() {
+        return random.nextBoolean() ? -1 : 1;
     }
 
     // Warning: Does not work as u expect

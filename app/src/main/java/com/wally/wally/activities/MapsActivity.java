@@ -5,11 +5,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,9 +33,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
+import com.google.maps.android.ui.IconGenerator;
 import com.wally.wally.App;
 import com.wally.wally.ContentPagingRetriever;
 import com.wally.wally.EndlessRecyclerOnScrollListener;
@@ -42,10 +49,15 @@ import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.ContentListView;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.datacontroller.content.Visibility.SocialVisibility;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -60,13 +72,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
 
-
     private ContentListView mContentListView;
-
 
     private MapsRecyclerAdapter mAdapter;
     private ContentPagingRetriever mContentRetriever;
     private EndlessRecyclerOnScrollListener mContentScrollListener;
+
+    private List<Marker> mMarkerList;
+    // Generates and adds markers in Background
+    private AsyncTask mMarkerGeneratorTask;
 
     /**
      * Start to see user profile
@@ -85,13 +99,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mUserProfile = (SocialUser) getIntent().getSerializableExtra(KEY_USER);
         initUserProfileView();
 
+        // TODO use correct fetcher
         ContentFetcher contentFetcher = App.getInstance().getDataController().createPublicContentFetcher();
 
         mContentListView = (ContentListView) findViewById(R.id.content_list_view);
         mContentRetriever = new ContentPagingRetriever(contentFetcher, 2);
         mAdapter = new MapsRecyclerAdapter(mContentRetriever);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        mContentScrollListener  = new EndlessRecyclerOnScrollListener(linearLayoutManager, 2) {
+        mContentScrollListener = new EndlessRecyclerOnScrollListener(linearLayoutManager, 2) {
             @Override
             public void onLoadNext() {
                 mContentRetriever.loadNext();
@@ -165,6 +180,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap = googleMap;
         mMap.setOnCameraChangeListener(this);
 
+        mMap.getUiSettings().setMapToolbarEnabled(false);
         if (Utils.checkLocationPermission(this)) {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
@@ -181,14 +197,76 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         onBackPressed();
     }
 
+    public void onPageLoaded() {
+        if (mMarkerList != null) {
+            for (Marker marker : mMarkerList) {
+                marker.remove();
+            }
+        }
+        mMarkerList = new ArrayList<>();
+
+        final List<Content> contentList = mContentRetriever.getList();
+
+        if (mMarkerGeneratorTask != null) {
+            mMarkerGeneratorTask.cancel(true);
+        }
+
+        mMarkerGeneratorTask = new AsyncTask<Void, Void, List<Bitmap>>() {
+
+            @Override
+            protected List<Bitmap> doInBackground(Void... params) {
+
+                List<Bitmap> icons = new ArrayList<>(contentList.size());
+                IconGenerator iconGenerator = new IconGenerator(MapsActivity.this);
+                iconGenerator.setTextAppearance(R.style.Bubble_TextAppearance_Light);
+
+                int[] colors = new int[3];
+                colors[SocialVisibility.PRIVATE] = ContextCompat.getColor(MapsActivity.this, R.color.private_content_marker_color);
+                colors[SocialVisibility.PUBLIC] = ContextCompat.getColor(MapsActivity.this, R.color.public_content_marker_color);
+                colors[SocialVisibility.PEOPLE] = ContextCompat.getColor(MapsActivity.this, R.color.people_content_marker_color);
+                for (int i = 0; i < contentList.size(); i++) {
+                    if (isCancelled()) {
+                        return null;
+                    }
+                    Visibility visibility = contentList.get(i).getVisibility();
+                    int color = colors[visibility.getSocialVisibility().getMode()];
+                    iconGenerator.setColor(color);
+                    icons.add(iconGenerator.makeIcon("" + (i + 1)));
+                }
+                return icons;
+            }
+
+            @Override
+            protected void onPostExecute(List<Bitmap> markerIcons) {
+                super.onPostExecute(markerIcons);
+                if (markerIcons == null) {
+                    return;
+                }
+                for (int i = 0; i < contentList.size(); i++) {
+                    Content c = contentList.get(i);
+                    Bitmap ic = markerIcons.get(i);
+
+                    Marker marker = mMap.addMarker(
+                            new MarkerOptions()
+                                    .position(c.getLocation())
+                                    .icon(BitmapDescriptorFactory.fromBitmap(ic)));
+                    mMarkerList.add(marker);
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+    }
+
     @Override
     public void onNextPageLoaded() {
         mContentScrollListener.loadingFinished();
+        onPageLoaded();
     }
 
     @Override
     public void onPreviousPageLoaded() {
         mContentScrollListener.loadingFinished();
+        onPageLoaded();
     }
 
     @Override
@@ -284,6 +362,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             return new VH(v);
         }
 
+        @SuppressLint("DefaultLocale")
         @Override
         public void onBindViewHolder(final VH vh, @SuppressLint("RecyclerView") final int position) {
             Content c = mRetriever.get(position);
@@ -294,6 +373,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             vh.noteImage.setBackground(null);
             vh.ownerName.setText(null);
             vh.ownerInfo.setTag(null);
+
+            vh.contentPosition.setText(String.format("%d", position + 1));
 
             if (!TextUtils.isEmpty(c.getImageUri())) {
                 Glide.with(getBaseContext())
@@ -418,6 +499,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             public ImageView noteImage;
             public TextView title;
             public TextView note;
+            public TextView contentPosition;
 
             public View ownerInfo;
 
@@ -432,6 +514,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 title = (TextView) itemView.findViewById(R.id.tv_title);
                 note = (TextView) itemView.findViewById(R.id.tv_note);
 
+                contentPosition = (TextView) itemView.findViewById(R.id.tv_content_position);
                 ownerInfo = itemView.findViewById(R.id.owner_profile_info);
 
                 itemView.setOnClickListener(this);
