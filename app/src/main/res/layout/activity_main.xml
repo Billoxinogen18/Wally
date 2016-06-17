@@ -13,13 +13,13 @@
         android:layout_gravity="center"
         android:text="Camera Disabled! No Tango Device!" />
 
-    <org.rajawali3d.surface.RajawaliSurfaceView
+    <org.rajawali3d.surface.RajawaliTextureView
         android:id="@+id/rajawali_surface"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
-        surfaceview:frameRate="60.0"
-        surfaceview:renderMode="RENDER_WHEN_DIRTY" />
+        app:frameRate="60.0"
+        app:renderMode="RENDER_WHEN_DIRTY"/>
 
     <TextView
         android:id="@+id/pose_invalid"

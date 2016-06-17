@@ -13,6 +13,7 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.components.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
+import org.rajawali3d.surface.RajawaliTextureView;
 
 /**
  * Created by shota on 5/27/16.
@@ -23,12 +24,12 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private WallyTangoUx mTangoUx;
     private boolean isLocalized;
     private boolean mIsFrameAvailableTangoThread;
-    private RajawaliSurfaceView mSurfaceView;
+    private RajawaliTextureView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
     private LocalizationListener mLocalizator;
 
 
-    public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager, LocalizationListener localizator){
+    public TangoUpdater(WallyTangoUx tangoUx, RajawaliTextureView surfaceView, TangoPointCloudManager pointCloudManager, LocalizationListener localizator){
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
@@ -64,7 +65,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         if (cameraId == TangoCameraIntrinsics.TANGO_CAMERA_COLOR) {
             // Mark a camera frame is available for rendering in the OpenGL thread
             setFrameAvailableTangoThread(true);
-            mSurfaceView.requestRender();
+            mSurfaceView.requestRenderUpdate();
         }
     }
 
