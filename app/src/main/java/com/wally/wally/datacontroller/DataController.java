@@ -10,7 +10,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
@@ -19,14 +18,8 @@ import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
-import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
-import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
-import com.wally.wally.datacontroller.queries.LocationQuery;
-import com.wally.wally.datacontroller.queries.PublicityQuery;
 import com.wally.wally.datacontroller.queries.UUIDQuery;
 import com.wally.wally.datacontroller.user.User;
-
-import java.util.Set;
 
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
@@ -41,7 +34,7 @@ public class DataController {
         this.storage = storage;
         users = database.child(Config.USERS_NODE);
         contents = database.child(Config.CONTENTS_NODE);
-        sanityCheck();
+        DebugUtils.sanityCheck();
     }
 
     public static DataController create() {
@@ -52,13 +45,6 @@ public class DataController {
             );
         }
         return instance;
-    }
-
-    private void sanityCheck() {
-//        contents.removeValue();
-//        DebugUtils.generateRandomContents(100, this);
-//        fetchAtLocation(new LatLng(0, 0), 100, DebugUtils.debugCallback());
-//        createPublicContentFetcher().fetchNext(50, DebugUtils.debugCallback());
     }
 
     private void uploadImage(String imagePath, String folder, final Callback<String> callback) {
@@ -112,37 +98,12 @@ public class DataController {
         new FirebaseContent(c).delete(contents);
     }
 
-    private void fetchAtLocation(final LatLng center, double radiusKm, FetchResultCallback callback) {
-        final double radius = radiusKm * 1000; // Convert to meters
-        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
-        final AggregatorCallback aggregator =
-                new AggregatorCallback(callback).withExpectedCallbacks(queries.size());
-        for (GeoHashQuery query : queries) {
-            new LocationQuery(query).fetch(contents, new FirebaseFetchResultCallback(aggregator));
-        }
-    }
-
-    private boolean locationIsInRange(LatLng location, LatLng center, double radius) {
-        return GeoUtils.distance(location, center) <= radius;
-    }
-
     /**
      * No alternative sadly, this method may crash badly
      */
     @Deprecated
     public void fetchByUUID(String uuid, FetchResultCallback callback) {
         new UUIDQuery(uuid).fetch(contents, new FirebaseFetchResultCallback(callback));
-    }
-
-    /**
-     * Fetches all public content without pagination.
-     *
-     * @deprecated use {@link #createPublicContentFetcher()} instead.
-     */
-    @Deprecated
-    public void fetchPublicContent(FetchResultCallback callback) {
-        new PublicityQuery(FirebaseContent.PUBLIC)
-                .fetch(contents, new FirebaseFetchResultCallback(callback));
     }
 
     public ContentFetcher createPublicContentFetcher() {
@@ -162,14 +123,6 @@ public class DataController {
     public ContentFetcher createUserContentFetcher(User me, User other, LatLng center, double r) {
         // TODO stub implementation
         return createPublicContentFetcher();
-    }
-
-    private ContentFetcher createPrivateContentFetcher(String userId) {
-        return new KeyPager(contents.child(userId).child("Private"));
-    }
-
-    private ContentFetcher createSharedContentFetcher(String userId) {
-        return new KeyPager(contents.child(userId).child("Shared"));
     }
 
     public User getCurrentUser() {

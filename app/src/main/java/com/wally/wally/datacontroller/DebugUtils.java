@@ -7,6 +7,7 @@ import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
@@ -110,7 +111,7 @@ public class DebugUtils {
         return new FetchResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
-                Log.d(tag, "" + result.size());
+                Log.d(tag, "<" + result.size() + ">");
                 for (Content c : result) {
                     logContent(c, tag);
                 }
@@ -125,6 +126,7 @@ public class DebugUtils {
 
     private static void logContent(Content c, String tag) {
         Log.d(tag, c.getId());
+//        Log.d(tag, c.getTitle());
 
 //        double diff = GeoUtils.distance(new LatLng(0,0), c.getLocation());
 //        LatLng l = c.getLocation();
@@ -135,4 +137,50 @@ public class DebugUtils {
     public static FetchResultCallback debugCallback() {
         return debugCallback(DataController.TAG);
     }
+
+
+    public static FetchResultCallback fetchNextDebugCallback(final int count,
+                                                             final ContentFetcher fetcher,
+                                                             final FetchResultCallback callback) {
+        return new FetchResultCallback() {
+
+            @Override
+            public void onResult(Collection<Content> result) {
+                DebugUtils.debugCallback().onResult(result);
+                fetcher.fetchNext(count, callback);
+            }
+
+            @Override
+            public void onError(Exception e) {}
+        };
+    }
+
+    public static FetchResultCallback fetchPrevDebugCallback(final int count,
+                                                             final ContentFetcher fetcher,
+                                                             final FetchResultCallback callback) {
+        return new FetchResultCallback() {
+
+            @Override
+            public void onResult(Collection<Content> result) {
+                DebugUtils.debugCallback().onResult(result);
+                fetcher.fetchPrev(count, callback);
+            }
+
+            @Override
+            public void onError(Exception e) {}
+        };
+    }
+
+    public static void sanityCheck() {
+//        contents.removeValue();
+//        DebugUtils.generateRandomContents(100, this);
+//        final ContentFetcher fetcher = createPublicContentFetcher();
+//        int count = 15;
+//        fetcher.fetchPrev(count,
+//                fetchNextDebugCallback(count, fetcher,
+//                        fetchNextDebugCallback(count, fetcher,
+//                                fetchNextDebugCallback(count, fetcher,
+//                                        DebugUtils.debugCallback()))));
+    }
+
 }
