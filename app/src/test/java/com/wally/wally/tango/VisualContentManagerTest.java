@@ -1,5 +1,7 @@
 package com.wally.wally.tango;
 
+import android.util.Log;
+
 import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.datacontroller.content.Content;
@@ -9,6 +11,10 @@ import org.junit.*;
 import org.mockito.Mock;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.*;
@@ -21,6 +27,7 @@ public class VisualContentManagerTest {
     private VisualContentManager mVisualContentManager;
     private Pose mPose;
     private Content mContent;
+    private Collection<Content> mContents;
 
 
 
@@ -29,7 +36,13 @@ public class VisualContentManagerTest {
         mVisualContentManager = new VisualContentManager();
         mPose = new Pose(new Vector3(1,1,1), new Quaternion(2,2,2,2));
         mContent = mock(Content.class);
+        mContents = getCollection(5);
     }
+
+    /******************************************
+     * Active Content
+     ******************************************/
+
 
     @Test
     public void activeContentTest1(){
@@ -123,6 +136,7 @@ public class VisualContentManagerTest {
         mVisualContentManager.setActiveContentRemoved();
     }
 
+    @Test
     public void activeContentTest12(){
         mVisualContentManager.addPendingActiveContent(mPose, mContent);
         mVisualContentManager.setActiveContentAdded();
@@ -140,91 +154,167 @@ public class VisualContentManagerTest {
     }
 
 
+    /******************************************
+     * Static Content
+     ******************************************/
 
-//    @Test
-//    public void staticContentTest1(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.addStaticContentToBeRenderedOnScreen(a);
-//        assertThat(mVisualContentManager.getStaticContentToBeRenderedOnScreen().contains(a), is(true));
-//    }
-//
-//    @Test
-//    public void staticContentTest2(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.addStaticContentToBeRenderedOnScreen(a);
-//        assertThat(mVisualContentManager.isStaticContentToBeRendered(), is(true));
-//    }
-//
-//    @Test
-//    public void staticContentTest3(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.addStaticContentToBeRenderedOnScreen(a);
-//        mVisualContentManager.addStaticContentAlreadyRenderedOnScreen(a);
-//        assertThat(mVisualContentManager.isStaticContentToBeRendered(), is(false));
-//    }
-//
-//    @Test
-//    public void staticContentTest4(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        ActiveVisualContent b = mock(ActiveVisualContent.class);
-//        mVisualContentManager.addStaticContentToBeRenderedOnScreen(a);
-//        mVisualContentManager.addStaticContentAlreadyRenderedOnScreen(b);
-//        assertThat(mVisualContentManager.isStaticContentToBeRendered(), is(true));
-//    }
-//
-//    @Test
-//    public void staticContentTest5(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.addStaticContentToBeRenderedOnScreen(a);
-//        mVisualContentManager.addStaticContentToBeRenderedOnScreen(a);
-//        assertThat(mVisualContentManager.isStaticContentToBeRendered(), is(true));
-//        assertThat(mVisualContentManager.getStaticContentToBeRenderedOnScreen().size(), is(1));
-//    }
-//
-//    @Test
-//    public void staticContentTest6(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        ActiveVisualContent b = mock(ActiveVisualContent.class);
-//        mVisualContentManager.addStaticContentToBeRenderedOnScreen(a);
-//        mVisualContentManager.addStaticContentToBeRenderedOnScreen(b);
-//        assertThat(mVisualContentManager.isStaticContentToBeRendered(), is(true));
-//        assertThat(mVisualContentManager.getStaticContentToBeRenderedOnScreen().size(), is(2));
-//    }
-//
-//
-//    @Test
-//    public void findContentByObject3DTest1(){
-//        VisualContent b = mock(VisualContent.class);
-//        ContentPlane cp = mock(ContentPlane.class);
-//        when(b.getVisual()).thenReturn(cp);
-//        mVisualContentManager.addStaticContentToBeRenderedOnScreen(b);
-//        assertThat(mVisualContentManager.findContentByObject3D(cp), is(IsNull.nullValue()));
-//        mVisualContentManager.addStaticContentAlreadyRenderedOnScreen(b);
-//        assertThat(mVisualContentManager.findContentByObject3D(cp), is(b));
-//    }
-//
-//    @Test
-//    public void findContentByObject3DTest2(){
-//        ContentPlane cp = mock(ContentPlane.class);
-//        assertThat(mVisualContentManager.findContentByObject3D(cp), is(IsNull.nullValue()));
-//    }
-//
-//
-//    @Test
-//    public void findVisualContentByContentTest1(){
-//        VisualContent b = mock(VisualContent.class);
-//        Content c = mock(Content.class);
-//        when(b.getContent()).thenReturn(c);
-//        mVisualContentManager.addStaticContentToBeRenderedOnScreen(b);
-//        assertThat(mVisualContentManager.findVisualContentByContent(c), is(IsNull.nullValue()));
-//        mVisualContentManager.addStaticContentAlreadyRenderedOnScreen(b);
-//        assertThat(mVisualContentManager.findVisualContentByContent(c), is(b));
-//    }
-//
-//    @Test
-//    public void findVisualContentByContentTest2(){
-//        Content c = mock(Content.class);
-//        assertThat(mVisualContentManager.findVisualContentByContent(c), is(IsNull.nullValue()));
-//    }
+    private Content getRandomContent(int n){
+        return new Content(""+n);
+    }
+
+    private Collection<Content> getCollection(int n){
+        Collection<Content> res = new ArrayList<>();
+        for (int i=0; i<n; i++){
+            res.add(getRandomContent(i));
+        }
+        return res;
+    }
+
+    private <T> ArrayList<T> getArrayListFromIterator(Iterator<T> a){
+        ArrayList<T> res = new ArrayList<T>();
+        while(a.hasNext()){
+            res.add(a.next());
+        }
+        return res;
+    }
+
+    private boolean iteratorEquals(Iterator<VisualContent> a, Iterator<Content> b){
+        ArrayList<VisualContent> l1 = getArrayListFromIterator(a);
+        ArrayList<Content> l2 = getArrayListFromIterator(b);
+        int index = 0;
+        while (l1.size() > 0){
+            VisualContent o = l1.get(index);
+            if (l2.contains(o.getContent())){
+                l2.remove(o.getContent());
+                l1.remove(o);
+            } else {
+                return false;
+            }
+        }
+        return l2.size() == 0;
+    }
+
+    private int iteratorSize(Iterator a){
+        return getArrayListFromIterator(a).size();
+    }
+
+    @Test
+    public void staticContentTest1(){
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        boolean eq1 = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), mContents.iterator());
+        boolean eq2 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), new ArrayList<Content>().iterator());
+        assertThat(eq1, is(true));
+        assertThat(eq2, is(true));
+    }
+
+    @Test
+    public void staticContentTest2(){
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        Iterator<VisualContent> it = mVisualContentManager.getStaticVisualContentToAdd();
+        while(it.hasNext()){
+            VisualContent vc = it.next();
+            mVisualContentManager.setStaticContentAdded(vc);
+        }
+
+        boolean eq = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), new ArrayList<Content>().iterator());
+        boolean eq2 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), new ArrayList<Content>().iterator());
+        assertThat(eq, is(true));
+        assertThat(eq2, is(true));
+    }
+
+    @Test
+    public void staticContentTest3(){
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        Iterator<VisualContent> it = mVisualContentManager.getStaticVisualContentToAdd();
+        while(it.hasNext()){
+            VisualContent vc = it.next();
+            mVisualContentManager.setStaticContentAdded(vc);
+        }
+        for (Content vc: mContents) {
+            mVisualContentManager.removePendingStaticContent(vc);
+        }
+
+        boolean eq = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), new ArrayList<Content>().iterator());
+        assertThat(eq, is(true));
+        boolean eq2 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), mContents.iterator());
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToRemove()), is(iteratorSize(mContents.iterator())));
+        assertThat(eq2, is(true));
+    }
+
+
+    @Test
+    public void staticContentTest4() {
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        Iterator<VisualContent> it = mVisualContentManager.getStaticVisualContentToAdd();
+        while (it.hasNext()) {
+            VisualContent vc = it.next();
+            mVisualContentManager.setStaticContentAdded(vc);
+        }
+        for (Content vc : mContents) {
+            mVisualContentManager.removePendingStaticContent(vc);
+        }
+        Iterator<VisualContent> it2 = mVisualContentManager.getStaticVisualContentToRemove();
+        while(it2.hasNext()){
+            VisualContent vc = it2.next();
+            mVisualContentManager.setStaticContentRemoved(vc);
+        }
+        boolean eq = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), new ArrayList<Content>().iterator());
+        assertThat(eq, is(true));
+        boolean eq2 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), new ArrayList<Content>().iterator());
+        assertThat(eq2, is(true));
+    }
+
+
+    @Test(expected = RuntimeException.class)
+    public void staticContentTest5(){
+        mVisualContentManager.localized();
+        mVisualContentManager.setStaticContentAdded(new VisualContent(mContent));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void staticContentTest6(){
+        mVisualContentManager.localized();
+        mVisualContentManager.removePendingStaticContent(mContent);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void staticContentTest7(){
+        mVisualContentManager.localized();
+        mVisualContentManager.setStaticContentRemoved(new VisualContent(mContent));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void staticContentTest8(){
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        mVisualContentManager.setStaticContentRemoved(new VisualContent(mContents.iterator().next()));
+    }
+
+    @Test
+    public void staticContentTest9(){
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        for (Content c: mContents) {
+            mVisualContentManager.removePendingStaticContent(c);
+        }
+        boolean eq = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), new ArrayList<Content>().iterator());
+        assertThat(eq, is(true));
+        boolean eq2 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), mContents.iterator());
+        assertThat(eq2, is(true));
+    }
+
+
+    /******************************************
+     * Localization
+     ******************************************/
+
+    @Test
+    public void localizationTest1(){
+        
+    }
 
 }

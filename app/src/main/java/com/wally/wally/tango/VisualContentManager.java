@@ -234,101 +234,6 @@ public class VisualContentManager implements LocalizationListener {
      * Static Content
      ******************************************/
 
-    private void addPendingStaticContent(VisualContent visualContent) {
-        synchronized (mStaticContentLock) {
-            visualContent.setStatus(RenderStatus.PendingRender);
-            int index = mStaticContent.indexOf(visualContent);
-            if (index == -1) {
-                mStaticContent.add(visualContent);
-            } else {
-                mStaticContent.set(index, visualContent);
-            }
-        }
-    }
-
-    private void removePendingStaticContent(VisualContent visualContent) {
-        synchronized (mStaticContentLock) {
-            visualContent.setStatus(RenderStatus.PendingRemove);
-            int index = mStaticContent.indexOf(visualContent);
-            if (index == -1) {
-            } else {
-                mStaticContent.set(index, visualContent);
-            }
-        }
-    }
-
-    public void removePendingStaticContent(Content content) {
-        synchronized (mStaticContentLock) {
-            VisualContent vc = findVisualContentByContent(content);
-            removePendingStaticContent(vc);
-        }
-    }
-
-    public VisualContent findVisualContentByContent(Content content) {
-        // TODO make with hashmap to get better performance
-        synchronized (mStaticContentLock) {
-            for (VisualContent vc : mStaticContent) {
-                if (vc.getContent().equals(content)) {
-                    return vc;
-                }
-            }
-            return null;
-        }
-    }
-
-    public void setStaticContentAdded(VisualContent visualContent) {
-        synchronized (mStaticContentLock) {
-            visualContent.setStatus(RenderStatus.Rendered);
-            int index = mStaticContent.indexOf(visualContent);
-            if (index == -1) {
-            } else {
-                mStaticContent.set(index, visualContent);
-            }
-        }
-    }
-
-    public void setStaticContentRemoved(VisualContent visualContent) {
-        synchronized (mStaticContentLock) {
-            int index = mStaticContent.indexOf(visualContent);
-            if (index == -1) {
-            } else {
-                mStaticContent.remove(visualContent);
-            }
-        }
-    }
-
-    public Iterator<VisualContent> getStaticVisualContentToAdd() {
-        synchronized (mStaticContentLock) {
-            return filterStaticVisualContentList(RenderStatus.PendingRender);
-        }
-    }
-
-    public Iterator<VisualContent> getStaticVisualContentToRemove() {
-        synchronized (mStaticContentLock) {
-            return filterStaticVisualContentList(RenderStatus.PendingRemove);
-        }
-    }
-
-    private Iterator<VisualContent> filterStaticVisualContentList(RenderStatus status) {
-        List<VisualContent> res = new ArrayList<>();
-        for (VisualContent vc : mStaticContent) {
-            if (vc.getStatus() == status) {
-                res.add(vc);
-            }
-        }
-        return res.iterator();
-    }
-
-//    public void createStaticContent(final Collection<Content> collection) {
-//        synchronized (mStaticContentLock) {
-//            for (Content c : collection) {
-//                addPendingStaticContent(new VisualContent(c));
-//            }
-//
-//        }
-//
-//    }
-
     public void createStaticContent(final Collection<Content> collection) {
         synchronized (mLocalizationLock) {
             synchronized (mStaticContentLock) {
@@ -348,6 +253,106 @@ public class VisualContentManager implements LocalizationListener {
         }
     }
 
+    public void removePendingStaticContent(Content content) {
+        synchronized (mStaticContentLock) {
+            VisualContent vc = findVisualContentByContent(content);
+            removePendingStaticContent(vc);
+        }
+    }
+
+    public void setStaticContentAdded(VisualContent visualContent) {
+        synchronized (mStaticContentLock) {
+            visualContent.setStatus(RenderStatus.Rendered);
+            int index = mStaticContent.indexOf(visualContent);
+            if (index != -1) {
+                mStaticContent.set(index, visualContent);
+            } else {
+                Utils.throwError();
+
+            }
+        }
+    }
+
+    public void setStaticContentRemoved(VisualContent visualContent) {
+        synchronized (mStaticContentLock) {
+            int index = mStaticContent.indexOf(visualContent);
+            if (index != -1) {
+                mStaticContent.remove(visualContent);
+            } else {
+                Utils.throwError();
+            }
+        }
+    }
+
+    public Iterator<VisualContent> getStaticVisualContentToAdd() {
+        synchronized (mStaticContentLock) {
+            return filterStaticVisualContentList(RenderStatus.PendingRender);
+        }
+    }
+
+    public Iterator<VisualContent> getStaticVisualContentToRemove() {
+        synchronized (mStaticContentLock) {
+            return filterStaticVisualContentList(RenderStatus.PendingRemove);
+        }
+    }
+
+    public VisualContent findVisualContentByContent(Content content) {
+        synchronized (mStaticContentLock) {
+            for (VisualContent vc : mStaticContent) {
+                if (vc.getContent().equals(content)) {
+                    return vc;
+                }
+            }
+            return null;
+        }
+    }
+
+    public VisualContent findContentByObject3D(Object3D object) {
+        synchronized (mStaticContentLock) {
+            for (VisualContent vc : mStaticContent) {
+                if (vc.getVisual().equals(object) && vc.getStatus() == RenderStatus.Rendered) {
+                    return vc;
+                }
+            }
+        }
+        return null;
+    }
+
+    private Iterator<VisualContent> filterStaticVisualContentList(RenderStatus status) {
+        List<VisualContent> res = new ArrayList<>();
+        for (VisualContent vc : mStaticContent) {
+            if (vc.getStatus() == status) {
+                res.add(vc);
+            }
+        }
+        return res.iterator();
+    }
+
+    private void removeAllStaticContent() {
+        //TODO buggy when renderer gets pending staticContent it will be rendered anyway.
+        synchronized (mStaticContentLock) {
+            for (VisualContent vc : mStaticContent) {
+                if (vc.getStatus() == RenderStatus.Rendered) {
+                    vc.setStatus(RenderStatus.PendingRemove);
+                } else if (vc.getStatus() == RenderStatus.PendingRender) {
+                    vc.setStatus(RenderStatus.None);
+                }
+            }
+        }
+    }
+
+    private void addPendingStaticContent(VisualContent visualContent) {
+        synchronized (mStaticContentLock) {
+            visualContent.setStatus(RenderStatus.PendingRender);
+            int index = mStaticContent.indexOf(visualContent);
+            if (index == -1) {
+                mStaticContent.add(visualContent);
+            } else {
+                mStaticContent.set(index, visualContent);
+            }
+        }
+    }
+
     private void addSavedPendingStaticContent(VisualContent visualContent) {
         synchronized (mStaticContentLock) {
             visualContent.setStatus(RenderStatus.PendingRender);
@@ -360,27 +365,13 @@ public class VisualContentManager implements LocalizationListener {
         }
     }
 
-    public VisualContent findContentByObject3D(Object3D object) {
-        // TODO make with hashmap to get better performance
+    private void removePendingStaticContent(VisualContent visualContent) {
         synchronized (mStaticContentLock) {
-            for (VisualContent vc : mStaticContent) {
-                if (vc.getVisual().equals(object) && vc.getStatus() == RenderStatus.Rendered) {
-                    return vc;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void removeAllStaticContent() {
-        //TODO buggy when renderer gets pending staticContent it will be rendered anyway.
-        synchronized (mStaticContentLock) {
-            for (VisualContent vc : mStaticContent) {
-                if (vc.getStatus() == RenderStatus.Rendered) {
-                    vc.setStatus(RenderStatus.PendingRemove);
-                } else if (vc.getStatus() == RenderStatus.PendingRender) {
-                    vc.setStatus(RenderStatus.None);
-                }
+            visualContent.setStatus(RenderStatus.PendingRemove);
+            int index = mStaticContent.indexOf(visualContent);
+            if (index == -1) {
+            } else {
+                mStaticContent.set(index, visualContent);
             }
         }
     }
