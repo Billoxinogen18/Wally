@@ -17,11 +17,10 @@ import java.security.SecureRandom;
 import java.util.Collection;
 
 public class DebugUtils {
-    public static final int CONTENT_PRE_PAGE = 5;
+    private static final String TAG = DebugUtils.class.getSimpleName();
     public static final Id DEBUG_USER_ID =
             new Id(Id.PROVIDER_FIREBASE, "bPwMCPf2MWbebkLQrUuXKw3kYjW2");
     public static final User DEBUG_USER = new User(DEBUG_USER_ID.getId()).withGgId("");
-    private static final String TAG = DebugUtils.class.getSimpleName();
     private static SecureRandom random = new SecureRandom();
 
     private static LatLng OFFICE_LAT_LNG = new LatLng(41.8057582f, 44.7681694f);
@@ -43,6 +42,7 @@ public class DebugUtils {
                 ).withVisibility(
                         new Visibility()
                                 .withTimeVisibility(null)
+                                .withAnonymousAuthor(false)
                                 .withSocialVisibility(randomPublicity())
                                 .withVisiblePreview(random.nextBoolean())
                                 .withAnonymousAuthor(random.nextBoolean())
@@ -62,13 +62,9 @@ public class DebugUtils {
     public static void generatePublicEnumeratedRandomContents(int n, DataController controller) {
         for (int i = 0; i < n; i++) {
             Content content = generateRandomContent().withTitle("" + i);
-            content.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PUBLIC));
+            content.getVisibility().withSocialVisibility(Visibility.PUBLIC);
             controller.save(content);
         }
-    }
-
-    public static void generateRandomContents(DataController controller) {
-        generateRandomContents(100, controller);
     }
 
     public static void generateRandomContentsNearOffice(DataController controller) {
@@ -179,14 +175,14 @@ public class DebugUtils {
     }
 
     public static void sanityCheck(DataController datacontroller) {
-//        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher(new LatLng(0, 0), 100);
-        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher();
+        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher(new LatLng(0, 0), 100);
+//        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher();
         int count = 15;
         fetcher.fetchPrev(count,
                 fetchNextDebugCallback(count, fetcher,
                         fetchNextDebugCallback(count, fetcher,
                                 fetchNextDebugCallback(count, fetcher,
-                                        fetchNextDebugCallback(count, fetcher,
+                                        fetchPrevDebugCallback(count, fetcher,
                                             DebugUtils.debugCallback())))));
     }
 

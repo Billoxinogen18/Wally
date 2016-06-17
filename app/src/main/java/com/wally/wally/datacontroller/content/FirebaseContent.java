@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FirebaseContent extends FirebaseObject {
-    public static final int PUBLIC = Visibility.SocialVisibility.PUBLIC;
 
     // NoteData
     public static final String K_NOTE           = "note";
