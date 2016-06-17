@@ -56,6 +56,14 @@ public class DebugUtils {
         }
     }
 
+    public static void generatePublicEnumeratedRandomContents(int n, DataController controller) {
+        for (int i = 0; i < n; i++) {
+            Content content = generateRandomContent().withTitle("" + i);
+            content.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PUBLIC));
+            controller.save(content);
+        }
+    }
+
     public static void generateRandomContents(DataController controller) {
         generateRandomContents(100, controller);
     }
