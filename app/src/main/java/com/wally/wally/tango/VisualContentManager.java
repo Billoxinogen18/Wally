@@ -2,7 +2,10 @@ package com.wally.wally.tango;
 
 import android.util.Log;
 
+import com.bumptech.glide.util.Util;
 import com.projecttango.rajawali.Pose;
+import com.wally.wally.R;
+import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 
@@ -107,9 +110,13 @@ public class VisualContentManager implements LocalizationListener {
      */
     public void addPendingActiveContent(Pose glPose, Content content) {
         synchronized (mActiveContentLock) {
-            content.withTangoData(new TangoData(glPose));
-            this.mActiveContent = new ActiveVisualContent(content);
-            mActiveContent.setStatus(RenderStatus.PendingRender);
+            if (mActiveContent == null) {
+                content.withTangoData(new TangoData(glPose));
+                this.mActiveContent = new ActiveVisualContent(content);
+                mActiveContent.setStatus(RenderStatus.PendingRender);
+            } else {
+                Utils.throwError();
+            }
         }
     }
 
@@ -117,6 +124,8 @@ public class VisualContentManager implements LocalizationListener {
         synchronized (mActiveContentLock) {
             if (mActiveContent != null) {
                 mActiveContent.setNewPose(newPose);
+            } else {
+                Utils.throwError();
             }
         }
     }
@@ -125,6 +134,8 @@ public class VisualContentManager implements LocalizationListener {
         synchronized (mActiveContent){
             if (mActiveContent != null){
                 mActiveContent.scaleContent(scale);
+            } else {
+                Utils.throwError();
             }
         }
     }
@@ -132,7 +143,13 @@ public class VisualContentManager implements LocalizationListener {
     public void removePendingActiveContent() {
         synchronized (mActiveContentLock) {
             if (mActiveContent != null) {
-                mActiveContent.setStatus(RenderStatus.PendingRemove);
+                if (mActiveContent.getStatus() == RenderStatus.Rendered) {
+                    mActiveContent.setStatus(RenderStatus.PendingRemove);
+                } else if (mActiveContent.getStatus() == RenderStatus.PendingRender) {
+                    mActiveContent.setStatus(RenderStatus.None);
+                }
+            } else {
+                Utils.throwError();
             }
         }
     }
@@ -142,34 +159,51 @@ public class VisualContentManager implements LocalizationListener {
      */
     public void setActiveContentAdded() {
         synchronized (mActiveContentLock) {
-            mActiveContent.setStatus(RenderStatus.Rendered);
-            //addPendingStaticContent(mActiveContent);
+            if (mActiveContent != null) {
+                mActiveContent.setStatus(RenderStatus.Rendered);
+            } else {
+                Utils.throwError();
+            }
         }
     }
 
     public void setActiveContentFinishFitting() {
         synchronized (mActiveContentLock) {
             synchronized (mStaticContentLock) {
-                int index = mStaticContent.indexOf(mActiveContent);
-                if (index == -1) {
-                    mStaticContent.add(mActiveContent);
+                if (mActiveContent.getStatus() == RenderStatus.Rendered) {
+                    int index = mStaticContent.indexOf(mActiveContent);
+                    if (index == -1) {
+                        mStaticContent.add(mActiveContent);
+                    } else {
+                        mStaticContent.set(index, mActiveContent);
+                    }
+                    mActiveContent = null;
                 } else {
-                    mStaticContent.set(index, mActiveContent);
+                    Utils.throwError();
                 }
-                mActiveContent = null;
             }
         }
     }
 
     public void setActiveContentRemoved() {
         synchronized (mActiveContentLock) {
-            mActiveContent = null;
+            if (mActiveContent.getStatus() == RenderStatus.PendingRemove || mActiveContent.getStatus() == RenderStatus.None) {
+                mActiveContent = null;
+            } else {
+                Utils.throwError();
+            }
         }
     }
 
     public ActiveVisualContent getActiveContent() {
         synchronized (mActiveContentLock) {
             return mActiveContent;
+        }
+    }
+
+    public boolean isActiveContent(){
+        synchronized (mActiveContent){
+            return mActiveContent != null;
         }
     }
 
@@ -230,7 +264,7 @@ public class VisualContentManager implements LocalizationListener {
         }
     }
 
-    private VisualContent findVisualContentByContent(Content content) {
+    public VisualContent findVisualContentByContent(Content content) {
         // TODO make with hashmap to get better performance
         synchronized (mStaticContentLock) {
             for (VisualContent vc : mStaticContent) {

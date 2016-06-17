@@ -228,7 +228,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
 
     @Override
     public void onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN && mVisualContentManager.getActiveContent() == null) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN && !mVisualContentManager.isActiveContent()) {
             getObjectAt(event.getX(), event.getY());
         }
     }

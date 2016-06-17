@@ -237,4 +237,8 @@ public final class Utils {
 // distance = circle radius from center to Northeast corner of bounds
         return r * Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
     }
+
+    public static void throwError() {
+        throw new RuntimeException("You did something you should not do! WTF dude?");
+    }
 }

@@ -36,69 +36,109 @@ public class VisualContentManagerTest {
         mVisualContentManager.addPendingActiveContent(mPose, mContent);
         assertThat(mVisualContentManager.getActiveContent().getContent(), is(mContent));
         assertThat(mVisualContentManager.getActiveContent().getStatus(), is(VisualContent.RenderStatus.PendingRender));
+        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(true));
+        assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(false));
     }
 
     @Test
     public void activeContentTest2(){
         mVisualContentManager.addPendingActiveContent(mPose, mContent);
-        assertThat(mVisualContentManager.getActiveContent().getContent(), is(mContent));
-        assertThat(mVisualContentManager.getActiveContent().getStatus(), is(VisualContent.RenderStatus.PendingRender));
+        mVisualContentManager.removePendingActiveContent();
+        assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(false));
+        assertThat(mVisualContentManager.getActiveContent().getStatus(), is(VisualContent.RenderStatus.None));
+        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(false));
     }
 
-//    @Test
-//    public void activeContentTest1(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-//        assertThat(mVisualContentManager.getActiveContent(), is(a));
-//    }
-//
-//    @Test
-//    public void activeContentTest2(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-//        assertThat(mVisualContentManager.shouldActiveContentREnderOnScreen(), is(true));
-//    }
-//
-//    @Test
-//    public void activeContentTest3(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-//        mVisualContentManager.activeContentAlreadyRenderedOnScreen();
-//        assertThat(mVisualContentManager.shouldActiveContentREnderOnScreen(), is(false));
-//    }
-//
-//    @Test
-//    public void activeContentTest4(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-//        mVisualContentManager.activeContentAlreadyRenderedOnScreen();
-//        assertThat(mVisualContentManager.getActiveContent(), is(a));
-//    }
-//
-//    @Test
-//    public void activeContentTest5(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-//        mVisualContentManager.removeActiveContent();
-//        assertThat(mVisualContentManager.getActiveContent(), is(IsNull.nullValue()));
-//    }
-//
-//    @Test
-//    public void activeContentTest6(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-//        mVisualContentManager.removeActiveContent();
-//        assertThat(mVisualContentManager.shouldActiveContentREnderOnScreen(), is(false));
-//    }
-//
-//
-//    @Test
-//    public void activeContentTest9(){
-//        ActiveVisualContent a = mock(ActiveVisualContent.class);
-//        mVisualContentManager.setActiveContentToBeRenderedOnScreen(a);
-//        mVisualContentManager.activeContentAddingFinished();
-//        assertThat(mVisualContentManager.getStaticContentToBeRenderedOnScreen().contains(a), is(true));
-//    }
+    @Test
+    public void activeContentTest3(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.setActiveContentAdded();
+        assertThat(mVisualContentManager.getActiveContent().getStatus(),is(VisualContent.RenderStatus.Rendered));
+        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(false));
+        assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(false));
+    }
+
+    @Test
+    public void activeContentTest4(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.setActiveContentAdded();
+        mVisualContentManager.removePendingActiveContent();
+        assertThat(mVisualContentManager.getActiveContent().getStatus(),is(VisualContent.RenderStatus.PendingRemove));
+        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(false));
+        assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(true));
+    }
+
+    @Test
+    public void activeContentTest5(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.setActiveContentAdded();
+        VisualContent con = mVisualContentManager.getActiveContent();
+        mVisualContentManager.setActiveContentFinishFitting();
+        assertThat(mVisualContentManager.getActiveContent(),is(IsNull.nullValue()));
+        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(false));
+        assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(false));
+        assertThat(mVisualContentManager.findVisualContentByContent(mContent), is(con));
+        assertThat(mVisualContentManager.findVisualContentByContent(mContent).getStatus(),is(VisualContent.RenderStatus.Rendered));
+    }
+
+    @Test
+    public void activeContentTest51(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.removePendingActiveContent();
+        mVisualContentManager.setActiveContentRemoved();
+        assertThat(mVisualContentManager.getActiveContent(),is(IsNull.nullValue()));
+        assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(false));
+        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(false));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void activeContentTest6(){
+        mVisualContentManager.removePendingActiveContent();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void activeContentTest7(){
+        mVisualContentManager.setActiveContentAdded();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void activeContentTest8(){
+        mVisualContentManager.updateActiveContent(null);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void activeContentTest9(){
+        mVisualContentManager.scaleActiveContent(1);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void activeContentTest10(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.setActiveContentFinishFitting();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void activeContentTest11(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.setActiveContentRemoved();
+    }
+
+    public void activeContentTest12(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.setActiveContentAdded();
+        mVisualContentManager.removePendingActiveContent();
+        mVisualContentManager.setActiveContentRemoved();
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void activeContentTest13(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.setActiveContentAdded();
+        mVisualContentManager.removePendingActiveContent();
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+    }
+
 
 
 //    @Test
