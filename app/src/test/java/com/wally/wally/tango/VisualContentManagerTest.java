@@ -7,6 +7,8 @@ import com.wally.wally.datacontroller.content.Content;
 import org.hamcrest.core.IsNull;
 import org.junit.*;
 import org.mockito.Mock;
+import org.rajawali3d.math.Quaternion;
+import org.rajawali3d.math.vector.Vector3;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.*;
@@ -25,12 +27,19 @@ public class VisualContentManagerTest {
     @Before
     public void init(){
         mVisualContentManager = new VisualContentManager();
-        mPose = mock(Pose.class);
+        mPose = new Pose(new Vector3(1,1,1), new Quaternion(2,2,2,2));
         mContent = mock(Content.class);
     }
 
     @Test
-    public void activeContentTest(){
+    public void activeContentTest1(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        assertThat(mVisualContentManager.getActiveContent().getContent(), is(mContent));
+        assertThat(mVisualContentManager.getActiveContent().getStatus(), is(VisualContent.RenderStatus.PendingRender));
+    }
+
+    @Test
+    public void activeContentTest2(){
         mVisualContentManager.addPendingActiveContent(mPose, mContent);
         assertThat(mVisualContentManager.getActiveContent().getContent(), is(mContent));
         assertThat(mVisualContentManager.getActiveContent().getStatus(), is(VisualContent.RenderStatus.PendingRender));

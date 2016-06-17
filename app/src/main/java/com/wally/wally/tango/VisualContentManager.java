@@ -121,6 +121,14 @@ public class VisualContentManager implements LocalizationListener {
         }
     }
 
+    public void scaleActiveContent(float scale){
+        synchronized (mActiveContent){
+            if (mActiveContent != null){
+                mActiveContent.scaleContent(scale);
+            }
+        }
+    }
+
     public void removePendingActiveContent() {
         synchronized (mActiveContentLock) {
             if (mActiveContent != null) {
