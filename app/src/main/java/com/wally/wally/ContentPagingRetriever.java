@@ -1,22 +1,18 @@
 package com.wally.wally;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.wally.wally.activities.MapsActivity;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
-import com.wally.wally.userManager.SocialUser;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by Meravici on 6/15/2016.
  */
 public class ContentPagingRetriever {
-    private static final int PAGE_LENGTH = 10;
+    private int pageLength;
 
     private ContentFetcher contentFetcher;
 
@@ -26,9 +22,13 @@ public class ContentPagingRetriever {
 
     private List<ContentPageRetrieveListener> observers;
 
-    public ContentPagingRetriever(ContentFetcher contentFetcher) {
+    private boolean hasNext = true;
+    private boolean hasPrevious = false;
+
+    public ContentPagingRetriever(ContentFetcher contentFetcher, int pageLenght) {
 
         this.contentFetcher = contentFetcher;
+        this.pageLength = pageLenght;
 
         observers = new ArrayList<>();
         previous = new ArrayList<>();
@@ -37,12 +37,12 @@ public class ContentPagingRetriever {
     }
 
     public Content get(int i) {
-        if (i < PAGE_LENGTH) {
+        if (i < pageLength) {
             return previous.get(i);
-        } else if (i < 2 * PAGE_LENGTH) {
-            return current.get(i % 10);
-        } else if (i < 3 * PAGE_LENGTH) {
-            return next.get(i % 10);
+        } else if (i < 2 * pageLength) {
+            return current.get(i % pageLength);
+        } else if (i < 3 * pageLength) {
+            return next.get(i % pageLength);
         }
         return null;
     }
@@ -59,7 +59,10 @@ public class ContentPagingRetriever {
     }
 
     public void loadNext() {
-        loadNext(PAGE_LENGTH);
+        if(hasNext) {
+            hasPrevious = true;
+            loadNext(pageLength);
+        }
     }
 
     private void loadNext(int num) {
@@ -77,21 +80,34 @@ public class ContentPagingRetriever {
                     previous = current;
                     current = next;
                     next = contents;
-                    fireSuccess();
+                    for (ContentPageRetrieveListener observer : observers) {
+                        observer.onNextPageLoaded();}
                 } else {
-                    fireFailure();
+                    hasNext = false;
+                    for (ContentPageRetrieveListener observer : observers) {
+                        observer.onNextPageFailed();
+                    }
                 }
             }
 
             @Override
             public void onError(Exception e) {
-                fireFailure();
+                hasNext = false;
+                for (ContentPageRetrieveListener observer : observers) {
+                    observer.onNextPageFailed();
+                }
             }
         });
     }
 
     public void loadPrevious() {
-        contentFetcher.fetchPrev(PAGE_LENGTH, new FetchResultCallback() {
+        if(hasPrevious){
+            hasNext = true;
+            loadPrevious(pageLength);
+        }
+    }
+    public void loadPrevious(int num){
+        contentFetcher.fetchPrev(num, new FetchResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
                 if (result.size() != 0) {
@@ -105,15 +121,23 @@ public class ContentPagingRetriever {
                     next = current;
                     current = previous;
                     previous = contents;
-                    fireSuccess();
+                    for (ContentPageRetrieveListener observer : observers) {
+                        observer.onPreviousPageLoaded();
+                    }
                 } else {
-                    fireFailure();
+                    hasPrevious = false;
+                    for (ContentPageRetrieveListener observer : observers) {
+                        observer.onPreviousPageFailed();
+                    }
                 }
             }
 
             @Override
             public void onError(Exception e) {
-                fireFailure();
+                hasPrevious = false;
+                for (ContentPageRetrieveListener observer : observers) {
+                    observer.onPreviousPageFailed();
+                }
             }
         });
     }
@@ -124,7 +148,7 @@ public class ContentPagingRetriever {
     }
 
     private void fetch() {
-        contentFetcher.fetchNext(PAGE_LENGTH * 3, new FetchResultCallback() {
+        contentFetcher.fetchNext(pageLength * 3, new FetchResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
                 if (result.size() != 0) {
@@ -136,24 +160,30 @@ public class ContentPagingRetriever {
                     }
                     previous.clear(); current.clear(); next.clear();
                     int i = 0;
-                    for (; i < Math.min(contents.size(), PAGE_LENGTH); i++)
+                    for (; i < Math.min(contents.size(), pageLength); i++)
                         previous.add(contents.get(i));
 
-                    for (; i < Math.min(contents.size(), PAGE_LENGTH * 2); i++)
+                    for (; i < Math.min(contents.size(), pageLength * 2); i++)
                         current.add(contents.get(i));
 
-                    for (; i < Math.min(contents.size(), PAGE_LENGTH * 3); i++)
+                    for (; i < Math.min(contents.size(), pageLength * 3); i++)
                         next.add(contents.get(i));
 
-                    fireSuccess();
+                    for (ContentPageRetrieveListener observer : observers) {
+                        observer.onNextPageLoaded();
+                    }
                 } else {
-                    fireFailure();
+                    for (ContentPageRetrieveListener observer : observers) {
+                        observer.onNextPageFailed();
+                    }
                 }
             }
 
             @Override
             public void onError(Exception e) {
-                fireFailure();
+                for (ContentPageRetrieveListener observer : observers) {
+                    observer.onNextPageFailed();
+                }
             }
         });
     }
@@ -162,22 +192,12 @@ public class ContentPagingRetriever {
         observers.add(contentPageRetrieveListener);
     }
 
-    public void fireSuccess() {
-        for (ContentPageRetrieveListener observer : observers) {
-            observer.onPageLoaded();
-        }
-    }
-
-    public void fireFailure() {
-        for (ContentPageRetrieveListener observer : observers) {
-            observer.onPageFailed();
-        }
-    }
-
 
     public interface ContentPageRetrieveListener {
-        void onPageLoaded();
+        void onNextPageLoaded();
+        void onPreviousPageLoaded();
 
-        void onPageFailed();
+        void onNextPageFailed();
+        void onPreviousPageFailed();
     }
 }

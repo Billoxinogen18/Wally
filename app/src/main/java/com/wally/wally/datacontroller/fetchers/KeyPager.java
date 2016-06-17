@@ -13,14 +13,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class PublicContentFetcher implements ContentFetcher {
+public class KeyPager implements ContentFetcher {
 
     private final DatabaseReference contents;
 
     private boolean hasNext;
     private String nextKey, prevKey;
 
-    public PublicContentFetcher(DatabaseReference contents) {
+    public KeyPager(DatabaseReference contents) {
         this.contents = contents;
         hasNext = true;
         prevKey = "";
@@ -38,7 +38,7 @@ public class PublicContentFetcher implements ContentFetcher {
         new FirebaseQuery() {
             @Override
             public Query getTarget(DatabaseReference ref) {
-                return ref.child("Public")
+                return ref
                         .orderByKey()
                         .limitToLast(count + 1)
                         .endAt(prevKey);
@@ -88,7 +88,7 @@ public class PublicContentFetcher implements ContentFetcher {
         new FirebaseQuery() {
             @Override
             public Query getTarget(DatabaseReference ref) {
-                return ref.child("Public")
+                return ref
                         .orderByKey()
                         .limitToFirst(count + 1)
                         .startAt(nextKey);

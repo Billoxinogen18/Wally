@@ -1,7 +1,5 @@
 package com.wally.wally.datacontroller;
 
-import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -12,23 +10,28 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
+import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
+import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
+import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
-import com.wally.wally.datacontroller.fetchers.PublicContentFetcher;
+import com.wally.wally.datacontroller.fetchers.KeyPager;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
 import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
-import com.wally.wally.datacontroller.user.*;
-import com.wally.wally.datacontroller.queries.*;
-import com.wally.wally.datacontroller.callbacks.*;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.FirebaseContent;
+import com.wally.wally.datacontroller.queries.LocationQuery;
+import com.wally.wally.datacontroller.queries.PublicityQuery;
+import com.wally.wally.datacontroller.queries.UUIDQuery;
+import com.wally.wally.datacontroller.user.User;
 
 import java.util.Set;
 
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
 
-    private static final String DATABASE_ROOT = "Develop";
+    private static final String DATABASE_ROOT = "Test";
     private static final String STORAGE_ROOT = DATABASE_ROOT;
     private static final String USERS_NODE = "Users";
     private static final String CONTENTS_NODE = "Contents";
@@ -46,12 +49,6 @@ public class DataController {
         sanityCheck();
     }
 
-    private void sanityCheck() {
-//        contents.removeValue();
-//        DebugUtils.generateRandomContents(1000, this);
-//        fetchAtLocation(new LatLng(0, 0), 10, DebugUtils.debugCallback());
-    }
-
     public static DataController create() {
         if (instance == null) {
             instance = new DataController(
@@ -60,6 +57,12 @@ public class DataController {
             );
         }
         return instance;
+    }
+
+    private void sanityCheck() {
+//        contents.removeValue();
+//        DebugUtils.generateRandomContents(1000, this);
+//        fetchAtLocation(new LatLng(0, 0), 10, DebugUtils.debugCallback());
     }
 
     private void uploadImage(String imagePath, String folder, final Callback<String> callback) {
@@ -96,7 +99,7 @@ public class DataController {
                     @Override
                     public void onResult(String result) {
                         c.withImageUri(result);
-                        new FirebaseContent(c).save(ref);
+                        c.withId(new FirebaseContent(c).save(ref));
                     }
 
                     @Override
@@ -118,7 +121,6 @@ public class DataController {
         Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
         final AggregatorCallback aggregator =
                 new AggregatorCallback(callback).withExpectedCallbacks(queries.size());
-        Log.d(TAG, "fetching...");
         for (GeoHashQuery query : queries) {
             new LocationQuery(query).fetch(contents, new FirebaseFetchResultCallback(aggregator));
         }
@@ -137,23 +139,8 @@ public class DataController {
     }
 
     /**
-     * No alternative sadly, this method may crash badly
-     */
-    @Deprecated
-    public void fetchByAuthor(Id authorId, FetchResultCallback callback) {
-        new AuthorQuery(authorId).fetch(contents, new FirebaseFetchResultCallback(callback));
-    }
-
-    /**
-     * No alternative sadly, this method may crash badly
-     */
-    @Deprecated
-    public void fetchByAuthor(User author, FetchResultCallback callback) {
-        fetchByAuthor(author.getId(), callback);
-    }
-
-    /**
      * Fetches all public content without pagination.
+     *
      * @deprecated use {@link #createPublicContentFetcher()} instead.
      */
     @Deprecated
@@ -163,7 +150,30 @@ public class DataController {
     }
 
     public ContentFetcher createPublicContentFetcher() {
-        return new PublicContentFetcher(contents);
+        return new KeyPager(contents.child("Public"));
+    }
+
+    public ContentFetcher createVisibleContentFetcher(User user, LatLng center, double r) {
+        // TODO stub implementation
+        return createPublicContentFetcher();
+    }
+
+    public ContentFetcher createMyContentFetcher(User user, LatLng center, double r) {
+        // TODO stub implementation
+        return createPublicContentFetcher();
+    }
+
+    public ContentFetcher createUserContentFetcher(User me, User other, LatLng center, double r) {
+        // TODO stub implementation
+        return createPublicContentFetcher();
+    }
+
+    private ContentFetcher createPrivateContentFetcher(String userId) {
+        return new KeyPager(contents.child(userId).child("Private"));
+    }
+
+    private ContentFetcher createSharedContentFetcher(String userId) {
+        return new KeyPager(contents.child(userId).child("Shared"));
     }
 
     public User getCurrentUser() {

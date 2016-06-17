@@ -6,10 +6,9 @@ import com.google.firebase.database.Exclude;
 import java.util.HashMap;
 
 public class FirebaseObject extends HashMap<String, Object> {
-    private HashMap<String, FirebaseObject> children;
-
     @Exclude
     public String id;
+    private HashMap<String, FirebaseObject> children;
 
     public FirebaseObject() {
         children = new HashMap<>();
@@ -31,8 +30,9 @@ public class FirebaseObject extends HashMap<String, Object> {
         return children.get(key);
     }
 
-    public void save(DatabaseReference ref) {
+    public String save(DatabaseReference ref) {
         id = FirebaseDAL.save(ref, this);
+        return id;
     }
 
     public void delete(DatabaseReference ref) {

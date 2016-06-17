@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,6 +35,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.ContentPagingRetriever;
+import com.wally.wally.EndlessRecyclerOnScrollListener;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
@@ -64,6 +66,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private MapsRecyclerAdapter mAdapter;
     private ContentPagingRetriever mContentRetriever;
+    private EndlessRecyclerOnScrollListener mContentScrollListener;
 
     /**
      * Start to see user profile
@@ -84,10 +87,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         ContentFetcher contentFetcher = App.getInstance().getDataController().createPublicContentFetcher();
 
-        mContentRetriever = new ContentPagingRetriever(contentFetcher);
         mContentListView = (ContentListView) findViewById(R.id.content_list_view);
+        mContentRetriever = new ContentPagingRetriever(contentFetcher, 2);
         mAdapter = new MapsRecyclerAdapter(mContentRetriever);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        mContentScrollListener  = new EndlessRecyclerOnScrollListener(linearLayoutManager, 2) {
+            @Override
+            public void onLoadNext() {
+                mContentRetriever.loadNext();
+            }
+
+            @Override
+            public void onLoadPrevious() {
+                mContentRetriever.loadPrevious();
+            }
+        };
+
+        mContentListView.setLayoutManager(linearLayoutManager);
         mContentListView.setAdapter(mAdapter);
+        mContentListView.addOnScrollListener(mContentScrollListener);
 
         mContentRetriever.registerLoadListener(this);
 
@@ -164,13 +182,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onPageLoaded() {
-        //TODO make markers
+    public void onNextPageLoaded() {
+        mContentScrollListener.loadingFinished();
     }
 
     @Override
-    public void onPageFailed() {
-        //TODO make markers
+    public void onPreviousPageLoaded() {
+        mContentScrollListener.loadingFinished();
+    }
+
+    @Override
+    public void onNextPageFailed() {
+        mContentScrollListener.loadingFinished();
+    }
+
+    @Override
+    public void onPreviousPageFailed() {
+        mContentScrollListener.loadingFinished();
     }
 
     @Override
@@ -352,19 +380,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public int getItemCount() {
             int size = mRetriever == null ? 0 : mRetriever.size();
-            Log.d(TAG, "getItemCount: " + size);
             return size;
         }
 
         @Override
-        public void onPageLoaded() {
-            notifyDataSetChanged();
+        public void onNextPageLoaded() {
+            notifyItemRemoved(0);
+            notifyItemRemoved(1);
+            notifyItemInserted(5);
+            notifyItemInserted(5);
         }
 
         @Override
-        public void onPageFailed() {
+        public void onPreviousPageLoaded() {
+            notifyItemRemoved(5);
+            notifyItemRemoved(6);
+            notifyItemInserted(0);
+            notifyItemInserted(0);
+        }
+
+        @Override
+        public void onNextPageFailed() {
 //            mContentListView.setLoadingViewVisibility(View.GONE);
 //            mContentListView.setListVisibility(View.VISIBLE);
+        }
+
+        @Override
+        public void onPreviousPageFailed() {
+
         }
 
         public class VH extends RecyclerView.ViewHolder implements View.OnClickListener {

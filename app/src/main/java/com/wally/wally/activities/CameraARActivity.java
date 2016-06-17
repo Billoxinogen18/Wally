@@ -155,8 +155,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
     }
 
     public void onShowProfileClick(View v) {
-        Intent profileIntent = ProfileActivity.newIntent(getBaseContext(), mUserManager.getUser());
-        startActivity(profileIntent);
+        onProfileClick(mUserManager.getUser());
     }
 
 
@@ -181,7 +180,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
     }
 
     public void onProfileClick(SocialUser user) {
-        startActivity(ProfileActivity.newIntent(this, user));
+        startActivity(MapsActivity.newIntent(this, user));
     }
 
     protected void saveActiveContent(Content content) {
