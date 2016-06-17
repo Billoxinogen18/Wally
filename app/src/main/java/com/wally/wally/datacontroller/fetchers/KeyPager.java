@@ -19,12 +19,22 @@ public class KeyPager implements ContentFetcher {
 
     private boolean hasNext;
     private String nextKey, prevKey;
+    private String startKey, endKey;
 
     public KeyPager(DatabaseReference contents) {
+        this(contents, null, null);
+    }
+
+    public KeyPager(DatabaseReference contents, String startKey, String endKey) {
         this.contents = contents;
         hasNext = true;
         prevKey = "";
         nextKey = "";
+        this.startKey = startKey;
+        this.endKey = endKey;
+        if (startKey != null) {
+            nextKey = startKey;
+        }
     }
 
     @Override
@@ -38,10 +48,8 @@ public class KeyPager implements ContentFetcher {
         new FirebaseQuery() {
             @Override
             public Query getTarget(DatabaseReference ref) {
-                return ref
-                        .orderByKey()
-                        .limitToLast(count + 1)
-                        .endAt(prevKey);
+                Query target = ref.orderByKey().limitToLast(count + 1).endAt(prevKey);
+                return startKey == null ? target : target.startAt(startKey);
             }
         }.fetch(contents, new FirebaseFetchResultCallback(
                 new Callback<Collection<Content>>() {
@@ -50,7 +58,7 @@ public class KeyPager implements ContentFetcher {
                         List<Content> contents = new ArrayList<>();
                         contents.addAll(result);
                         hasNext = true;
-                        if (result.size() == 1) {
+                        if (result.size() < 2) {
                             prevKey = "";
                             contents.clear();
                         } else {
@@ -88,10 +96,8 @@ public class KeyPager implements ContentFetcher {
         new FirebaseQuery() {
             @Override
             public Query getTarget(DatabaseReference ref) {
-                return ref
-                        .orderByKey()
-                        .limitToFirst(count + 1)
-                        .startAt(nextKey);
+                Query target = ref.orderByKey().limitToFirst(count + 1).startAt(nextKey);
+                return endKey == null ? target : target.endAt(endKey);
             }
         }.fetch(contents, new FirebaseFetchResultCallback(
                 new Callback<Collection<Content>>() {

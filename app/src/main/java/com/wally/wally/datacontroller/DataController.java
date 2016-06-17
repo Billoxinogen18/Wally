@@ -17,6 +17,7 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
+import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
 import com.wally.wally.datacontroller.queries.UUIDQuery;
@@ -114,17 +115,17 @@ public class DataController {
 
     public ContentFetcher createVisibleContentFetcher(User user, LatLng center, double r) {
         // TODO stub implementation
-        return createPublicContentFetcher();
+        return createPublicContentFetcher(center, r);
     }
 
     public ContentFetcher createMyContentFetcher(User user, LatLng center, double r) {
         // TODO stub implementation
-        return createPublicContentFetcher();
+        return createPublicContentFetcher(center, r);
     }
 
     public ContentFetcher createUserContentFetcher(User me, User other, LatLng center, double r) {
         // TODO stub implementation
-        return createPublicContentFetcher();
+        return createPublicContentFetcher(center, r);
     }
 
     public User getCurrentUser() {
@@ -154,16 +155,14 @@ public class DataController {
     }
 
     ContentFetcher createPublicContentFetcher(LatLng center, double radiusKm) {
+        DatabaseReference target = contents.child("Public");
         final double radius = radiusKm * 1000; // Convert to meters
         Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
-        int counter = 0;
+        PagerChain chain = new PagerChain();
         for (GeoHashQuery query : queries) {
-            ContentFetcher fetcher = new KeyPager(contents.child("Public"));
-            counter++;
-            if (counter == 2) {
-                return  fetcher;
-            }
+            chain.addPager(new KeyPager(
+                    target, query.getStartValue(), query.getEndValue()));
         }
-        return null;
+        return chain;
     }
 }
