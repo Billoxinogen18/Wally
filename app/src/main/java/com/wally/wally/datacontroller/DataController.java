@@ -18,8 +18,11 @@ import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
+import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
 import com.wally.wally.datacontroller.queries.UUIDQuery;
 import com.wally.wally.datacontroller.user.User;
+
+import java.util.Set;
 
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
@@ -34,7 +37,10 @@ public class DataController {
         this.storage = storage;
         users = database.child(Config.USERS_NODE);
         contents = database.child(Config.CONTENTS_NODE);
-        DebugUtils.sanityCheck();
+
+        // Debug calls will be deleted in the end
+//        DebugUtils.refreshContents(contents, this);
+        DebugUtils.sanityCheck(this);
     }
 
     public static DataController create() {
@@ -57,21 +63,17 @@ public class DataController {
     }
 
     public void save(final Content c) {
+        final FirebaseContent content = new FirebaseContent(c);
         DatabaseReference target;
 
         if (c.isPublic()) {
             target = contents.child("Public");
         } else if (c.isPrivate()) {
-            target = contents.child(c.getAuthorId()).child("Private");
+            target = contents.child(c.getAuthorId());
         } else {
-            target = contents.child(c.getAuthorId()).child("Shared");
+            target = contents.child("Shared");
         }
-
-        if (c.getId() == null) {
-            target = target.push();
-        } else {
-            target = target.child(c.getId());
-        }
+        target = target.child(c.getId());
 
         final DatabaseReference ref = target;
         uploadImage(
@@ -81,7 +83,7 @@ public class DataController {
                     @Override
                     public void onResult(String result) {
                         c.withImageUri(result);
-                        c.withId(new FirebaseContent(c).save(ref));
+                        c.withId(content.save(ref));
                     }
 
                     @Override
@@ -149,5 +151,19 @@ public class DataController {
                 callback.onError(databaseError.toException());
             }
         });
+    }
+
+    ContentFetcher createPublicContentFetcher(LatLng center, double radiusKm) {
+        final double radius = radiusKm * 1000; // Convert to meters
+        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
+        int counter = 0;
+        for (GeoHashQuery query : queries) {
+            ContentFetcher fetcher = new KeyPager(contents.child("Public"));
+            counter++;
+            if (counter == 2) {
+                return  fetcher;
+            }
+        }
+        return null;
     }
 }

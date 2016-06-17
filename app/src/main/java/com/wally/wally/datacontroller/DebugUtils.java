@@ -3,6 +3,7 @@ package com.wally.wally.datacontroller;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseReference;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
@@ -172,16 +173,21 @@ public class DebugUtils {
         };
     }
 
-    public static void sanityCheck() {
-//        contents.removeValue();
-//        DebugUtils.generateRandomContents(100, this);
-//        final ContentFetcher fetcher = createPublicContentFetcher();
-//        int count = 15;
-//        fetcher.fetchPrev(count,
-//                fetchNextDebugCallback(count, fetcher,
-//                        fetchNextDebugCallback(count, fetcher,
-//                                fetchNextDebugCallback(count, fetcher,
-//                                        DebugUtils.debugCallback()))));
+    public static void refreshContents(DatabaseReference contents, DataController datacontroller) {
+        contents.removeValue();
+        generateRandomContents(100, datacontroller);
+    }
+
+    public static void sanityCheck(DataController datacontroller) {
+//        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher(new LatLng(0, 0), 100);
+        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher();
+        int count = 15;
+        fetcher.fetchPrev(count,
+                fetchNextDebugCallback(count, fetcher,
+                        fetchNextDebugCallback(count, fetcher,
+                                fetchNextDebugCallback(count, fetcher,
+                                        fetchNextDebugCallback(count, fetcher,
+                                            DebugUtils.debugCallback())))));
     }
 
 }
