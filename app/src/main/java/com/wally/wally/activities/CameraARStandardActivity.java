@@ -3,6 +3,7 @@ package com.wally.wally.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.wally.wally.R;
@@ -39,7 +40,7 @@ public class CameraARStandardActivity extends CameraARActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+        View mSurfaceView = findViewById(R.id.rajawali_surface);
         ((ViewGroup) mSurfaceView.getParent()).removeView(mSurfaceView); //TODO should not delete rajawali
     }
 }
