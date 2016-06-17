@@ -31,11 +31,6 @@ import java.util.Set;
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
 
-    private static final String DATABASE_ROOT = "Test";
-    private static final String STORAGE_ROOT = DATABASE_ROOT;
-    private static final String USERS_NODE = "Users";
-    private static final String CONTENTS_NODE = "Contents";
-
     private static DataController instance;
 
     private User currentUser;
@@ -44,16 +39,16 @@ public class DataController {
 
     private DataController(DatabaseReference database, StorageReference storage) {
         this.storage = storage;
-        users = database.child(USERS_NODE);
-        contents = database.child(CONTENTS_NODE);
+        users = database.child(Config.USERS_NODE);
+        contents = database.child(Config.CONTENTS_NODE);
         sanityCheck();
     }
 
     public static DataController create() {
         if (instance == null) {
             instance = new DataController(
-                    FirebaseDatabase.getInstance().getReference().child(DATABASE_ROOT),
-                    FirebaseStorage.getInstance().getReference().child(STORAGE_ROOT)
+                    FirebaseDatabase.getInstance().getReference().child(Config.DATABASE_ROOT),
+                    FirebaseStorage.getInstance().getReference().child(Config.STORAGE_ROOT)
             );
         }
         return instance;
@@ -61,8 +56,9 @@ public class DataController {
 
     private void sanityCheck() {
 //        contents.removeValue();
-//        DebugUtils.generateRandomContents(1000, this);
-//        fetchAtLocation(new LatLng(0, 0), 10, DebugUtils.debugCallback());
+//        DebugUtils.generateRandomContents(100, this);
+//        fetchAtLocation(new LatLng(0, 0), 100, DebugUtils.debugCallback());
+//        createPublicContentFetcher().fetchNext(50, DebugUtils.debugCallback());
     }
 
     private void uploadImage(String imagePath, String folder, final Callback<String> callback) {
