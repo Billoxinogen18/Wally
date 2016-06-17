@@ -78,8 +78,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         mVisualContentManager = new VisualContentManager();
         fetchContentForAdf(context,mAdfUuid);
 
-        final WallyRenderer renderer = new WallyRenderer(context, mVisualContentManager);
-        renderer.setOnContentSelectListener(this);
+        final WallyRenderer renderer = new WallyRenderer(context, mVisualContentManager, this);
 
         mSurfaceView.setSurfaceRenderer(renderer);
         WallyTangoUx tangoUx = new WallyTangoUx(context);

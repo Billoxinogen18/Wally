@@ -58,9 +58,10 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
     private ObjectColorPicker mPicker;
 
 
-    public WallyRenderer(Context context, VisualContentManager visualContentManager) {
+    public WallyRenderer(Context context, VisualContentManager visualContentManager, OnVisualContentSelectedListener onContentSelectedListener) {
         super(context);
         mVisualContentManager = visualContentManager;
+        mOnContentSelectedListener = onContentSelectedListener;
     }
 
     @Override
@@ -244,9 +245,5 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
             getCurrentScene().addChild(VisualContentBorder.getInstance());
             mVisualContentManager.setBorderOnScreen(true);
         }
-    }
-
-    public void setOnContentSelectListener(OnVisualContentSelectedListener mContentSelectListener) {
-        this.mOnContentSelectedListener = mContentSelectListener;
     }
 }

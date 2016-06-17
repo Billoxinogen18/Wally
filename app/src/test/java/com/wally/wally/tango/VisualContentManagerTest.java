@@ -1,10 +1,12 @@
 package com.wally.wally.tango;
 
 import com.projecttango.rajawali.ContentPlane;
+import com.projecttango.rajawali.Pose;
 import com.wally.wally.datacontroller.content.Content;
 
 import org.hamcrest.core.IsNull;
 import org.junit.*;
+import org.mockito.Mock;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.*;
@@ -15,10 +17,23 @@ import static org.mockito.Mockito.*;
  */
 public class VisualContentManagerTest {
     private VisualContentManager mVisualContentManager;
+    private Pose mPose;
+    private Content mContent;
+
+
 
     @Before
     public void init(){
         mVisualContentManager = new VisualContentManager();
+        mPose = mock(Pose.class);
+        mContent = mock(Content.class);
+    }
+
+    @Test
+    public void activeContentTest(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        assertThat(mVisualContentManager.getActiveContent().getContent(), is(mContent));
+        assertThat(mVisualContentManager.getActiveContent().getStatus(), is(VisualContent.RenderStatus.PendingRender));
     }
 
 //    @Test

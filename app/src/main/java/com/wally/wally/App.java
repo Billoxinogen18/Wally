@@ -3,6 +3,7 @@ package com.wally.wally;
 import android.app.Application;
 import android.content.Context;
 
+import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.userManager.UserManager;
 import com.wally.wally.userManager.SocialUserFactory;
