@@ -7,12 +7,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
-import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
@@ -20,9 +21,11 @@ import com.wally.wally.datacontroller.fetchers.KeyPager;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
-import com.wally.wally.datacontroller.queries.UUIDQuery;
+import com.wally.wally.datacontroller.queries.FirebaseQuery;
 import com.wally.wally.datacontroller.user.User;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 public class DataController {
@@ -32,12 +35,13 @@ public class DataController {
 
     private User currentUser;
     private StorageReference storage;
-    private DatabaseReference users, contents;
+    private DatabaseReference users, contents, rooms;
 
     private DataController(DatabaseReference database, StorageReference storage) {
         this.storage = storage;
         users = database.child(Config.USERS_NODE);
         contents = database.child(Config.CONTENTS_NODE);
+        rooms = database.child("Rooms");
 
         // Debug calls will be deleted in the end
 //        DebugUtils.refreshContents(contents, this);
@@ -85,6 +89,8 @@ public class DataController {
                     public void onResult(String result) {
                         c.withImageUri(result);
                         c.withId(content.save(ref));
+                        String extendedId = ref.getParent().getKey() + ":" + ref.getKey();
+                        rooms.child(c.getUuid()).child(extendedId).setValue(true);
                     }
 
                     @Override
@@ -101,12 +107,29 @@ public class DataController {
         new FirebaseContent(c).delete(contents);
     }
 
-    /**
-     * No alternative sadly, this method may crash badly
-     */
-    @Deprecated
-    public void fetchByUUID(String uuid, FetchResultCallback callback) {
-        new UUIDQuery(uuid).fetch(contents, new FirebaseFetchResultCallback(callback));
+    public void fetchByUUID(String uuid, final FetchResultCallback callback) {
+        rooms.child(uuid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<Map<String, Boolean>> indicator =
+                        new GenericTypeIndicator<Map<String, Boolean>>(){};
+                Map<String, Boolean> extendedIds = dataSnapshot.getValue(indicator);
+                if (extendedIds == null) {
+                    callback.onResult(Collections.<Content>emptySet());
+                    return;
+                }
+                AggregatorCallback aggregator = new AggregatorCallback(callback)
+                        .withExpectedCallbacks(extendedIds.size());
+                for (String key : extendedIds.keySet()) {
+                    fetchContentAt(key.replace(':', '/'), contents, aggregator);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
     }
 
     public ContentFetcher createPublicContentFetcher() {
@@ -164,5 +187,22 @@ public class DataController {
                     target, query.getStartValue(), query.getEndValue()));
         }
         return chain;
+    }
+
+    private void fetchContentAt(String path, DatabaseReference ref,
+                                final FetchResultCallback callback) {
+        ref.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Content content = FirebaseQuery.firebaseContentFromSnapshot(dataSnapshot).toContent();
+                callback.onResult(Collections.singleton(content));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
     }
 }
