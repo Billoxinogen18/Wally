@@ -17,18 +17,33 @@ import java.security.SecureRandom;
 import java.util.Collection;
 
 public class DebugUtils {
+    public static final String TAG = DebugUtils.class.getSimpleName();
+    public static final String[] USER_IDS = new String[] {
+            "bPwMCPf2MWbebkLQrUuXKw3kYjW2", // Johan's ID
+            "8g7t26liJZgP6Z7jHgTkTdZLk632", // Georg's ID
+            "8g7t26liJZgP6Z7jHgTkTdZLk632", // Tango's ID
+            "uSlLJUtZqbRDTMeLU4MdcToS8ZZ2", // Misha's ID
+    };
+
     public static final Id DEBUG_USER_ID =
             new Id(Id.PROVIDER_FIREBASE, "bPwMCPf2MWbebkLQrUuXKw3kYjW2");
     public static final User DEBUG_USER = new User(DEBUG_USER_ID.getId()).withGgId("");
-    private static final String TAG = DebugUtils.class.getSimpleName();
-    private static SecureRandom random = new SecureRandom();
 
-    private static LatLng OFFICE_LAT_LNG = new LatLng(41.8057582f, 44.7681694f);
+    public static final LatLng OFFICE_LAT_LNG = new LatLng(41.8057582f, 44.7681694f);
+
+    public static String[] ROOMS = new String[] {
+            "a", "b", "c", "d", "e",
+            "f", "g", "h", "i", "j",
+            "k", "l", "m", "n", "o"
+    };
+
+    private static DataController datacontroller;
+    private static SecureRandom random = new SecureRandom();
 
     // This method is for debugging purposes
     public static Content generateRandomContent() {
         return new Content()
-                .withUuid(randomStr(5))
+                .withUuid(randomStr(1))
                 .withNote(randomStr(15))
                 .withTitle(randomStr(7))
                 .withColor(random.nextInt())
@@ -73,6 +88,10 @@ public class DebugUtils {
                     .withImageUri(null)
                     .withLocation(randomLatLngNearPoint(OFFICE_LAT_LNG)));
         }
+    }
+
+    private static String randomRoom() {
+        return ROOMS[random.nextInt(ROOMS.length)];
     }
 
     private static Visibility.SocialVisibility randomPublicity() {
@@ -175,15 +194,17 @@ public class DebugUtils {
     }
 
     public static void sanityCheck(DataController datacontroller) {
-        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher(new LatLng(0, 0), 100);
+        DebugUtils.datacontroller = datacontroller;
+//        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher(new LatLng(0, 0), 100);
 //        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher();
-        int count = 15;
-        fetcher.fetchPrev(count,
-                fetchNextDebugCallback(count, fetcher,
-                        fetchNextDebugCallback(count, fetcher,
-                                fetchNextDebugCallback(count, fetcher,
-                                        fetchPrevDebugCallback(count, fetcher,
-                                            DebugUtils.debugCallback())))));
+//        int count = 15;
+//        fetcher.fetchPrev(count,
+//                fetchNextDebugCallback(count, fetcher,
+//                        fetchNextDebugCallback(count, fetcher,
+//                                fetchNextDebugCallback(count, fetcher,
+//                                        fetchPrevDebugCallback(count, fetcher,
+//                                            debugCallback())))));
     }
+
 
 }
