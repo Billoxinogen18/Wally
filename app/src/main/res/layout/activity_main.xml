@@ -40,7 +40,6 @@
         android:text="Walk around!"
         android:visibility="gone" />
 
-    <!--<include layout="@layout/layout_content_select" />-->
     <com.wally.wally.components.SelectedMenuView
         android:id="@+id/selected_menu_view"
         android:layout_width="match_parent"

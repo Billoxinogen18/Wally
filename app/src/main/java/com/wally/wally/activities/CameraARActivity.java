@@ -84,6 +84,8 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         if (requestCode == REQUEST_CODE_MY_LOCATION) {
             if (Utils.checkLocationPermission(this)) {
                 saveActiveContent(mContentToSave);
+            } else {
+                // TODO show error that user can't add content without location permission
             }
         }
     }
@@ -192,6 +194,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
                 content.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
             }
             onSaveContent(content);
+            Log.wtf(TAG, "saveActiveContent: " + content);
             mDataController.save(content);
         } else {
             ActivityCompat.requestPermissions(this,

@@ -62,13 +62,33 @@ public class UserInfoView extends LinearLayout {
                 R.styleable.UserInfoView,
                 0, 0);
 
-        int sizeEnum = 0;
         try {
-            sizeEnum = a.getInt(R.styleable.UserInfoView_view_size, 0);
+            if (a.hasValue(R.styleable.UserInfoView_custom_layout)) {
+                int customLayoutRes = a.getResourceId(R.styleable.UserInfoView_custom_layout, -1);
+                initFromCustomLayout(customLayoutRes);
+            } else {
+                int sizeEnum = a.getInt(R.styleable.UserInfoView_view_size, 0);
+                initWithSize(sizeEnum);
+            }
         } finally {
             a.recycle();
         }
 
+        // Just show sample data in preview
+        if (isInEditMode()) {
+            mUserImage.setImageResource(R.drawable.sample_user_image);
+            mUserName.setText("Giorgi Gogiashvili");
+        }
+    }
+
+    private void initFromCustomLayout(int layoutId) {
+        inflate(getContext(), layoutId, this);
+        mUserImage = (ImageView) findViewById(R.id.iv_owner_image);
+        mUserName = (TextView) findViewById(R.id.owner_name);
+    }
+
+    private void initWithSize(int sizeEnum) {
+        Context context = getContext();
         // Choose resources according to xml attribute
         @DimenRes int imageSizeResId;
         @DimenRes int textSizeResId;
@@ -104,12 +124,6 @@ public class UserInfoView extends LinearLayout {
         // Now add views to parent
         addView(mUserImage);
         addView(mUserName);
-
-        // Just show sample data in preview
-        if (isInEditMode()) {
-            mUserImage.setImageResource(R.drawable.sample_user_image);
-            mUserName.setText("Giorgi Gogiashvili");
-        }
     }
 
     public void setAnonymousUser() {
