@@ -345,6 +345,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Recycler View Adapter
+    ///////////////////////////////////////////////////////////////////////////
+
     private class MapsRecyclerAdapter extends RecyclerView.Adapter<MapsRecyclerAdapter.VH> implements ContentPagingRetriever.ContentPageRetrieveListener {
         private ContentPagingRetriever mRetriever;
 
@@ -385,7 +389,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mGoogleApiClient);
             }
 
-            if (!c.getVisibility().isPreviewVisible()) {
+            boolean isOwn = Utils.isCurrentUser(c.getAuthorId());
+            // Check if user can see content preview
+            if (!c.getVisibility().isPreviewVisible() && !isOwn) {
                 vh.card.setCardBackgroundColor(
                         ContextCompat.getColor(MapsActivity.this, R.color.content_not_visible_color));
                 vh.title.setText(R.string.content_not_visible_title);
@@ -429,8 +435,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void onNextPageLoaded() {
             notifyItemRemoved(0);
             notifyItemRemoved(0);
-            notifyItemInserted(getItemCount()-1);
-            notifyItemInserted(getItemCount()-1);
+            notifyItemInserted(getItemCount() - 1);
+            notifyItemInserted(getItemCount() - 1);
         }
 
         @Override

@@ -8,11 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -20,8 +17,8 @@ import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.SelectedMenuView;
+import com.wally.wally.components.UserInfoView;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
@@ -206,14 +203,9 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
 
     @SuppressWarnings("ConstantConditions")
     private void displayProfileBar(SocialUser user) {
-        findViewById(R.id.profile_bar).setVisibility(View.VISIBLE);
-        Glide.with(getBaseContext())
-                .load(user.getAvatarUrl())
-                .override(1000, 1000)
-                .transform(new CircleTransform(getBaseContext()))
-                .into((ImageView) findViewById(R.id.profile_image));
-
-        ((TextView) findViewById(R.id.profile_name)).setText(user.getFirstName());
+        UserInfoView infoView = (UserInfoView) findViewById(R.id.profile_bar);
+        infoView.setVisibility(View.VISIBLE);
+        infoView.setUser(user);
     }
 
     private GoogleApiClient getGoogleApiClient() {

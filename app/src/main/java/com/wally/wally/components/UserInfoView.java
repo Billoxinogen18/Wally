@@ -18,6 +18,7 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.wally.wally.App;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
@@ -111,29 +112,6 @@ public class UserInfoView extends LinearLayout {
         }
     }
 
-    private void setUserData(SocialUser user) {
-        mLastUserId = null;
-        mUser = user;
-        if (user == null) {
-            clearUser();
-            return;
-        }
-        if (TextUtils.isEmpty(user.getAvatarUrl())) {
-            mUserImage.setImageDrawable(null);
-            mUserImage.setBackground(null);
-        } else {
-            Glide.with(getContext())
-                    .load(user.getAvatarUrl())
-                    .crossFade()
-                    .fitCenter()
-                    .thumbnail(0.1f)
-                    .placeholder(R.drawable.ic_account_circle_black_24dp)
-                    .transform(new CircleTransform(getContext()))
-                    .into(mUserImage);
-        }
-        mUserName.setText(user.getDisplayName());
-    }
-
     public void setAnonymousUser() {
         mLastUserId = null;
         mUser = null;
@@ -162,13 +140,12 @@ public class UserInfoView extends LinearLayout {
      * @param isAnonymous true if you want to set as anonymous (If it's not current user) <br/>
      */
     public void loadAndSetUser(final String userId, boolean isAnonymous, final GoogleApiClient googleApiClient) {
-        SocialUser currentUser = App.getInstance().getUserManager().getUser();
-        boolean isOwn = TextUtils.equals(userId, currentUser.getBaseUser().getGgId().getId());
+        boolean isOwn = Utils.isCurrentUser(userId);
         if (isAnonymous && !isOwn) {
             setAnonymousUser();
         } else {
             if (isOwn) {
-                setUserData(currentUser);
+                setUser(App.getInstance().getUserManager().getUser());
             } else {
                 loadAndSetUser(userId, googleApiClient);
             }
@@ -202,7 +179,7 @@ public class UserInfoView extends LinearLayout {
                         if (!TextUtils.equals(mLastUserId, userId) || user == null) {
                             return;
                         }
-                        setUserData(user);
+                        setUser(user);
                     }
 
                     @Override
@@ -221,5 +198,34 @@ public class UserInfoView extends LinearLayout {
 
     public SocialUser getUser() {
         return mUser;
+    }
+
+    /**
+     * This method directly sets user on view, without loading
+     *
+     * @param user user to set
+     */
+    public void setUser(SocialUser user) {
+        mLastUserId = null;
+        mUser = user;
+        if (user == null) {
+            clearUser();
+            return;
+        }
+        if (TextUtils.isEmpty(user.getAvatarUrl())) {
+            mUserImage.setImageDrawable(null);
+            mUserImage.setBackground(null);
+        } else {
+            // TODO optimize avatar image size
+            Glide.with(getContext())
+                    .load(user.getAvatarUrl())
+                    .crossFade()
+                    .fitCenter()
+                    .thumbnail(0.1f)
+                    .placeholder(R.drawable.ic_account_circle_black_24dp)
+                    .transform(new CircleTransform(getContext()))
+                    .into(mUserImage);
+        }
+        mUserName.setText(user.getDisplayName());
     }
 }

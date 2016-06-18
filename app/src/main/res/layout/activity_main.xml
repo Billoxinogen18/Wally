@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:surfaceview="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,7 +18,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="center"
         app:frameRate="60.0"
-        app:renderMode="RENDER_WHEN_DIRTY"/>
+        app:renderMode="RENDER_WHEN_DIRTY" />
 
     <TextView
         android:id="@+id/pose_invalid"
@@ -45,8 +44,8 @@
     <com.wally.wally.components.SelectedMenuView
         android:id="@+id/selected_menu_view"
         android:layout_width="match_parent"
-        android:visibility="gone"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/layout_fitting"
@@ -96,31 +95,15 @@
         android:src="@drawable/watermark"
         android:tint="@color/colorPrimaryDark" />
 
-    <LinearLayout
+    <com.wally.wally.components.UserInfoView
         android:id="@+id/profile_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
-        android:layout_margin="@dimen/watermark_margin"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:clickable="true"
+        android:background="?attr/selectableItemBackground"
         android:onClick="onShowProfileClick"
-        android:orientation="horizontal"
-        android:visibility="gone">
-
-        <ImageView
-            android:id="@+id/profile_image"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginEnd="8dp" />
-
-        <TextView
-            android:id="@+id/profile_name"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center" />
-    </LinearLayout>
-
+        android:padding="@dimen/watermark_margin"
+        app:view_size="small" />
 
     <!-- Map button -->
     <android.support.v7.widget.CardView

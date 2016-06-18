@@ -29,6 +29,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.atap.tangoservice.Tango;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.userManager.SocialUser;
 
 import java.text.DateFormat;
 
@@ -236,5 +237,15 @@ public final class Utils {
 
         // distance = circle radius from center to Northeast corner of bounds
         return r * Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
+    }
+
+    /**
+     * @param userId user id to check
+     * @return true if userId is same signed user.
+     */
+    public static boolean isCurrentUser(String userId) {
+        SocialUser currentUser = App.getInstance().getUserManager().getUser();
+        return currentUser != null &&
+                TextUtils.equals(userId, currentUser.getBaseUser().getId().getId());
     }
 }

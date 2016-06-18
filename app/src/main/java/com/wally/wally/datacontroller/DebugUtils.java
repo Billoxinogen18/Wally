@@ -17,10 +17,10 @@ import java.security.SecureRandom;
 import java.util.Collection;
 
 public class DebugUtils {
-    private static final String TAG = DebugUtils.class.getSimpleName();
     public static final Id DEBUG_USER_ID =
             new Id(Id.PROVIDER_FIREBASE, "bPwMCPf2MWbebkLQrUuXKw3kYjW2");
     public static final User DEBUG_USER = new User(DEBUG_USER_ID.getId()).withGgId("");
+    private static final String TAG = DebugUtils.class.getSimpleName();
     private static SecureRandom random = new SecureRandom();
 
     private static LatLng OFFICE_LAT_LNG = new LatLng(41.8057582f, 44.7681694f);
@@ -68,7 +68,7 @@ public class DebugUtils {
     }
 
     public static void generateRandomContentsNearOffice(DataController controller) {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 60; i++) {
             controller.save(generateRandomContent()
                     .withImageUri(null)
                     .withLocation(randomLatLngNearPoint(OFFICE_LAT_LNG)));
