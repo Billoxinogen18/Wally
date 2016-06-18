@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import com.wally.wally.R;
 import com.wally.wally.datacontroller.content.Content;
 
-import org.rajawali3d.surface.RajawaliSurfaceView;
-
 /**
  * Created by shota on 5/21/16.
  */
@@ -34,7 +32,7 @@ public class CameraARStandardActivity extends CameraARActivity {
 
     @Override
     public void onContentCreated(Content contentCreated, boolean isEditMode) {
-
+        saveActiveContent(contentCreated);
     }
 
     @Override

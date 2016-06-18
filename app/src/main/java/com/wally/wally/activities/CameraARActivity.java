@@ -62,8 +62,28 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         // Initialize managers
         mUserManager = ((App) getApplicationContext()).getUserManager(); //TODO get LoginManager from the Factory!
         mDataController = ((App) getApplicationContext()).getDataController();
-//        getGoogleApiClient();
+
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .enableAutoManage(this, this)
+                .addOnConnectionFailedListener(this)
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addScope(Plus.SCOPE_PLUS_PROFILE)
+                .addApi(Plus.API)
+                .addApi(LocationServices.API)
+                .build();
     }
+
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
 
     @Override
     protected void onPause() {
@@ -113,7 +133,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
                 @Override
                 public void run() {
                     mSelectedMenuView.setVisibility(content == null ? View.GONE : View.VISIBLE);
-                    mSelectedMenuView.setContent(content, getGoogleApiClient());
+                    mSelectedMenuView.setContent(content, mGoogleApiClient);
                     mLastSelectTime = System.currentTimeMillis();
 
                     mSelectedMenuView.postDelayed(new Runnable() {
@@ -142,7 +162,6 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
 
 
     public void onNewContentClick(View v) {
-        Log.d(TAG, "onNewContentClick() called with: " + "v = [" + v + "]");
         NewContentDialogFragment.newInstance()
                 .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
 
@@ -186,10 +205,13 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         mContentToSave = content;
         // Check and set location to content
         if (Utils.checkLocationPermission(this)) {
-            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(getGoogleApiClient());
+            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
             if (myLocation == null) {
                 Toast.makeText(this, "Couldn't get user location", Toast.LENGTH_SHORT).show();
+                // TODO show error or something
+                Log.e(TAG, "saveActiveContent: Cannot get user location");
+                return;
             } else {
                 content.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
             }
@@ -209,19 +231,5 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         UserInfoView infoView = (UserInfoView) findViewById(R.id.profile_bar);
         infoView.setVisibility(View.VISIBLE);
         infoView.setUser(user);
-    }
-
-    private GoogleApiClient getGoogleApiClient() {
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                    .enableAutoManage(this, this)
-                    .addOnConnectionFailedListener(this)
-                    .addScope(Plus.SCOPE_PLUS_LOGIN)
-                    .addScope(Plus.SCOPE_PLUS_PROFILE)
-                    .addApi(Plus.API)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-        return mGoogleApiClient;
     }
 }
