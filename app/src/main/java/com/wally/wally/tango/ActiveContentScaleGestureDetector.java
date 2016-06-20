@@ -7,7 +7,6 @@ import android.view.ScaleGestureDetector;
  * Created by shota on 5/27/16.
  */
 
-//TODO it might be better to implement in ActiveContent class. let's see later...
 public class ActiveContentScaleGestureDetector implements ScaleGestureDetector.OnScaleGestureListener {
     private static final String TAG = ActiveContentScaleGestureDetector.class.getSimpleName();
 
