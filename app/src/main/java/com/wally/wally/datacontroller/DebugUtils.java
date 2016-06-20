@@ -14,22 +14,12 @@ import com.wally.wally.datacontroller.user.User;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class DebugUtils {
     public static final String TAG = DebugUtils.class.getSimpleName();
-    public static final String[] USER_IDS = new String[] {
-            "bPwMCPf2MWbebkLQrUuXKw3kYjW2", // Johan's ID
-            "8g7t26liJZgP6Z7jHgTkTdZLk632", // Georg's ID
-            "8g7t26liJZgP6Z7jHgTkTdZLk632", // Tango's ID
-            "uSlLJUtZqbRDTMeLU4MdcToS8ZZ2", // Misha's ID
-    };
-
-    public static final Id DEBUG_USER_ID =
-            new Id(Id.PROVIDER_FIREBASE, "bPwMCPf2MWbebkLQrUuXKw3kYjW2");
-    public static final User DEBUG_USER = new User(DEBUG_USER_ID.getId()).withGgId("");
-
-    public static final LatLng OFFICE_LAT_LNG = new LatLng(41.8057582f, 44.7681694f);
 
     public static String[] ROOMS = new String[] {
             "a", "b", "c", "d", "e",
@@ -37,10 +27,22 @@ public class DebugUtils {
             "k", "l", "m", "n", "o"
     };
 
+    public static final User[] USERS = new User[] {
+            new User("bPwMCPf2MWbebkLQrUuXKw3kYjW2").withGgId(""),  // Io
+            new User("8g7t26liJZgP6Z7jHgTkTdZLk632").withGgId("114669062093261610699"), // George
+            new User("50tSKKashRRrbPP3fKtOWI9vpRg1").withGgId(""), // Tango
+            new User("uSlLJUtZqbRDTMeLU4MdcToS8ZZ2").withGgId("112058086965911533829"), // Misha
+    };
+
+    public static final User DEBUG_USER = USERS[3];
+
+    public static final LatLng OFFICE_LAT_LNG = new LatLng(41.8057582f, 44.7681694f);
+
+
     private static DataController datacontroller;
     private static SecureRandom random = new SecureRandom();
 
-    // This method is for debugging purposes
+
     public static Content generateRandomContent() {
         return new Content()
                 .withUuid(randomStr(1))
@@ -48,13 +50,9 @@ public class DebugUtils {
                 .withTitle(randomStr(7))
                 .withColor(random.nextInt())
                 .withImageUri("http://" + randomStr(10))
-                .withAuthorId(DEBUG_USER_ID.getId())
-                .withLocation(
-                        new LatLng(
-                                random.nextDouble(),
-                                random.nextDouble()
-                        )
-                ).withVisibility(
+                .withAuthorId(DEBUG_USER.getId().getId())
+                .withLocation(randomLatLngNearPoint(OFFICE_LAT_LNG))
+                .withVisibility(
                         new Visibility()
                                 .withTimeVisibility(null)
                                 .withAnonymousAuthor(false)
@@ -69,24 +67,17 @@ public class DebugUtils {
     }
 
     public static void generateRandomContents(int n, DataController controller) {
+        int publicContentNumber = 0;
         for (int i = 0; i < n; i++) {
-            controller.save(generateRandomContent());
-        }
-    }
-
-    public static void generatePublicEnumeratedRandomContents(int n, DataController controller) {
-        for (int i = 0; i < n; i++) {
-            Content content = generateRandomContent().withTitle("" + i);
-            content.getVisibility().withSocialVisibility(Visibility.PUBLIC);
-            controller.save(content);
-        }
-    }
-
-    public static void generateRandomContentsNearOffice(DataController controller) {
-        for (int i = 0; i < 60; i++) {
-            controller.save(generateRandomContent()
-                    .withImageUri(null)
-                    .withLocation(randomLatLngNearPoint(OFFICE_LAT_LNG)));
+            Content content = generateRandomContent();
+            if (content.isPublic()) {
+                content.withTitle("" + publicContentNumber++);
+            } else if (!content.isPrivate()) {
+                List<Id> sharedWith = new ArrayList<>();
+                sharedWith.add(USERS[1].getGgId());
+                content.getVisibility().getSocialVisibility().withSharedWith(sharedWith);
+            }
+            controller.save(content.withImageUri(null));
         }
     }
 
@@ -101,18 +92,13 @@ public class DebugUtils {
     }
 
     private static Double[] randomDoubleArray() {
-        return new Double[]{
-                random.nextDouble(),
-                random.nextDouble(),
-                random.nextDouble()
-        };
+        return new Double[]{ random.nextDouble(), random.nextDouble(), random.nextDouble() };
     }
 
     private static LatLng randomLatLngNearPoint(LatLng point) {
-        return new LatLng(
-                point.latitude + nextSign() * (random.nextDouble() % 100) / 500,
-                point.longitude + nextSign() * (random.nextDouble() % 100) / 500
-        );
+        double randomLat = point.latitude + nextSign() * (random.nextDouble() % 100) / 500;
+        double randomLng = point.longitude + nextSign() * (random.nextDouble() % 100) / 500;
+        return new LatLng(randomLat, randomLng);
     }
 
     private static int nextSign() {
@@ -145,7 +131,7 @@ public class DebugUtils {
         Log.d(tag, c.getId());
 //        Log.d(tag, c.getTitle());
 
-//        double diff = GeoUtils.distance(new LatLng(0,0), c.getLocation());
+//        double diff = GeoUtils.distance(OFFICE_LAT_LNG, c.getLocation());
 //        LatLng l = c.getLocation();
 //        Log.d(tag, new GeoHash(l.latitude, l.longitude).getGeoHashString() + ": " + diff);
 

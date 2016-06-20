@@ -16,6 +16,8 @@ import java.util.List;
 
 public class Visibility implements Serializable {
 
+    public static final SocialVisibility PUBLIC = new SocialVisibility(SocialVisibility.PUBLIC);
+    public static final SocialVisibility PRIVATE = new SocialVisibility(SocialVisibility.PRIVATE);
     private SocialVisibility socialVisibility;
     private Date visibleUntil;
     private boolean isAuthorAnonymous;
@@ -74,8 +76,8 @@ public class Visibility implements Serializable {
     }
 
     public static class SocialVisibility implements Serializable {
-        public static final int PRIVATE = 0;
-        public static final int PUBLIC = 1;
+        public static final int PUBLIC = 0;
+        public static final int PRIVATE = 1;
         public static final int PEOPLE = 2;
 
         private int mode;
@@ -99,10 +101,10 @@ public class Visibility implements Serializable {
         @DrawableRes
         int toDrawableRes(@SocialVisibilityMode int range) {
             switch (range) {
-                case PRIVATE:
-                    return R.drawable.ic_private_visibility_black_24dp;
                 case PUBLIC:
                     return R.drawable.ic_public_visibility_24dp;
+                case PRIVATE:
+                    return R.drawable.ic_private_visibility_black_24dp;
                 case PEOPLE:
                     return R.drawable.ic_people_visibility_black;
                 default:
@@ -139,7 +141,4 @@ public class Visibility implements Serializable {
         public @interface SocialVisibilityMode {
         }
     }
-
-    public static final SocialVisibility PUBLIC = new SocialVisibility(SocialVisibility.PUBLIC);
-    public static final SocialVisibility PRIVATE = new SocialVisibility(SocialVisibility.PRIVATE);
 }

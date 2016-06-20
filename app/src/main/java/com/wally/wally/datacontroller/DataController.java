@@ -1,5 +1,7 @@
 package com.wally.wally.datacontroller;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -41,7 +43,7 @@ public class DataController {
         this.storage = storage;
         users = database.child(Config.USERS_NODE);
         contents = database.child(Config.CONTENTS_NODE);
-        rooms = database.child("Rooms");
+        rooms = database.child(Config.ROOMS_NODE);
 
         // Debug calls will be deleted in the end
 //        DebugUtils.refreshContents(contents, this);
@@ -67,10 +69,8 @@ public class DataController {
         }
     }
 
-    public void save(final Content c) {
-        final FirebaseContent content = new FirebaseContent(c);
+    private DatabaseReference getContentReference(Content c) {
         DatabaseReference target;
-
         if (c.isPublic()) {
             target = contents.child("Public");
         } else if (c.isPrivate()) {
@@ -78,9 +78,13 @@ public class DataController {
         } else {
             target = contents.child("Shared");
         }
-        target = target.child(c.getId());
+        return target.child(c.getId());
+    }
 
-        final DatabaseReference ref = target;
+    public void save(final Content c) {
+        if (c.getId() != null) { delete(c); }
+        final FirebaseContent content = new FirebaseContent(c);
+        final DatabaseReference ref = getContentReference(c);
         uploadImage(
                 c.getImageUri(),
                 ref.getKey(),
@@ -104,7 +108,19 @@ public class DataController {
     }
 
     public void delete(Content c) {
-        new FirebaseContent(c).delete(contents);
+        if (c.getId() == null) {
+            throw new IllegalArgumentException("Id of the content is null");
+        }
+        String extendedPublicId = "Public:" + c.getId();
+        String extendedSharedId = "Shared:" + c.getId();
+        String extendedPrivateId = c.getAuthorId() + ":" + c.getId();
+        rooms.child(c.getUuid()).child(extendedPublicId).removeValue();
+        rooms.child(c.getUuid()).child(extendedSharedId).removeValue();
+        rooms.child(c.getUuid()).child(extendedPrivateId).removeValue();
+        // TODO rewrite using .replace(':', '/') calls
+        contents.child("Public").child(c.getId()).removeValue();
+        contents.child("Shared").child(c.getId()).removeValue();
+        contents.child(c.getAuthorId()).child(c.getId()).removeValue();
     }
 
     public void fetchByUUID(String uuid, final FetchResultCallback callback) {
@@ -132,21 +148,39 @@ public class DataController {
         });
     }
 
+    /**
+     *
+     * @deprecated use {@link #createFetcherForPublicContent()} ()} instead.
+     */
+    @Deprecated
     public ContentFetcher createPublicContentFetcher() {
+        return createFetcherForPublicContent();
+    }
+
+
+    public ContentFetcher createFetcherForPublicContent() {
         return new KeyPager(contents.child("Public"));
     }
 
-    public ContentFetcher createVisibleContentFetcher(User user, LatLng center, double r) {
+    public ContentFetcher createFetcherForPrivateContent() {
+        User current = getCurrentUser();
+        return new KeyPager(contents.child(current.getId().getId()));
+    }
+
+    public ContentFetcher createFetcherForVisibleContent(LatLng center, double r) {
+        User current = getCurrentUser();
         // TODO stub implementation
         return createPublicContentFetcher(center, r);
     }
 
-    public ContentFetcher createMyContentFetcher(User user, LatLng center, double r) {
+    public ContentFetcher createFetcherForMyContent(LatLng center, double r) {
+        User current = getCurrentUser();
         // TODO stub implementation
         return createPublicContentFetcher(center, r);
     }
 
-    public ContentFetcher createUserContentFetcher(User me, User other, LatLng center, double r) {
+    public ContentFetcher createFetcherForUserContent(User user, LatLng center, double r) {
+        User current = getCurrentUser();
         // TODO stub implementation
         return createPublicContentFetcher(center, r);
     }
@@ -178,6 +212,11 @@ public class DataController {
     }
 
     ContentFetcher createPublicContentFetcher(LatLng center, double radiusKm) {
+        if (radiusKm > Config.RADIUS_MAX_KM) {
+            // We decided that too big radius (2500 km)
+            // means we don't need to filter by location
+            return createFetcherForPublicContent();
+        }
         DatabaseReference target = contents.child("Public");
         final double radius = radiusKm * 1000; // Convert to meters
         Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);

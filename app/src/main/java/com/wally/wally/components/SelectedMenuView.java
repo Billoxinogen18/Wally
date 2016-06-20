@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.userManager.SocialUser;
 
@@ -63,6 +64,8 @@ public class SelectedMenuView extends RelativeLayout {
                     content.getAuthorId(),
                     content.getVisibility().isAuthorAnonymous(),
                     googleApiClient);
+
+            showContentControlPanel(Utils.isCurrentUser(content.getAuthorId()));
             // TODO add content creation date
             // mNoteDate.setText(content.getDate());
         }
