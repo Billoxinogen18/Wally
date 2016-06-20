@@ -96,6 +96,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         if(mVisualContentManager.isActiveContent()) {
             mVisualContentManager.removePendingActiveContent();
         }
+        mVisualContentManager.removeSavedActiveContent();
     }
 
     @Override

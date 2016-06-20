@@ -204,9 +204,14 @@ public class VisualContentManager implements LocalizationListener {
         }
     }
 
+    public void removeSavedActiveContent(){
+        mSavedActiveContent = null;
+    }
+
     public void removePendingActiveContent() {
         synchronized (mActiveContentLock) {
             if (mActiveContent != null) {
+                Log.d(TAG, "removePendingActiveContent() called with: " + mActiveContent.getStatus());
                 if (mActiveContent.getStatus() == RenderStatus.Rendered) {
                     mActiveContent.setStatus(RenderStatus.PendingRemove);
                 } else if (mActiveContent.getStatus() == RenderStatus.PendingRender) {
