@@ -23,13 +23,13 @@ import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
+import com.wally.wally.tango.LocalizationListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoManager;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.VisualContentManager;
 import com.wally.wally.tango.WallyRenderer;
 
-import org.rajawali3d.surface.RajawaliSurfaceView;
 import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.util.Arrays;
@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * Created by shota on 5/21/16.
  */
-public class CameraARTangoActivity extends CameraARActivity implements ContentFitter.OnContentFitListener {
+public class CameraARTangoActivity extends CameraARActivity implements ContentFitter.OnContentFitListener, LocalizationListener {
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
     private static final String ARG_ADF_UUID = "ARG_ADF_UUID";
 
@@ -48,6 +48,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     private TangoManager mTangoManager;
     private FloatingActionButton mFinishFitting;
     private View mLayoutFitting;
+    private FloatingActionButton mFinishFittingFab;
     private List<View> mNonFittingModeViews;
 
 
@@ -67,6 +68,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         super.onCreate(savedInstanceState);
 
         mLayoutFitting = findViewById(R.id.layout_fitting);
+        mFinishFittingFab = (FloatingActionButton) mLayoutFitting.findViewById(R.id.btn_finish_fitting);
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         RajawaliTextureView mSurfaceView = (RajawaliTextureView) findViewById(R.id.rajawali_surface);
@@ -77,7 +79,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         mAdfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
 
         mVisualContentManager = new VisualContentManager();
-        fetchContentForAdf(context,mAdfUuid);
+        fetchContentForAdf(context, mAdfUuid);
 
         final WallyRenderer renderer = new WallyRenderer(context, mVisualContentManager, this);
 
@@ -88,7 +90,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
         tangoUx.setLayout(mTangoUxLayout);
 
-        TangoUpdater tangoUpdater = new TangoUpdater(tangoUx,mSurfaceView,pointCloudManager, mVisualContentManager);
+        TangoUpdater tangoUpdater = new TangoUpdater(tangoUx, mSurfaceView, pointCloudManager, this);
         TangoFactory tangoFactory = new TangoFactory(context);
         mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, mAdfUuid);
         restoreState(savedInstanceState);
@@ -182,7 +184,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
         if (mContentFitter != null) {
             if (mContentFitter.isCancelled()) {
-                mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager, mVisualContentManager,this);
+                mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager, mVisualContentManager, this);
             }
             mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             onFitStatusChange(true);
@@ -203,7 +205,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mFinishFitting.setEnabled(pose != null);
+                mFinishFitting.setEnabled(pose != null && mVisualContentManager.isLocalized());
             }
         });
     }
@@ -238,5 +240,27 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         startActivityForResult(
                 Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
                 Tango.TANGO_INTENT_ACTIVITYCODE);
+    }
+
+    @Override
+    public void localized() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mVisualContentManager.localized();
+                mFinishFittingFab.setEnabled(true);
+            }
+        });
+    }
+
+    @Override
+    public void notLocalized() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mVisualContentManager.notLocalized();
+                mFinishFittingFab.setEnabled(false);
+            }
+        });
     }
 }

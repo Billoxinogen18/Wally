@@ -1,9 +1,7 @@
 package com.wally.wally.tango;
 
 import android.util.Log;
-import android.view.SurfaceView;
 
-import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoEvent;
@@ -12,7 +10,6 @@ import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.components.WallyTangoUx;
 
-import org.rajawali3d.surface.RajawaliSurfaceView;
 import org.rajawali3d.surface.RajawaliTextureView;
 
 /**
@@ -29,7 +26,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private LocalizationListener mLocalizator;
 
 
-    public TangoUpdater(WallyTangoUx tangoUx, RajawaliTextureView surfaceView, TangoPointCloudManager pointCloudManager, LocalizationListener localizator){
+    public TangoUpdater(WallyTangoUx tangoUx, RajawaliTextureView surfaceView, TangoPointCloudManager pointCloudManager, LocalizationListener localizator) {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
@@ -41,8 +38,8 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         if (mTangoUx != null) {
             mTangoUx.updatePoseStatus(pose.statusCode);
         }
-
         if (pose.statusCode != TangoPoseData.POSE_VALID) {
+            setTangoLocalization(false);
             if (mTangoUx != null) {
                 mTangoUx.showCustomMessage("Hold Still");
                 //setTangoLocalization(false);
@@ -87,19 +84,19 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         }
     }
 
-    public synchronized boolean isFrameAvailableTangoThread(){
+    public synchronized boolean isFrameAvailableTangoThread() {
         return mIsFrameAvailableTangoThread;
     }
 
-    public synchronized void setFrameAvailableTangoThread(boolean available){
+    public synchronized void setFrameAvailableTangoThread(boolean available) {
         mIsFrameAvailableTangoThread = available;
     }
 
-    private synchronized boolean isTangoLocalized(){
+    private synchronized boolean isTangoLocalized() {
         return isLocalized;
     }
 
-    public synchronized void setTangoLocalization(boolean localization){
+    public synchronized void setTangoLocalization(boolean localization) {
         if (isLocalized != localization) {
             isLocalized = localization;
             if (isLocalized) {

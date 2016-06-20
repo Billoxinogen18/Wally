@@ -79,7 +79,9 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         mFittingStatusListener.onContentFit(newPose);
         lastPose = newPose;
         if (newPose != null) {
-            mVisualContentManager.updateActiveContent(ScenePoseCalculator.toOpenGLPose(newPose));
+            if (mVisualContentManager.isActiveContent()) { //TODO cancel contentfitter when not localized
+                mVisualContentManager.updateActiveContent(ScenePoseCalculator.toOpenGLPose(newPose));
+            }
         }
 
     }
@@ -106,6 +108,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         // Order of this calls matter!!!
         mFittingStatusListener.onContentFittingFinished(getContent());
         //mVisualContentManager.setActiveContentAdded();
+        // TODO here we might lost localization (Theoretically possible)
         mVisualContentManager.setActiveContentFinishFitting();
         //mVisualContentManager.removePendingActiveContent();
         cancel(true);

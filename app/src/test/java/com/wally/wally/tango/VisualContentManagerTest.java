@@ -1,25 +1,21 @@
 package com.wally.wally.tango;
 
-import android.util.Log;
-
-import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.datacontroller.content.Content;
 
 import org.hamcrest.core.IsNull;
-import org.junit.*;
-import org.mockito.Mock;
+import org.junit.Before;
+import org.junit.Test;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.*;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by shota on 5/26/16.
@@ -55,14 +51,7 @@ public class VisualContentManagerTest {
         assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(false));
     }
 
-    @Test
-    public void activeContentTest2(){
-        mVisualContentManager.addPendingActiveContent(mPose, mContent);
-        mVisualContentManager.removePendingActiveContent();
-        assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(false));
-        assertThat(mVisualContentManager.getActiveContent().getStatus(), is(VisualContent.RenderStatus.None));
-        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(false));
-    }
+//§
 
     @Test
     public void activeContentTest3(){
@@ -100,7 +89,7 @@ public class VisualContentManagerTest {
     public void activeContentTest51(){
         mVisualContentManager.addPendingActiveContent(mPose, mContent);
         mVisualContentManager.removePendingActiveContent();
-        mVisualContentManager.setActiveContentRemoved();
+        //mVisualContentManager.setActiveContentRemoved();
         assertThat(mVisualContentManager.getActiveContent(),is(IsNull.nullValue()));
         assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(false));
         assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(false));

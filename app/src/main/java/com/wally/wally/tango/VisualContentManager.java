@@ -2,9 +2,7 @@ package com.wally.wally.tango;
 
 import android.util.Log;
 
-import com.bumptech.glide.util.Util;
 import com.projecttango.rajawali.Pose;
-import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
@@ -17,28 +15,25 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.wally.wally.tango.VisualContent.*;
+import static com.wally.wally.tango.VisualContent.RenderStatus;
 
 /**
  * Created by shota on 5/30/16.
  */
 public class VisualContentManager implements LocalizationListener {
     private static final String TAG = VisualContentManager.class.getSimpleName();
-    private boolean mIsLocalized;
     private final Object mLocalizationLock = new Object();
-
     //Active Content
     private final Object mActiveContentLock = new Object();
-    private ActiveVisualContent mActiveContent;
-    private ActiveVisualContent mSavedActiveContent;
-
     //Static Content
     private final Object mStaticContentLock = new Object();
-    private List<VisualContent> mStaticContent;
-    private List<VisualContent> mSavedStaticContent;
-
     //Selected Content
     private final Object mSelectedContentLock = new Object();
+    private boolean mIsLocalized;
+    private ActiveVisualContent mActiveContent;
+    private ActiveVisualContent mSavedActiveContent;
+    private List<VisualContent> mStaticContent;
+    private List<VisualContent> mSavedStaticContent;
     private VisualContent mSelectedContent;
     private boolean mBorderOnScreen;
 
@@ -215,7 +210,8 @@ public class VisualContentManager implements LocalizationListener {
                 if (mActiveContent.getStatus() == RenderStatus.Rendered) {
                     mActiveContent.setStatus(RenderStatus.PendingRemove);
                 } else if (mActiveContent.getStatus() == RenderStatus.PendingRender) {
-                    mActiveContent.setStatus(RenderStatus.None);
+                    //mActiveContent.setStatus(RenderStatus.None);
+                    mActiveContent = null;
                 }
             } else {
                 Utils.throwError();

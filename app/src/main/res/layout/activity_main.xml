@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:onClick="onFinishFittingClick"
             android:src="@drawable/ic_accept_white_24dp"
-            app:backgroundTint="@color/accept_button_color" />
+            app:backgroundTint="@color/btn_finish_fitting_background_color" />
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
