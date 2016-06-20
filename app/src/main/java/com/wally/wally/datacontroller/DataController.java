@@ -132,21 +132,39 @@ public class DataController {
         });
     }
 
+    /**
+     *
+     * @deprecated use {@link #createFetcherForPublicContent()} ()} instead.
+     */
+    @Deprecated
     public ContentFetcher createPublicContentFetcher() {
+        return createFetcherForPublicContent();
+    }
+
+
+    public ContentFetcher createFetcherForPublicContent() {
         return new KeyPager(contents.child("Public"));
     }
 
-    public ContentFetcher createVisibleContentFetcher(User user, LatLng center, double r) {
+    public ContentFetcher createFetcherForPrivateContent() {
+        User current = getCurrentUser();
+        return new KeyPager(contents.child(current.getId().getId()));
+    }
+
+    public ContentFetcher createFetcherForVisibleContent(LatLng center, double r) {
+        User current = getCurrentUser();
         // TODO stub implementation
         return createPublicContentFetcher(center, r);
     }
 
-    public ContentFetcher createMyContentFetcher(User user, LatLng center, double r) {
+    public ContentFetcher createFetcherForMyContent(LatLng center, double r) {
+        User current = getCurrentUser();
         // TODO stub implementation
         return createPublicContentFetcher(center, r);
     }
 
-    public ContentFetcher createUserContentFetcher(User me, User other, LatLng center, double r) {
+    public ContentFetcher createFetcherForUserContent(User user, LatLng center, double r) {
+        User current = getCurrentUser();
         // TODO stub implementation
         return createPublicContentFetcher(center, r);
     }
