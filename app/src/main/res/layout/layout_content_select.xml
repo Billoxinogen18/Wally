@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_content_select"
     android:layout_width="match_parent"
@@ -9,44 +10,13 @@
     android:orientation="vertical"
     tools:visibility="visible">
 
-    <RelativeLayout
-        android:id="@+id/layout_note_info"
+    <com.wally.wally.components.UserInfoView
+        android:id="@+id/user_info_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:animateLayoutChanges="true"
-        android:background="@drawable/owner_info_background"
-        android:paddingRight="16dp">
-
-        <ImageView
-            android:id="@+id/iv_owner_image"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginRight="16dp"/>
-
-        <TextView
-            android:id="@+id/owner_name"
-            style="@style/TextAppearance.AppCompat.Subhead"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_toRightOf="@+id/iv_owner_image"
-            android:animateLayoutChanges="true"
-            android:textColor="#ffffff"
-            tools:text="Giorgi Gogiashvili" />
-
-        <TextView
-            android:id="@+id/note_date"
-            style="@style/TextAppearance.AppCompat.Caption"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/owner_name"
-            android:layout_below="@+id/owner_name"
-            android:layout_marginTop="8dp"
-            android:text="12 sep"
-            android:textColor="#b3ffffff" />
-    </RelativeLayout>
+        app:custom_layout="@layout/content_select_user_view" />
 
     <LinearLayout
         android:id="@+id/content_control_panel"

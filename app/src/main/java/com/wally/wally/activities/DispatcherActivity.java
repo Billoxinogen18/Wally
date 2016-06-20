@@ -32,7 +32,11 @@ public class DispatcherActivity extends LoginActivity implements UserManager.Use
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
         trySignIn();
     }
 

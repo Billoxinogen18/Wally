@@ -18,39 +18,32 @@
         android:orientation="vertical"
         android:padding="12dp">
 
-        <LinearLayout
-            android:id="@+id/owner_profile_info"
+        <TextView
+            android:id="@+id/tv_content_position"
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:padding="8dp"
+            tools:text="12" />
+
+        <com.wally.wally.components.UserInfoView
+            android:id="@+id/user_info_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
             android:background="?attr/selectableItemBackground"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp" />
 
-            <ImageView
-                android:id="@+id/iv_owner_image"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginRight="12dp"
-                tools:src="@drawable/sample_user_image" />
-
-            <TextView
-                android:id="@+id/tv_owner_name"
-                style="@style/TextAppearance.AppCompat.Title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                tools:text="Giorgi Gogiashvili" />
-        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_title"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/owner_profile_info"
+            android:layout_below="@id/user_info_view"
             android:layout_marginBottom="8dp"
             android:ellipsize="end"
             android:lines="1"

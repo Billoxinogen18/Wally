@@ -3,12 +3,11 @@ package com.wally.wally.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.wally.wally.R;
 import com.wally.wally.datacontroller.content.Content;
-
-import org.rajawali3d.surface.RajawaliSurfaceView;
 
 /**
  * Created by shota on 5/21/16.
@@ -33,13 +32,13 @@ public class CameraARStandardActivity extends CameraARActivity {
 
     @Override
     public void onContentCreated(Content contentCreated, boolean isEditMode) {
-
+        saveActiveContent(contentCreated);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+        View mSurfaceView = findViewById(R.id.rajawali_surface);
         ((ViewGroup) mSurfaceView.getParent()).removeView(mSurfaceView); //TODO should not delete rajawali
     }
 }

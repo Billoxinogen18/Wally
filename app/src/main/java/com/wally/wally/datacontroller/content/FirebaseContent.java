@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FirebaseContent extends FirebaseObject {
-    public static final int PUBLIC = Visibility.SocialVisibility.PUBLIC;
 
     // NoteData
     public static final String K_NOTE           = "note";
@@ -36,6 +35,7 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_PREVIEW        = "preview";
     public static final String K_DURATION       = "duration";
     public static final String K_PUBLICITY      = "publicity";
+    public static final String K_ANONYMOUS      = "anonymous";
     public static final String K_SHARED         = "Shared";
 
     public FirebaseContent() {
@@ -49,6 +49,7 @@ public class FirebaseContent extends FirebaseObject {
         setLocation(c.getLocation());
         setTangoData(c.getTangoData());
         setVisibility(c.getVisibility());
+        c.withId(id);
     }
 
 
@@ -90,9 +91,10 @@ public class FirebaseContent extends FirebaseObject {
 
     private void setLocation(LatLng loc) {
         if (loc == null) return;
-        String geoHash = new GeoHash(loc.latitude, loc.longitude).getGeoHashString();
+        if (id == null) {
+            id = new GeoHash(loc.latitude, loc.longitude).getGeoHashString();
+        }
         getChild(K_LOCATION)
-                .put(K_HASH, geoHash)
                 .put(K_LAT, loc.latitude)
                 .put(K_LNG, loc.longitude);
     }
@@ -118,6 +120,7 @@ public class FirebaseContent extends FirebaseObject {
         return new Visibility()
                 .withSocialVisibility(getPublicity())
                 .withTimeVisibility(get(K_DURATION).toData())
+                .withAnonymousAuthor(get(K_ANONYMOUS).toBoolean())
                 .withVisiblePreview(getChild(K_NOTE_DATA).get(K_PREVIEW).toBoolean());
     }
 
@@ -125,6 +128,7 @@ public class FirebaseContent extends FirebaseObject {
         if (v == null) return;
         put(K_DURATION, v.getVisibleUntil());
         put(K_PUBLICITY, v.getSocialVisibility().getMode());
+        put(K_ANONYMOUS, v.isAuthorAnonymous());
         getChild(K_NOTE_DATA).put(K_PREVIEW, v.isPreviewVisible());
         // TODO generalize creation of "shared" object
         FirebaseObject shared = getChild(K_SHARED)

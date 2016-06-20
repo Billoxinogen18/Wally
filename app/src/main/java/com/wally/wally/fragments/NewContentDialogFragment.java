@@ -445,20 +445,23 @@ public class NewContentDialogFragment extends DialogFragment implements
                 }
             });
 
+            CheckBox checkBoxAnonymousAuthor = (CheckBox) v.findViewById(R.id.checkbox_anonymous_author);
+            checkBoxAnonymousAuthor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    mCont.getVisibility().withAnonymousAuthor(isChecked);
+                }
+            });
+
             // init map preview
-            final CheckBox checkBoxMapPreview = (CheckBox) v.findViewById(R.id.checkbox_map_preview);
+            CheckBox checkBoxMapPreview = (CheckBox) v.findViewById(R.id.checkbox_map_preview);
             checkBoxMapPreview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     mCont.getVisibility().withVisiblePreview(isChecked);
                 }
             });
-            v.findViewById(R.id.layout_map_preview).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    checkBoxMapPreview.performClick();
-                }
-            });
+
 
             // init time to live view
             mNoteDeleteTime = (TextView) v.findViewById(R.id.tv_note_delete_time);
@@ -480,6 +483,7 @@ public class NewContentDialogFragment extends DialogFragment implements
             // Init views from model
             Visibility visibility = mCont.getVisibility();
 
+            checkBoxAnonymousAuthor.setChecked(visibility.isAuthorAnonymous());
             checkBoxMapPreview.setChecked(visibility.isPreviewVisible());
             updateTimeVisibilityView();
         }

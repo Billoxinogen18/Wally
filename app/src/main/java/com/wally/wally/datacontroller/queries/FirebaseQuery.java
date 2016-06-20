@@ -25,12 +25,7 @@ public abstract class FirebaseQuery {
             public void onDataChange(DataSnapshot snapshot) {
                 List<FirebaseContent> result = new ArrayList<>();
                 for (DataSnapshot contentSnapshot : snapshot.getChildren()) {
-                    FirebaseContent content = new FirebaseContent();
-                    GenericTypeIndicator<Map<String, Object>> indicator =
-                            new GenericTypeIndicator<Map<String, Object>>(){};
-                    content.putAll(contentSnapshot.getValue(indicator));
-                    content.id = contentSnapshot.getKey();
-                    result.add(content);
+                    result.add(firebaseContentFromSnapshot(contentSnapshot));
                 }
                 callback.onResult(result);
             }
@@ -41,6 +36,15 @@ public abstract class FirebaseQuery {
             }
 
         });
+    }
+
+    public static FirebaseContent firebaseContentFromSnapshot(DataSnapshot snapshot) {
+        FirebaseContent content = new FirebaseContent();
+        GenericTypeIndicator<Map<String, Object>> indicator =
+                new GenericTypeIndicator<Map<String, Object>>(){};
+        content.putAll(snapshot.getValue(indicator));
+        content.id = snapshot.getKey();
+        return content;
     }
 
 }

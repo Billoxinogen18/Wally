@@ -139,4 +139,7 @@ public class Visibility implements Serializable {
         public @interface SocialVisibilityMode {
         }
     }
+
+    public static final SocialVisibility PUBLIC = new SocialVisibility(SocialVisibility.PUBLIC);
+    public static final SocialVisibility PRIVATE = new SocialVisibility(SocialVisibility.PRIVATE);
 }

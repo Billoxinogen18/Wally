@@ -8,11 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -20,8 +17,8 @@ import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.SelectedMenuView;
+import com.wally.wally.components.UserInfoView;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
@@ -65,8 +62,28 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         // Initialize managers
         mUserManager = ((App) getApplicationContext()).getUserManager(); //TODO get LoginManager from the Factory!
         mDataController = ((App) getApplicationContext()).getDataController();
-//        getGoogleApiClient();
+
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                .enableAutoManage(this, this)
+                .addOnConnectionFailedListener(this)
+                .addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addScope(Plus.SCOPE_PLUS_PROFILE)
+                .addApi(Plus.API)
+                .addApi(LocationServices.API)
+                .build();
     }
+
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
 
     @Override
     protected void onPause() {
@@ -87,6 +104,8 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         if (requestCode == REQUEST_CODE_MY_LOCATION) {
             if (Utils.checkLocationPermission(this)) {
                 saveActiveContent(mContentToSave);
+            } else {
+                // TODO show error that user can't add content without location permission
             }
         }
     }
@@ -114,7 +133,7 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
                 @Override
                 public void run() {
                     mSelectedMenuView.setVisibility(content == null ? View.GONE : View.VISIBLE);
-                    mSelectedMenuView.setContent(content, getGoogleApiClient());
+                    mSelectedMenuView.setContent(content, mGoogleApiClient);
                     mLastSelectTime = System.currentTimeMillis();
 
                     mSelectedMenuView.postDelayed(new Runnable() {
@@ -143,7 +162,6 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
 
 
     public void onNewContentClick(View v) {
-        Log.d(TAG, "onNewContentClick() called with: " + "v = [" + v + "]");
         NewContentDialogFragment.newInstance()
                 .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
 
@@ -187,14 +205,18 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
         mContentToSave = content;
         // Check and set location to content
         if (Utils.checkLocationPermission(this)) {
-            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(getGoogleApiClient());
+            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
             if (myLocation == null) {
                 Toast.makeText(this, "Couldn't get user location", Toast.LENGTH_SHORT).show();
+                // TODO show error or something
+                Log.e(TAG, "saveActiveContent: Cannot get user location");
+                return;
             } else {
                 content.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
             }
             onSaveContent(content);
+            Log.wtf(TAG, "saveActiveContent: " + content);
             mDataController.save(content);
         } else {
             ActivityCompat.requestPermissions(this,
@@ -206,27 +228,8 @@ public abstract class CameraARActivity extends LoginActivity implements OnVisual
 
     @SuppressWarnings("ConstantConditions")
     private void displayProfileBar(SocialUser user) {
-        findViewById(R.id.profile_bar).setVisibility(View.VISIBLE);
-        Glide.with(getBaseContext())
-                .load(user.getAvatarUrl())
-                .override(1000, 1000)
-                .transform(new CircleTransform(getBaseContext()))
-                .into((ImageView) findViewById(R.id.profile_image));
-
-        ((TextView) findViewById(R.id.profile_name)).setText(user.getFirstName());
-    }
-
-    private GoogleApiClient getGoogleApiClient() {
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                    .enableAutoManage(this, this)
-                    .addOnConnectionFailedListener(this)
-                    .addScope(Plus.SCOPE_PLUS_LOGIN)
-                    .addScope(Plus.SCOPE_PLUS_PROFILE)
-                    .addApi(Plus.API)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-        return mGoogleApiClient;
+        UserInfoView infoView = (UserInfoView) findViewById(R.id.profile_bar);
+        infoView.setVisibility(View.VISIBLE);
+        infoView.setUser(user);
     }
 }

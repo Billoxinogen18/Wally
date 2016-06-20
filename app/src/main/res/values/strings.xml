@@ -164,4 +164,8 @@
     <string name="photo_chooser_dialog_title">Select photo</string>
     <string name="people_chooser_dialog_title">Share with</string>
     <string name="anonymous">Anonymous</string>
+    <string name="preview_visibility_checkbox">Preview Is visible on map</string>
+    <string name="anonymous_author_checkbox">Anonymous author</string>
+    <string name="content_not_visible_title">Content Not visible</string>
+    <string name="content_not_visible_note">Move directly with camera to see</string>
 </resources>

@@ -30,6 +30,7 @@ import com.wally.wally.tango.VisualContentManager;
 import com.wally.wally.tango.WallyRenderer;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
+import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -68,7 +69,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         mLayoutFitting = findViewById(R.id.layout_fitting);
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
-        RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+        RajawaliTextureView mSurfaceView = (RajawaliTextureView) findViewById(R.id.rajawali_surface);
 
         Context context = getBaseContext();
 

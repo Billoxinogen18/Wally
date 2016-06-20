@@ -126,14 +126,18 @@ public class Content implements Serializable {
 
     @Override
     public String toString() {
-        return id + ": {uuid=" + uuid +
-                ", note=" + note +
-                ", title=" + title +
-                ", imageUri=" + imageUri +
-                ", visibility=" + visibility +
-                ", location=" + location +
+        return "Content{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", note='" + note + '\'' +
+                ", imageUri='" + imageUri + '\'' +
+                ", uuid='" + uuid + '\'' +
+                ", color=" + color +
                 ", tangoData=" + tangoData +
-                "}";
+                ", location=" + location +
+                ", visibility=" + visibility +
+                ", authorId='" + authorId + '\'' +
+                '}';
     }
 
     @Override

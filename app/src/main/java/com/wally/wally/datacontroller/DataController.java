@@ -7,62 +7,55 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
-import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
+import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
-import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
-import com.wally.wally.datacontroller.queries.LocationQuery;
-import com.wally.wally.datacontroller.queries.PublicityQuery;
-import com.wally.wally.datacontroller.queries.UUIDQuery;
+import com.wally.wally.datacontroller.queries.FirebaseQuery;
 import com.wally.wally.datacontroller.user.User;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
 
-    private static final String DATABASE_ROOT = "Test";
-    private static final String STORAGE_ROOT = DATABASE_ROOT;
-    private static final String USERS_NODE = "Users";
-    private static final String CONTENTS_NODE = "Contents";
-
     private static DataController instance;
 
     private User currentUser;
     private StorageReference storage;
-    private DatabaseReference users, contents;
+    private DatabaseReference users, contents, rooms;
 
     private DataController(DatabaseReference database, StorageReference storage) {
         this.storage = storage;
-        users = database.child(USERS_NODE);
-        contents = database.child(CONTENTS_NODE);
-        sanityCheck();
+        users = database.child(Config.USERS_NODE);
+        contents = database.child(Config.CONTENTS_NODE);
+        rooms = database.child("Rooms");
+
+        // Debug calls will be deleted in the end
+//        DebugUtils.refreshContents(contents, this);
+        DebugUtils.sanityCheck(this);
     }
 
     public static DataController create() {
         if (instance == null) {
             instance = new DataController(
-                    FirebaseDatabase.getInstance().getReference().child(DATABASE_ROOT),
-                    FirebaseStorage.getInstance().getReference().child(STORAGE_ROOT)
+                    FirebaseDatabase.getInstance().getReference().child(Config.DATABASE_ROOT),
+                    FirebaseStorage.getInstance().getReference().child(Config.STORAGE_ROOT)
             );
         }
         return instance;
-    }
-
-    private void sanityCheck() {
-//        contents.removeValue();
-//        DebugUtils.generateRandomContents(1000, this);
-//        fetchAtLocation(new LatLng(0, 0), 10, DebugUtils.debugCallback());
     }
 
     private void uploadImage(String imagePath, String folder, final Callback<String> callback) {
@@ -75,21 +68,17 @@ public class DataController {
     }
 
     public void save(final Content c) {
+        final FirebaseContent content = new FirebaseContent(c);
         DatabaseReference target;
 
         if (c.isPublic()) {
             target = contents.child("Public");
         } else if (c.isPrivate()) {
-            target = contents.child(c.getAuthorId()).child("Private");
+            target = contents.child(c.getAuthorId());
         } else {
-            target = contents.child(c.getAuthorId()).child("Shared");
+            target = contents.child("Shared");
         }
-
-        if (c.getId() == null) {
-            target = target.push();
-        } else {
-            target = target.child(c.getId());
-        }
+        target = target.child(c.getId());
 
         final DatabaseReference ref = target;
         uploadImage(
@@ -99,7 +88,9 @@ public class DataController {
                     @Override
                     public void onResult(String result) {
                         c.withImageUri(result);
-                        c.withId(new FirebaseContent(c).save(ref));
+                        c.withId(content.save(ref));
+                        String extendedId = ref.getParent().getKey() + ":" + ref.getKey();
+                        rooms.child(c.getUuid()).child(extendedId).setValue(true);
                     }
 
                     @Override
@@ -116,37 +107,29 @@ public class DataController {
         new FirebaseContent(c).delete(contents);
     }
 
-    private void fetchAtLocation(final LatLng center, double radiusKm, FetchResultCallback callback) {
-        final double radius = radiusKm * 1000; // Convert to meters
-        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
-        final AggregatorCallback aggregator =
-                new AggregatorCallback(callback).withExpectedCallbacks(queries.size());
-        for (GeoHashQuery query : queries) {
-            new LocationQuery(query).fetch(contents, new FirebaseFetchResultCallback(aggregator));
-        }
-    }
+    public void fetchByUUID(String uuid, final FetchResultCallback callback) {
+        rooms.child(uuid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GenericTypeIndicator<Map<String, Boolean>> indicator =
+                        new GenericTypeIndicator<Map<String, Boolean>>(){};
+                Map<String, Boolean> extendedIds = dataSnapshot.getValue(indicator);
+                if (extendedIds == null) {
+                    callback.onResult(Collections.<Content>emptySet());
+                    return;
+                }
+                AggregatorCallback aggregator = new AggregatorCallback(callback)
+                        .withExpectedCallbacks(extendedIds.size());
+                for (String key : extendedIds.keySet()) {
+                    fetchContentAt(key.replace(':', '/'), contents, aggregator);
+                }
+            }
 
-    private boolean locationIsInRange(LatLng location, LatLng center, double radius) {
-        return GeoUtils.distance(location, center) <= radius;
-    }
-
-    /**
-     * No alternative sadly, this method may crash badly
-     */
-    @Deprecated
-    public void fetchByUUID(String uuid, FetchResultCallback callback) {
-        new UUIDQuery(uuid).fetch(contents, new FirebaseFetchResultCallback(callback));
-    }
-
-    /**
-     * Fetches all public content without pagination.
-     *
-     * @deprecated use {@link #createPublicContentFetcher()} instead.
-     */
-    @Deprecated
-    public void fetchPublicContent(FetchResultCallback callback) {
-        new PublicityQuery(FirebaseContent.PUBLIC)
-                .fetch(contents, new FirebaseFetchResultCallback(callback));
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
     }
 
     public ContentFetcher createPublicContentFetcher() {
@@ -155,25 +138,17 @@ public class DataController {
 
     public ContentFetcher createVisibleContentFetcher(User user, LatLng center, double r) {
         // TODO stub implementation
-        return createPublicContentFetcher();
+        return createPublicContentFetcher(center, r);
     }
 
     public ContentFetcher createMyContentFetcher(User user, LatLng center, double r) {
         // TODO stub implementation
-        return createPublicContentFetcher();
+        return createPublicContentFetcher(center, r);
     }
 
     public ContentFetcher createUserContentFetcher(User me, User other, LatLng center, double r) {
         // TODO stub implementation
-        return createPublicContentFetcher();
-    }
-
-    private ContentFetcher createPrivateContentFetcher(String userId) {
-        return new KeyPager(contents.child(userId).child("Private"));
-    }
-
-    private ContentFetcher createSharedContentFetcher(String userId) {
-        return new KeyPager(contents.child(userId).child("Shared"));
+        return createPublicContentFetcher(center, r);
     }
 
     public User getCurrentUser() {
@@ -193,6 +168,35 @@ public class DataController {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 callback.onResult(dataSnapshot.getValue(User.class));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+    ContentFetcher createPublicContentFetcher(LatLng center, double radiusKm) {
+        DatabaseReference target = contents.child("Public");
+        final double radius = radiusKm * 1000; // Convert to meters
+        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
+        PagerChain chain = new PagerChain();
+        for (GeoHashQuery query : queries) {
+            chain.addPager(new KeyPager(
+                    target, query.getStartValue(), query.getEndValue()));
+        }
+        return chain;
+    }
+
+    private void fetchContentAt(String path, DatabaseReference ref,
+                                final FetchResultCallback callback) {
+        ref.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Content content = FirebaseQuery.firebaseContentFromSnapshot(dataSnapshot).toContent();
+                callback.onResult(Collections.singleton(content));
+
             }
 
             @Override
