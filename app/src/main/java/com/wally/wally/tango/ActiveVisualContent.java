@@ -74,4 +74,12 @@ public class ActiveVisualContent extends VisualContent {
         mVisual.setRotation(currentPose.getOrientation());
         return mVisual;
     }
+
+    @Override
+    public ActiveVisualContent cloneContent(){
+        ActiveVisualContent res = new ActiveVisualContent(mContent);
+        res.setStatus(getStatus());
+        res.setNewPose(mNewPose);
+        return res;
+    }
 }

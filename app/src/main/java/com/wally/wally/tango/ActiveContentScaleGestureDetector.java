@@ -22,8 +22,8 @@ public class ActiveContentScaleGestureDetector implements ScaleGestureDetector.O
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         float scale = detector.getScaleFactor() != 0 ? detector.getScaleFactor() : 1f;
-        if (mVisualContentManager.getActiveContent() != null) {
-            mVisualContentManager.getActiveContent().scaleContent(scale);
+        if (mVisualContentManager.isActiveContent()) {
+            mVisualContentManager.scaleActiveContent(scale);
         } else {
             Log.e(TAG, "onScale() was called but active content is not on screen");
         }

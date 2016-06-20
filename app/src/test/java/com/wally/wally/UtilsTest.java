@@ -24,7 +24,7 @@ public final class UtilsTest {
         Display d = mock(Display.class);
         when(m.getDefaultDisplay()).thenReturn(d);
         when(x.getSystemService(Context.WINDOW_SERVICE)).thenReturn(m);
-        new WallyRenderer(x,null);
+        new WallyRenderer(x,null,null);
 
     }
 

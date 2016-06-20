@@ -91,7 +91,9 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        mVisualContentManager.removePendingActiveContent();
+        if(mVisualContentManager.isActiveContent()) {
+            mVisualContentManager.removePendingActiveContent();
+        }
     }
 
     @Override
