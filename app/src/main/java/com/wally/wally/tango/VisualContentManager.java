@@ -13,6 +13,7 @@ import org.rajawali3d.Object3D;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,11 +30,12 @@ public class VisualContentManager implements LocalizationListener {
     //Active Content
     private final Object mActiveContentLock = new Object();
     private ActiveVisualContent mActiveContent;
+    private ActiveVisualContent mSavedActiveContent;
 
     //Static Content
     private final Object mStaticContentLock = new Object();
     private List<VisualContent> mStaticContent;
-    private List<VisualContent> savedStaticContent;
+    private List<VisualContent> mSavedStaticContent;
 
     //Selected Content
     private final Object mSelectedContentLock = new Object();
@@ -44,7 +46,7 @@ public class VisualContentManager implements LocalizationListener {
     public VisualContentManager() {
         mIsLocalized = false;
         mStaticContent = new ArrayList<>();
-        savedStaticContent = new ArrayList<>();
+        mSavedStaticContent = new ArrayList<>();
     }
 
     /**
@@ -56,13 +58,29 @@ public class VisualContentManager implements LocalizationListener {
         Log.d(TAG, "localized() called with: " + "");
         synchronized (mLocalizationLock) {
             mIsLocalized = true;
+            synchronized (mActiveContentLock){
+                if (mSavedActiveContent != null) {
+                    mActiveContent = getLocalizationNewActiveContent(mSavedActiveContent, mActiveContent);
+                    mSavedActiveContent = null;
+                }
+            }
             synchronized (mStaticContentLock) {
-                mStaticContent = savedStaticContent;
-                for (VisualContent vc : mStaticContent){
-                    vc.setStatus(RenderStatus.PendingRender);
+                if (mSavedStaticContent != null) {
+                    mStaticContent = getLocalizationNewStaticContent(mSavedStaticContent, mStaticContent);
+                    mSavedStaticContent = null;
                 }
             }
         }
+    }
+
+    private ActiveVisualContent getLocalizationNewActiveContent(ActiveVisualContent savedContent, ActiveVisualContent contentNow){
+        ActiveVisualContent res = savedContent;
+        if ((savedContent.getStatus() == RenderStatus.Rendered || savedContent.getStatus() == RenderStatus.PendingRender)
+                && (contentNow == null || (contentNow.getStatus() != RenderStatus.Rendered && contentNow.getStatus() != RenderStatus.PendingRemove))) {
+            res.setStatus(RenderStatus.PendingRender);
+        }
+
+        return res;
     }
 
     /**
@@ -74,10 +92,27 @@ public class VisualContentManager implements LocalizationListener {
         Log.d(TAG, "notLocalized() called with: " + "");
         synchronized (mLocalizationLock) {
             mIsLocalized = false;
+            synchronized (mActiveContentLock){
+                if (isActiveContent()) {
+                    mSavedActiveContent = mActiveContent.cloneContent();
+                    removePendingActiveContent();
+                }
+            }
             synchronized (mStaticContentLock) {
-                savedStaticContent = cloneList(mStaticContent);
+                mSavedStaticContent = cloneList(mStaticContent);
                 removeAllStaticContent();
             }
+        }
+    }
+
+    /**
+     * Is called from Renderer thread
+     *
+     * @return
+     */
+    public boolean isLocalized() {
+        synchronized (mLocalizationLock) {
+            return mIsLocalized;
         }
     }
 
@@ -89,14 +124,48 @@ public class VisualContentManager implements LocalizationListener {
         return res;
     }
 
-    /**
-     * Is called from Renderer thread
-     *
-     * @return
-     */
-    private boolean isLocalized() {
-        synchronized (mLocalizationLock) {
-            return mIsLocalized;
+
+    private VisualContent findVisualContentInStaticContentList(VisualContent vc, List<VisualContent> contentNow){
+        for(VisualContent c: contentNow){
+            if (c.getContent().equals(vc.getContent())) return c;
+        }
+        return null;
+    }
+
+    private ArrayList<VisualContent> getLocalizationNewStaticContent(List<VisualContent> savedContent, List<VisualContent> contentNow){
+        ArrayList<VisualContent> newCon = new ArrayList<>();
+        for (VisualContent oldC : savedContent){
+            VisualContent newC = findVisualContentInStaticContentList(oldC, contentNow);
+            if (newC != null){
+                if((oldC.getStatus() == RenderStatus.Rendered || oldC.getStatus() == RenderStatus.PendingRender) &&
+                        (newC.getStatus() != RenderStatus.Rendered && newC.getStatus() != RenderStatus.PendingRemove)){
+                    oldC.setStatus(RenderStatus.PendingRender);
+                    newCon.add(oldC);
+                } else if (oldC.getStatus() == RenderStatus.PendingRemove && newC.getStatus() != RenderStatus.None){
+                    newCon.add(oldC);
+                }
+            } else {
+                if (oldC.getStatus() == RenderStatus.Rendered){
+                    oldC.setStatus(RenderStatus.PendingRender);
+                    newCon.add(oldC);
+                } else if (oldC.getStatus() == RenderStatus.PendingRender){
+                    newCon.add(oldC);
+                }
+            }
+        }
+        return newCon;
+    }
+
+    private void removeAllStaticContent() {
+        //TODO buggy when renderer gets pending staticContent it will be rendered anyway.
+        synchronized (mStaticContentLock) {
+            for (VisualContent vc : mStaticContent) {
+                if (vc.getStatus() == RenderStatus.Rendered) {
+                    vc.setStatus(RenderStatus.PendingRemove);
+                } else if (vc.getStatus() == RenderStatus.PendingRender) {
+                    vc.setStatus(RenderStatus.None);
+                }
+            }
         }
     }
 
@@ -202,7 +271,7 @@ public class VisualContentManager implements LocalizationListener {
     }
 
     public boolean isActiveContent(){
-        synchronized (mActiveContent){
+        synchronized (mActiveContentLock){
             return mActiveContent != null;
         }
     }
@@ -213,8 +282,10 @@ public class VisualContentManager implements LocalizationListener {
      * @return
      */
     public boolean shouldActiveContentRenderOnScreen() {
-        synchronized (mActiveContentLock) {
-            return mActiveContent != null && mActiveContent.getStatus() == RenderStatus.PendingRender;
+        synchronized (mLocalizationLock) {
+            synchronized (mActiveContentLock) {
+                return mActiveContent != null && mActiveContent.getStatus() == RenderStatus.PendingRender && isLocalized();
+            }
         }
     }
 
@@ -285,8 +356,14 @@ public class VisualContentManager implements LocalizationListener {
     }
 
     public Iterator<VisualContent> getStaticVisualContentToAdd() {
-        synchronized (mStaticContentLock) {
-            return filterStaticVisualContentList(RenderStatus.PendingRender);
+        synchronized (mLocalizationLock) {
+            synchronized (mStaticContentLock) {
+                if (isLocalized()) {
+                    return filterStaticVisualContentList(RenderStatus.PendingRender);
+                } else {
+                    return Collections.emptyIterator();
+                }
+            }
         }
     }
 
@@ -328,18 +405,6 @@ public class VisualContentManager implements LocalizationListener {
         return res.iterator();
     }
 
-    private void removeAllStaticContent() {
-        //TODO buggy when renderer gets pending staticContent it will be rendered anyway.
-        synchronized (mStaticContentLock) {
-            for (VisualContent vc : mStaticContent) {
-                if (vc.getStatus() == RenderStatus.Rendered) {
-                    vc.setStatus(RenderStatus.PendingRemove);
-                } else if (vc.getStatus() == RenderStatus.PendingRender) {
-                    vc.setStatus(RenderStatus.None);
-                }
-            }
-        }
-    }
 
     private void addPendingStaticContent(VisualContent visualContent) {
         synchronized (mStaticContentLock) {
@@ -356,11 +421,11 @@ public class VisualContentManager implements LocalizationListener {
     private void addSavedPendingStaticContent(VisualContent visualContent) {
         synchronized (mStaticContentLock) {
             visualContent.setStatus(RenderStatus.PendingRender);
-            int index = savedStaticContent.indexOf(visualContent);
+            int index = mSavedStaticContent.indexOf(visualContent);
             if (index == -1) {
-                savedStaticContent.add(visualContent);
+                mSavedStaticContent.add(visualContent);
             } else {
-                savedStaticContent.set(index, visualContent);
+                mSavedStaticContent.set(index, visualContent);
             }
         }
     }

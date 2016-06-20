@@ -14,6 +14,7 @@ import org.rajawali3d.math.vector.Vector3;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -47,6 +48,7 @@ public class VisualContentManagerTest {
     @Test
     public void activeContentTest1(){
         mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.localized();
         assertThat(mVisualContentManager.getActiveContent().getContent(), is(mContent));
         assertThat(mVisualContentManager.getActiveContent().getStatus(), is(VisualContent.RenderStatus.PendingRender));
         assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(true));
@@ -203,42 +205,31 @@ public class VisualContentManagerTest {
         mVisualContentManager.localized();
         mVisualContentManager.createStaticContent(mContents);
         boolean eq1 = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), mContents.iterator());
-        boolean eq2 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), new ArrayList<Content>().iterator());
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToRemove()), is(0));
         assertThat(eq1, is(true));
-        assertThat(eq2, is(true));
     }
 
     @Test
     public void staticContentTest2(){
         mVisualContentManager.localized();
         mVisualContentManager.createStaticContent(mContents);
-        Iterator<VisualContent> it = mVisualContentManager.getStaticVisualContentToAdd();
-        while(it.hasNext()){
-            VisualContent vc = it.next();
-            mVisualContentManager.setStaticContentAdded(vc);
-        }
+        addAllPendingStaticContent();
 
-        boolean eq = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), new ArrayList<Content>().iterator());
-        boolean eq2 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), new ArrayList<Content>().iterator());
-        assertThat(eq, is(true));
-        assertThat(eq2, is(true));
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToAdd()), is(0));
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToRemove()), is(0));
+
     }
 
     @Test
     public void staticContentTest3(){
         mVisualContentManager.localized();
         mVisualContentManager.createStaticContent(mContents);
-        Iterator<VisualContent> it = mVisualContentManager.getStaticVisualContentToAdd();
-        while(it.hasNext()){
-            VisualContent vc = it.next();
-            mVisualContentManager.setStaticContentAdded(vc);
-        }
+        addAllPendingStaticContent();
         for (Content vc: mContents) {
             mVisualContentManager.removePendingStaticContent(vc);
         }
 
-        boolean eq = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), new ArrayList<Content>().iterator());
-        assertThat(eq, is(true));
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToAdd()), is(0));
         boolean eq2 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), mContents.iterator());
         assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToRemove()), is(iteratorSize(mContents.iterator())));
         assertThat(eq2, is(true));
@@ -249,23 +240,14 @@ public class VisualContentManagerTest {
     public void staticContentTest4() {
         mVisualContentManager.localized();
         mVisualContentManager.createStaticContent(mContents);
-        Iterator<VisualContent> it = mVisualContentManager.getStaticVisualContentToAdd();
-        while (it.hasNext()) {
-            VisualContent vc = it.next();
-            mVisualContentManager.setStaticContentAdded(vc);
-        }
+        addAllPendingStaticContent();
         for (Content vc : mContents) {
             mVisualContentManager.removePendingStaticContent(vc);
         }
-        Iterator<VisualContent> it2 = mVisualContentManager.getStaticVisualContentToRemove();
-        while(it2.hasNext()){
-            VisualContent vc = it2.next();
-            mVisualContentManager.setStaticContentRemoved(vc);
-        }
-        boolean eq = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), new ArrayList<Content>().iterator());
-        assertThat(eq, is(true));
-        boolean eq2 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), new ArrayList<Content>().iterator());
-        assertThat(eq2, is(true));
+        removeAllPendingStaticContent();
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToAdd()), is(0));
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToRemove()), is(0));
+
     }
 
 
@@ -301,12 +283,27 @@ public class VisualContentManagerTest {
         for (Content c: mContents) {
             mVisualContentManager.removePendingStaticContent(c);
         }
-        boolean eq = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), new ArrayList<Content>().iterator());
-        assertThat(eq, is(true));
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToAdd()), is(0));
         boolean eq2 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), mContents.iterator());
         assertThat(eq2, is(true));
     }
 
+
+    private void addAllPendingStaticContent(){
+        Iterator<VisualContent> it = mVisualContentManager.getStaticVisualContentToAdd();
+        while (it.hasNext()) {
+            VisualContent vc = it.next();
+            mVisualContentManager.setStaticContentAdded(vc);
+        }
+    }
+
+    private void removeAllPendingStaticContent(){
+        Iterator<VisualContent> it2 = mVisualContentManager.getStaticVisualContentToRemove();
+        while(it2.hasNext()){
+            VisualContent vc = it2.next();
+            mVisualContentManager.setStaticContentRemoved(vc);
+        }
+    }
 
     /******************************************
      * Localization
@@ -314,7 +311,134 @@ public class VisualContentManagerTest {
 
     @Test
     public void localizationTest1(){
-        
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        mVisualContentManager.notLocalized();
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToAdd()), is(0));
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToRemove()), is(0));
     }
+
+    @Test
+    public void localizationTest2(){
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        addAllPendingStaticContent();
+        mVisualContentManager.notLocalized();
+
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToAdd()), is(0));
+        boolean eq1 = iteratorEquals(mVisualContentManager.getStaticVisualContentToRemove(), mContents.iterator());
+        assertThat(eq1, is(true));
+    }
+
+    @Test
+    public void localizationTest3(){
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        addAllPendingStaticContent();
+        mVisualContentManager.notLocalized();
+        mVisualContentManager.localized();
+
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToAdd()), is(0));
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToRemove()), is(0));
+    }
+
+    @Test
+    public void localizationTest4(){
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        addAllPendingStaticContent();
+        mVisualContentManager.notLocalized();
+        removeAllPendingStaticContent();
+        addAllPendingStaticContent();
+        mVisualContentManager.localized();
+
+        boolean eq = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), mContents.iterator());
+        assertThat(eq, is(true));
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToRemove()), is(0));
+    }
+
+    @Test
+    public void localizationTest5(){
+        mVisualContentManager.localized();
+        mVisualContentManager.createStaticContent(mContents);
+        addAllPendingStaticContent();
+        mVisualContentManager.notLocalized();
+        removeAllPendingStaticContent();
+        addAllPendingStaticContent();
+        mVisualContentManager.localized();
+
+        boolean eq = iteratorEquals(mVisualContentManager.getStaticVisualContentToAdd(), mContents.iterator());
+        assertThat(eq, is(true));
+        assertThat(iteratorSize(mVisualContentManager.getStaticVisualContentToRemove()), is(0));
+    }
+
+
+
+    @Test
+    public void localizationTest6(){
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(false));
+    }
+
+
+    @Test
+    public void localizationTest7(){
+        mVisualContentManager.localized();
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.setActiveContentAdded();
+        mVisualContentManager.notLocalized();
+        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(false));
+        assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(true));
+    }
+
+    @Test
+    public void localizationTest8(){
+        mVisualContentManager.localized();
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.setActiveContentAdded();
+        mVisualContentManager.notLocalized();
+        mVisualContentManager.localized();
+        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(false));
+        assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(false));
+    }
+
+
+
+    @Test
+    public void localizationTest9(){
+        mVisualContentManager.localized();
+        mVisualContentManager.addPendingActiveContent(mPose, mContent);
+        mVisualContentManager.setActiveContentAdded();
+        mVisualContentManager.notLocalized();
+        mVisualContentManager.setActiveContentRemoved();
+        mVisualContentManager.localized();
+        assertThat(mVisualContentManager.shouldActiveContentRenderOnScreen(), is(true));
+        assertThat(mVisualContentManager.shouldActiveContentRemoveFromScreen(), is(false));
+    }
+
+//    @Test
+//    public void getLocalizationNewContentTest(){
+//        ArrayList<VisualContent> v = getVCList(5);
+//        ArrayList<VisualContent> v2 = getVCList(5);
+//        ArrayList<VisualContent> res = mVisualContentManager.getLocalizationNewContent(v,v2);
+//        assertThat(v.size(), is(res.size()));
+//        for (int i=0; i<v.size(); i++){
+//            assertThat(res.contains(v.get(i)), is(true));
+//        }
+//    }
+//
+//    private ArrayList<VisualContent> getVCList(int n){
+//        ArrayList<VisualContent> res = new ArrayList<>();
+//        for (int i=0; i<n; i++){
+//            res.add(getVisualContent(i));
+//        }
+//        return res;
+//    }
+//
+//    private VisualContent getVisualContent(int id){
+//        VisualContent v = new VisualContent(new Content(""+id));
+//        v.setStatus(VisualContent.RenderStatus.Rendered);
+//        return v;
+//    }
 
 }
