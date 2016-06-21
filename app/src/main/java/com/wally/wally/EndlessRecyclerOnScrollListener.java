@@ -7,47 +7,51 @@ import android.util.Log;
 public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScrollListener {
     public static String TAG = EndlessRecyclerOnScrollListener.class.getSimpleName();
 
-    private boolean loading; // True if we are still waiting for the last set of data to load.
-    private int numItemsOnPage = 5; // The minimum amount of items to have below your current scroll position before loading more.
+    private boolean loading = true; // True if we are still waiting for the last set of data to load.
+    private int visibleThreshold = 5; // The minimum amount of items to have below your current scroll position before loading more.
+    int firstVisibleItem, visibleItemCount, totalItemCount, lastVisibleItem;
 
 
-    private LinearLayoutManager mLinearLayoutManager;
-
-    public EndlessRecyclerOnScrollListener(LinearLayoutManager linearLayoutManager, int numItemsOnPage) {
-        this.mLinearLayoutManager = linearLayoutManager;
-        this.numItemsOnPage = numItemsOnPage;
+    public EndlessRecyclerOnScrollListener(int numItemsOnPage) {
+        this.visibleThreshold = numItemsOnPage;
     }
+
+
+    public void loadingFinished() {
+        loading = false;
+    }
+
+    public abstract void onLoadNext();
+
+    public abstract void onLoadPrevious();
+
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
         super.onScrolled(recyclerView, dx, dy);
 
-        int lastVisibleItemPosition = mLinearLayoutManager.findLastVisibleItemPosition();
-        int firstVisibleItemPosition = mLinearLayoutManager.findFirstVisibleItemPosition();
-        int totalItems = mLinearLayoutManager.getItemCount();
+        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
-//        Log.d(TAG, "onScrolled() called with: " + "dx = [" + dx + "], dy = [" + dy + "]");
-//        Log.d(TAG, "onScrolled() called: " + "lastVisible = [" + lastVisibleItemPosition +
-//                "], firstVisible = [" + firstVisibleItemPosition + "]" +
-//                "], total = [" + totalItems + "]");
+        visibleItemCount = recyclerView.getChildCount();
+        totalItemCount = linearLayoutManager.getItemCount();
+        firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
+        lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
+        Log.d(TAG, "onScrolled: Loading=" + loading);
+        if (!loading && dy > 0 && (totalItemCount - visibleItemCount)
+                <= (firstVisibleItem + visibleThreshold)) {
+            // End has been reached
+            Log.d(TAG, "onScrolled: loadNext");
+            onLoadNext();
 
-        if(!loading) {
-            if (dy > 0 && lastVisibleItemPosition > totalItems - numItemsOnPage) {
-                Log.d(TAG, "onScrolled: LoadNext");
-                loading = true;
-                onLoadNext();
-            } else if (dy < 0 && firstVisibleItemPosition < numItemsOnPage) {
-                Log.d(TAG, "onScrolled: LoadPrevious");
-                loading = true;
-                onLoadPrevious();
-            }
+            loading = true;
+        }
+
+        if (!loading && dy < 0 && visibleItemCount > (lastVisibleItem - visibleThreshold)) {
+            // End has been reached
+            Log.d(TAG, "onScrolled: loadPrevious");
+            onLoadPrevious();
+
+            loading = true;
         }
     }
-
-    public void loadingFinished(){
-        loading = false;
-    }
-
-    public abstract void onLoadNext();
-    public abstract void onLoadPrevious();
 }
