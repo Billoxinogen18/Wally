@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Camera;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
+import com.wally.wally.App;
 import com.wally.wally.EndlessRecyclerOnScrollListener;
 import com.wally.wally.R;
 import com.wally.wally.StubContentFetcher;
@@ -178,7 +180,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     MY_LOCATION_REQUEST_CODE);
         }
         //TODO what to do when in profile
-//        centerMapOnMyLocation();
+        centerMapOnMyLocation();
     }
 
     public void onBtnCameraClick(View view) {
@@ -271,7 +273,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        ContentFetcher contentFetcher = getContentFetcher();
+        ContentFetcher contentFetcher = getContentFetcher(cameraPosition);
 
         mContentRetriever = new ContentPagingRetriever(contentFetcher, PAGE_LENGTH);
         mContentRetriever.registerLoadListener(this);
@@ -287,7 +289,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             if (permissions.length == 1 &&
                     permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                centerMapOnMyLocation();
+                centerMapOnMyLocation();
             }
         }
     }
@@ -295,7 +297,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onConnected(Bundle connectionHint) {
         mGoogleApiClient.unregisterConnectionCallbacks(this);
-//        centerMapOnMyLocation();
+        centerMapOnMyLocation();
     }
 
     @Override
@@ -318,30 +320,30 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onStop();
     }
 
-    private ContentFetcher getContentFetcher() {
+    private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
         double radius = Utils.getRadius(mMap.getProjection().getVisibleRegion().latLngBounds);
-        ContentFetcher contentFetcher = new StubContentFetcher();
+        ContentFetcher contentFetcher;
 
-//        if(mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)){
-//            contentFetcher = App.getInstance().getDataController()
-//                    .createMyContentFetcher(
-//                            mUserProfile.getBaseUser(),
-//                            cameraPosition.target,
-//                            radius);
-//        }else if(mUserProfile != null){
-//            contentFetcher = App.getInstance().getDataController()
-//                    .createUserContentFetcher(
-//                            App.getInstance().getUserManager().getUser().getBaseUser(),
-//                            mUserProfile.getBaseUser(),
-//                            cameraPosition.target,
-//                            radius);
-//        }else{
-//            contentFetcher = App.getInstance().getDataController().createVisibleContentFetcher(
-//                    App.getInstance().getUserManager().getUser().getBaseUser(),
-//                    cameraPosition.target,
-//                    radius
-//            );
-//        }
+        if(mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)){
+            contentFetcher = App.getInstance().getDataController()
+                    .createMyContentFetcher(
+                            mUserProfile.getBaseUser(),
+                            cameraPosition.target,
+                            radius);
+        }else if(mUserProfile != null){
+            contentFetcher = App.getInstance().getDataController()
+                    .createUserContentFetcher(
+                            App.getInstance().getUserManager().getUser().getBaseUser(),
+                            mUserProfile.getBaseUser(),
+                            cameraPosition.target,
+                            radius);
+        }else{
+            contentFetcher = App.getInstance().getDataController().createVisibleContentFetcher(
+                    App.getInstance().getUserManager().getUser().getBaseUser(),
+                    cameraPosition.target,
+                    radius
+            );
+        }
         return contentFetcher;
     }
 
