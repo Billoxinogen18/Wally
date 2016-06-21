@@ -35,6 +35,7 @@ public class ContentPagingRetriever {
 
     private boolean lastNextOne = true;
     private boolean lastNextTwo = true;
+    private long lastRequestId = 0;
 
     public ContentPagingRetriever(ContentFetcher contentFetcher, int pageLenght) {
         this.contentFetcher = contentFetcher;
@@ -78,9 +79,17 @@ public class ContentPagingRetriever {
     }
 
     private void loadNext(final int num) {
-        contentFetcher.fetchNext(num, new FetchResultCallback() {
+        lastRequestId = System.currentTimeMillis();
+        contentFetcher.fetchNext(num, new LastRequestCallback(lastRequestId) {
             @Override
             public void onResult(Collection<Content> result) {
+                if(this.requestId != lastRequestId){
+                    for (ContentPageRetrieveListener observer : observers) {
+                        observer.onNextPageFinish();
+                    }
+                    return;
+                }
+
                 if (!lastNextOne) {
                     lastNextOne = true;
                     loadNext(num);
@@ -120,6 +129,13 @@ public class ContentPagingRetriever {
 
             @Override
             public void onError(Exception e) {
+                if(this.requestId != lastRequestId) {
+                    for (ContentPageRetrieveListener observer : observers) {
+                        observer.onNextPageFinish();
+                    }
+                    return;
+                }
+
                 hasNext = false;
                 for (ContentPageRetrieveListener observer : observers) {
                     observer.onNextPageFail();
@@ -136,9 +152,17 @@ public class ContentPagingRetriever {
     }
 
     public void loadPrevious(final int num) {
-        contentFetcher.fetchPrev(num, new FetchResultCallback() {
+        lastRequestId = System.currentTimeMillis();
+        contentFetcher.fetchPrev(num, new LastRequestCallback(lastRequestId) {
             @Override
             public void onResult(Collection<Content> result) {
+                if(this.requestId != lastRequestId){
+                    for (ContentPageRetrieveListener observer : observers) {
+                        observer.onPreviousPageFinish();
+                    }
+                    return;
+                }
+
                 if (lastNextOne) {
                     lastNextOne = false;
                     loadPrevious(num);
@@ -177,6 +201,13 @@ public class ContentPagingRetriever {
 
             @Override
             public void onError(Exception e) {
+                if(this.requestId != lastRequestId){
+                    for (ContentPageRetrieveListener observer : observers) {
+                        observer.onPreviousPageFinish();
+                    }
+                    return;
+                }
+
                 hasPrevious = false;
                 for (ContentPageRetrieveListener observer : observers) {
                     observer.onPreviousPageFail();
@@ -254,6 +285,24 @@ public class ContentPagingRetriever {
         return sb.toString();
     }
 
+    private abstract class LastRequestCallback implements FetchResultCallback{
+        public long requestId;
+
+        public LastRequestCallback(long requestId){
+            this.requestId = requestId;
+        }
+
+        @Override
+        public void onResult(Collection<Content> result) {
+
+        }
+
+        @Override
+        public void onError(Exception e) {
+
+        }
+    }
+
     public interface ContentPageRetrieveListener {
         void onInit();
 
@@ -266,5 +315,9 @@ public class ContentPagingRetriever {
         void onPreviousPageLoad(int pageLength);
 
         void onPreviousPageFail();
+
+        void onNextPageFinish();
+
+        void onPreviousPageFinish();
     }
 }

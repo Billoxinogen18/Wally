@@ -32,6 +32,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
+import com.wally.wally.App;
 import com.wally.wally.EndlessRecyclerOnScrollListener;
 import com.wally.wally.R;
 import com.wally.wally.StubContentFetcher;
@@ -230,39 +231,51 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onNextPageLoad(int pageLength) {
         Log.d(TAG, "onNextPageLoad() called with: " + "pageLength = [" + pageLength + "]");
         onPageLoaded();
-        mContentScrollListener.loadingFinished();
+        mContentScrollListener.loadingNextFinished();
     }
 
     @Override
     public void onPreviousPageLoad(int pageLength) {
         Log.d(TAG, "onPreviousPageLoad() called with: " + "pageLength = [" + pageLength + "]");
         onPageLoaded();
-        mContentScrollListener.loadingFinished();
+        mContentScrollListener.loadingPreviousFinished();
     }
 
     @Override
     public void onNextPageFail() {
         Log.d(TAG, "onNextPageFail() called with: " + "");
-        mContentScrollListener.loadingFinished();
+        mContentScrollListener.loadingNextFinished();
     }
 
     @Override
     public void onPreviousPageFail() {
         Log.d(TAG, "onPreviousPageFail() called with: " + "");
-        mContentScrollListener.loadingFinished();
+        mContentScrollListener.loadingPreviousFinished();
+    }
+
+    @Override
+    public void onNextPageFinish() {
+        mContentScrollListener.loadingNextFinished();
+    }
+
+    @Override
+    public void onPreviousPageFinish() {
+        mContentScrollListener.loadingPreviousFinished();
     }
 
     @Override
     public void onInit() {
         Log.d(TAG, "onInit() called with: " + "");
         onPageLoaded();
-        mContentScrollListener.loadingFinished();
+        mContentScrollListener.loadingPreviousFinished();
+        mContentScrollListener.loadingNextFinished();
     }
 
     @Override
     public void onFail() {
         Log.d(TAG, "onFail() called with: " + "");
-        mContentScrollListener.loadingFinished();
+        mContentScrollListener.loadingPreviousFinished();
+        mContentScrollListener.loadingNextFinished();
     }
 
     @Override
@@ -316,25 +329,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
-//        double radius = Utils.getRadius(mMap.getProjection().getVisibleRegion().latLngBounds);
-        ContentFetcher contentFetcher = new StubContentFetcher();
+        double radius = Utils.getRadius(mMap.getProjection().getVisibleRegion().latLngBounds);
+        ContentFetcher contentFetcher;// = new StubContentFetcher();
 
-//        if(mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)){
-//            contentFetcher = App.getInstance().getDataController()
-//                    .createFetcherForMyContent(
-//                            cameraPosition.target,
-//                            radius);
-//        }else if(mUserProfile != null){
-//            contentFetcher = App.getInstance().getDataController()
-//                    .createFetcherForUserContent(mUserProfile.getBaseUser(),
-//                            cameraPosition.target,
-//                            radius);
-//        }else{
-//            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
-//                    cameraPosition.target,
-//                    radius
-//            );
-//        }
+        if(mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)){
+            contentFetcher = App.getInstance().getDataController()
+                    .createFetcherForMyContent(
+                            cameraPosition.target,
+                            radius);
+        }else if(mUserProfile != null){
+            contentFetcher = App.getInstance().getDataController()
+                    .createFetcherForUserContent(mUserProfile.getBaseUser(),
+                            cameraPosition.target,
+                            radius);
+        }else{
+            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
+                    cameraPosition.target,
+                    radius
+            );
+        }
         return contentFetcher;
     }
 

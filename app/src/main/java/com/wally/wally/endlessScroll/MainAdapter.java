@@ -158,6 +158,16 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         });
     }
 
+    @Override
+    public void onNextPageFinish() {
+
+    }
+
+    @Override
+    public void onPreviousPageFinish() {
+
+    }
+
     public void setUserProfile(SocialUser userProfile) {
         this.userProfile = userProfile;
     }
