@@ -31,7 +31,7 @@ public class ContentPagingRetriever {
     private Handler handler;
 
     private boolean hasNext = true;
-    private boolean hasPrevious = false;
+    private boolean hasPrevious = true;
 
     private boolean lastNextOne = true;
     private boolean lastNextTwo = true;
@@ -75,7 +75,7 @@ public class ContentPagingRetriever {
             for (ContentPageRetrieveListener observer : observers) {
                 observer.onBeforeNextPageLoad();
             }
-
+            hasPrevious = true;
             loadNext(pageLength);
         }
     }
@@ -105,7 +105,6 @@ public class ContentPagingRetriever {
                                 previous = current;
                                 current = next;
                                 next = contents;
-                                hasPrevious = true;
                                 for (ContentPageRetrieveListener observer : observers) {
                                     observer.onNextPageLoad(contents.size());
                                 }
@@ -139,7 +138,7 @@ public class ContentPagingRetriever {
             for (ContentPageRetrieveListener observer : observers) {
                 observer.onBeforePreviousPageLoad();
             }
-
+            hasNext = true;
             loadPrevious(pageLength);
         }
     }
@@ -170,7 +169,6 @@ public class ContentPagingRetriever {
                                 current = previous;
                                 previous = contents;
 
-                                hasNext = true;
                                 for (ContentPageRetrieveListener observer : observers) {
                                     observer.onPreviousPageLoad(contents.size());
                                 }

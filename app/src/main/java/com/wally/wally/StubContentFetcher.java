@@ -38,19 +38,21 @@ public class StubContentFetcher implements ContentFetcher {
     @Override
     public void fetchPrev(int i, final FetchResultCallback callback) {
         final ArrayList<Content> res = new ArrayList<>();
+        
         for(int y = 0; y < i; y++){
             if(!iterator.hasPrevious()) break;
-                res.add(iterator.previous());
+            res.add(iterator.previous());
         }
         Collections.reverse(res);
+        Log.d("BLA", "fetchPrev: " + listToString(res));
         new Thread(new Runnable() {
             @Override
             public void run() {
-//                try {
-//                    Thread.sleep(3000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 callback.onResult(res);
             }
         }).start();

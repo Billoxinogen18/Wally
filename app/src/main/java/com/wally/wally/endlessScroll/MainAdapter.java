@@ -27,6 +27,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private ContentListViewItem.OnClickListener onClickListener;
 
     private boolean hasNext = true;
+    private boolean hasPrevious = false;
 
     private Handler mainHandler;
 
@@ -41,7 +42,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     @Override
     public int getItemViewType(int position) {
-        if (position == getItemCount() - 1) {
+        if (position == getItemCount() - 1 || position == 0) {
             return PROGRESS_VIEW_TYPE;
         }
 
@@ -55,7 +56,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             View v = LayoutInflater
                     .from(context).inflate(R.layout.maps_content_list_progress_item, parent, false);
             return new ProgressViewHolder(v);
-        }else {
+        } else {
 
             ContentListViewItem contentListViewItem = new ContentListViewItem(context);
             return new MainListItemViewHolder(context, contentListViewItem);
@@ -65,24 +66,26 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if(position != getItemCount()-1) {
-            MainListItemViewHolder mHolder = (MainListItemViewHolder)holder;
-            Content content = dataSource.get(position);
+
+        if (position == 0) {
+            ProgressViewHolder mHolder = (ProgressViewHolder) holder;
+            mHolder.toHide.setVisibility(hasPrevious ? View.VISIBLE : View.GONE);
+        } else if (position == getItemCount() - 1) {
+            ProgressViewHolder mHolder = (ProgressViewHolder) holder;
+            mHolder.toHide.setVisibility(hasNext ? View.VISIBLE : View.GONE);
+        } else {
+            MainListItemViewHolder mHolder = (MainListItemViewHolder) holder;
+            Content content = dataSource.get(position - 1);
             mHolder.contentListViewItem.clear();
             mHolder.contentListViewItem.setContent(content, googleApiClient);
             mHolder.contentListViewItem.setPosition(position);
             mHolder.contentListViewItem.setOnClickListener(onClickListener);
-        }else{
-            Log.d(TAG, "onBindViewHolder: " + hasNext);
-            if(!hasNext){
-                holder.itemView.setVisibility(View.GONE);
-            }
         }
     }
 
     @Override
     public int getItemCount() {
-        return dataSource.size()+1;
+        return dataSource.size() + 2;
     }
 
     public void setOnClickListener(ContentListViewItem.OnClickListener onClickListener) {
@@ -115,6 +118,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
+                hasPrevious = true;
                 notifyItemRangeRemoved(0, dataSource.pageLength);
                 notifyItemRangeInserted(getItemCount(), pageLength);
             }
@@ -127,7 +131,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             @Override
             public void run() {
                 hasNext = false;
-                notifyItemChanged(getItemCount()-1);
+                notifyItemChanged(getItemCount() - 1);
             }
         });
 
@@ -141,19 +145,27 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     @Override
     public void onPreviousPageLoad(int pageLength) {
         Log.d(TAG, "onPreviousPageLoad: ");
+        hasNext = true;
         notifyItemRangeInserted(0, pageLength);
-        notifyItemRangeRemoved(getItemCount()-1, dataSource.pageLength);
+        notifyItemRangeRemoved(getItemCount() - 1, dataSource.pageLength);
     }
 
     @Override
     public void onPreviousPageFail() {
-
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                hasPrevious = false;
+                notifyItemChanged(0);
+            }
+        });
     }
 
     public class ProgressViewHolder extends RecyclerView.ViewHolder {
-
+        View toHide;
         public ProgressViewHolder(View itemView) {
             super(itemView);
+            toHide = itemView.findViewById(R.id.progressbar);
         }
     }
 
