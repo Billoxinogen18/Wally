@@ -36,11 +36,9 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
         totalItemCount = linearLayoutManager.getItemCount();
         firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
         lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-        Log.d(TAG, "onScrolled: Loading=" + loading);
         if (!loading && dy > 0 && (totalItemCount - visibleItemCount)
                 <= (firstVisibleItem + visibleThreshold)) {
             // End has been reached
-            Log.d(TAG, "onScrolled: loadNext");
             onLoadNext();
 
             loading = true;
@@ -48,7 +46,6 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
 
         if (!loading && dy < 0 && visibleItemCount > (lastVisibleItem - visibleThreshold)) {
             // End has been reached
-            Log.d(TAG, "onScrolled: loadPrevious");
             onLoadPrevious();
 
             loading = true;

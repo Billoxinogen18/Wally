@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:id="@+id/tv_content_position"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:padding="8dp"
+        tools:text="12" />
+
+    <com.wally.wally.components.UserInfoView
+        android:id="@+id/user_info_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-8dp"
+        android:background="?attr/selectableItemBackground"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp" />
+
+
+    <TextView
+        android:id="@+id/tv_title"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/user_info_view"
+        android:layout_marginBottom="8dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:maxLines="1"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="Note title here"
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_note"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title"
+        android:layout_marginBottom="8dp"
+        android:ellipsize="end"
+        android:fontFamily="serif"
+        android:maxLines="2"
+        android:scrollbars="none"
+        android:textSize="14sp"
+        android:visibility="gone"
+        tools:text="Note maybe big text here "
+        tools:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/iv_note_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tv_note"
+        android:layout_centerVertical="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ic_btn_map_75dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+</RelativeLayout>

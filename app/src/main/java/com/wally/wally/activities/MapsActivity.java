@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Camera;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,7 +32,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
-import com.wally.wally.App;
 import com.wally.wally.EndlessRecyclerOnScrollListener;
 import com.wally.wally.R;
 import com.wally.wally.StubContentFetcher;
@@ -230,44 +228,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onNextPageLoad(int pageLength) {
+        Log.d(TAG, "onNextPageLoad() called with: " + "pageLength = [" + pageLength + "]");
         onPageLoaded();
         mContentScrollListener.loadingFinished();
     }
 
     @Override
     public void onPreviousPageLoad(int pageLength) {
+        Log.d(TAG, "onPreviousPageLoad() called with: " + "pageLength = [" + pageLength + "]");
         onPageLoaded();
         mContentScrollListener.loadingFinished();
     }
 
     @Override
-    public void onBeforeNextPageLoad() {
-        mContentScrollListener.loadingFinished();
-    }
-
-    @Override
-    public void onBeforePreviousPageLoad() {
-        mContentScrollListener.loadingFinished();
-    }
-
-    @Override
     public void onNextPageFail() {
+        Log.d(TAG, "onNextPageFail() called with: " + "");
         mContentScrollListener.loadingFinished();
     }
 
     @Override
     public void onPreviousPageFail() {
+        Log.d(TAG, "onPreviousPageFail() called with: " + "");
         mContentScrollListener.loadingFinished();
     }
 
     @Override
     public void onInit() {
+        Log.d(TAG, "onInit() called with: " + "");
         onPageLoaded();
         mContentScrollListener.loadingFinished();
     }
 
     @Override
     public void onFail() {
+        Log.d(TAG, "onFail() called with: " + "");
         mContentScrollListener.loadingFinished();
     }
 

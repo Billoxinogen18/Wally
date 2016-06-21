@@ -22,23 +22,18 @@
             android:required="false" />
 
         <activity
-            android:screenOrientation="landscape"
             android:name=".activities.CameraARTangoActivity"
             android:label="@string/app_name" />
         <activity
-            android:screenOrientation="landscape"
             android:name=".activities.CameraARStandardActivity"
             android:label="@string/app_name" />
         <activity
-            android:screenOrientation="landscape"
             android:name=".activities.MapsActivity"
             android:label="@string/title_activity_maps" />
         <activity
-            android:screenOrientation="landscape"
             android:name=".activities.ADFChooser"
             android:label="@string/title_activity_adfchooser" />
         <activity
-            android:screenOrientation="landscape"
             android:name=".activities.DispatcherActivity"
             android:theme="@style/AppTheme.SplashScreen">
             <intent-filter android:label="@string/app_name">

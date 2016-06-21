@@ -72,9 +72,6 @@ public class ContentPagingRetriever {
 
     public void loadNext() {
         if (hasNext) {
-            for (ContentPageRetrieveListener observer : observers) {
-                observer.onBeforeNextPageLoad();
-            }
             hasPrevious = true;
             loadNext(pageLength);
         }
@@ -133,11 +130,6 @@ public class ContentPagingRetriever {
 
     public void loadPrevious() {
         if (hasPrevious) {
-
-
-            for (ContentPageRetrieveListener observer : observers) {
-                observer.onBeforePreviousPageLoad();
-            }
             hasNext = true;
             loadPrevious(pageLength);
         }
@@ -267,15 +259,9 @@ public class ContentPagingRetriever {
 
         void onFail();
 
-
-        void onBeforeNextPageLoad();
-
         void onNextPageLoad(int pageLength);
 
         void onNextPageFail();
-
-
-        void onBeforePreviousPageLoad();
 
         void onPreviousPageLoad(int pageLength);
 

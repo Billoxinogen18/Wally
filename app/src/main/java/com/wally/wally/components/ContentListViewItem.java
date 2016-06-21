@@ -21,9 +21,7 @@ import com.wally.wally.userManager.SocialUser;
 /**
  * Created by Meravici on 6/20/2016.
  */
-public class ContentListViewItem extends RelativeLayout {
-
-    private CardView card;
+public class ContentListViewItem extends CardView {
     private UserInfoView userInfoView;
     private ImageView noteImage;
     private TextView title;
@@ -49,7 +47,7 @@ public class ContentListViewItem extends RelativeLayout {
     }
 
     public void clear() {
-        card.setCardBackgroundColor(Color.WHITE);
+        setCardBackgroundColor(Color.WHITE);
 
         noteImage.setImageDrawable(null);
         noteImage.setBackground(null);
@@ -78,7 +76,7 @@ public class ContentListViewItem extends RelativeLayout {
         boolean isOwn = Utils.isCurrentUser(content.getAuthorId());
         // Check if user can see content preview
         if (!content.getVisibility().isPreviewVisible() && !isOwn) {
-            card.setCardBackgroundColor(
+            setCardBackgroundColor(
                     ContextCompat.getColor(getContext(), R.color.content_not_visible_color));
             title.setText(R.string.content_not_visible_title);
             note.setText(R.string.content_not_visible_note);
@@ -100,9 +98,9 @@ public class ContentListViewItem extends RelativeLayout {
         }
 
         if (content.getColor() != null) {
-            card.setCardBackgroundColor(content.getColor());
+            setCardBackgroundColor(content.getColor());
         } else {
-            card.setCardBackgroundColor(Color.WHITE);
+            setCardBackgroundColor(Color.WHITE);
         }
         title.setText(content.getTitle());
         title.setVisibility(TextUtils.isEmpty(content.getTitle()) ? View.GONE : View.VISIBLE);
@@ -112,9 +110,7 @@ public class ContentListViewItem extends RelativeLayout {
     }
 
     private void init() {
-        inflate(getContext(), R.layout.maps_content_list_item, this);
-
-        card = (CardView) findViewById(R.id.card);
+        inflate(getContext(), R.layout.content_listview_item, this);
 
         userInfoView = (UserInfoView) findViewById(R.id.user_info_view);
         noteImage = (ImageView) findViewById(R.id.iv_note_image);

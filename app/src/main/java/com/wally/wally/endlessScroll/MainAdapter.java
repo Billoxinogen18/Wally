@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +24,15 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private ContentPagingRetriever dataSource;
     private GoogleApiClient googleApiClient;
     private Context context;
+    private SocialUser userProfile;
     private ContentListViewItem.OnClickListener onClickListener;
+
 
     private boolean hasNext = true;
     private boolean hasPrevious = false;
 
     private Handler mainHandler;
-    private SocialUser userProfile;
+
 
     public MainAdapter(Context context, GoogleApiClient googleApiClient, ContentPagingRetriever dataSource) {
         this.context = context;
@@ -59,9 +60,8 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                     .from(context).inflate(R.layout.maps_content_list_progress_item, parent, false);
             return new ProgressViewHolder(v);
         } else {
-
-            ContentListViewItem contentListViewItem = new ContentListViewItem(context);
-            return new MainListItemViewHolder(context, contentListViewItem);
+            View v = LayoutInflater.from(context).inflate(R.layout.maps_content_list_item, parent, false);
+            return new MainListItemViewHolder(v);
         }
     }
 
@@ -97,7 +97,6 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     @Override
     public void onInit() {
-        Log.d(TAG, "onInit: ");
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -108,11 +107,6 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
 
     @Override
     public void onFail() {
-
-    }
-
-    @Override
-    public void onBeforeNextPageLoad() {
 
     }
 
@@ -141,16 +135,16 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     }
 
     @Override
-    public void onBeforePreviousPageLoad() {
+    public void onPreviousPageLoad(final int pageLength) {
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                hasNext = true;
+                notifyItemRangeInserted(0, pageLength);
+                notifyItemRangeRemoved(getItemCount() - 1, dataSource.pageLength);
+            }
+        });
 
-    }
-
-    @Override
-    public void onPreviousPageLoad(int pageLength) {
-        Log.d(TAG, "onPreviousPageLoad: ");
-        hasNext = true;
-        notifyItemRangeInserted(0, pageLength);
-        notifyItemRangeRemoved(getItemCount() - 1, dataSource.pageLength);
     }
 
     @Override
