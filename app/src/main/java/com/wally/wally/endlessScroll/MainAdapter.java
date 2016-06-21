@@ -13,6 +13,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.wally.wally.R;
 import com.wally.wally.components.ContentListViewItem;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.userManager.SocialUser;
 
 /**
  * Created by Meravici on 6/20/2016. yea
@@ -30,6 +31,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private boolean hasPrevious = false;
 
     private Handler mainHandler;
+    private SocialUser userProfile;
 
     public MainAdapter(Context context, GoogleApiClient googleApiClient, ContentPagingRetriever dataSource) {
         this.context = context;
@@ -78,6 +80,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             Content content = dataSource.get(position - 1);
             mHolder.contentListViewItem.clear();
             mHolder.contentListViewItem.setContent(content, googleApiClient);
+            mHolder.contentListViewItem.setUserProfile(userProfile);
             mHolder.contentListViewItem.setPosition(position);
             mHolder.contentListViewItem.setOnClickListener(onClickListener);
         }
@@ -159,6 +162,10 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
                 notifyItemChanged(0);
             }
         });
+    }
+
+    public void setUserProfile(SocialUser userProfile) {
+        this.userProfile = userProfile;
     }
 
     public class ProgressViewHolder extends RecyclerView.ViewHolder {

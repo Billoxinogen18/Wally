@@ -19,7 +19,7 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.userManager.SocialUser;
 
 /**
- * Created by Xato on 6/20/2016.
+ * Created by Meravici on 6/20/2016.
  */
 public class ContentListViewItem extends RelativeLayout {
 
@@ -139,11 +139,17 @@ public class ContentListViewItem extends RelativeLayout {
 
 
     public void setPosition(int position) {
-        contentPosition.setText(String.format("%d", position + 1));
+        contentPosition.setText("" + position);
     }
 
     public void setOnClickListener(OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
+    }
+
+    public void setUserProfile(SocialUser userProfile) {
+        if (userProfile != null) {
+            userInfoView.setVisibility(View.GONE);
+        }
     }
 
 

@@ -279,6 +279,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mContentRetriever.registerLoadListener(this);
         mContentRetriever.setContentFetcher(contentFetcher);
         MainAdapter adapter = new MainAdapter(getBaseContext(), mGoogleApiClient, mContentRetriever);
+        adapter.setUserProfile(mUserProfile);
         adapter.setOnClickListener(this);
         mContentListView.setAdapter(adapter);
     }
