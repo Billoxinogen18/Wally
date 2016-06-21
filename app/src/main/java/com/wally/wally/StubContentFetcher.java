@@ -13,12 +13,10 @@ import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.ListIterator;
 
 /**
- * Created by Xato on 6/20/2016.
+ * Created by Meravici on 6/20/2016.
  */
 public class StubContentFetcher implements ContentFetcher {
     public ArrayList<Content> contents= new ArrayList<>();
@@ -105,13 +103,13 @@ public class StubContentFetcher implements ContentFetcher {
                         new Visibility()
                                 .withTimeVisibility(null)
                                 .withAnonymousAuthor(false)
-                                .withSocialVisibility(DebugUtils.randomPublicity())
+                                .withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PUBLIC))
                                 .withVisiblePreview(random.nextBoolean())
                                 .withAnonymousAuthor(random.nextBoolean())
                 ).withTangoData(
                         new TangoData()
                                 .withScale((double) random.nextInt())
-                                .withRotation(DebugUtils.randomDoubleArray())
-                                .withTranslation(DebugUtils.randomDoubleArray()));
+                                .withRotation(new Double[]{})
+                                .withTranslation(new Double[]{}));
     }
 }
