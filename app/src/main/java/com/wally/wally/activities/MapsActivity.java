@@ -322,25 +322,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
-        double radius = Utils.getRadius(mMap.getProjection().getVisibleRegion().latLngBounds);
-        ContentFetcher contentFetcher;
+//        double radius = Utils.getRadius(mMap.getProjection().getVisibleRegion().latLngBounds);
+        ContentFetcher contentFetcher = new StubContentFetcher();
 
-        if(mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)){
-            contentFetcher = App.getInstance().getDataController()
-                    .createFetcherForMyContent(
-                            cameraPosition.target,
-                            radius);
-        }else if(mUserProfile != null){
-            contentFetcher = App.getInstance().getDataController()
-                    .createFetcherForUserContent(mUserProfile.getBaseUser(),
-                            cameraPosition.target,
-                            radius);
-        }else{
-            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
-                    cameraPosition.target,
-                    radius
-            );
-        }
+//        if(mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)){
+//            contentFetcher = App.getInstance().getDataController()
+//                    .createFetcherForMyContent(
+//                            cameraPosition.target,
+//                            radius);
+//        }else if(mUserProfile != null){
+//            contentFetcher = App.getInstance().getDataController()
+//                    .createFetcherForUserContent(mUserProfile.getBaseUser(),
+//                            cameraPosition.target,
+//                            radius);
+//        }else{
+//            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
+//                    cameraPosition.target,
+//                    radius
+//            );
+//        }
         return contentFetcher;
     }
 
