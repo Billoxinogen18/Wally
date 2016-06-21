@@ -1,5 +1,7 @@
-package com.wally.wally;
+package com.wally.wally.endlessScroll;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
@@ -11,12 +13,12 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Created by Meravici on 6/15/2016.
+ * Created by Meravici on 6/15/2016. yea
  */
 public class ContentPagingRetriever {
     private static final String TAG = ContentPagingRetriever.class.getSimpleName();
 
-    private int pageLength;
+    public int pageLength;
 
     private ContentFetcher contentFetcher;
 
@@ -26,14 +28,15 @@ public class ContentPagingRetriever {
 
     private List<ContentPageRetrieveListener> observers;
 
-//    private boolean hasNext = true;
-//    private boolean hasPrevious = false;
+    private Handler handler;
+
+    private boolean hasNext = true;
+    private boolean hasPrevious = false;
 
     private boolean lastNextOne = true;
     private boolean lastNextTwo = true;
 
     public ContentPagingRetriever(ContentFetcher contentFetcher, int pageLenght) {
-
         this.contentFetcher = contentFetcher;
         this.pageLength = pageLenght;
 
@@ -41,6 +44,8 @@ public class ContentPagingRetriever {
         previous = new ArrayList<>();
         current = new ArrayList<>();
         next = new ArrayList<>();
+
+        handler = new Handler(Looper.getMainLooper());
     }
 
     public Content get(int i) {
@@ -66,10 +71,13 @@ public class ContentPagingRetriever {
     }
 
     public void loadNext() {
-//        if (hasNext) {
-//            hasPrevious = true;
+        if (hasNext) {
+            for (ContentPageRetrieveListener observer : observers) {
+                observer.onBeforeNextPageLoad();
+            }
+
             loadNext(pageLength);
-//        }
+        }
     }
 
     private void loadNext(final int num) {
@@ -84,24 +92,31 @@ public class ContentPagingRetriever {
                     loadNext(num);
                 } else {
                     if (result.size() != 0) {
-                        List<Content> contents;
+                        final List<Content> contents;
                         if (result instanceof List) {
                             contents = (List<Content>) result;
                         } else {
                             contents = new ArrayList<>(result);
                         }
 
-                        previous = current;
-                        current = next;
-                        next = contents;
-                        for (ContentPageRetrieveListener observer : observers) {
-                            observer.onNextPageLoaded();
-                        }
-                        Log.d(TAG, "onResult: next " + ContentPagingRetriever.this.toString());
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                previous = current;
+                                current = next;
+                                next = contents;
+                                hasPrevious = true;
+                                for (ContentPageRetrieveListener observer : observers) {
+                                    observer.onNextPageLoad(contents.size());
+                                }
+
+                                Log.d(TAG, "run: " + ContentPagingRetriever.this.toString());
+                            }
+                        });
                     } else {
-//                        hasNext = false;
+                        hasNext = false;
                         for (ContentPageRetrieveListener observer : observers) {
-                            observer.onNextPageFailed();
+                            observer.onNextPageFail();
                         }
                     }
                 }
@@ -109,19 +124,24 @@ public class ContentPagingRetriever {
 
             @Override
             public void onError(Exception e) {
-//                hasNext = false;
+                hasNext = false;
                 for (ContentPageRetrieveListener observer : observers) {
-                    observer.onNextPageFailed();
+                    observer.onNextPageFail();
                 }
             }
         });
     }
 
     public void loadPrevious() {
-//        if (hasPrevious) {
-//            hasNext = true;
+        if (hasPrevious) {
+
+
+            for (ContentPageRetrieveListener observer : observers) {
+                observer.onBeforePreviousPageLoad();
+            }
+
             loadPrevious(pageLength);
-//        }
+        }
     }
 
     public void loadPrevious(final int num) {
@@ -131,30 +151,35 @@ public class ContentPagingRetriever {
                 if (lastNextOne) {
                     lastNextOne = false;
                     loadPrevious(num);
-                }else if(lastNextTwo){
+                } else if (lastNextTwo) {
                     lastNextTwo = false;
                     loadPrevious(num);
                 } else {
                     if (result.size() != 0) {
-                        List<Content> contents;
+                        final List<Content> contents;
                         if (result instanceof List) {
                             contents = (List<Content>) result;
                         } else {
                             contents = new ArrayList<>(result);
                         }
 
-                        next = current;
-                        current = previous;
-                        previous = contents;
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                next = current;
+                                current = previous;
+                                previous = contents;
 
-                        for (ContentPageRetrieveListener observer : observers) {
-                            observer.onPreviousPageLoaded();
-                        }
-                        Log.d(TAG, "onResult: prev " + ContentPagingRetriever.this.toString());
+                                hasNext = true;
+                                for (ContentPageRetrieveListener observer : observers) {
+                                    observer.onPreviousPageLoad(contents.size());
+                                }
+                            }
+                        });
                     } else {
-//                        hasPrevious = false;
+                        hasPrevious = false;
                         for (ContentPageRetrieveListener observer : observers) {
-                            observer.onPreviousPageFailed();
+                            observer.onPreviousPageFail();
                         }
                     }
                 }
@@ -162,9 +187,9 @@ public class ContentPagingRetriever {
 
             @Override
             public void onError(Exception e) {
-//                hasPrevious = false;
+                hasPrevious = false;
                 for (ContentPageRetrieveListener observer : observers) {
-                    observer.onPreviousPageFailed();
+                    observer.onPreviousPageFail();
                 }
             }
         });
@@ -200,11 +225,11 @@ public class ContentPagingRetriever {
                         next.add(contents.get(i));
 
                     for (ContentPageRetrieveListener observer : observers) {
-                        observer.onNextPageLoaded();
+                        observer.onInit();
                     }
                 } else {
                     for (ContentPageRetrieveListener observer : observers) {
-                        observer.onNextPageFailed();
+                        observer.onFail();
                     }
                 }
             }
@@ -212,7 +237,7 @@ public class ContentPagingRetriever {
             @Override
             public void onError(Exception e) {
                 for (ContentPageRetrieveListener observer : observers) {
-                    observer.onNextPageFailed();
+                    observer.onFail();
                 }
             }
         });
@@ -240,12 +265,22 @@ public class ContentPagingRetriever {
     }
 
     public interface ContentPageRetrieveListener {
-        void onNextPageLoaded();
+        void onInit();
 
-        void onPreviousPageLoaded();
+        void onFail();
 
-        void onNextPageFailed();
 
-        void onPreviousPageFailed();
+        void onBeforeNextPageLoad();
+
+        void onNextPageLoad(int pageLength);
+
+        void onNextPageFail();
+
+
+        void onBeforePreviousPageLoad();
+
+        void onPreviousPageLoad(int pageLength);
+
+        void onPreviousPageFail();
     }
 }
