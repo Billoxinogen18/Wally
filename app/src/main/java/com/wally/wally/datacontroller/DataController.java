@@ -1,7 +1,5 @@
 package com.wally.wally.datacontroller;
 
-import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,9 +19,14 @@ import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
+import com.wally.wally.datacontroller.fetchers.QueryContentFetcher;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
+import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
+import com.wally.wally.datacontroller.queries.AuthorQuery;
+import com.wally.wally.datacontroller.queries.ContentQuery;
 import com.wally.wally.datacontroller.queries.FirebaseQuery;
+import com.wally.wally.datacontroller.queries.SharedWithQuery;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.Collections;
@@ -148,41 +151,71 @@ public class DataController {
         });
     }
 
-    /**
-     *
-     * @deprecated use {@link #createFetcherForPublicContent()} ()} instead.
-     */
-    @Deprecated
-    public ContentFetcher createPublicContentFetcher() {
-        return createFetcherForPublicContent();
-    }
-
-
     public ContentFetcher createFetcherForPublicContent() {
         return new KeyPager(contents.child("Public"));
     }
 
-    public ContentFetcher createFetcherForPrivateContent() {
+    public ContentFetcher createFetcherForPublicContent(LatLng center, double radiusKm) {
+        if (radiusKm > Config.RADIUS_MAX_KM) {
+            // We decided that too big radius (>2500 km)
+            // means we don't need to filter by location
+            return createFetcherForPublicContent();
+        }
+        DatabaseReference target = contents.child("Public");
+        final double radius = radiusKm * 1000; // Convert to meters
+        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
+        PagerChain chain = new PagerChain();
+        for (GeoHashQuery query : queries) {
+            chain.addPager(new KeyPager(
+                    target, query.getStartValue(), query.getEndValue()));
+        }
+        return chain;
+    }
+
+    public ContentFetcher createFetcherForPublicContent(User user, LatLng center, double radiusKm) {
+        FirebaseQuery authorQuery = new AuthorQuery(user.getId());
+        Predicate<Content> predicate = isLocationInRangePredicate(center, radiusKm);
+        ContentQuery query = new ContentQuery(authorQuery, contents.child("Public"), predicate);
+        return new QueryContentFetcher(query);
+    }
+
+    public ContentFetcher createFetcherForSharedContent(LatLng center, double radiusKm) {
         User current = getCurrentUser();
-        return new KeyPager(contents.child(current.getId().getId()));
+        FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
+        Predicate<Content> predicate = isLocationInRangePredicate(center, radiusKm);
+        ContentQuery query = new ContentQuery(sharedWithQuery, contents.child("Shared"),predicate);
+        return new QueryContentFetcher(query);
+    }
+
+    public ContentFetcher createFetcherForPrivateContent(LatLng center, double radiusKm) {
+        User current = getCurrentUser();
+        DatabaseReference target = contents.child(current.getId().getId());
+        ContentFetcher fetcher = createFetcherForLocation(center, radiusKm, target);
+        if (fetcher == null) {
+            fetcher = new KeyPager(target);
+        }
+        return fetcher;
+    }
+
+    public ContentFetcher createFetcherForMyContent(LatLng center, double radiusKm) {
+        User current = getCurrentUser();
+        PagerChain chain = new PagerChain();
+        chain.addPager(createFetcherForPrivateContent(center, radiusKm));
+        chain.addPager(createFetcherForSharedContent(center, radiusKm));
+        chain.addPager(createFetcherForPublicContent(current, center, radiusKm));
+        return chain;
     }
 
     public ContentFetcher createFetcherForVisibleContent(LatLng center, double r) {
         User current = getCurrentUser();
         // TODO stub implementation
-        return createPublicContentFetcher(center, r);
-    }
-
-    public ContentFetcher createFetcherForMyContent(LatLng center, double r) {
-        User current = getCurrentUser();
-        // TODO stub implementation
-        return createPublicContentFetcher(center, r);
+        return createFetcherForPublicContent(center, r);
     }
 
     public ContentFetcher createFetcherForUserContent(User user, LatLng center, double r) {
         User current = getCurrentUser();
         // TODO stub implementation
-        return createPublicContentFetcher(center, r);
+        return createFetcherForPublicContent(center, r);
     }
 
     public User getCurrentUser() {
@@ -211,23 +244,6 @@ public class DataController {
         });
     }
 
-    ContentFetcher createPublicContentFetcher(LatLng center, double radiusKm) {
-        if (radiusKm > Config.RADIUS_MAX_KM) {
-            // We decided that too big radius (2500 km)
-            // means we don't need to filter by location
-            return createFetcherForPublicContent();
-        }
-        DatabaseReference target = contents.child("Public");
-        final double radius = radiusKm * 1000; // Convert to meters
-        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
-        PagerChain chain = new PagerChain();
-        for (GeoHashQuery query : queries) {
-            chain.addPager(new KeyPager(
-                    target, query.getStartValue(), query.getEndValue()));
-        }
-        return chain;
-    }
-
     private void fetchContentAt(String path, DatabaseReference ref,
                                 final FetchResultCallback callback) {
         ref.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -243,5 +259,35 @@ public class DataController {
                 callback.onError(databaseError.toException());
             }
         });
+    }
+
+    private ContentFetcher createFetcherForLocation(LatLng center,
+                                                    double radiusKm,
+                                                    DatabaseReference target) {
+        if (radiusKm > Config.RADIUS_MAX_KM) {
+            // We decided that too big radius (>2500 km)
+            // means we don't need to filter by location
+            return null;
+        }
+        final double radius = radiusKm * 1000; // Convert to meters
+        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
+        PagerChain chain = new PagerChain();
+        for (GeoHashQuery query : queries) {
+            String startKey = query.getStartValue();
+            String endKey = query.getEndValue();
+            chain.addPager(new KeyPager(target, startKey, endKey));
+        }
+        return chain;
+    }
+
+    private Predicate<Content> isLocationInRangePredicate(final LatLng center, final double radiusKm) {
+        return new Predicate<Content>() {
+            private double radius = radiusKm * 1000;
+
+            @Override
+            public boolean test(Content target) {
+                return GeoUtils.distance(target.getLocation(), center) < radius;
+            }
+        };
     }
 }
