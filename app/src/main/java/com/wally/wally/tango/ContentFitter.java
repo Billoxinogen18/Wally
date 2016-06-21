@@ -3,8 +3,12 @@ package com.wally.wally.tango;
 import android.os.AsyncTask;
 
 import com.google.atap.tangoservice.TangoPoseData;
+import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.datacontroller.content.Content;
+
+import org.rajawali3d.math.Quaternion;
+import org.rajawali3d.math.vector.Vector3;
 
 /**
  * Thread that fits content on the wall.
@@ -37,7 +41,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        TangoPoseData tangoPoseData = getValidPose();
+        TangoPoseData tangoPoseData = null;
         while (tangoPoseData == null) {
             tangoPoseData = getValidPose();
             mFittingStatusListener.onContentFit(null);
@@ -78,9 +82,11 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         }
         mFittingStatusListener.onContentFit(newPose);
         lastPose = newPose;
-        if (newPose != null) {
-            if (mVisualContentManager.isActiveContent()) { //TODO cancel contentfitter when not localized
+        if (mVisualContentManager.isActiveContent()) { //TODO cancel contentfitter when not localized
+            if (newPose != null) {
                 mVisualContentManager.updateActiveContent(ScenePoseCalculator.toOpenGLPose(newPose));
+            } else {
+                mVisualContentManager.updateActiveContent(mTangoManager.getDevicePoseInFront());
             }
         }
 

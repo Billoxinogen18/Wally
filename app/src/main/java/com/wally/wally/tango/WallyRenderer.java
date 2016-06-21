@@ -133,6 +133,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
 
     private void addActiveContent(ActiveVisualContent activeVisualContent){
         removeBorder();
+        //activeVisualContent.getVisual().setLookAt(getCurrentCamera().getPosition());
         getCurrentScene().addChild(activeVisualContent.getVisual());
         mVisualContentManager.setActiveContentAdded();
         mPicker.registerObject(activeVisualContent.getVisual());

@@ -470,4 +470,11 @@ public class VisualContentManager implements LocalizationListener {
         }
     }
 
+//    public void activeContentInHands(Pose newPose) {
+//        synchronized (mActiveContentLock){
+//            if (mActiveContent != null){
+//                mActiveContent.setNewPose();
+//            }
+//        }
+//    }
 }

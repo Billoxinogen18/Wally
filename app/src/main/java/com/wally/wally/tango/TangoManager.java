@@ -13,6 +13,7 @@ import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
+import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
@@ -21,6 +22,9 @@ import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 
+import org.rajawali3d.math.Matrix4;
+import org.rajawali3d.math.Quaternion;
+import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
 
 import java.util.ArrayList;
@@ -145,6 +149,18 @@ public class TangoManager {
      */
     public TangoPoseData findPlaneInMiddle() {
         return doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread);
+    }
+
+    public Pose getDevicePoseInFront(){
+        TangoPoseData devicePose =
+                mTango.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR);
+        Pose p = ScenePoseCalculator.toOpenGlCameraPose(devicePose,mExtrinsics);
+
+        Vector3 addto = p.getOrientation().multiply(new Vector3(0,0,-1));
+        Quaternion rot = new Quaternion().fromAngleAxis(addto, 180);
+
+        return new Pose(p.getPosition().add(addto), p.getOrientation().multiply(rot));
+
     }
 
     /**
@@ -303,4 +319,22 @@ public class TangoManager {
                 intersectionPointPlaneModelPair.intersectionPoint,
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
     }
+
+//    private Pose glCameraToglWorldPose(Pose cameraPose, TangoPoseData devicePose, DeviceExtrinsics extrinsics){
+//        Matrix4 startServiceTdevice = ScenePoseCalculator.tangoPoseToMatrix(devicePose);
+//
+//        // Get device pose in OpenGL world frame.
+//        Matrix4 openglTDevice = ScenePoseCalculator.OPENGL_T_TANGO_WORLD.clone().multiply(startServiceTdevice);
+//
+////        // Get OpenGL camera pose in OpenGL world frame.
+////        Matrix4 openglWorldTOpenglCamera =
+////                openglTDevice.multiply(extrinsics.getDeviceTColorCamera()).
+////                        multiply(COLOR_CAMERA_T_OPENGL_CAMERA);
+//        Matrix4 m =  new Matrix4();
+//
+//      //  return matrixToPose(openglWorldTOpenglCamera);
+//
+//    }
+
+
 }
