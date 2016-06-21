@@ -1,7 +1,5 @@
 package com.wally.wally.datacontroller.queries;
 
-import android.util.Log;
-
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.wally.wally.datacontroller.content.FirebaseContent;
