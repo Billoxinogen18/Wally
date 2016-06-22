@@ -175,7 +175,11 @@ public class VisualContentManager implements LocalizationListener {
     public void addPendingActiveContent(Pose glPose, Content content) {
         synchronized (mActiveContentLock) {
             if (mActiveContent == null) {
-                content.withTangoData(new TangoData(glPose));
+                TangoData td = new TangoData(glPose);
+                if (content != null && content.getTangoData() != null) {
+                    td = td.withScale(content.getTangoData().getScale());
+                }
+                content.withTangoData(td);
                 this.mActiveContent = new ActiveVisualContent(content);
                 mActiveContent.setStatus(RenderStatus.PendingRender);
             } else {
