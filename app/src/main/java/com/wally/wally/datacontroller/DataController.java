@@ -17,6 +17,7 @@ import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
+import com.wally.wally.datacontroller.fetchers.FilteredFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.fetchers.QueryContentFetcher;
@@ -263,7 +264,7 @@ public class DataController {
             String endKey = query.getEndValue();
             chain.addPager(new KeyPager(target, startKey, endKey));
         }
-        return chain;
+        return new FilteredFetcher(chain, isLocationInRangePredicate(center, radiusKm));
     }
 
     private Predicate<Content> isLocationInRangePredicate(final LatLng center, final double radiusKm) {
