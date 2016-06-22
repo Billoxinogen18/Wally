@@ -17,8 +17,8 @@ import com.wally.wally.userManager.SocialUser;
 /**
  * Created by Meravici on 6/20/2016. yea
  */
-public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ContentPagingRetriever.ContentPageRetrieveListener {
-    private static final String TAG = MainAdapter.class.getSimpleName();
+public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ContentPagingRetriever.ContentPageRetrieveListener {
+    private static final String TAG = EndlessScrollAdapter.class.getSimpleName();
     private static final int PROGRESS_VIEW_TYPE = 73;
 
     private ContentPagingRetriever dataSource;
@@ -34,7 +34,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     private Handler mainHandler;
 
 
-    public MainAdapter(Context context, GoogleApiClient googleApiClient, ContentPagingRetriever dataSource) {
+    public EndlessScrollAdapter(Context context, GoogleApiClient googleApiClient, ContentPagingRetriever dataSource) {
         this.context = context;
         this.googleApiClient = googleApiClient;
         this.dataSource = dataSource;
@@ -81,7 +81,7 @@ public class MainAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             mHolder.contentListViewItem.clear();
             mHolder.contentListViewItem.setContent(content, googleApiClient);
             mHolder.contentListViewItem.setUserProfile(userProfile);
-            mHolder.contentListViewItem.setPosition(position);
+            mHolder.contentListViewItem.setPosition(dataSource.getContentPagingEnumerator().get(position-1));
             mHolder.contentListViewItem.setOnClickListener(onClickListener);
         }
     }

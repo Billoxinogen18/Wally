@@ -1,7 +1,6 @@
 package com.wally.wally.endlessScroll;
 
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
@@ -37,25 +36,29 @@ public class ContentPagingRetriever {
     private boolean lastNextTwo = true;
     private long lastRequestId = 0;
 
-    public ContentPagingRetriever(ContentFetcher contentFetcher, int pageLenght) {
+    public ContentPagingRetriever(ContentFetcher contentFetcher, Handler handler, int pageLength) {
         this.contentFetcher = contentFetcher;
-        this.pageLength = pageLenght;
+        this.pageLength = pageLength;
 
         observers = new ArrayList<>();
         previous = new ArrayList<>();
         current = new ArrayList<>();
         next = new ArrayList<>();
 
-        handler = new Handler(Looper.getMainLooper());
+        this.handler = handler;
+
+        fetch();
     }
 
     public Content get(int i) {
-        if (i < pageLength) {
-            return previous.get(i);
-        } else if (i < 2 * pageLength) {
-            return current.get(i % pageLength);
-        } else if (i < 3 * pageLength) {
-            return next.get(i % pageLength);
+        if(i < size()) {
+            if (i < pageLength) {
+                return previous.get(i);
+            } else if (i < 2 * pageLength) {
+                return current.get(i % pageLength);
+            } else if (i < 3 * pageLength) {
+                return next.get(i % pageLength);
+            }
         }
         return null;
     }
@@ -214,11 +217,6 @@ public class ContentPagingRetriever {
                 }
             }
         });
-    }
-
-    public void setContentFetcher(ContentFetcher contentFetcher) {
-        this.contentFetcher = contentFetcher;
-        fetch();
     }
 
     private void fetch() {
