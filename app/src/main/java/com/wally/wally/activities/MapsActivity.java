@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -33,9 +34,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
-import com.wally.wally.EndlessRecyclerOnScrollListener;
+import com.wally.wally.endlessScroll.EndlessRecyclerOnScrollListener;
 import com.wally.wally.R;
-import com.wally.wally.StubContentFetcher;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.ContentListView;
@@ -43,7 +43,7 @@ import com.wally.wally.components.ContentListViewItem;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.endlessScroll.ContentPagingRetriever;
-import com.wally.wally.endlessScroll.MainAdapter;
+import com.wally.wally.endlessScroll.EndlessScrollAdapter;
 import com.wally.wally.endlessScroll.MarkerGenerator;
 import com.wally.wally.userManager.SocialUser;
 
@@ -76,6 +76,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     // Generates and adds markers in Background
     private AsyncTask mMarkerGeneratorTask;
 
+
+    private Handler mainThreadHandler;
+
     /**
      * Start to see user profile
      */
@@ -89,6 +92,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        mainThreadHandler = new Handler(getMainLooper());
 
         mUserProfile = (SocialUser) getIntent().getSerializableExtra(KEY_USER);
         initUserProfileView();
@@ -282,10 +287,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onCameraChange(CameraPosition cameraPosition) {
         ContentFetcher contentFetcher = getContentFetcher(cameraPosition);
 
-        mContentRetriever = new ContentPagingRetriever(contentFetcher, PAGE_LENGTH);
+        mContentRetriever = new ContentPagingRetriever(contentFetcher, mainThreadHandler, PAGE_LENGTH);
         mContentRetriever.registerLoadListener(this);
-        mContentRetriever.setContentFetcher(contentFetcher);
-        MainAdapter adapter = new MainAdapter(getBaseContext(), mGoogleApiClient, mContentRetriever);
+        EndlessScrollAdapter adapter = new EndlessScrollAdapter(getBaseContext(), mGoogleApiClient, mContentRetriever);
         adapter.setUserProfile(mUserProfile);
         adapter.setOnClickListener(this);
         mContentListView.setAdapter(adapter);
