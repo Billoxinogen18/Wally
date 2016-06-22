@@ -81,7 +81,7 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
             mHolder.contentListViewItem.clear();
             mHolder.contentListViewItem.setContent(content, googleApiClient);
             mHolder.contentListViewItem.setUserProfile(userProfile);
-            mHolder.contentListViewItem.setPosition(dataSource.getContentPagingEnumerator().get(position-1));
+            mHolder.contentListViewItem.setPosition(position);
             mHolder.contentListViewItem.setOnClickListener(onClickListener);
         }
     }

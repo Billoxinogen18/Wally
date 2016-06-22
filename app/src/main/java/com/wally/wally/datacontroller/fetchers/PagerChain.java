@@ -5,7 +5,6 @@ import com.wally.wally.datacontroller.content.Content;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class PagerChain implements ContentFetcher {
@@ -33,8 +32,9 @@ public class PagerChain implements ContentFetcher {
     @Override
     public void fetchPrev(final int count, final FetchResultCallback callback) {
         if (currentPagerIndex == -1) {
-            callback.onResult(new ArrayList<>(head));
+            ArrayList<Content> finalResult = new ArrayList<>(head);
             head.clear();
+            callback.onResult(finalResult);
             return;
         }
 
@@ -42,19 +42,17 @@ public class PagerChain implements ContentFetcher {
             currentPagerIndex--;
         }
 
-        pagerList.get(currentPagerIndex).fetchPrev(count, new FetchResultCallback() {
+        pagerList.get(currentPagerIndex).fetchPrev(count - head.size(), new FetchResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
-                if (result.size() == count) {
-                    List<Content> finalResult = new ArrayList<>();
-                    finalResult.addAll(result);
-                    finalResult.addAll(head);
+                head.addAll(result);
+                if (head.size() == count) {
+                    List<Content> finalResult = new ArrayList<>(head);
                     head.clear();
                     callback.onResult(finalResult);
                 } else {
                     currentPagerIndex--;
-                    head.addAll(result);
-                    fetchPrev(count - result.size(), callback);
+                    fetchPrev(count, callback);
                 }
             }
 
@@ -68,8 +66,9 @@ public class PagerChain implements ContentFetcher {
     @Override
     public void fetchNext(final int count, final FetchResultCallback callback) {
         if (currentPagerIndex == pagerList.size()) {
-            callback.onResult(new ArrayList<>(tail));
+            ArrayList<Content> finalResult = new ArrayList<>(tail);
             tail.clear();
+            callback.onResult(finalResult);
             return;
         }
 
@@ -77,19 +76,17 @@ public class PagerChain implements ContentFetcher {
             currentPagerIndex++;
         }
 
-        pagerList.get(currentPagerIndex).fetchNext(count, new FetchResultCallback() {
+        pagerList.get(currentPagerIndex).fetchNext(count - tail.size(), new FetchResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
-                if (result.size() == count) {
-                    List<Content> finalResult = new ArrayList<>();
-                    finalResult.addAll(result);
-                    finalResult.addAll(tail);
+                tail.addAll(result);
+                if (tail.size() == count) {
+                    List<Content> finalResult = new ArrayList<>(tail);
                     tail.clear();
                     callback.onResult(finalResult);
                 } else {
                     currentPagerIndex++;
-                    tail.addAll(result);
-                    fetchNext(count - result.size(), callback);
+                    fetchNext(count, callback);
                 }
             }
 
@@ -98,7 +95,6 @@ public class PagerChain implements ContentFetcher {
                 callback.onError(e);
             }
         });
-
     }
 
 }
