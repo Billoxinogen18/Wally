@@ -10,6 +10,7 @@ import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.components.WallyTangoUx;
 
+import org.rajawali3d.surface.RajawaliSurfaceView;
 import org.rajawali3d.surface.RajawaliTextureView;
 
 /**
@@ -21,12 +22,12 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private WallyTangoUx mTangoUx;
     private boolean isLocalized;
     private boolean mIsFrameAvailableTangoThread;
-    private RajawaliTextureView mSurfaceView;
+    private RajawaliSurfaceView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
     private LocalizationListener mLocalizator;
 
 
-    public TangoUpdater(WallyTangoUx tangoUx, RajawaliTextureView surfaceView, TangoPointCloudManager pointCloudManager, LocalizationListener localizator) {
+    public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager, LocalizationListener localizator) {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;

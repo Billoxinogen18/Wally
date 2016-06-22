@@ -12,7 +12,7 @@
         android:layout_gravity="center"
         android:text="Camera Disabled! No Tango Device!" />
 
-    <org.rajawali3d.surface.RajawaliTextureView
+    <org.rajawali3d.surface.RajawaliSurfaceView
         android:id="@+id/rajawali_surface"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

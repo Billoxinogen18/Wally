@@ -17,18 +17,14 @@ import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
-import com.wally.wally.App;
 import com.wally.wally.components.WallyTangoUx;
-import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
-import com.wally.wally.datacontroller.content.Content;
 
-import org.rajawali3d.math.Matrix4;
+
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Created by shota on 4/21/16.
@@ -125,6 +121,7 @@ public class TangoManager {
                 @Override
                 public void run() {
                     try {
+                        TangoSupport.initialize();
                         connectTango();
                         connectRenderer();
                         mIsConnected = true;
@@ -304,14 +301,14 @@ public class TangoManager {
                 rgbTimestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR,
                 xyzIj.timestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH);
 
+
         // Perform plane fitting with the latest available point cloud data.
         TangoSupport.IntersectionPointPlaneModelPair intersectionPointPlaneModelPair =
                 TangoSupport.fitPlaneModelNearClick(xyzIj, mIntrinsics,
                         colorTdepthPose, u, v);
 
         // Get the device pose at the time the plane data was acquired.
-        TangoPoseData devicePose =
-                mTango.getPoseAtTime(xyzIj.timestamp, FRAME_PAIR);
+        TangoPoseData devicePose = mTango.getPoseAtTime(xyzIj.timestamp, FRAME_PAIR);
 
         // Update the AR object location.
 
@@ -319,22 +316,6 @@ public class TangoManager {
                 intersectionPointPlaneModelPair.intersectionPoint,
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
     }
-
-//    private Pose glCameraToglWorldPose(Pose cameraPose, TangoPoseData devicePose, DeviceExtrinsics extrinsics){
-//        Matrix4 startServiceTdevice = ScenePoseCalculator.tangoPoseToMatrix(devicePose);
-//
-//        // Get device pose in OpenGL world frame.
-//        Matrix4 openglTDevice = ScenePoseCalculator.OPENGL_T_TANGO_WORLD.clone().multiply(startServiceTdevice);
-//
-////        // Get OpenGL camera pose in OpenGL world frame.
-////        Matrix4 openglWorldTOpenglCamera =
-////                openglTDevice.multiply(extrinsics.getDeviceTColorCamera()).
-////                        multiply(COLOR_CAMERA_T_OPENGL_CAMERA);
-//        Matrix4 m =  new Matrix4();
-//
-//      //  return matrixToPose(openglWorldTOpenglCamera);
-//
-//    }
 
 
 }
