@@ -151,25 +151,11 @@ public class DataController {
         });
     }
 
-    public ContentFetcher createFetcherForPublicContent() {
-        return new KeyPager(contents.child("Public"));
-    }
-
     public ContentFetcher createFetcherForPublicContent(LatLng center, double radiusKm) {
-        if (radiusKm > Config.RADIUS_MAX_KM) {
-            // We decided that too big radius (>2500 km)
-            // means we don't need to filter by location
-            return createFetcherForPublicContent();
-        }
         DatabaseReference target = contents.child("Public");
-        final double radius = radiusKm * 1000; // Convert to meters
-        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
-        PagerChain chain = new PagerChain();
-        for (GeoHashQuery query : queries) {
-            chain.addPager(new KeyPager(
-                    target, query.getStartValue(), query.getEndValue()));
-        }
-        return chain;
+        ContentFetcher fetcher = createFetcherForLocation(center, radiusKm, target);
+        if (fetcher == null) { fetcher = new KeyPager(target); }
+        return fetcher;
     }
 
     public ContentFetcher createFetcherForPublicContent(User user, LatLng center, double radiusKm) {
