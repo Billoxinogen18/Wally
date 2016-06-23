@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,13 +22,27 @@ import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
 import com.google.atap.tangoservice.TangoErrorException;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.fragments.PersistentDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ADFChooser extends AppCompatActivity {
+public class ADFChooser extends AppCompatActivity implements PersistentDialogFragment.PersistentDialogListener {
+    public static final int RC_AREA_LEARNING = 182;
+    public static final int RC_EXPORT_ADF = 22;
     private static final String TAG = ADFChooser.class.getSimpleName();
     private static final String EXPLORER_PACKAGE_NAME = "com.projecttango.tangoexplorer";
+    private static final String INTENT_CLASSPACKAGE = "com.projecttango.tango";
+    private static final String INTENT_IMPORTEXPORT_CLASSNAME = "com.google.atap.tango.RequestImportExportActivity";
+
+    // startActivityForResult requires a code number.
+    private static final String EXTRA_KEY_SOURCEUUID = "SOURCE_UUID";
+    private static final String EXTRA_KEY_DESTINATIONFILE = "DESTINATION_FILE";
+    private static final int RC_EXPLAIN_EXPORT = 192;
+
+    private boolean mFlagShowImportExplanation = false;
+    private boolean mFlagStartUploading = false;
+    private String mSelectedUUID;
 
     public static Intent newIntent(Context context) {
         Intent i = new Intent(context, ADFChooser.class);
@@ -44,11 +57,11 @@ public class ADFChooser extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if(Utils.isTangoDevice(getBaseContext())) {
+        if (Utils.isTangoDevice(getBaseContext())) {
             if (!Utils.hasADFPermissions(getBaseContext())) {
                 requestADFPermission();
             }
-        }else{
+        } else {
             startActivity(CameraARStandardActivity.newIntent(getBaseContext()));
         }
     }
@@ -65,6 +78,22 @@ public class ADFChooser extends AppCompatActivity {
                 Log.i(TAG, "onResume: No Tango or Didn't have ADF permission returning.");
             }
         }
+
+        Log.d(TAG, "onResume() called with: " + mFlagShowImportExplanation + " " + mFlagStartUploading);
+        if (mFlagShowImportExplanation) {
+            mFlagShowImportExplanation = false;
+
+            PersistentDialogFragment.newInstance(this, RC_EXPLAIN_EXPORT,
+                    R.string.explain_adf_export_permission,
+                    R.string.give_permission,
+                    R.string.close_application)
+                    .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
+        }
+        if (mFlagStartUploading) {
+            mFlagStartUploading = false;
+
+            startUploading();
+        }
     }
 
     private void loadRecycler() {
@@ -76,7 +105,7 @@ public class ADFChooser extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    private ArrayList<Pair<String, TangoAreaDescriptionMetaData>> getADFList(){
+    private ArrayList<Pair<String, TangoAreaDescriptionMetaData>> getADFList() {
         Tango mTango = new Tango(this);
         ArrayList<Pair<String, TangoAreaDescriptionMetaData>> mFullADFList = new ArrayList<>();
         ArrayList<String> mFullUUIDList = new ArrayList<>();
@@ -99,7 +128,7 @@ public class ADFChooser extends AppCompatActivity {
 
     public void startWithNewADF(View v) {
         Intent intent = getPackageManager().getLaunchIntentForPackage(EXPLORER_PACKAGE_NAME);
-        if(intent == null){
+        if (intent == null) {
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + EXPLORER_PACKAGE_NAME));
         }
         startActivity(intent);
@@ -108,9 +137,75 @@ public class ADFChooser extends AppCompatActivity {
     private void requestADFPermission() {
         startActivityForResult(
                 Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
-                Tango.TANGO_INTENT_ACTIVITYCODE);
+                RC_AREA_LEARNING);
     }
 
+    private void onAdfSelected(String uuid) {
+        mSelectedUUID = uuid;
+
+        Intent exportIntent = new Intent();
+        exportIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
+        exportIntent.putExtra(EXTRA_KEY_SOURCEUUID, uuid);
+        exportIntent.putExtra(EXTRA_KEY_DESTINATIONFILE, Utils.getAdfFileName());
+        startActivityForResult(exportIntent, RC_EXPORT_ADF);
+    }
+
+    @Override
+    public void onDialogPositiveClicked(int requestCode) {
+        if (requestCode == RC_EXPLAIN_EXPORT) {
+            onAdfSelected(mSelectedUUID);
+        }
+    }
+
+    @Override
+    public void onDialogNegativeClicked(int requestCode) {
+        if (requestCode == RC_EXPLAIN_EXPORT) {
+            finish();
+            System.exit(0);
+        }
+    }
+
+    private void startUploading() {
+        Log.d(TAG, "startUploading() called with: " + "");
+        Toast.makeText(ADFChooser.this, "Now we can upload ADF", Toast.LENGTH_SHORT).show();
+        // f.getPath();
+        // TODO after uploaded startActivity(CameraARTangoActivity.newIntent(getBaseContext(), uuid));
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult() called with: " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
+        if (requestCode == RC_EXPORT_ADF) {
+            if (resultCode == RESULT_OK) {
+                mFlagStartUploading = true;
+            } else {
+                mFlagShowImportExplanation = true;
+            }
+        } else if (requestCode == RC_AREA_LEARNING) {
+            // TODO
+            if (resultCode == RESULT_OK) {
+
+            } else {
+
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("mSelectedUUID", mSelectedUUID);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            mSelectedUUID = savedInstanceState.getString("mSelectedUUID");
+        }
+    }
 
     private class ADFListAdapter extends RecyclerView.Adapter<ADFListAdapter.ADFViewHolder> {
 
@@ -161,7 +256,7 @@ public class ADFChooser extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String uuid = mData.get(getAdapterPosition()).first;
-                startActivity(CameraARTangoActivity.newIntent(getBaseContext(), uuid));
+                onAdfSelected(uuid);
             }
         }
     }

@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.Environment;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
@@ -33,6 +34,7 @@ import com.google.atap.tangoservice.Tango;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.userManager.SocialUser;
 
+import java.io.File;
 import java.text.DateFormat;
 
 /**
@@ -257,5 +259,15 @@ public final class Utils {
 
     public static LatLng extractLatLng(@NonNull Location location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
+    }
+
+    public static String getAdfFileName() {
+        String folder = Environment.getExternalStorageDirectory().getAbsolutePath()
+                + File.separator + "Wally";
+        File file = new File(folder);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return folder;
     }
 }

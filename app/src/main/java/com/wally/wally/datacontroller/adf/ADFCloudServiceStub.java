@@ -7,7 +7,7 @@ import com.wally.wally.datacontroller.callbacks.Callback;
 
 /**
  * This class is just for testing, should be deleted later
- *
+ * <p/>
  * Created by shota on 6/20/16.
  */
 @Deprecated
@@ -23,7 +23,7 @@ public class ADFCloudServiceStub implements ADFCloudService {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                callback.onResult("dfd");
+                callback.onResult(null);
             }
         }).start();
     }
