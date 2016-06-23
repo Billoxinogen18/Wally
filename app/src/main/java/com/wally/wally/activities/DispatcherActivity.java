@@ -38,14 +38,14 @@ import com.wally.wally.datacontroller.adf.ADFCloudService;
 import com.wally.wally.datacontroller.adf.ADFCloudServiceStub;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
-import com.wally.wally.fragments.PermissionExplanationDialogFragment;
+import com.wally.wally.fragments.PersistentDialogFragment;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
 
 public class DispatcherActivity extends LoginActivity implements
         UserManager.UserLoadListener,
         GoogleApiClient.ConnectionCallbacks,
-        PermissionExplanationDialogFragment.PermissionExplanationListener {
+        PersistentDialogFragment.PersistentDialogListener {
 
     public static final int RC_EXPLAIN_LOCATION = 12;
     public static final int RC_EXPLAIN_ADF_IMPORT = 90;
@@ -107,14 +107,22 @@ public class DispatcherActivity extends LoginActivity implements
             loadADF();
         } else if (mFlagShowLocationExplanation) {
             mFlagShowLocationExplanation = false;
-            PermissionExplanationDialogFragment.newInstance(
-                    getString(R.string.explain_location_permission), RC_EXPLAIN_LOCATION, true)
-                    .show(getSupportFragmentManager(), PermissionExplanationDialogFragment.TAG);
+            PersistentDialogFragment.newInstance(
+                    getBaseContext(),
+                    RC_EXPLAIN_LOCATION,
+                    R.string.explain_location_permission,
+                    R.string.open_settings,
+                    R.string.close_application)
+                    .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
         } else if (mFlagShowAdfImportExplanation) {
             mFlagShowAdfImportExplanation = false;
-            PermissionExplanationDialogFragment.newInstance(
-                    getString(R.string.explain_adf_import_permission), RC_EXPLAIN_ADF_IMPORT, false)
-                    .show(getSupportFragmentManager(), PermissionExplanationDialogFragment.TAG);
+            PersistentDialogFragment.newInstance(
+                    getBaseContext(),
+                    RC_EXPLAIN_ADF_IMPORT,
+                    R.string.explain_adf_import_permission,
+                    R.string.give_permission,
+                    R.string.close_application)
+                    .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
         }
     }
 
@@ -156,7 +164,7 @@ public class DispatcherActivity extends LoginActivity implements
     }
 
     @Override
-    public void givePermissionClicked(int requestCode) {
+    public void onDialogPositiveClicked(int requestCode) {
         // Load Adf continues correct flow.
         switch (requestCode) {
             case RC_EXPLAIN_LOCATION:
@@ -175,7 +183,7 @@ public class DispatcherActivity extends LoginActivity implements
     }
 
     @Override
-    public void closeAppClicked(int requestCode) {
+    public void onDialogNegativeClicked(int requestCode) {
         finish();
         System.exit(0);
     }
