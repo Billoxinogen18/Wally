@@ -10,6 +10,7 @@ import com.wally.wally.datacontroller.callbacks.Callback;
  *
  * Created by shota on 6/20/16.
  */
+@Deprecated
 public class ADFCloudServiceStub implements ADFCloudService {
 
     @Override

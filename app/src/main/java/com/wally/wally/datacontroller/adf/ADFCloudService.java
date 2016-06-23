@@ -9,6 +9,7 @@ import com.wally.wally.datacontroller.callbacks.Callback;
  * Adf Cloud service interface
  * Created by shota on 6/20/16.
  */
+@Deprecated
 public interface ADFCloudService {
     /**
      * Makes estimation and returns most suitable ADF URI
