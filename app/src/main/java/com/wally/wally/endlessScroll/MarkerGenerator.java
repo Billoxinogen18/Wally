@@ -17,12 +17,14 @@ import java.util.List;
  * Created by Xato on 6/20/2016.
  */
 public abstract class MarkerGenerator extends AsyncTask<Void, Void, List<Bitmap>> {
+    private final int startIndex;
     private Context context;
     private List<Content> contents;
 
-    public MarkerGenerator(Context context, List<Content> contents) {
+    public MarkerGenerator(Context context, List<Content> contents, int startIndex) {
         this.contents = contents;
         this.context = context;
+        this.startIndex = startIndex;
     }
 
     @Override
@@ -43,7 +45,7 @@ public abstract class MarkerGenerator extends AsyncTask<Void, Void, List<Bitmap>
             Visibility visibility = contents.get(i).getVisibility();
             int color = colors[visibility.getSocialVisibility().getMode()];
             iconGenerator.setColor(color);
-            icons.add(iconGenerator.makeIcon("" + (i + 1)));
+            icons.add(iconGenerator.makeIcon("" + (startIndex + i)));
         }
         return icons;
     }

@@ -27,6 +27,8 @@ public class ContentPagingRetriever {
 
     private List<ContentPageRetrieveListener> observers;
 
+    private ContentPagingEnumerator contentPagingEnumerator;
+
     private Handler handler;
 
     private boolean hasNext = true;
@@ -46,6 +48,8 @@ public class ContentPagingRetriever {
         next = new ArrayList<>();
 
         this.handler = handler;
+
+        contentPagingEnumerator = new ContentPagingEnumerator(pageLength);
 
         fetch();
     }
@@ -81,6 +85,39 @@ public class ContentPagingRetriever {
         }
     }
 
+    public void loadPrevious() {
+        if (hasPrevious) {
+            hasNext = true;
+            loadPrevious(pageLength);
+        }
+    }
+
+    public ContentPagingEnumerator getContentPagingEnumerator(){
+        return contentPagingEnumerator;
+    }
+
+    public void registerLoadListener(ContentPageRetrieveListener contentPageRetrieveListener) {
+        observers.add(contentPageRetrieveListener);
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (Content content : previous) {
+            sb.append(content.getTitle()).append(",");
+        }
+
+        for (Content content : current) {
+            sb.append(content.getTitle()).append(",");
+        }
+
+        for (Content content : next) {
+            sb.append(content.getTitle()).append(",");
+        }
+
+        return sb.toString();
+    }
+
+
     private void loadNext(final int num) {
         lastRequestId = System.currentTimeMillis();
         contentFetcher.fetchNext(num, new LastRequestCallback(lastRequestId) {
@@ -100,7 +137,8 @@ public class ContentPagingRetriever {
                     lastNextTwo = true;
                     loadNext(num);
                 } else {
-                    if (result.size() != 0) {
+                    if (!result.isEmpty()) {
+                        contentPagingEnumerator.next(result.size());
                         final List<Content> contents;
                         if (result instanceof List) {
                             contents = (List<Content>) result;
@@ -147,14 +185,7 @@ public class ContentPagingRetriever {
         });
     }
 
-    public void loadPrevious() {
-        if (hasPrevious) {
-            hasNext = true;
-            loadPrevious(pageLength);
-        }
-    }
-
-    public void loadPrevious(final int num) {
+    private void loadPrevious(final int num) {
         lastRequestId = System.currentTimeMillis();
         contentFetcher.fetchPrev(num, new LastRequestCallback(lastRequestId) {
             @Override
@@ -173,7 +204,8 @@ public class ContentPagingRetriever {
                     lastNextTwo = false;
                     loadPrevious(num);
                 } else {
-                    if (result.size() != 0) {
+                    if (!result.isEmpty()) {
+                        contentPagingEnumerator.prev(result.size());
                         final List<Content> contents;
                         if (result instanceof List) {
                             contents = (List<Content>) result;
@@ -262,26 +294,6 @@ public class ContentPagingRetriever {
         });
     }
 
-    public void registerLoadListener(ContentPageRetrieveListener contentPageRetrieveListener) {
-        observers.add(contentPageRetrieveListener);
-    }
-
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (Content content : previous) {
-            sb.append(content.getTitle()).append(",");
-        }
-
-        for (Content content : current) {
-            sb.append(content.getTitle()).append(",");
-        }
-
-        for (Content content : next) {
-            sb.append(content.getTitle()).append(",");
-        }
-
-        return sb.toString();
-    }
 
     private abstract class LastRequestCallback implements FetchResultCallback{
         public long requestId;

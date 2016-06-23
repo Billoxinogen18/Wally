@@ -208,7 +208,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     mMarkerGeneratorTask.cancel(true);
                 }
 
-                mMarkerGeneratorTask = new MarkerGenerator(getBaseContext(), contentList) {
+                int startPosition = mContentRetriever.getContentPagingEnumerator().get(0);
+
+                mMarkerGeneratorTask = new MarkerGenerator(getBaseContext(), contentList, startPosition) {
                     @Override
                     protected void onPostExecute(List<Bitmap> markerIcons) {
                         if (markerIcons == null) {
