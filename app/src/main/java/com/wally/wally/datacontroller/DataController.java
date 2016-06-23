@@ -152,29 +152,29 @@ public class DataController {
         });
     }
 
-    public ContentFetcher createFetcherForPublicContent(LatLng center, double radiusKm) {
+    private ContentFetcher createFetcherForPublicContent(LatLng center, double radiusKm) {
         DatabaseReference target = contents.child("Public");
         ContentFetcher fetcher = createFetcherForLocation(center, radiusKm, target);
         if (fetcher == null) { fetcher = new KeyPager(target); }
         return fetcher;
     }
 
-    public ContentFetcher createFetcherForPublicContent(User user, LatLng center, double radiusKm) {
+    private ContentFetcher createFetcherForPublicContent(User user, LatLng center, double radiusKm) {
         FirebaseQuery authorQuery = new AuthorQuery(user.getId());
         Predicate<Content> predicate = isLocationInRangePredicate(center, radiusKm);
         ContentQuery query = new ContentQuery(authorQuery, contents.child("Public"), predicate);
         return new QueryContentFetcher(query);
     }
 
-    public ContentFetcher createFetcherForSharedContent(LatLng center, double radiusKm) {
+    private ContentFetcher createFetcherForMySharedContent(LatLng center, double radiusKm) {
         User current = getCurrentUser();
-        FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
+        FirebaseQuery authorQuery = new AuthorQuery(current.getId());
         Predicate<Content> predicate = isLocationInRangePredicate(center, radiusKm);
-        ContentQuery query = new ContentQuery(sharedWithQuery, contents.child("Shared"),predicate);
+        ContentQuery query = new ContentQuery(authorQuery, contents.child("Shared"), predicate);
         return new QueryContentFetcher(query);
     }
 
-    public ContentFetcher createFetcherForPrivateContent(LatLng center, double radiusKm) {
+    private ContentFetcher createFetcherForPrivateContent(LatLng center, double radiusKm) {
         User current = getCurrentUser();
         DatabaseReference target = contents.child(current.getId().getId());
         ContentFetcher fetcher = createFetcherForLocation(center, radiusKm, target);
@@ -184,25 +184,40 @@ public class DataController {
         return fetcher;
     }
 
+
+    private ContentFetcher createFetcherForContentSharedWithMe(LatLng center, double radiusKm) {
+        User current = getCurrentUser();
+        FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
+        Predicate<Content> predicate = isLocationInRangePredicate(center, radiusKm);
+        ContentQuery query = new ContentQuery(sharedWithQuery, contents.child("Shared"),predicate);
+        return new QueryContentFetcher(query);
+    }
+
     public ContentFetcher createFetcherForMyContent(LatLng center, double radiusKm) {
         User current = getCurrentUser();
         PagerChain chain = new PagerChain();
         chain.addPager(createFetcherForPrivateContent(center, radiusKm));
-        chain.addPager(createFetcherForSharedContent(center, radiusKm));
+        chain.addPager(createFetcherForMySharedContent(center, radiusKm));
         chain.addPager(createFetcherForPublicContent(current, center, radiusKm));
         return chain;
     }
 
-    public ContentFetcher createFetcherForVisibleContent(LatLng center, double r) {
-        User current = getCurrentUser();
-        // TODO stub implementation
-        return createFetcherForPublicContent(center, r);
+    public ContentFetcher createFetcherForVisibleContent(LatLng center, double radiusKm) {
+        PagerChain chain = new PagerChain();
+        chain.addPager(createFetcherForPublicContent(center, radiusKm));
+        chain.addPager(createFetcherForContentSharedWithMe(center, radiusKm));
+        return chain;
     }
 
-    public ContentFetcher createFetcherForUserContent(User user, LatLng center, double r) {
+    public ContentFetcher createFetcherForUserContent(User user, LatLng center, double radiusKm) {
         User current = getCurrentUser();
-        // TODO stub implementation
-        return createFetcherForPublicContent(center, r);
+        PagerChain chain = new PagerChain();
+        ContentFetcher sharedContentFetcher = createFetcherForContentSharedWithMe(center, radiusKm);
+        Predicate<Content> hasAuthorPredicate = hasAuthorPredicate(user.getId().getId());
+        sharedContentFetcher = new FilteredFetcher(sharedContentFetcher, hasAuthorPredicate);
+        chain.addPager(sharedContentFetcher);
+        chain.addPager(createFetcherForPublicContent(user, center, radiusKm));
+        return chain;
     }
 
     public User getCurrentUser() {
@@ -267,13 +282,23 @@ public class DataController {
         return new FilteredFetcher(chain, isLocationInRangePredicate(center, radiusKm));
     }
 
-    private Predicate<Content> isLocationInRangePredicate(final LatLng center, final double radiusKm) {
+    private Predicate<Content> isLocationInRangePredicate(final LatLng center,
+                                                          final double radiusKm) {
         return new Predicate<Content>() {
             private double radius = radiusKm * 1000;
 
             @Override
             public boolean test(Content target) {
                 return GeoUtils.distance(target.getLocation(), center) < radius;
+            }
+        };
+    }
+
+    private Predicate<Content> hasAuthorPredicate(final String userId) {
+        return new Predicate<Content>() {
+            @Override
+            public boolean test(Content target) {
+                return userId.equals(target.getAuthorId());
             }
         };
     }
