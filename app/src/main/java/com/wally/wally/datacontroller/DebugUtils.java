@@ -98,7 +98,7 @@ public class DebugUtils {
         return new Double[]{ random.nextDouble(), random.nextDouble(), random.nextDouble() };
     }
 
-    private static LatLng randomLatLngNearPoint(LatLng point) {
+    public static LatLng randomLatLngNearPoint(LatLng point) {
         double randomLat = point.latitude + nextSign() * (random.nextDouble() % 100) / 500;
         double randomLng = point.longitude + nextSign() * (random.nextDouble() % 100) / 500;
         return new LatLng(randomLat, randomLng);

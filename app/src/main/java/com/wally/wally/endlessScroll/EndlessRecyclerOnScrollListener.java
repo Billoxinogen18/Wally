@@ -6,11 +6,11 @@ import android.support.v7.widget.RecyclerView;
 public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScrollListener {
     public static String TAG = EndlessRecyclerOnScrollListener.class.getSimpleName();
 
-    private boolean loadingNext = true;
-    private boolean loadingPrevious = true;// True if we are still waiting for the last set of data to load.
+    private boolean loading = true;
     private int visibleThreshold = 5; // The minimum amount of items to have below your current scroll position before loading more.
     int firstVisibleItem, visibleItemCount, totalItemCount, lastVisibleItem;
 
+    int lastFirstVisibleItem = -1;
 
     public EndlessRecyclerOnScrollListener(int numItemsOnPage) {
         this.visibleThreshold = numItemsOnPage;
@@ -18,16 +18,12 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
 
 
     public void loadingNextFinished() {
-        loadingNext = false;
-    }
-    public void loadingPreviousFinished() {
-        loadingPrevious = false;
+        loading = false;
     }
 
     public abstract void onLoadNext();
 
-    public abstract void onLoadPrevious();
-
+    public abstract void onVisibleItemChanged(int previous, int position);
 
     @Override
     public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -35,23 +31,24 @@ public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScr
 
         LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
 
+        int firstCompletelyVisibleItem = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
+
+        if(firstCompletelyVisibleItem != lastFirstVisibleItem){
+            onVisibleItemChanged(lastFirstVisibleItem, firstCompletelyVisibleItem);
+            lastFirstVisibleItem = firstCompletelyVisibleItem;
+        }
+
+
         visibleItemCount = recyclerView.getChildCount();
         totalItemCount = linearLayoutManager.getItemCount();
         firstVisibleItem = linearLayoutManager.findFirstVisibleItemPosition();
         lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-        if (!loadingNext && dy > 0 && (totalItemCount - visibleItemCount)
+        if (!loading && dy > 0 && (totalItemCount - visibleItemCount)
                 <= (firstVisibleItem + visibleThreshold)) {
             // End has been reached
             onLoadNext();
 
-            loadingNext = true;
-        }
-
-        if (!loadingPrevious && dy < 0 && visibleItemCount > (lastVisibleItem - visibleThreshold)) {
-            // End has been reached
-            onLoadPrevious();
-
-            loadingPrevious = true;
+            loading = true;
         }
     }
 }

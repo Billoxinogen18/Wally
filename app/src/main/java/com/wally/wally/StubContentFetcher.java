@@ -2,7 +2,6 @@ package com.wally.wally;
 
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.DebugUtils;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
@@ -16,7 +15,7 @@ import java.util.Collections;
 import java.util.ListIterator;
 
 /**
- * Created by Meravici on 6/20/2016.
+ * Created by Meravici on 6/20/2016. yea
  */
 public class StubContentFetcher implements ContentFetcher {
     public ArrayList<Content> contents= new ArrayList<>();
@@ -94,12 +93,7 @@ public class StubContentFetcher implements ContentFetcher {
                 .withColor(random.nextInt())
 //                .withImageUri("http://" + DebugUtils.randomStr(10))
                 .withAuthorId("8g7t26liJZgP6Z7jHgTkTdZLk632")
-                .withLocation(
-                        new LatLng(
-                                random.nextDouble(),
-                                random.nextDouble()
-                        )
-                ).withVisibility(
+                .withLocation(DebugUtils.randomLatLngNearPoint(DebugUtils.OFFICE_LAT_LNG)).withVisibility(
                         new Visibility()
                                 .withTimeVisibility(null)
                                 .withAnonymousAuthor(false)
