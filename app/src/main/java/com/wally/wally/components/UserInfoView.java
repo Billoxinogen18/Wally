@@ -1,6 +1,7 @@
 package com.wally.wally.components;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -183,14 +184,14 @@ public class UserInfoView extends LinearLayout {
             @Override
             public void onResult(User result) {
                 // Check if new request came while we were loading user data.
-                if (!TextUtils.equals(mLastUserId, userId) || result == null) {
+                if (!TextUtils.equals(mLastUserId, userId) || result == null || ((Activity) getContext()).isDestroyed()) {
                     return;
                 }
                 App.getInstance().getUserManager().loadUser(result, googleApiClient, new UserManager.UserLoadListener() {
                     @Override
                     public void onUserLoad(SocialUser user) {
                         // Second check here
-                        if (!TextUtils.equals(mLastUserId, userId) || user == null) {
+                        if (!TextUtils.equals(mLastUserId, userId) || user == null || ((Activity) getContext()).isDestroyed()) {
                             return;
                         }
                         setUser(user);

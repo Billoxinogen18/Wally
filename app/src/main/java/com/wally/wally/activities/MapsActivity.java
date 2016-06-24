@@ -4,9 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -27,27 +25,25 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
-import com.wally.wally.endlessScroll.EndlessRecyclerOnScrollListener;
 import com.wally.wally.R;
+import com.wally.wally.StubContentFetcher;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.ContentListView;
 import com.wally.wally.components.ContentListViewItem;
+import com.wally.wally.components.MapWindowAdapter;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.endlessScroll.ContentPagingRetriever;
+import com.wally.wally.endlessScroll.EndlessRecyclerOnScrollListener;
 import com.wally.wally.endlessScroll.EndlessScrollAdapter;
-import com.wally.wally.endlessScroll.MarkerGenerator;
+import com.wally.wally.endlessScroll.MarkerManager;
 import com.wally.wally.userManager.SocialUser;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
@@ -72,12 +68,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ContentPagingRetriever mContentRetriever;
     private EndlessRecyclerOnScrollListener mContentScrollListener;
 
-    private List<Marker> mMarkerList;
-    // Generates and adds markers in Background
-    private AsyncTask mMarkerGeneratorTask;
-
-
     private Handler mainThreadHandler;
+    private MarkerManager mMarkerManager;
 
     /**
      * Start to see user profile
@@ -100,22 +92,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mContentListView = (ContentListView) findViewById(R.id.content_list_view);
 
-        mContentScrollListener = new EndlessRecyclerOnScrollListener(PAGE_LENGTH) {
-            @Override
-            public void onLoadNext() {
-                mContentRetriever.loadNext();
-            }
-
-            @Override
-            public void onLoadPrevious() {
-                mContentRetriever.loadPrevious();
-            }
-        };
-
-        mContentListView.setLayoutManager(new LinearLayoutManager(this));
-        mContentListView.addOnScrollListener(mContentScrollListener);
-
-
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
                 .addConnectionCallbacks(this)
@@ -128,7 +104,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        mapFragment.setRetainInstance(true);
+//        mapFragment.setRetainInstance(true);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -173,6 +149,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnCameraChangeListener(this);
+        mMap.setInfoWindowAdapter(new MapWindowAdapter(this));
 
         mMap.getUiSettings().setMapToolbarEnabled(false);
         if (Utils.checkLocationPermission(this)) {
@@ -183,108 +160,68 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_LOCATION_REQUEST_CODE);
         }
-        //TODO what to do when in profile
+
+        mMarkerManager = new MarkerManager(getBaseContext(), mMap);
+        mContentScrollListener = new EndlessRecyclerOnScrollListener(PAGE_LENGTH) {
+            @Override
+            public void onLoadNext() {
+                mContentRetriever.loadNext();
+            }
+
+            @Override
+            public void onVisibleItemChanged(final int previous, final int current) {
+                mMarkerManager.selectMarkerAt(current);
+            }
+        };
+
+        mContentListView.setLayoutManager(new LinearLayoutManager(this));
+        mContentListView.addOnScrollListener(mContentScrollListener);
+
+
         centerMapOnMyLocation();
+        loadContentNearLocation(mMap.getCameraPosition());
     }
 
     public void onBtnCameraClick(View view) {
         onBackPressed();
     }
 
-    public void onPageLoaded() {
+    public void onPageLoaded(final int pageLength) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (mMarkerList != null) {
-                    for (Marker marker : mMarkerList) {
-                        marker.remove();
-                    }
+                int size = mContentRetriever.size();
+                List<Content> contentList = mContentRetriever.getList();
+                contentList = contentList.subList(Math.max(size - pageLength, 0), size);
+
+                for (int i = 0; i < contentList.size(); i++) {
+                    Content c = contentList.get(i);
+                    int visibility = mContentRetriever.get(i).getVisibility().getSocialVisibility().getMode();
+                    mMarkerManager.addMarker("" + (size - pageLength + i + 1), visibility, c.getLocation());
                 }
-                mMarkerList = new ArrayList<>();
-
-                final List<Content> contentList = mContentRetriever.getList();
-
-                if (mMarkerGeneratorTask != null) {
-                    mMarkerGeneratorTask.cancel(true);
-                }
-
-                mMarkerGeneratorTask = new MarkerGenerator(getBaseContext(), contentList) {
-                    @Override
-                    protected void onPostExecute(List<Bitmap> markerIcons) {
-                        if (markerIcons == null) {
-                            return;
-                        }
-                        for (int i = 0; i < contentList.size(); i++) {
-                            Content c = contentList.get(i);
-                            Bitmap ic = markerIcons.get(i);
-
-                            Marker marker = mMap.addMarker(
-                                    new MarkerOptions()
-                                            .position(c.getLocation())
-                                            .icon(BitmapDescriptorFactory.fromBitmap(ic)));
-                            mMarkerList.add(marker);
-                        }
-                    }
-                }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });
-
-
     }
 
     @Override
     public void onNextPageLoad(int pageLength) {
-        Log.d(TAG, "onNextPageLoad() called with: " + "pageLength = [" + pageLength + "]");
-        onPageLoaded();
+        onPageLoaded(pageLength);
         mContentScrollListener.loadingNextFinished();
     }
 
-    @Override
-    public void onPreviousPageLoad(int pageLength) {
-        Log.d(TAG, "onPreviousPageLoad() called with: " + "pageLength = [" + pageLength + "]");
-        onPageLoaded();
-        mContentScrollListener.loadingPreviousFinished();
-    }
 
     @Override
     public void onNextPageFail() {
-        Log.d(TAG, "onNextPageFail() called with: " + "");
         mContentScrollListener.loadingNextFinished();
     }
 
-    @Override
-    public void onPreviousPageFail() {
-        Log.d(TAG, "onPreviousPageFail() called with: " + "");
-        mContentScrollListener.loadingPreviousFinished();
+
+    public void onAreaUpdate(View view) {
+        loadContentNearLocation(mMap.getCameraPosition());
+        Toast.makeText(getBaseContext(), "Updating area", Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public void onNextPageFinish() {
-        mContentScrollListener.loadingNextFinished();
-    }
-
-    @Override
-    public void onPreviousPageFinish() {
-        mContentScrollListener.loadingPreviousFinished();
-    }
-
-    @Override
-    public void onInit() {
-        Log.d(TAG, "onInit() called with: " + "");
-        onPageLoaded();
-        mContentScrollListener.loadingPreviousFinished();
-        mContentScrollListener.loadingNextFinished();
-    }
-
-    @Override
-    public void onFail() {
-        Log.d(TAG, "onFail() called with: " + "");
-        mContentScrollListener.loadingPreviousFinished();
-        mContentScrollListener.loadingNextFinished();
-    }
-
-    @Override
-    public void onCameraChange(CameraPosition cameraPosition) {
+    private void loadContentNearLocation(CameraPosition cameraPosition) {
         ContentFetcher contentFetcher = getContentFetcher(cameraPosition);
 
         mContentRetriever = new ContentPagingRetriever(contentFetcher, mainThreadHandler, PAGE_LENGTH);
@@ -293,6 +230,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         adapter.setUserProfile(mUserProfile);
         adapter.setOnClickListener(this);
         mContentListView.setAdapter(adapter);
+
+        mMarkerManager.reset();
     }
 
     @Override
@@ -334,7 +273,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
         double radius = Utils.getRadius(mMap.getProjection().getVisibleRegion().latLngBounds);
-        ContentFetcher contentFetcher;// = new StubContentFetcher();
+        ContentFetcher contentFetcher = new StubContentFetcher();
 
         if(mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)){
             contentFetcher = App.getInstance().getDataController()
@@ -371,5 +310,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_LOCATION_REQUEST_CODE);
         }
+    }
+
+    @Override
+    public void onCameraChange(CameraPosition cameraPosition) {
+
     }
 }

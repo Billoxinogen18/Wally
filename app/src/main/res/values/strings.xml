@@ -168,4 +168,10 @@
     <string name="anonymous_author_checkbox">Anonymous author</string>
     <string name="content_not_visible_title">Content Not visible</string>
     <string name="content_not_visible_note">Move directly with camera to see</string>
+    <string name="close_application">Close Application</string>
+    <string name="give_permission">Give permission</string>
+    <string name="explain_location_permission">The application needs Location to download proper Area description files</string>
+    <string name="explain_adf_import_permission">Without Importing ADF from cloud we won\'t be able to show you any content</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="explain_adf_export_permission">Without exporting ADF we won\'t be able to show or share your contents</string>
 </resources>

@@ -18,7 +18,7 @@ import com.wally.wally.userManager.SocialUser;
  * Created by Meravici on 6/20/2016. yea
  */
 public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ContentPagingRetriever.ContentPageRetrieveListener {
-    private static final String TAG = EndlessScrollAdapter.class.getSimpleName();
+    public static final String TAG = EndlessScrollAdapter.class.getSimpleName();
     private static final int PROGRESS_VIEW_TYPE = 73;
 
     private ContentPagingRetriever dataSource;
@@ -29,7 +29,6 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
 
 
     private boolean hasNext = true;
-    private boolean hasPrevious = false;
 
     private Handler mainHandler;
 
@@ -45,7 +44,7 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemViewType(int position) {
-        if (position == getItemCount() - 1 || position == 0) {
+        if (position == getItemCount() - 1) {
             return PROGRESS_VIEW_TYPE;
         }
 
@@ -68,55 +67,35 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-
-        if (position == 0) {
-            ProgressViewHolder mHolder = (ProgressViewHolder) holder;
-            mHolder.toHide.setVisibility(hasPrevious ? View.VISIBLE : View.GONE);
-        } else if (position == getItemCount() - 1) {
+        if (position == getItemCount() - 1) {
             ProgressViewHolder mHolder = (ProgressViewHolder) holder;
             mHolder.toHide.setVisibility(hasNext ? View.VISIBLE : View.GONE);
         } else {
             MainListItemViewHolder mHolder = (MainListItemViewHolder) holder;
-            Content content = dataSource.get(position - 1);
+            Content content = dataSource.get(position);
             mHolder.contentListViewItem.clear();
             mHolder.contentListViewItem.setContent(content, googleApiClient);
             mHolder.contentListViewItem.setUserProfile(userProfile);
-            mHolder.contentListViewItem.setPosition(position);
+            mHolder.contentListViewItem.setPosition(position+1);
             mHolder.contentListViewItem.setOnClickListener(onClickListener);
         }
     }
 
     @Override
     public int getItemCount() {
-        return dataSource.size() + 2;
+        return dataSource.size() + 1;
     }
 
     public void setOnClickListener(ContentListViewItem.OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
     }
 
-    @Override
-    public void onInit() {
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                notifyDataSetChanged();
-            }
-        });
-    }
-
-    @Override
-    public void onFail() {
-
-    }
 
     @Override
     public void onNextPageLoad(final int pageLength) {
         mainHandler.post(new Runnable() {
             @Override
             public void run() {
-                hasPrevious = true;
-                notifyItemRangeRemoved(0, dataSource.pageLength);
                 notifyItemRangeInserted(getItemCount(), pageLength);
             }
         });
@@ -131,40 +110,6 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
                 notifyItemChanged(getItemCount() - 1);
             }
         });
-
-    }
-
-    @Override
-    public void onPreviousPageLoad(final int pageLength) {
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                hasNext = true;
-                notifyItemRangeInserted(0, pageLength);
-                notifyItemRangeRemoved(getItemCount() - 1, dataSource.pageLength);
-            }
-        });
-
-    }
-
-    @Override
-    public void onPreviousPageFail() {
-        mainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                hasPrevious = false;
-                notifyItemChanged(0);
-            }
-        });
-    }
-
-    @Override
-    public void onNextPageFinish() {
-
-    }
-
-    @Override
-    public void onPreviousPageFinish() {
 
     }
 

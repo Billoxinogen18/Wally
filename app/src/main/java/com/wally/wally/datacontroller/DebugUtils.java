@@ -9,6 +9,7 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 import com.wally.wally.datacontroller.content.Visibility;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
+import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
@@ -50,7 +51,7 @@ public class DebugUtils {
                 .withTitle(randomStr(7))
                 .withColor(random.nextInt())
                 .withImageUri("http://" + randomStr(10))
-                .withAuthorId(DEBUG_USER.getId().getId())
+                .withAuthorId(USERS[random.nextInt(4)].getId().getId())
                 .withLocation(randomLatLngNearPoint(OFFICE_LAT_LNG))
                 .withVisibility(
                         new Visibility()
@@ -70,11 +71,13 @@ public class DebugUtils {
         int publicContentNumber = 0;
         for (int i = 0; i < n; i++) {
             Content content = generateRandomContent();
+            content.getVisibility().withSocialVisibility(Visibility.PRIVATE);
             if (content.isPublic()) {
                 content.withTitle("" + publicContentNumber++);
             } else if (!content.isPrivate()) {
                 List<Id> sharedWith = new ArrayList<>();
                 sharedWith.add(USERS[1].getGgId());
+                sharedWith.add(USERS[3].getGgId());
                 content.getVisibility().getSocialVisibility().withSharedWith(sharedWith);
             }
             controller.save(content.withImageUri(null));
@@ -95,7 +98,7 @@ public class DebugUtils {
         return new Double[]{ random.nextDouble(), random.nextDouble(), random.nextDouble() };
     }
 
-    private static LatLng randomLatLngNearPoint(LatLng point) {
+    public static LatLng randomLatLngNearPoint(LatLng point) {
         double randomLat = point.latitude + nextSign() * (random.nextDouble() % 100) / 500;
         double randomLng = point.longitude + nextSign() * (random.nextDouble() % 100) / 500;
         return new LatLng(randomLat, randomLng);
@@ -128,12 +131,14 @@ public class DebugUtils {
     }
 
     private static void logContent(Content c, String tag) {
-        Log.d(tag, c.getId());
+//        Log.d(tag, c.getId());
 //        Log.d(tag, c.getTitle());
 
-//        double diff = GeoUtils.distance(OFFICE_LAT_LNG, c.getLocation());
+        double diff = GeoUtils.distance(OFFICE_LAT_LNG, c.getLocation());
 //        LatLng l = c.getLocation();
 //        Log.d(tag, new GeoHash(l.latitude, l.longitude).getGeoHashString() + ": " + diff);
+
+        Log.d(tag, c.getAuthorId() + " (" + c.getVisibility().getSocialVisibility().getMode() + ") " + diff);
 
     }
 
@@ -181,16 +186,25 @@ public class DebugUtils {
 
     public static void sanityCheck(DataController datacontroller) {
         DebugUtils.datacontroller = datacontroller;
-//        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher(new LatLng(0, 0), 100);
-//        final ContentFetcher fetcher = datacontroller.createPublicContentFetcher();
-//        int count = 15;
-//        fetcher.fetchPrev(count,
-//                fetchNextDebugCallback(count, fetcher,
-//                        fetchNextDebugCallback(count, fetcher,
-//                                fetchNextDebugCallback(count, fetcher,
-//                                        fetchPrevDebugCallback(count, fetcher,
-//                                            debugCallback())))));
-    }
 
+//        Content content = generateRandomContent();
+//        content.getVisibility().withSocialVisibility(Visibility.PUBLIC);
+//        datacontroller.save(content);
+//        content.getVisibility().withSocialVisibility(Visibility.PRIVATE);
+//        datacontroller.save(content);
+//        datacontroller.delete(content);
+
+//        ContentFetcher fetcher = datacontroller.createFetcherForMyContent(OFFICE_LAT_LNG, 100);
+//        ContentFetcher fetcher = datacontroller.createFetcherForVisibleContent(OFFICE_LAT_LNG, 100);
+        ContentFetcher fetcher = datacontroller.createFetcherForUserContent(USERS[0], OFFICE_LAT_LNG, 100);
+        fetcher.fetchNext(150, debugCallback());
+//        int count = 15;
+//        fetcher.fetchNext(3,
+//                fetchNextDebugCallback(4, fetcher,
+//                        fetchNextDebugCallback(5, fetcher,
+//                                fetchNextDebugCallback(6, fetcher,
+//                                        fetchNextDebugCallback(count, fetcher,
+//                                                debugCallback())))));
+    }
 
 }
