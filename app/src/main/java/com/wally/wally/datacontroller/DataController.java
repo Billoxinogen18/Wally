@@ -41,6 +41,7 @@ public class DataController {
 
     private User currentUser;
     private StorageReference storage;
+    private FirebaseADFService adfService;
     private DatabaseReference users, contents, rooms;
 
     private DataController(DatabaseReference database, StorageReference storage) {
@@ -301,5 +302,12 @@ public class DataController {
                 return userId.equals(target.getAuthorId());
             }
         };
+    }
+
+    public ADFService getADFService() {
+        if (adfService == null) {
+            adfService = new FirebaseADFService(rooms, storage);
+        }
+        return adfService;
     }
 }
