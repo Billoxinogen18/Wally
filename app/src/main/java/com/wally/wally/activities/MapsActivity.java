@@ -218,6 +218,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public void onAreaUpdate(View view) {
         loadContentNearLocation(mMap.getCameraPosition());
+        mContentListView.startLoading();
         Toast.makeText(getBaseContext(), "Updating area", Toast.LENGTH_SHORT).show();
     }
 
@@ -226,6 +227,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mContentRetriever = new ContentPagingRetriever(contentFetcher, mainThreadHandler, PAGE_LENGTH);
         mContentRetriever.registerLoadListener(this);
+        mContentRetriever.registerLoadListener(mContentListView);
         EndlessScrollAdapter adapter = new EndlessScrollAdapter(getBaseContext(), mGoogleApiClient, mContentRetriever);
         adapter.setUserProfile(mUserProfile);
         adapter.setOnClickListener(this);
