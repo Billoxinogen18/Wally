@@ -21,25 +21,19 @@ import java.util.List;
 
 public class DebugUtils {
     public static final String TAG = DebugUtils.class.getSimpleName();
-
-    public static String[] ROOMS = new String[] {
-            "a", "b", "c", "d", "e",
-            "f", "g", "h", "i", "j",
-            "k", "l", "m", "n", "o"
-    };
-
-    public static final User[] USERS = new User[] {
+    public static final User[] USERS = new User[]{
             new User("bPwMCPf2MWbebkLQrUuXKw3kYjW2").withGgId(""),  // Io
             new User("8g7t26liJZgP6Z7jHgTkTdZLk632").withGgId("114669062093261610699"), // George
             new User("50tSKKashRRrbPP3fKtOWI9vpRg1").withGgId(""), // Tango
             new User("uSlLJUtZqbRDTMeLU4MdcToS8ZZ2").withGgId("112058086965911533829"), // Misha
     };
-
     public static final User DEBUG_USER = USERS[3];
-
     public static final LatLng OFFICE_LAT_LNG = new LatLng(41.8057582f, 44.7681694f);
-
-
+    public static String[] ROOMS = new String[]{
+            "a", "b", "c", "d", "e",
+            "f", "g", "h", "i", "j",
+            "k", "l", "m", "n", "o"
+    };
     private static DataController datacontroller;
     private static SecureRandom random = new SecureRandom();
 
@@ -95,7 +89,7 @@ public class DebugUtils {
     }
 
     private static Double[] randomDoubleArray() {
-        return new Double[]{ random.nextDouble(), random.nextDouble(), random.nextDouble() };
+        return new Double[]{random.nextDouble(), random.nextDouble(), random.nextDouble()};
     }
 
     public static LatLng randomLatLngNearPoint(LatLng point) {
@@ -159,7 +153,8 @@ public class DebugUtils {
             }
 
             @Override
-            public void onError(Exception e) {}
+            public void onError(Exception e) {
+            }
         };
     }
 
@@ -175,7 +170,8 @@ public class DebugUtils {
             }
 
             @Override
-            public void onError(Exception e) {}
+            public void onError(Exception e) {
+            }
         };
     }
 
@@ -186,25 +182,6 @@ public class DebugUtils {
 
     public static void sanityCheck(DataController datacontroller) {
         DebugUtils.datacontroller = datacontroller;
-
-//        Content content = generateRandomContent();
-//        content.getVisibility().withSocialVisibility(Visibility.PUBLIC);
-//        datacontroller.save(content);
-//        content.getVisibility().withSocialVisibility(Visibility.PRIVATE);
-//        datacontroller.save(content);
-//        datacontroller.delete(content);
-
-//        ContentFetcher fetcher = datacontroller.createFetcherForMyContent(OFFICE_LAT_LNG, 100);
-//        ContentFetcher fetcher = datacontroller.createFetcherForVisibleContent(OFFICE_LAT_LNG, 100);
-        ContentFetcher fetcher = datacontroller.createFetcherForUserContent(USERS[0], OFFICE_LAT_LNG, 100);
-        fetcher.fetchNext(150, debugCallback());
-//        int count = 15;
-//        fetcher.fetchNext(3,
-//                fetchNextDebugCallback(4, fetcher,
-//                        fetchNextDebugCallback(5, fetcher,
-//                                fetchNextDebugCallback(6, fetcher,
-//                                        fetchNextDebugCallback(count, fetcher,
-//                                                debugCallback())))));
     }
 
 }
