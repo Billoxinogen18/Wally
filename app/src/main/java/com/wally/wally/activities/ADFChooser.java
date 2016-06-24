@@ -242,6 +242,10 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
         public void onBindViewHolder(ADFViewHolder holder, int position) {
             Pair<String, TangoAreaDescriptionMetaData> data = mData.get(position);
 
+            Log.wtf(TAG, "onBindViewHolder: " + data.second.toString());
+            //double[] locRawData = new double[] data.second.get(TangoAreaDescriptionMetaData.KEY_TRANSFORMATION));
+
+            data.second.get(TangoAreaDescriptionMetaData.KEY_TRANSFORMATION);
             byte[] nameBytes = data.second.get(TangoAreaDescriptionMetaData.KEY_NAME);
             if (nameBytes == null) {
                 holder.name.setVisibility(View.GONE);

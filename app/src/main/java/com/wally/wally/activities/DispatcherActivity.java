@@ -283,6 +283,7 @@ public class DispatcherActivity extends LoginActivity implements
             return;
         }
         mLoadingView.setVisibility(View.VISIBLE);
+        onAdfLoadedInFileSystem(null);
         // TODO move with real ADF service
 //        ADFService s = App.getInstance().getDataController().getADFService();
 //        s.download(Utils.getAdfFilePath("0f43439c-1fda-419d-bb1a-dbc15a3bcb20"), "0f43439c-1fda-419d-bb1a-dbc15a3bcb20", new Callback<Void>() {
