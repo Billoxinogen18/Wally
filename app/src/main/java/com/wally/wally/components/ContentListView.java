@@ -7,15 +7,18 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.wally.wally.R;
+import com.wally.wally.endlessScroll.ContentPagingRetriever;
 
 /**
- * Created by Meravici on 6/15/2016.
+ * Created by Meravici on 6/15/2016. yea
  */
-public class ContentListView extends FrameLayout {
+public class ContentListView extends FrameLayout implements ContentPagingRetriever.ContentPageRetrieveListener {
 
     private RecyclerView mRecycler;
     private View mEmptyContentView;
-    private View mLoadingContentView;
+
+    private boolean isFirstLoad = true;
+
     public ContentListView(Context context) {
         super(context);
         init();
@@ -36,11 +39,11 @@ public class ContentListView extends FrameLayout {
         inflate(getContext(), R.layout.content_list_view, this);
         mRecycler = (RecyclerView) findViewById(R.id.recyclerview);
         mEmptyContentView = findViewById(R.id.empty_view);
-        mLoadingContentView = findViewById(R.id.loading_view);
     }
 
     public void setAdapter(RecyclerView.Adapter adapter) {
         mRecycler.setAdapter(adapter);
+        isFirstLoad = true;
     }
 
     public void addOnScrollListener(RecyclerView.OnScrollListener onScrollListener) {
@@ -51,21 +54,31 @@ public class ContentListView extends FrameLayout {
         mRecycler.setLayoutManager(layoutManager);
     }
 
-//    public void startLoading() {
-//        mLoadingContentView.setVisibility(View.VISIBLE);
-//        mEmptyContentView.setVisibility(View.GONE);
-//        mRecycler.setVisibility(View.GONE);
-//    }
-//
-//    public void setLoadingViewVisibility(int visibility) {
-//        mLoadingContentView.setVisibility(visibility);
-//    }
-//
-//    public void setListVisibility(int visibility) {
-//        mRecycler.setVisibility(visibility);
-//    }
-//
-//    public void setEmptyViewVisibility(int visibility) {
-//        mEmptyContentView.setVisibility(visibility);
-//    }
+    @Override
+    public void onNextPageLoad(int pageLength) {
+        if(isFirstLoad){
+            if(pageLength==0){
+                mRecycler.setVisibility(GONE);
+                mEmptyContentView.setVisibility(VISIBLE);
+            }else{
+                mRecycler.setVisibility(VISIBLE);
+                mEmptyContentView.setVisibility(GONE);
+            }
+            isFirstLoad = false;
+        }
+    }
+
+    public void startLoading(){
+        mRecycler.setVisibility(VISIBLE);
+        mEmptyContentView.setVisibility(GONE);
+    }
+
+    @Override
+    public void onNextPageFail() {
+        if(isFirstLoad){
+            mRecycler.setVisibility(GONE);
+            mEmptyContentView.setVisibility(VISIBLE);
+            isFirstLoad = false;
+        }
+    }
 }
