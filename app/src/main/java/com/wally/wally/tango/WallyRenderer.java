@@ -47,13 +47,14 @@ import javax.microedition.khronos.opengles.GL10;
 public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedListener {
 
     private static final String TAG = WallyRenderer.class.getSimpleName();
+    private static final int CONTENT_CHANGE_COUNT_ON_RENDER = 1;
+    private long timeForARender;
 
     private VisualContentManager mVisualContentManager;
 
     // Augmented reality related fields
     private ATexture mTangoCameraTexture;
     private boolean mSceneCameraConfigured;
-    //    private ScaleGestureDetector mScaleDetector;
     private OnVisualContentSelectedListener mOnContentSelectedListener;
     private ObjectColorPicker mPicker;
 
@@ -88,6 +89,8 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
         mPicker.setOnObjectPickedListener(this);
 
         mPicker.registerObject(backgroundQuad);
+
+        timeForARender = (long)(500/getFrameRate());
 
     }
 
@@ -133,7 +136,6 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
 
     private void addActiveContent(ActiveVisualContent activeVisualContent){
         removeBorder();
-        //activeVisualContent.getVisual().setLookAt(getCurrentCamera().getPosition());
         getCurrentScene().addChild(activeVisualContent.getVisual());
         mVisualContentManager.setActiveContentAdded();
         mPicker.registerObject(activeVisualContent.getVisual());
@@ -163,6 +165,62 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
             mPicker.registerObject(vc.getVisual());
         }
     }
+
+    private void renderStaticContent2(){
+        Iterator<VisualContent> removeIt = mVisualContentManager.getStaticVisualContentToRemove();
+        for (int i=0; i<CONTENT_CHANGE_COUNT_ON_RENDER; i++){
+            if (removeIt.hasNext()){
+                VisualContent vc = removeIt.next();
+                getCurrentScene().removeChild(vc.getVisual());
+                mVisualContentManager.setStaticContentRemoved(vc);
+                mOnContentSelectedListener.onVisualContentSelected(null);
+                removeBorder();
+            } else {
+                break;
+            }
+        }
+
+        Iterator<VisualContent> addIt = mVisualContentManager.getStaticVisualContentToAdd();
+        for (int i=0; i<CONTENT_CHANGE_COUNT_ON_RENDER; i++){
+            if (addIt.hasNext()){
+                VisualContent vc = addIt.next();
+                getCurrentScene().addChild(vc.getVisual());
+                mVisualContentManager.setStaticContentAdded(vc);
+                mPicker.registerObject(vc.getVisual());
+            } else {
+                break;
+            }
+        }
+    }
+
+    private void renderStaticContent3(){
+        long startTime = System.currentTimeMillis();
+        Iterator<VisualContent> removeIt = mVisualContentManager.getStaticVisualContentToRemove();
+        Iterator<VisualContent> addIt = mVisualContentManager.getStaticVisualContentToAdd();
+        boolean next = true;
+        while(next) {
+            next = false;
+            if (removeIt.hasNext()) {
+                VisualContent vc = removeIt.next();
+                getCurrentScene().removeChild(vc.getVisual());
+                mVisualContentManager.setStaticContentRemoved(vc);
+                mOnContentSelectedListener.onVisualContentSelected(null);
+                removeBorder();
+                next = true;
+            }
+
+            if (addIt.hasNext()) {
+                VisualContent vc = addIt.next();
+                getCurrentScene().addChild(vc.getVisual());
+                mVisualContentManager.setStaticContentAdded(vc);
+                mPicker.registerObject(vc.getVisual());
+                next = true;
+            }
+            long iterTime = System.currentTimeMillis();
+            if (iterTime - startTime > timeForARender) return;
+        }
+    }
+
 
     @Override
     protected void onRender(long elapsedRealTime, double deltaTime) {
