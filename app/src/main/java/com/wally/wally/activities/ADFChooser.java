@@ -146,7 +146,7 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
         Intent exportIntent = new Intent();
         exportIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
         exportIntent.putExtra(EXTRA_KEY_SOURCEUUID, uuid);
-        exportIntent.putExtra(EXTRA_KEY_DESTINATIONFILE, Utils.getAdfFileName());
+        exportIntent.putExtra(EXTRA_KEY_DESTINATIONFILE, Utils.getAdfFilesFolder());
         startActivityForResult(exportIntent, RC_EXPORT_ADF);
     }
 
@@ -165,12 +165,28 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
         }
     }
 
+    @SuppressWarnings("MissingPermission")
     private void startUploading() {
-        Log.d(TAG, "startUploading() called with: " + "");
-        Toast.makeText(ADFChooser.this, "Now we can upload ADF", Toast.LENGTH_SHORT).show();
-        // f.getPath();
+        Log.d(TAG, "startUploading() called with: " + mSelectedUUID);
+        startActivity(CameraARTangoActivity.newIntent(getBaseContext(), mSelectedUUID));
+//        App.getInstance().getDataController().getADFService().upload(
+//                Utils.getAdfFilesFolder() + "/" + mSelectedUUID,
+//                mSelectedUUID,
+//                new LatLng(41, 41),
+//                new Callback<Void>() {
+//
+//                    @Override
+//                    public void onResult(Void result) {
+//                        Toast.makeText(ADFChooser.this, "SUCCESS UPLOADED FKIN", Toast.LENGTH_SHORT).show();
+//                        Log.d(TAG, "onResult() called with: " + "result = [" + result + "]");
+//                    }
+//
+//                    @Override
+//                    public void onError(Exception e) {
+//                        Log.d(TAG, "onError() called with: " + "e = [" + e + "]");
+//                    }
+//                });
         // TODO after uploaded startActivity(CameraARTangoActivity.newIntent(getBaseContext(), uuid));
-
     }
 
     @Override
@@ -226,6 +242,10 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
         public void onBindViewHolder(ADFViewHolder holder, int position) {
             Pair<String, TangoAreaDescriptionMetaData> data = mData.get(position);
 
+            Log.wtf(TAG, "onBindViewHolder: " + data.second.toString());
+            //double[] locRawData = new double[] data.second.get(TangoAreaDescriptionMetaData.KEY_TRANSFORMATION));
+
+            data.second.get(TangoAreaDescriptionMetaData.KEY_TRANSFORMATION);
             byte[] nameBytes = data.second.get(TangoAreaDescriptionMetaData.KEY_NAME);
             if (nameBytes == null) {
                 holder.name.setVisibility(View.GONE);

@@ -261,13 +261,18 @@ public final class Utils {
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
 
-    public static String getAdfFileName() {
+    public static String getAdfFilesFolder() {
         String folder = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + File.separator + "Wally";
         File file = new File(folder);
         if (!file.exists()) {
+            //noinspection ResultOfMethodCallIgnored
             file.mkdirs();
         }
         return folder;
+    }
+
+    public static String getAdfFilePath(String uuid) {
+        return getAdfFilesFolder() + "/" + uuid;
     }
 }

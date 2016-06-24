@@ -26,7 +26,7 @@ public class FirebaseADFService implements ADFService {
     public void download(String path, String uuid, final Callback<Void> callback) {
         File localFile = new File(path);
 
-        storage.child(uuid).getFile(localFile)
+        storage.child(uuid).child(uuid).getFile(localFile)
                 .addOnSuccessListener(
                 new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                     @Override

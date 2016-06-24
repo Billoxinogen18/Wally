@@ -34,9 +34,6 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.adf.ADFCloudService;
-import com.wally.wally.datacontroller.adf.ADFCloudServiceStub;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.fragments.PersistentDialogFragment;
 import com.wally.wally.userManager.SocialUser;
@@ -286,29 +283,23 @@ public class DispatcherActivity extends LoginActivity implements
             return;
         }
         mLoadingView.setVisibility(View.VISIBLE);
+        onAdfLoadedInFileSystem(null);
         // TODO move with real ADF service
-        ADFCloudService cloudService = new ADFCloudServiceStub();
-        cloudService.downloadADf(location, new Callback<String>() {
-            @Override
-            public void onResult(final String result) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        onAdfLoadedInFileSystem(result);
-                    }
-                });
-            }
-
-            @Override
-            public void onError(Exception e) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        onAdfLoadedInFileSystem(null);
-                    }
-                });
-            }
-        });
+//        ADFService s = App.getInstance().getDataController().getADFService();
+//        s.download(Utils.getAdfFilePath("0f43439c-1fda-419d-bb1a-dbc15a3bcb20"), "0f43439c-1fda-419d-bb1a-dbc15a3bcb20", new Callback<Void>() {
+//            @Override
+//            public void onResult(Void result) {
+//                Log.d(TAG, "onResult() called with: " + "result = [" + result + "]");
+//                Toast.makeText(DispatcherActivity.this, "THIS SHIT WORKS", Toast.LENGTH_SHORT).show();
+//                onAdfLoadedInFileSystem(Utils.getAdfFilePath("0f43439c-1fda-419d-bb1a-dbc15a3bcb20"));
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//                Log.d(TAG, "onError() called with: " + "e = [" + e + "]");
+//                onAdfLoadedInFileSystem(null);
+//            }
+//        });
     }
 
     private void onAdfLoadedInFileSystem(String uri) {
