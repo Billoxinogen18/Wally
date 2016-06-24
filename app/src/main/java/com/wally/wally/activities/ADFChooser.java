@@ -168,7 +168,7 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
     @SuppressWarnings("MissingPermission")
     private void startUploading() {
         Log.d(TAG, "startUploading() called with: " + mSelectedUUID);
-        CameraARTangoActivity.newIntent(getBaseContext(), mSelectedUUID);
+        startActivity(CameraARTangoActivity.newIntent(getBaseContext(), mSelectedUUID));
 //        App.getInstance().getDataController().getADFService().upload(
 //                Utils.getAdfFilesFolder() + "/" + mSelectedUUID,
 //                mSelectedUUID,
