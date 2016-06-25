@@ -1,6 +1,7 @@
 package com.wally.wally.datacontroller.content;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.datacontroller.SerializableLatLng;
 
 import java.io.Serializable;
 
@@ -93,15 +94,11 @@ public class Content implements Serializable {
     }
 
     public LatLng getLocation() {
-        return location == null ? null : location.toLatLng();
+        return SerializableLatLng.toLatLng(location);
     }
 
     public Content withLocation(LatLng location) {
-        if (location == null) {
-            this.location = null;
-        } else {
-            this.location = new SerializableLatLng(location);
-        }
+        this.location = SerializableLatLng.fromLatLng(location);
         return this;
     }
 
@@ -162,24 +159,5 @@ public class Content implements Serializable {
 
     public boolean isPrivate() {
         return visibility.getSocialVisibility().getMode() == Visibility.SocialVisibility.PRIVATE;
-    }
-
-    private static class SerializableLatLng implements Serializable {
-        private double lat;
-        private double lng;
-
-        public SerializableLatLng(LatLng loc) {
-            lat = loc.latitude;
-            lng = loc.longitude;
-        }
-
-        public LatLng toLatLng() {
-            return new LatLng(lat, lng);
-        }
-
-        @Override
-        public String toString() {
-            return "{" + "lat=" + lat + ", lng=" + lng + "}";
-        }
     }
 }
