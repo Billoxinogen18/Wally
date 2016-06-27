@@ -1,14 +1,20 @@
 package com.wally.wally.datacontroller.adf;
 
-import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
 import com.wally.wally.datacontroller.DebugUtils;
 import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.datacontroller.firebase.FirebaseDAL;
+import com.wally.wally.datacontroller.firebase.FirebaseObject;
+import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
 
+import java.io.File;
 import java.util.List;
 
 public class FirebaseADFService implements ADFService {
@@ -87,36 +93,31 @@ public class FirebaseADFService implements ADFService {
      * {@inheritDoc}
      */
     @Override
-    public void upload(String path, AdfMetaData adfMetaData, final Callback<Void> callback) {
-        Log.w(TAG, "upload: the method is stub");
-        new Thread(new Runnable() {
+    public void upload(String path, final AdfMetaData adfMetaData, final Callback<Void> callback) {
+        FirebaseDAL.uploadFile(storage, path, adfMetaData.getUuid(), new Callback<String>() {
             @Override
-            public void run() {
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                if (DebugUtils.randomBool()) {
-                    callback.onResult(null);
-                } else {
-                    callback.onError(new Exception("Here is random description"));
-                }
+            public void onResult(String result) {
+                saveMetaData(adfMetaData);
+                callback.onResult(null);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                callback.onError(e);
             }
         });
+    }
 
-//        FirebaseDAL.uploadFile(storage.child(uuid), path, new Callback<String>() {
-//            @Override
-//            public void onResult(String result) {
-//                GeoHash hash = new GeoHash(location.latitude, location.longitude);
-//                db.child(hash.getGeoHashString()).setValue(uuid);
-//                callback.onResult(null);
-//            }
-//
-//            @Override
-//            public void onError(Exception e) {
-//                callback.onError(e);
-//            }
-//        });
+    private void saveMetaData(AdfMetaData obj) {
+        LatLng l = obj.getLatLng();
+        String hash = new GeoHash(l.latitude, l.longitude).getGeoHashString();
+        db.child(hash).setValue(toFirebaseObject(obj).put("hash", hash));
+    }
+
+    private FirebaseObject toFirebaseObject(AdfMetaData obj) {
+        return new FirebaseObject()
+                .put("name", obj.getName())
+                .put("uuid", obj.getUuid())
+                .put("location", obj.getLatLng());
     }
 }
