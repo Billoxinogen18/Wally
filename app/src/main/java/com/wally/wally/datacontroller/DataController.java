@@ -55,7 +55,7 @@ public class DataController {
         rooms = database.child(Config.ROOMS_NODE);
 
         // Debug calls will be deleted in the end
-        DebugUtils.refreshContents(contents.getParent(), this);
+//        DebugUtils.refreshContents(contents.getParent(), this);
         DebugUtils.sanityCheck(this);
     }
 
