@@ -147,7 +147,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
         mOnContentSelectedListener.onVisualContentSelected(null);
     }
 
-    private void renderStaticContent(){
+    private void renderStaticContent3(){
         Iterator<VisualContent> removeIt = mVisualContentManager.getStaticVisualContentToRemove();
         while(removeIt.hasNext()){
             VisualContent vc = removeIt.next();
@@ -193,7 +193,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
         }
     }
 
-    private void renderStaticContent3(){
+    private void renderStaticContent(){
         long startTime = System.currentTimeMillis();
         Iterator<VisualContent> removeIt = mVisualContentManager.getStaticVisualContentToRemove();
         Iterator<VisualContent> addIt = mVisualContentManager.getStaticVisualContentToAdd();
