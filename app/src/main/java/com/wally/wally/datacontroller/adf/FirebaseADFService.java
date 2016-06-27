@@ -33,36 +33,23 @@ public class FirebaseADFService implements ADFService {
      */
     @Override
     public void download(String path, String uuid, final Callback<Void> callback) {
-        Log.w(TAG, "download: the method is stub");
+        File localFile = new File(path);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                callback.onError(new Exception("Here is random description"));
-            }
-        });
-//        File localFile = new File(path);
-//
-//        storage.child(uuid).child(uuid).getFile(localFile)
-//                .addOnSuccessListener(
-//                        new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-//                            @Override
-//                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-//                                callback.onResult(null);
-//                            }
-//                        })
-//                .addOnFailureListener(
-//                        new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(Exception e) {
-//                                callback.onError(e);
-//                            }
-//                        });
+        storage.child(uuid).getFile(localFile)
+                .addOnSuccessListener(
+                        new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                callback.onResult(null);
+                            }
+                        })
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(Exception e) {
+                                callback.onError(e);
+                            }
+                        });
     }
 
     /**
