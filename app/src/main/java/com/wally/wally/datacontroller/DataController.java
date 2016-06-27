@@ -170,6 +170,12 @@ public class DataController {
         return new QueryContentFetcher(query);
     }
 
+    private ContentFetcher createFetcherForPublicContent(User user) {
+        FirebaseQuery authorQuery = new AuthorQuery(user.getId());
+        ContentQuery query = new ContentQuery(authorQuery, contents.child("Public"));
+        return new QueryContentFetcher(query);
+    }
+
     private ContentFetcher createFetcherForMySharedContent(LatLng center, double radiusKm) {
         User current = getCurrentUser();
         FirebaseQuery authorQuery = new AuthorQuery(current.getId());
@@ -197,6 +203,13 @@ public class DataController {
         return new QueryContentFetcher(query);
     }
 
+    private ContentFetcher createFetcherForContentSharedWithMe() {
+        User current = getCurrentUser();
+        FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
+        ContentQuery query = new ContentQuery(sharedWithQuery, contents.child("Shared"));
+        return new QueryContentFetcher(query);
+    }
+
     public ContentFetcher createFetcherForMyContent(LatLng center, double radiusKm) {
         User current = getCurrentUser();
         PagerChain chain = new PagerChain();
@@ -221,6 +234,17 @@ public class DataController {
         sharedContentFetcher = new FilteredFetcher(sharedContentFetcher, hasAuthorPredicate);
         chain.addPager(sharedContentFetcher);
         chain.addPager(createFetcherForPublicContent(user, center, radiusKm));
+        return chain;
+    }
+
+    public ContentFetcher createFetcherForUserContent(User user) {
+        User current = getCurrentUser();
+        PagerChain chain = new PagerChain();
+        ContentFetcher sharedContentFetcher = createFetcherForContentSharedWithMe();
+        Predicate<Content> hasAuthorPredicate = hasAuthorPredicate(user.getId().getId());
+        sharedContentFetcher = new FilteredFetcher(sharedContentFetcher, hasAuthorPredicate);
+        chain.addPager(sharedContentFetcher);
+        chain.addPager(createFetcherForPublicContent(user));
         return chain;
     }
 
