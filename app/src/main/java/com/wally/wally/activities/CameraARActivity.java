@@ -31,7 +31,7 @@ import com.wally.wally.userManager.UserManager;
 /**
  * Created by shota on 5/21/16.
  */
-public abstract class CameraARActivity extends LoginActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, SelectedMenuView.OnSelectedMenuActionListener {
+public abstract class CameraARActivity extends GoogleApiClientActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, SelectedMenuView.OnSelectedMenuActionListener {
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int REQUEST_CODE_MY_LOCATION = 22;
     protected DataController mDataController;

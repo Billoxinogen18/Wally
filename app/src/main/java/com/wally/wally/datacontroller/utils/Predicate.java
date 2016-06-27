@@ -1,4 +1,4 @@
-package com.wally.wally.datacontroller;
+package com.wally.wally.datacontroller.utils;
 
 
 public abstract class Predicate<T> {

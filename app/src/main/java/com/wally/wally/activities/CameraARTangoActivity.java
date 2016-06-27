@@ -31,7 +31,6 @@ import com.wally.wally.tango.VisualContentManager;
 import com.wally.wally.tango.WallyRenderer;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
-import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -57,10 +56,17 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     private VisualContentManager mVisualContentManager;
 
 
+    /**
+     * Redirects to ADF chooser, because activity is being started without ADF.
+     * ADF chooser will start {@link CameraARTangoActivity} with chosen ADF file.
+     */
+    public static Intent newIntent(Context context) {
+        return ADFChooser.newIntent(context);
+    }
+
     public static Intent newIntent(Context context, @Nullable String uuid) {
         Intent i = new Intent(context, CameraARTangoActivity.class);
         i.putExtra(ARG_ADF_UUID, uuid);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         return i;
     }
 

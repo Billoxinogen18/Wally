@@ -11,6 +11,8 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.datacontroller.adf.ADFService;
+import com.wally.wally.datacontroller.adf.FirebaseADFService;
 import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
@@ -29,6 +31,7 @@ import com.wally.wally.datacontroller.queries.ContentQuery;
 import com.wally.wally.datacontroller.queries.FirebaseQuery;
 import com.wally.wally.datacontroller.queries.SharedWithQuery;
 import com.wally.wally.datacontroller.user.User;
+import com.wally.wally.datacontroller.utils.Predicate;
 
 import java.util.Collections;
 import java.util.Map;

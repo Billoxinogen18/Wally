@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
+import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
@@ -107,6 +108,10 @@ public class DebugUtils {
         return new BigInteger(130, random).toString(32).substring(0, length);
     }
 
+    public static boolean randomBool() {
+        return random.nextBoolean();
+    }
+
     public static FetchResultCallback debugCallback(final String tag) {
         return new FetchResultCallback() {
             @Override
@@ -184,4 +189,14 @@ public class DebugUtils {
         DebugUtils.datacontroller = datacontroller;
     }
 
+    public static List<AdfMetaData> generateRandomAdfMetaData(int quantity) {
+        List<AdfMetaData> list = new ArrayList<>(quantity);
+        for (int i = 0; i < quantity; i++) {
+            list.add(new AdfMetaData(
+                    randomStr(10),
+                    randomStr(30),
+                    randomLatLngNearPoint(OFFICE_LAT_LNG)));
+        }
+        return list;
+    }
 }

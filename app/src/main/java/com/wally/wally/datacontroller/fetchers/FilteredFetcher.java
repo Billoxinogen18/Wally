@@ -1,6 +1,6 @@
 package com.wally.wally.datacontroller.fetchers;
 
-import com.wally.wally.datacontroller.Predicate;
+import com.wally.wally.datacontroller.utils.Predicate;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 

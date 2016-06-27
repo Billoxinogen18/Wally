@@ -1,129 +1,278 @@
 package com.wally.wally.activities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
 import com.google.atap.tangoservice.TangoErrorException;
+import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.datacontroller.adf.ADFService;
+import com.wally.wally.datacontroller.adf.AdfMetaData;
+import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 import com.wally.wally.fragments.PersistentDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ADFChooser extends AppCompatActivity implements PersistentDialogFragment.PersistentDialogListener {
-    public static final int RC_AREA_LEARNING = 182;
-    public static final int RC_EXPORT_ADF = 22;
+public class ADFChooser extends AppCompatActivity implements PersistentDialogFragment.PersistentDialogListener, GoogleApiClient.ConnectionCallbacks {
+
+    // Permission Denied explain codes
+    public static final int RC_EXPLAIN_LOCATION = 13;
+    public static final int RC_EXPLAIN_ADF = 19;
     private static final String TAG = ADFChooser.class.getSimpleName();
+    // Permission Request codes
+    private static final int RC_REQ_AREA_LEARNING = 182;
+    private static final int RC_REQ_LOCATION = 91;
     private static final String EXPLORER_PACKAGE_NAME = "com.projecttango.tangoexplorer";
-    private static final String INTENT_CLASSPACKAGE = "com.projecttango.tango";
-    private static final String INTENT_IMPORTEXPORT_CLASSNAME = "com.google.atap.tango.RequestImportExportActivity";
 
-    // startActivityForResult requires a code number.
-    private static final String EXTRA_KEY_SOURCEUUID = "SOURCE_UUID";
-    private static final String EXTRA_KEY_DESTINATIONFILE = "DESTINATION_FILE";
-    private static final int RC_EXPLAIN_EXPORT = 192;
-
-    private boolean mFlagShowImportExplanation = false;
-    private boolean mFlagStartUploading = false;
     private String mSelectedUUID;
+    private Tango mTango;
+    private boolean mIsTangoReady;
+
+    private ADFListAdapter mAdapter;
+    private GoogleApiClient mGoogleApiClient;
+
+    private boolean mExplainLocationPermission;
+    private boolean mExplainAdfPermission;
+    private boolean mShouldLoadServerAdfs = true;
 
     public static Intent newIntent(Context context) {
-        Intent i = new Intent(context, ADFChooser.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        return i;
+        Log.wtf(TAG, "newIntent: ");
+        return new Intent(context, ADFChooser.class);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adfchooser);
+
+        if (!Utils.isTangoDevice(getBaseContext())) {
+            throw new IllegalStateException("Starting ADF chooser on Non-Tango device");
+        }
+        initViews();
+
+        if (!Utils.hasADFPermissions(getBaseContext())) {
+            requestADFPermission();
+        }
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, null)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .build();
+    }
+
+    private void initViews() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        if (Utils.isTangoDevice(getBaseContext())) {
-            if (!Utils.hasADFPermissions(getBaseContext())) {
-                requestADFPermission();
-            }
-        } else {
-            startActivity(CameraARStandardActivity.newIntent(getBaseContext()));
-        }
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_adf);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        mAdapter = new ADFListAdapter();
+        recyclerView.setAdapter(mAdapter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        tryLoadServerADfList();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // Synchronize against disconnecting while the service is being used in the OpenGL thread or
-        // in the UI thread.
-        synchronized (this) {
-            if (Utils.isTangoDevice(getBaseContext()) && Utils.hasADFPermissions(getBaseContext())) {
-                loadRecycler();
-            } else {
-                Log.i(TAG, "onResume: No Tango or Didn't have ADF permission returning.");
-            }
-        }
+        tryLoadLocalAdfList();
 
-        Log.d(TAG, "onResume() called with: " + mFlagShowImportExplanation + " " + mFlagStartUploading);
-        if (mFlagShowImportExplanation) {
-            mFlagShowImportExplanation = false;
-
-            PersistentDialogFragment.newInstance(this, RC_EXPLAIN_EXPORT,
-                    R.string.explain_adf_export_permission,
+        if (mExplainLocationPermission) {
+            mExplainLocationPermission = false;
+            PersistentDialogFragment.newInstance(
+                    this,
+                    RC_EXPLAIN_LOCATION,
+                    R.string.explain_location_permission,
+                    R.string.give_permission,
+                    R.string.close_application)
+                    .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
+        } else if (mExplainAdfPermission) {
+            mExplainAdfPermission = false;
+            PersistentDialogFragment.newInstance(
+                    this,
+                    RC_EXPLAIN_ADF,
+                    R.string.explain_adf_permission,
                     R.string.give_permission,
                     R.string.close_application)
                     .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
         }
-        if (mFlagStartUploading) {
-            mFlagStartUploading = false;
+    }
 
-            startUploading();
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mTango != null) {
+            synchronized (this) {
+                // Unbinds Tango Service
+                mTango.disconnect();
+                mIsTangoReady = false;
+            }
         }
     }
 
-    private void loadRecycler() {
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview_adf);
-        assert recyclerView != null;
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        ADFListAdapter adapter = new ADFListAdapter(getADFList());
-        recyclerView.setAdapter(adapter);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_REQ_AREA_LEARNING) {
+            if (resultCode != RESULT_OK) {
+                mExplainAdfPermission = true;
+            }
+        }
     }
 
-    private ArrayList<Pair<String, TangoAreaDescriptionMetaData>> getADFList() {
-        Tango mTango = new Tango(this);
-        ArrayList<Pair<String, TangoAreaDescriptionMetaData>> mFullADFList = new ArrayList<>();
-        ArrayList<String> mFullUUIDList = new ArrayList<>();
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == RC_REQ_LOCATION) {
+            if (Utils.checkLocationPermission(this)) {
+                tryLoadServerADfList();
+            } else {
+                mExplainLocationPermission = true;
+            }
+        }
+    }
+
+    @Override
+    public void onDialogPositiveClicked(int requestCode) {
+        Log.d(TAG, "onDialogPositiveClicked() called with: " + "requestCode = [" + requestCode + "]");
+        if (requestCode == RC_EXPLAIN_LOCATION) {
+            tryLoadServerADfList();
+        } else if (requestCode == RC_EXPLAIN_ADF) {
+            requestADFPermission();
+        }
+    }
+
+    @Override
+    public void onDialogNegativeClicked(int requestCode) {
+        finish();
+        System.exit(0);
+    }
+
+    private void tryLoadLocalAdfList() {
+        if (Utils.hasADFPermissions(getBaseContext())) {
+            if (mIsTangoReady) {
+                loadLocalAdfList();
+            } else {
+                mTango = new Tango(this, new Runnable() {
+                    public void run() {
+                        mIsTangoReady = true;
+                        loadLocalAdfList();
+                    }
+                });
+            }
+        }
+    }
+
+    // The method is synchronized because it uses mTango
+    private synchronized void loadLocalAdfList() {
+        if (!mIsTangoReady) {
+            return;
+        }
         try {
-            mFullUUIDList = mTango.listAreaDescriptions();
+            final ArrayList<AdfSyncInfo> adfDataList = new ArrayList<>();
+            for (String uuid : mTango.listAreaDescriptions()) {
+                TangoAreaDescriptionMetaData metadata = mTango.loadAreaDescriptionMetaData(uuid);
+                adfDataList.add(AdfSyncInfo.fromMetadata(metadata));
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    onLocalADfsLoaded(adfDataList);
+                }
+            });
         } catch (TangoErrorException e) {
             Toast.makeText(this, R.string.tango_error, Toast.LENGTH_SHORT).show();
         }
-        if (mFullUUIDList.size() == 0) {
-            Toast.makeText(this, R.string.no_adfs_tango_error, Toast.LENGTH_SHORT).show();
-        }
+    }
 
-        for (String uuid : mFullUUIDList) {
-            TangoAreaDescriptionMetaData metadata = mTango.loadAreaDescriptionMetaData(uuid);
-            mFullADFList.add(new Pair<>(uuid, metadata));
+    private void tryLoadServerADfList() {
+        if (!mShouldLoadServerAdfs) {
+            return;
         }
+        if (!Utils.checkLocationPermission(this)) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    RC_REQ_LOCATION);
+            return;
+        }
+        if (!mGoogleApiClient.isConnected()) {
+            return;
+        }
+        mShouldLoadServerAdfs = false;
 
-        return mFullADFList;
+        LocationListener locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+                loadServerADfList(Utils.extractLatLng(location));
+            }
+        };
+
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(0);
+        locationRequest.setFastestInterval(0);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationServices.FusedLocationApi.
+                requestLocationUpdates(mGoogleApiClient, locationRequest, locationListener);
+    }
+
+    private void loadServerADfList(@Nullable LatLng location) {
+        ADFService s = App.getInstance().getDataController().getADFService();
+        Toast.makeText(ADFChooser.this, "Now we can download server ADF list", Toast.LENGTH_SHORT).show();
+        // s.download();
+    }
+
+    private void onLocalADfsLoaded(ArrayList<AdfSyncInfo> localAdfs) {
+        mAdapter.setData(localAdfs);
     }
 
     public void startWithNewADF(View v) {
@@ -137,82 +286,22 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
     private void requestADFPermission() {
         startActivityForResult(
                 Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
-                RC_AREA_LEARNING);
+                RC_REQ_AREA_LEARNING);
     }
 
     private void onAdfSelected(String uuid) {
         mSelectedUUID = uuid;
 
-        Intent exportIntent = new Intent();
-        exportIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
-        exportIntent.putExtra(EXTRA_KEY_SOURCEUUID, uuid);
-        exportIntent.putExtra(EXTRA_KEY_DESTINATIONFILE, Utils.getAdfFilesFolder());
-        startActivityForResult(exportIntent, RC_EXPORT_ADF);
-    }
-
-    @Override
-    public void onDialogPositiveClicked(int requestCode) {
-        if (requestCode == RC_EXPLAIN_EXPORT) {
-            onAdfSelected(mSelectedUUID);
-        }
-    }
-
-    @Override
-    public void onDialogNegativeClicked(int requestCode) {
-        if (requestCode == RC_EXPLAIN_EXPORT) {
-            finish();
-            System.exit(0);
-        }
-    }
-
-    @SuppressWarnings("MissingPermission")
-    private void startUploading() {
-        Log.d(TAG, "startUploading() called with: " + mSelectedUUID);
-        startActivity(CameraARTangoActivity.newIntent(getBaseContext(), mSelectedUUID));
-//        App.getInstance().getDataController().getADFService().upload(
-//                Utils.getAdfFilesFolder() + "/" + mSelectedUUID,
-//                mSelectedUUID,
-//                new LatLng(41, 41),
-//                new Callback<Void>() {
-//
-//                    @Override
-//                    public void onResult(Void result) {
-//                        Toast.makeText(ADFChooser.this, "SUCCESS UPLOADED FKIN", Toast.LENGTH_SHORT).show();
-//                        Log.d(TAG, "onResult() called with: " + "result = [" + result + "]");
-//                    }
-//
-//                    @Override
-//                    public void onError(Exception e) {
-//                        Log.d(TAG, "onError() called with: " + "e = [" + e + "]");
-//                    }
-//                });
-        // TODO after uploaded startActivity(CameraARTangoActivity.newIntent(getBaseContext(), uuid));
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult() called with: " + "requestCode = [" + requestCode + "], resultCode = [" + resultCode + "], data = [" + data + "]");
-        if (requestCode == RC_EXPORT_ADF) {
-            if (resultCode == RESULT_OK) {
-                mFlagStartUploading = true;
-            } else {
-                mFlagShowImportExplanation = true;
-            }
-        } else if (requestCode == RC_AREA_LEARNING) {
-            // TODO
-            if (resultCode == RESULT_OK) {
-
-            } else {
-
-            }
-        }
+        // TODO start fragment there
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("mSelectedUUID", mSelectedUUID);
+        outState.putBoolean("mExplainAdfPermission", mExplainAdfPermission);
+        outState.putBoolean("mExplainLocationPermission", mExplainLocationPermission);
+        outState.putBoolean("mShouldLoadServerAdfs", mShouldLoadServerAdfs);
     }
 
     @Override
@@ -220,15 +309,19 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
             mSelectedUUID = savedInstanceState.getString("mSelectedUUID");
+            mExplainAdfPermission = savedInstanceState.getBoolean("mExplainAdfPermission");
+            mExplainLocationPermission = savedInstanceState.getBoolean("mExplainLocationPermission");
+            mShouldLoadServerAdfs = savedInstanceState.getBoolean("mShouldLoadServerAdfs");
         }
     }
 
     private class ADFListAdapter extends RecyclerView.Adapter<ADFListAdapter.ADFViewHolder> {
 
-        private final List<Pair<String, TangoAreaDescriptionMetaData>> mData;
+        private List<AdfSyncInfo> mData;
 
-        public ADFListAdapter(List<Pair<String, TangoAreaDescriptionMetaData>> data) {
+        public void setData(List<AdfSyncInfo> data) {
             mData = data;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -240,20 +333,10 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
 
         @Override
         public void onBindViewHolder(ADFViewHolder holder, int position) {
-            Pair<String, TangoAreaDescriptionMetaData> data = mData.get(position);
+            AdfMetaData data = mData.get(position).getAdfMetaData();
 
-            Log.wtf(TAG, "onBindViewHolder: " + data.second.toString());
-            //double[] locRawData = new double[] data.second.get(TangoAreaDescriptionMetaData.KEY_TRANSFORMATION));
-
-            data.second.get(TangoAreaDescriptionMetaData.KEY_TRANSFORMATION);
-            byte[] nameBytes = data.second.get(TangoAreaDescriptionMetaData.KEY_NAME);
-            if (nameBytes == null) {
-                holder.name.setVisibility(View.GONE);
-            } else {
-                holder.name.setVisibility(View.VISIBLE);
-                holder.name.setText(new String(nameBytes));
-            }
-            holder.uuid.setText(data.first);
+            holder.name.setText(data.getName());
+            holder.uuid.setText(data.getUuid());
         }
 
         @Override
@@ -275,7 +358,8 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
 
             @Override
             public void onClick(View v) {
-                String uuid = mData.get(getAdapterPosition()).first;
+                // TODO if is from server do other
+                String uuid = mData.get(getAdapterPosition()).getAdfMetaData().getUuid();
                 onAdfSelected(uuid);
             }
         }

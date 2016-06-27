@@ -15,9 +15,7 @@ import com.wally.wally.datacontroller.content.Content;
 public class CameraARStandardActivity extends CameraARActivity {
 
     public static Intent newIntent(Context context) {
-        Intent i = new Intent(context, CameraARStandardActivity.class);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        return i;
+        return new Intent(context, CameraARStandardActivity.class);
     }
 
     @Override
