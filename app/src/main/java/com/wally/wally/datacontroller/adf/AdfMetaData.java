@@ -1,7 +1,5 @@
 package com.wally.wally.datacontroller.adf;
 
-import android.support.annotation.Nullable;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
@@ -39,9 +37,7 @@ public class AdfMetaData implements Serializable {
         this.uuid = uuid;
     }
 
-    public
-    @Nullable
-    LatLng getLatLng() {
+    public LatLng getLatLng() {
         return SerializableLatLng.toLatLng(latLng);
     }
 
