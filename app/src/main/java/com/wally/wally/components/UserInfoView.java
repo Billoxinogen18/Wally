@@ -80,6 +80,7 @@ public class UserInfoView extends LinearLayout {
             mUserImage.setImageResource(R.drawable.sample_user_image);
             mUserName.setText("Giorgi Gogiashvili");
         }
+
     }
 
     private void initFromCustomLayout(int layoutId) {
@@ -132,6 +133,7 @@ public class UserInfoView extends LinearLayout {
         mUser = null;
         mUserName.setText(R.string.anonymous);
         mUserImage.setImageResource(R.drawable.ic_anonymous_user_icon);
+        setEnabled(false);
     }
 
     /**
@@ -155,6 +157,7 @@ public class UserInfoView extends LinearLayout {
      * @param isAnonymous true if you want to set as anonymous (If it's not current user) <br/>
      */
     public void loadAndSetUser(final String userId, boolean isAnonymous, final GoogleApiClient googleApiClient) {
+        setEnabled(true);
         boolean isOwn = Utils.isCurrentUser(userId);
         if (isAnonymous && !isOwn) {
             setAnonymousUser();

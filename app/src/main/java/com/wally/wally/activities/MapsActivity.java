@@ -179,7 +179,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         centerMapOnMyLocation();
-        loadContentNearLocation(mMap.getCameraPosition());
     }
 
     public void onBtnCameraClick(View view) {
@@ -306,7 +305,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             LatLng myPosition = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
 
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 16), 2000, null);
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 16), 2000, new GoogleMap.CancelableCallback() {
+                @Override
+                public void onFinish() {
+                    loadContentNearLocation(mMap.getCameraPosition());
+                }
+
+                @Override
+                public void onCancel() {
+                    loadContentNearLocation(mMap.getCameraPosition());
+                }
+            });
         } else {
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},

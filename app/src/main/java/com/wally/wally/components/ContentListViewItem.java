@@ -19,7 +19,7 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.userManager.SocialUser;
 
 /**
- * Created by Meravici on 6/20/2016.
+ * Created by Meravici on 6/20/2016. yea
  */
 public class ContentListViewItem extends CardView {
     private UserInfoView userInfoView;
@@ -142,10 +142,8 @@ public class ContentListViewItem extends CardView {
         this.onClickListener = onClickListener;
     }
 
-    public void setUserProfile(SocialUser userProfile) {
-        if (userProfile != null) {
-            userInfoView.setVisibility(View.GONE);
-        }
+    public void showUserInfo(boolean show) {
+        userInfoView.setVisibility(show? VISIBLE : View.GONE);
     }
 
 
