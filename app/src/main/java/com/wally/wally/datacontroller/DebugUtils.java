@@ -190,6 +190,13 @@ public class DebugUtils {
     }
 
     public static List<AdfMetaData> generateRandomAdfMetaData(int quantity) {
-        return null;
+        List<AdfMetaData> list = new ArrayList<>(quantity);
+        for (int i = 0; i < quantity; i++) {
+            list.add(new AdfMetaData(
+                    randomStr(10),
+                    randomStr(30),
+                    randomLatLngNearPoint(OFFICE_LAT_LNG)));
+        }
+        return list;
     }
 }
