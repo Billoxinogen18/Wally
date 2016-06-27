@@ -1,4 +1,4 @@
-package com.wally.wally.datacontroller;
+package com.wally.wally.datacontroller.adf;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -9,7 +9,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
-import com.wally.wally.datacontroller.adf.AdfMetaData;
+import com.wally.wally.datacontroller.DebugUtils;
 import com.wally.wally.datacontroller.callbacks.Callback;
 
 import java.io.File;

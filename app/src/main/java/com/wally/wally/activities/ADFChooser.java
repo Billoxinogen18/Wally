@@ -32,7 +32,7 @@ import com.google.atap.tangoservice.TangoErrorException;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.ADFService;
+import com.wally.wally.datacontroller.adf.ADFService;
 import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 import com.wally.wally.fragments.PersistentDialogFragment;

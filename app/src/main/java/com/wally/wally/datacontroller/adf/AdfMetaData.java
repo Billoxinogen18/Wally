@@ -3,7 +3,7 @@ package com.wally.wally.datacontroller.adf;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.wally.wally.datacontroller.SerializableLatLng;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.io.Serializable;
 
