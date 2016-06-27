@@ -15,10 +15,14 @@ public class AdfMetaData implements Serializable {
     private String uuid;
     private SerializableLatLng latLng;
 
-    public AdfMetaData(String name, String uuid, LatLng latLng) {
+    public AdfMetaData(String name, String uuid, SerializableLatLng latLng) {
         this.name = name;
         this.uuid = uuid;
-        this.latLng = SerializableLatLng.fromLatLng(latLng);
+        this.latLng = latLng;
+    }
+
+    public AdfMetaData(String name, String uuid, LatLng latLng) {
+        this(name, uuid, SerializableLatLng.fromLatLng(latLng));
     }
 
     public String getName() {
