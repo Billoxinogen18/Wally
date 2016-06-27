@@ -1,5 +1,7 @@
 package com.wally.wally.datacontroller.adf;
 
+import android.support.annotation.Nullable;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.SerializableLatLng;
 
@@ -9,13 +11,13 @@ import java.io.Serializable;
  * ADF data class that stores info about adf
  * Created by ioane5 on 6/25/16.
  */
-public class AdfData implements Serializable {
+public class AdfMetaData implements Serializable {
 
     private String name;
     private String uuid;
     private SerializableLatLng latLng;
 
-    public AdfData(String name, String uuid, LatLng latLng) {
+    public AdfMetaData(String name, String uuid, LatLng latLng) {
         this.name = name;
         this.uuid = uuid;
         this.latLng = SerializableLatLng.fromLatLng(latLng);
@@ -37,7 +39,9 @@ public class AdfData implements Serializable {
         this.uuid = uuid;
     }
 
-    public LatLng getLatLng() {
+    public
+    @Nullable
+    LatLng getLatLng() {
         return SerializableLatLng.toLatLng(latLng);
     }
 
@@ -47,7 +51,7 @@ public class AdfData implements Serializable {
 
     @Override
     public String toString() {
-        return "AdfData{" +
+        return "AdfMetaData{" +
                 "name='" + name + '\'' +
                 ", uuid='" + uuid + '\'' +
                 ", latLng=" + latLng +

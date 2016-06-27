@@ -33,7 +33,7 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.ADFService;
-import com.wally.wally.datacontroller.adf.AdfData;
+import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 import com.wally.wally.fragments.PersistentDialogFragment;
 
@@ -333,7 +333,7 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
 
         @Override
         public void onBindViewHolder(ADFViewHolder holder, int position) {
-            AdfData data = mData.get(position).getAdfData();
+            AdfMetaData data = mData.get(position).getAdfMetaData();
 
             holder.name.setText(data.getName());
             holder.uuid.setText(data.getUuid());
@@ -359,7 +359,7 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
             @Override
             public void onClick(View v) {
                 // TODO if is from server do other
-                String uuid = mData.get(getAdapterPosition()).getAdfData().getUuid();
+                String uuid = mData.get(getAdapterPosition()).getAdfMetaData().getUuid();
                 onAdfSelected(uuid);
             }
         }

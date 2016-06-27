@@ -1,19 +1,23 @@
 package com.wally.wally.datacontroller;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
-import com.wally.wally.datacontroller.firebase.FirebaseDAL;
-import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
 
 import java.io.File;
+import java.util.List;
 
 public class FirebaseADFService implements ADFService {
 
+    private static final String TAG = FirebaseADFService.class.getSimpleName();
     private final DatabaseReference db;
     private final StorageReference storage;
 
@@ -22,48 +26,88 @@ public class FirebaseADFService implements ADFService {
         this.storage = storage.child("ADFs");
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void download(String path, String uuid, final Callback<Void> callback) {
         File localFile = new File(path);
 
         storage.child(uuid).child(uuid).getFile(localFile)
                 .addOnSuccessListener(
-                new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                        callback.onResult(null);
-                    }
-                })
+                        new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                                callback.onResult(null);
+                            }
+                        })
                 .addOnFailureListener(
-                new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        callback.onError(e);
-                    }
-                });
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(Exception e) {
+                                callback.onError(e);
+                            }
+                        });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void searchUuidNearLocation(LatLng location, Callback<String> callback) {
-        throw new UnsupportedOperationException("Not implemented yet");
-    }
-
-    @Override
-    public void upload(String path, final String uuid, final LatLng location, final Callback<Void> callback) {
-        FirebaseDAL.uploadFile(storage.child(uuid), path, new Callback<String>() {
+    public void searchADfMetaDataNearLocation(@NonNull LatLng location, final Callback<List<AdfMetaData>> callback) {
+        Log.w(TAG, "searchADfMetaDataNearLocation: the method is stub");
+        new Thread(new Runnable() {
             @Override
-            public void onResult(String result) {
-                GeoHash hash = new GeoHash(location.latitude, location.longitude);
-                db.child(hash.getGeoHashString()).setValue(uuid);
-                callback.onResult(null);
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (DebugUtils.randomBool()) {
+                    callback.onResult(DebugUtils.generateRandomAdfMetaData(5));
+                } else {
+                    callback.onError(new Exception("Here is random description"));
+                }
             }
+        });
+    }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void upload(String path, AdfMetaData adfMetaData, final Callback<Void> callback) {
+        Log.w(TAG, "upload: the method is stub");
+        new Thread(new Runnable() {
             @Override
-            public void onError(Exception e) {
-                callback.onError(e);
+            public void run() {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (DebugUtils.randomBool()) {
+                    callback.onResult(null);
+                } else {
+                    callback.onError(new Exception("Here is random description"));
+                }
             }
         });
 
+//        FirebaseDAL.uploadFile(storage.child(uuid), path, new Callback<String>() {
+//            @Override
+//            public void onResult(String result) {
+//                GeoHash hash = new GeoHash(location.latitude, location.longitude);
+//                db.child(hash.getGeoHashString()).setValue(uuid);
+//                callback.onResult(null);
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//                callback.onError(e);
+//            }
+//        });
     }
-
 }

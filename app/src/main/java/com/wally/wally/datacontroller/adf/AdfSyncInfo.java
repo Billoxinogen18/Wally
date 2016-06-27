@@ -15,12 +15,12 @@ import java.nio.ByteBuffer;
  */
 public class AdfSyncInfo implements Serializable {
 
-    private AdfData adfData;
+    private AdfMetaData adfMetaData;
     private boolean isLocal;
     private boolean isSynchronized;
 
-    public AdfSyncInfo(AdfData adfData, boolean isLocal) {
-        this.adfData = adfData;
+    public AdfSyncInfo(AdfMetaData adfMetaData, boolean isLocal) {
+        this.adfMetaData = adfMetaData;
         this.isLocal = isLocal;
     }
 
@@ -37,7 +37,7 @@ public class AdfSyncInfo implements Serializable {
         double[] lla = LocationConverter.ecefToLla(ecef);
         LatLng loc = new LatLng(lla[0], lla[1]);
 
-        return new AdfSyncInfo(new AdfData(name, uuid, loc), true);
+        return new AdfSyncInfo(new AdfMetaData(name, uuid, loc), true);
     }
 
     public boolean isLocal() {
@@ -52,8 +52,8 @@ public class AdfSyncInfo implements Serializable {
         return isSynchronized;
     }
 
-    public AdfData getAdfData() {
-        return adfData;
+    public AdfMetaData getAdfMetaData() {
+        return adfMetaData;
     }
 
     /**
@@ -66,7 +66,7 @@ public class AdfSyncInfo implements Serializable {
     @Override
     public String toString() {
         return "AdfSyncInfo{" +
-                "adfData=" + adfData +
+                "adfMetaData=" + adfMetaData +
                 ", isLocal=" + isLocal +
                 ", isSynchronized=" + isSynchronized +
                 '}';
