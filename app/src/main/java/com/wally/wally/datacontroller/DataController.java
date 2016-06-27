@@ -219,6 +219,11 @@ public class DataController {
         return chain;
     }
 
+    public ContentFetcher createFetcherForMyContent() {
+        //TODO
+        return null;
+    }
+
     public ContentFetcher createFetcherForVisibleContent(LatLng center, double radiusKm) {
         PagerChain chain = new PagerChain();
         chain.addPager(createFetcherForPublicContent(center, radiusKm));

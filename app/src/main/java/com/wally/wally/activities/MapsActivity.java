@@ -301,9 +301,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
             contentFetcher = App.getInstance().getDataController()
-                    .createFetcherForMyContent(
-                            cameraPosition.target,
-                            radius);
+                    .createFetcherForMyContent();
         } else if (mUserProfile != null) {
             contentFetcher = App.getInstance().getDataController()
                     .createFetcherForUserContent(mUserProfile.getBaseUser());
