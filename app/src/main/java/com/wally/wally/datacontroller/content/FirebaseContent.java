@@ -91,9 +91,8 @@ public class FirebaseContent extends FirebaseObject {
 
     private void setLocation(LatLng loc) {
         if (loc == null) return;
-        if (id == null) {
-            id = new GeoHash(loc.latitude, loc.longitude).getGeoHashString();
-        }
+        String hash = new GeoHash(loc.latitude, loc.longitude).getGeoHashString();
+        put(K_HASH, hash);
         getChild(K_LOCATION)
                 .put(K_LAT, loc.latitude)
                 .put(K_LNG, loc.longitude);

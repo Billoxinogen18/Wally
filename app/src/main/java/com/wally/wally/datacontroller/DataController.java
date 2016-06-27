@@ -23,6 +23,7 @@ import com.wally.wally.datacontroller.fetchers.FilteredFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.fetchers.QueryContentFetcher;
+import com.wally.wally.datacontroller.fetchers.ValuePager;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
 import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
@@ -54,7 +55,7 @@ public class DataController {
         rooms = database.child(Config.ROOMS_NODE);
 
         // Debug calls will be deleted in the end
-//        DebugUtils.refreshContents(contents, this);
+//        DebugUtils.refreshContents(contents.getParent(), this);
         DebugUtils.sanityCheck(this);
     }
 
@@ -86,13 +87,17 @@ public class DataController {
         } else {
             target = contents.child("Shared");
         }
-        return target.child(c.getId());
+        return c.getId() != null ? target.child(c.getId()) : target.push();
+    }
+
+    private void addInRoom(String uuid, String id) {
+        rooms.child(uuid).child(id).setValue(true);
     }
 
     public void save(final Content c) {
         if (c.getId() != null) { delete(c); }
-        final FirebaseContent content = new FirebaseContent(c);
         final DatabaseReference ref = getContentReference(c);
+        c.withId(ref.getKey());
         uploadImage(
                 c.getImageUri(),
                 ref.getKey(),
@@ -100,9 +105,11 @@ public class DataController {
                     @Override
                     public void onResult(String result) {
                         c.withImageUri(result);
-                        c.withId(content.save(ref));
-                        String extendedId = ref.getParent().getKey() + ":" + ref.getKey();
-                        rooms.child(c.getUuid()).child(extendedId).setValue(true);
+                        new FirebaseContent(c).save(ref);
+                        if (c.getUuid() != null) {
+                            String extendedId = ref.getParent().getKey() + ":" + ref.getKey();
+                            addInRoom(c.getUuid(), extendedId);
+                        }
                     }
 
                     @Override
@@ -170,6 +177,12 @@ public class DataController {
         return new QueryContentFetcher(query);
     }
 
+    private ContentFetcher createFetcherForPublicContent(User user) {
+        FirebaseQuery authorQuery = new AuthorQuery(user.getId());
+        ContentQuery query = new ContentQuery(authorQuery, contents.child("Public"));
+        return new QueryContentFetcher(query);
+    }
+
     private ContentFetcher createFetcherForMySharedContent(LatLng center, double radiusKm) {
         User current = getCurrentUser();
         FirebaseQuery authorQuery = new AuthorQuery(current.getId());
@@ -197,6 +210,13 @@ public class DataController {
         return new QueryContentFetcher(query);
     }
 
+    private ContentFetcher createFetcherForContentSharedWithMe() {
+        User current = getCurrentUser();
+        FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
+        ContentQuery query = new ContentQuery(sharedWithQuery, contents.child("Shared"));
+        return new QueryContentFetcher(query);
+    }
+
     public ContentFetcher createFetcherForMyContent(LatLng center, double radiusKm) {
         User current = getCurrentUser();
         PagerChain chain = new PagerChain();
@@ -204,6 +224,11 @@ public class DataController {
         chain.addPager(createFetcherForMySharedContent(center, radiusKm));
         chain.addPager(createFetcherForPublicContent(current, center, radiusKm));
         return chain;
+    }
+
+    public ContentFetcher createFetcherForMyContent() {
+        //TODO
+        return null;
     }
 
     public ContentFetcher createFetcherForVisibleContent(LatLng center, double radiusKm) {
@@ -221,6 +246,17 @@ public class DataController {
         sharedContentFetcher = new FilteredFetcher(sharedContentFetcher, hasAuthorPredicate);
         chain.addPager(sharedContentFetcher);
         chain.addPager(createFetcherForPublicContent(user, center, radiusKm));
+        return chain;
+    }
+
+    public ContentFetcher createFetcherForUserContent(User user) {
+        User current = getCurrentUser();
+        PagerChain chain = new PagerChain();
+        ContentFetcher sharedContentFetcher = createFetcherForContentSharedWithMe();
+        Predicate<Content> hasAuthorPredicate = hasAuthorPredicate(user.getId().getId());
+        sharedContentFetcher = new FilteredFetcher(sharedContentFetcher, hasAuthorPredicate);
+        chain.addPager(sharedContentFetcher);
+        chain.addPager(createFetcherForPublicContent(user));
         return chain;
     }
 
@@ -275,13 +311,28 @@ public class DataController {
             // means we don't need to filter by location
             return null;
         }
+
+        if (radiusKm <= 0) {
+            return new ContentFetcher() {
+                @Override
+                public void fetchPrev(int i, FetchResultCallback callback) {
+                    callback.onResult(Collections.<Content>emptySet());
+                }
+
+                @Override
+                public void fetchNext(int i, FetchResultCallback callback) {
+                    callback.onResult(Collections.<Content>emptySet());
+                }
+            };
+        }
+
         final double radius = radiusKm * 1000; // Convert to meters
         Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
         PagerChain chain = new PagerChain();
         for (GeoHashQuery query : queries) {
             String startKey = query.getStartValue();
             String endKey = query.getEndValue();
-            chain.addPager(new KeyPager(target, startKey, endKey));
+            chain.addPager(new ValuePager(target, "hash", startKey, endKey));
         }
         return new FilteredFetcher(chain, isLocationInRangePredicate(center, radiusKm));
     }

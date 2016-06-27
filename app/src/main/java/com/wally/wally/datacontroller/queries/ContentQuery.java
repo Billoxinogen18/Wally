@@ -27,7 +27,12 @@ public class ContentQuery {
 
 
     public ContentQuery(FirebaseQuery query, DatabaseReference ref) {
-        this(query, ref, null);
+        this(query, ref, new Predicate<Content>() {
+            @Override
+            public boolean test(Content target) {
+                return true;
+            }
+        });
     }
 
 

@@ -29,7 +29,6 @@ public class UserManager {
     }
 
     public SocialUser getUser(){
-        Log.d(TAG, "getUser: " + mUser);
         return mUser;
     }
 
