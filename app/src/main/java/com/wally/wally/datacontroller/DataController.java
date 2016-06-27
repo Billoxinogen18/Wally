@@ -311,6 +311,21 @@ public class DataController {
             // means we don't need to filter by location
             return null;
         }
+
+        if (radiusKm <= 0) {
+            return new ContentFetcher() {
+                @Override
+                public void fetchPrev(int i, FetchResultCallback callback) {
+                    callback.onResult(Collections.<Content>emptySet());
+                }
+
+                @Override
+                public void fetchNext(int i, FetchResultCallback callback) {
+                    callback.onResult(Collections.<Content>emptySet());
+                }
+            };
+        }
+
         final double radius = radiusKm * 1000; // Convert to meters
         Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
         PagerChain chain = new PagerChain();
