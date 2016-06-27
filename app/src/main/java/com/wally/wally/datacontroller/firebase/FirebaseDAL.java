@@ -16,10 +16,9 @@ import java.util.UUID;
 
 public class FirebaseDAL {
 
-    public static void uploadFile(StorageReference storage, String localPath,
-                                  final Callback<String> resultCallback) {
-
-        storage.child(UUID.randomUUID().toString())
+    public static void uploadFile(StorageReference storage, String localPath, String name,
+                                   final Callback<String > callback) {
+        storage.child(name)
                 .putFile(Uri.fromFile(new File(localPath)))
                 .addOnSuccessListener(
                         new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -27,9 +26,9 @@ public class FirebaseDAL {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 Uri downloadUri = taskSnapshot.getDownloadUrl();
                                 if (downloadUri == null) {
-                                    resultCallback.onError(new Exception("could not upload!"));
+                                    callback.onError(new Exception("could not upload!"));
                                 } else {
-                                    resultCallback.onResult(downloadUri.toString());
+                                    callback.onResult(downloadUri.toString());
                                 }
                             }
                         })
@@ -37,10 +36,15 @@ public class FirebaseDAL {
                         new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                resultCallback.onError(e);
+                                callback.onError(e);
                             }
                         }
                 );
+    }
+
+    public static void uploadFile(StorageReference storage, String localPath,
+                                  final Callback<String> callback) {
+        uploadFile(storage, localPath, UUID.randomUUID().toString(), callback);
     }
 
     public static String save(DatabaseReference ref, FirebaseObject target) {
