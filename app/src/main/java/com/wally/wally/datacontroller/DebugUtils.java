@@ -194,7 +194,7 @@ public class DebugUtils {
         for (int i = 0; i < quantity; i++) {
             list.add(new AdfMetaData(
                     randomStr(10),
-                    randomStr(30),
+                    randomStr(20),
                     randomLatLngNearPoint(OFFICE_LAT_LNG)));
         }
         return list;

@@ -39,7 +39,7 @@ public class FirebaseADFService implements ADFService {
                 }
                 callback.onError(new Exception("Here is random description"));
             }
-        });
+        }).start();
 //        File localFile = new File(path);
 //
 //        storage.child(uuid).child(uuid).getFile(localFile)
@@ -69,17 +69,13 @@ public class FirebaseADFService implements ADFService {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if (DebugUtils.randomBool()) {
-                    callback.onResult(DebugUtils.generateRandomAdfMetaData(5));
-                } else {
-                    callback.onError(new Exception("Here is random description"));
-                }
+                callback.onResult(DebugUtils.generateRandomAdfMetaData(5));
             }
-        });
+        }).start();
     }
 
 
@@ -103,7 +99,7 @@ public class FirebaseADFService implements ADFService {
                     callback.onError(new Exception("Here is random description"));
                 }
             }
-        });
+        }).start();
 
 //        FirebaseDAL.uploadFile(storage.child(uuid), path, new Callback<String>() {
 //            @Override
