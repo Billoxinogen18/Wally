@@ -61,7 +61,6 @@ public class SocialUserFactory {
                             PersonBuffer personBuffer = peopleData.getPersonBuffer();
                             try {
                                 Person person = personBuffer.get(0);
-                                Log.d(TAG, "onResult: " + person.getDisplayName());
                                 final SocialUser googleUser = toSocialUser(baseUser, person);
 
                                 Plus.PeopleApi.loadVisible(googleApiClient, null).setResultCallback(
@@ -93,7 +92,6 @@ public class SocialUserFactory {
     }
 
     private SocialUser toSocialUser(User baseUser, Person person){
-        Log.d(TAG, "toSocialUser() called with: " + "person = [" + person.getDisplayName() + "]");
         SocialUser socialUser = new GoogleUser(baseUser)
                 .withDisplayName(person.getDisplayName())
                 .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);

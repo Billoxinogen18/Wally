@@ -16,6 +16,7 @@ public class ContentListView extends FrameLayout implements ContentPagingRetriev
 
     private RecyclerView mRecycler;
     private View mEmptyContentView;
+    private OnScrollSettleListener onScrollSettleListener;
 
     private boolean isFirstLoad = true;
 
@@ -38,6 +39,15 @@ public class ContentListView extends FrameLayout implements ContentPagingRetriev
     private void init() {
         inflate(getContext(), R.layout.content_list_view, this);
         mRecycler = (RecyclerView) findViewById(R.id.recyclerview);
+        mRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if(newState == RecyclerView.SCROLL_STATE_IDLE && onScrollSettleListener != null){
+                    onScrollSettleListener.onScrollSettled();
+                }
+            }
+        });
         mEmptyContentView = findViewById(R.id.empty_view);
     }
 
@@ -80,5 +90,13 @@ public class ContentListView extends FrameLayout implements ContentPagingRetriev
             mEmptyContentView.setVisibility(VISIBLE);
             isFirstLoad = false;
         }
+    }
+
+    public void setOnScrollSettleListener(OnScrollSettleListener onScrollSettleListener) {
+        this.onScrollSettleListener = onScrollSettleListener;
+    }
+
+    public interface OnScrollSettleListener{
+        void onScrollSettled();
     }
 }
