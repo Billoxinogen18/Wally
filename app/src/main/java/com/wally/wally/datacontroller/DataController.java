@@ -23,6 +23,7 @@ import com.wally.wally.datacontroller.fetchers.FilteredFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.fetchers.QueryContentFetcher;
+import com.wally.wally.datacontroller.fetchers.ValuePager;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
 import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
@@ -54,7 +55,7 @@ public class DataController {
         rooms = database.child(Config.ROOMS_NODE);
 
         // Debug calls will be deleted in the end
-//        DebugUtils.refreshContents(contents, this);
+        DebugUtils.refreshContents(contents.getParent(), this);
         DebugUtils.sanityCheck(this);
     }
 
@@ -86,13 +87,17 @@ public class DataController {
         } else {
             target = contents.child("Shared");
         }
-        return target.child(c.getId());
+        return c.getId() != null ? target.child(c.getId()) : target.push();
+    }
+
+    private void addInRoom(String uuid, String id) {
+        rooms.child(uuid).child(id).setValue(true);
     }
 
     public void save(final Content c) {
         if (c.getId() != null) { delete(c); }
-        final FirebaseContent content = new FirebaseContent(c);
         final DatabaseReference ref = getContentReference(c);
+        c.withId(ref.getKey());
         uploadImage(
                 c.getImageUri(),
                 ref.getKey(),
@@ -100,9 +105,11 @@ public class DataController {
                     @Override
                     public void onResult(String result) {
                         c.withImageUri(result);
-                        c.withId(content.save(ref));
-                        String extendedId = ref.getParent().getKey() + ":" + ref.getKey();
-                        rooms.child(c.getUuid()).child(extendedId).setValue(true);
+                        new FirebaseContent(c).save(ref);
+                        if (c.getUuid() != null) {
+                            String extendedId = ref.getParent().getKey() + ":" + ref.getKey();
+                            addInRoom(c.getUuid(), extendedId);
+                        }
                     }
 
                     @Override
@@ -310,7 +317,7 @@ public class DataController {
         for (GeoHashQuery query : queries) {
             String startKey = query.getStartValue();
             String endKey = query.getEndValue();
-            chain.addPager(new KeyPager(target, startKey, endKey));
+            chain.addPager(new ValuePager(target, "hash", startKey, endKey));
         }
         return new FilteredFetcher(chain, isLocationInRangePredicate(center, radiusKm));
     }
