@@ -40,16 +40,33 @@
             tools:text="Gio Gogiashvili" />
     </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/my_location"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:background="@android:color/background_light"
-        android:onClick="onMyLocationClick"
-        android:src="@drawable/ic_my_location_black_24dp" />
+        android:orientation="vertical">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/update_area"
+            app:fabSize="mini"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            app:backgroundTint="@android:color/background_light"
+            android:onClick="onAreaUpdate"
+            android:src="@drawable/ic_sync_black_24dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/my_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="onMyLocationClick"
+            android:src="@drawable/ic_my_location_black_24dp" />
+
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/list"
