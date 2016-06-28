@@ -91,7 +91,7 @@ public class DataController {
     }
 
     private void addInRoom(String uuid, String id) {
-        rooms.child(uuid).child(id).setValue(true);
+        rooms.child(uuid).child("Contents").child(id).setValue(true);
     }
 
     public void save(final Content c) {
@@ -139,7 +139,8 @@ public class DataController {
     }
 
     public void fetchByUUID(String uuid, final FetchResultCallback callback) {
-        rooms.child(uuid).addListenerForSingleValueEvent(new ValueEventListener() {
+        rooms.child(uuid).child("Contents")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 GenericTypeIndicator<Map<String, Boolean>> indicator =

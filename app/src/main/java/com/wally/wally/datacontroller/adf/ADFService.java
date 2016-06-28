@@ -24,12 +24,19 @@ public interface ADFService {
      */
     void searchADfMetaDataNearLocation(LatLng location, Callback<List<AdfMetaData>> callback);
 
+
+    /**
+     *
+     * @deprecated use {@link #upload(String, AdfMetaData)} instead.
+     */
+    @Deprecated
+    void upload(String path, AdfMetaData adfMetaData, Callback<Void> callback);
+
     /**
      * Uploads adf with it's meta data to server
      *
      * @param path        path of adf on local disk
      * @param adfMetaData Adf data that contains uuid, name and location
-     * @param callback    callback with success/error result
      */
-    void upload(String path, AdfMetaData adfMetaData, Callback<Void> callback);
+    void upload(String path, AdfMetaData adfMetaData);
 }

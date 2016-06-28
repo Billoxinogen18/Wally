@@ -1,6 +1,7 @@
 package com.wally.wally.datacontroller.adf;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -106,17 +107,23 @@ public class FirebaseADFService implements ADFService {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public void upload(String path, final AdfMetaData adfMetaData, final Callback<Void> callback) {
+        upload(path, adfMetaData);
+        callback.onResult(null);
+    }
+
+    @Override
+    public void upload(String path, final AdfMetaData adfMetaData) {
         FirebaseDAL.uploadFile(storage, path, adfMetaData.getUuid(), new Callback<String>() {
             @Override
             public void onResult(String result) {
                 saveMetaData(adfMetaData);
-                callback.onResult(null);
             }
 
             @Override
             public void onError(Exception e) {
-                callback.onError(e);
+                // should retry?!
             }
         });
     }
@@ -124,14 +131,16 @@ public class FirebaseADFService implements ADFService {
     private void saveMetaData(AdfMetaData obj) {
         LatLng l = obj.getLatLng();
         String hash = new GeoHash(l.latitude, l.longitude).getGeoHashString();
-        db.child(hash).setValue(toFirebaseObject(obj).put("hash", hash));
+        db.child(obj.getUuid()).updateChildren(toFirebaseObject(obj).put("hash", hash));
     }
 
     private FirebaseObject toFirebaseObject(AdfMetaData obj) {
+        LatLng l = obj.getLatLng();
         return new FirebaseObject()
                 .put("name", obj.getName())
                 .put("uuid", obj.getUuid())
-                .put("location", obj.getLatLng());
+                .put("location/latitude", l.latitude)
+                .put("location/longitude", l.longitude);
     }
 
     private AdfMetaData toAdfMetaData(DataSnapshot snapshot) {
