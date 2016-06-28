@@ -33,14 +33,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.R;
-import com.wally.wally.StubContentFetcher;
 import com.wally.wally.Utils;
 import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.ContentListView;
 import com.wally.wally.components.ContentListViewItem;
 import com.wally.wally.components.MapWindowAdapter;
-import com.wally.wally.datacontroller.DebugUtils;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.endlessScroll.ContentPagingRetriever;
@@ -75,6 +72,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private Handler mainThreadHandler;
     private MarkerManager mMarkerManager;
+    private GoogleMap.CancelableCallback defaultCenterMyLocationCallback = new GoogleMap.CancelableCallback() {
+        @Override
+        public void onFinish() {
+            loadContentNearLocation(mMap.getCameraPosition());
+        }
+
+        @Override
+        public void onCancel() {
+            loadContentNearLocation(mMap.getCameraPosition());
+        }
+    };
 
     /**
      * Start to see user profile
@@ -135,6 +143,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMarkerManager = new MarkerManager(getBaseContext(), mMap);
         mContentScrollListener = new EndlessRecyclerOnScrollListener(PAGE_LENGTH) {
             int markerCounter = 0;
+
             @Override
             public void onLoadNext() {
                 mContentRetriever.loadNext();
@@ -188,7 +197,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onCameraChange(CameraPosition cameraPosition) {
 
     }
-
 
     @Override
     public void onScrollSettled() {
@@ -310,20 +318,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
         double radius = Utils.getRadius(mMap.getProjection().getVisibleRegion().latLngBounds);
-        ContentFetcher contentFetcher = new StubContentFetcher();
-//
-//        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
-//            contentFetcher = App.getInstance().getDataController()
-//                    .createFetcherForMyContent();
-//        } else if (mUserProfile != null) {
-//            contentFetcher = App.getInstance().getDataController()
-//                    .createFetcherForUserContent(mUserProfile.getBaseUser());
-//        } else {
-//            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
-//                    cameraPosition.target,
-//                    radius
-//            );
-//        }
+        ContentFetcher contentFetcher;
+
+        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
+            contentFetcher = App.getInstance().getDataController()
+                    .createFetcherForMyContent();
+        } else if (mUserProfile != null) {
+            contentFetcher = App.getInstance().getDataController()
+                    .createFetcherForUserContent(mUserProfile.getBaseUser());
+        } else {
+            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
+                    cameraPosition.target,
+                    radius
+            );
+        }
         return contentFetcher;
     }
 
@@ -358,16 +366,4 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.animateCamera(cu);
 
     }
-
-    private GoogleMap.CancelableCallback defaultCenterMyLocationCallback = new GoogleMap.CancelableCallback() {
-        @Override
-        public void onFinish() {
-            loadContentNearLocation(mMap.getCameraPosition());
-        }
-
-        @Override
-        public void onCancel() {
-            loadContentNearLocation(mMap.getCameraPosition());
-        }
-    };
 }
