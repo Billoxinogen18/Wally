@@ -71,6 +71,7 @@ public class ContentListViewItem extends CardView {
         userInfoView.loadAndSetUser(
                 content.getAuthorId(),
                 content.getVisibility().isAuthorAnonymous(), googleApiClient);
+        userInfoView.setStatus(Utils.formatDateSmart(getContext(), content.getCreationDate().getTime()));
 
 
         boolean isOwn = Utils.isCurrentUser(content.getAuthorId());

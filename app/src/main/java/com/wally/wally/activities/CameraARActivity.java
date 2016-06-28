@@ -27,6 +27,8 @@ import com.wally.wally.tango.VisualContent;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
 
+import java.util.Date;
+
 
 /**
  * Created by shota on 5/21/16.
@@ -212,6 +214,10 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
                 return;
             } else {
                 content.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
+            }
+
+            if(content.getCreationDate() == null) {
+                content.withCreationDate(new Date(System.currentTimeMillis()));
             }
             onSaveContent(content);
             Log.wtf(TAG, "saveActiveContent: " + content);

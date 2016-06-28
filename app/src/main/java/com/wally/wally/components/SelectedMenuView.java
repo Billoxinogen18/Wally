@@ -65,6 +65,8 @@ public class SelectedMenuView extends RelativeLayout {
                     content.getVisibility().isAuthorAnonymous(),
                     googleApiClient);
 
+            mNoteDate.setText(Utils.formatDateSmart(getContext(), content.getCreationDate().getTime()));
+
             showContentControlPanel(Utils.isCurrentUser(content.getAuthorId()));
             // TODO add content creation date
             // mNoteDate.setText(content.getDate());

@@ -185,6 +185,19 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
+    public void onCameraChange(CameraPosition cameraPosition) {
+
+    }
+
+
+    @Override
+    public void onScrollSettled() {
+        if (mUserProfile != null) {
+            centerMapOnVisibleMarkers();
+        }
+    }
+
+    @Override
     public void onNextPageLoad(int pageLength) {
         loadNewPageMarkers(pageLength);
         mContentScrollListener.loadingNextFinished();
@@ -297,20 +310,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
         double radius = Utils.getRadius(mMap.getProjection().getVisibleRegion().latLngBounds);
-        ContentFetcher contentFetcher; // = new StubContentFetcher();
-
-        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
-            contentFetcher = App.getInstance().getDataController()
-                    .createFetcherForMyContent();
-        } else if (mUserProfile != null) {
-            contentFetcher = App.getInstance().getDataController()
-                    .createFetcherForUserContent(mUserProfile.getBaseUser());
-        } else {
-            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
-                    cameraPosition.target,
-                    radius
-            );
-        }
+        ContentFetcher contentFetcher = new StubContentFetcher();
+//
+//        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
+//            contentFetcher = App.getInstance().getDataController()
+//                    .createFetcherForMyContent();
+//        } else if (mUserProfile != null) {
+//            contentFetcher = App.getInstance().getDataController()
+//                    .createFetcherForUserContent(mUserProfile.getBaseUser());
+//        } else {
+//            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
+//                    cameraPosition.target,
+//                    radius
+//            );
+//        }
         return contentFetcher;
     }
 
@@ -346,12 +359,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    @Override
-    public void onCameraChange(CameraPosition cameraPosition) {
-
-    }
-
-
     private GoogleMap.CancelableCallback defaultCenterMyLocationCallback = new GoogleMap.CancelableCallback() {
         @Override
         public void onFinish() {
@@ -363,11 +370,4 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             loadContentNearLocation(mMap.getCameraPosition());
         }
     };
-
-    @Override
-    public void onScrollSettled() {
-        if (mUserProfile != null) {
-            centerMapOnVisibleMarkers();
-        }
-    }
 }

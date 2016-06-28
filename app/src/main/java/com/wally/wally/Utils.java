@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -101,7 +102,7 @@ public final class Utils {
         if (DateUtils.isToday(date)) {
             return DateUtils.formatSameDayTime(date, now, DateFormat.MEDIUM, DateFormat.MEDIUM).toString();
         } else {
-            return DateUtils.formatDateTime(context, date, DateUtils.FORMAT_ABBREV_ALL);
+            return DateUtils.formatDateTime(context, date, DateUtils.FORMAT_ABBREV_RELATIVE);
         }
     }
 
@@ -158,8 +159,9 @@ public final class Utils {
         cv.layout(0, 0, cv.getMeasuredWidth(), cv.getMeasuredHeight());
 
         final Bitmap bitmap = Bitmap.createBitmap(cv.getMeasuredWidth(),
-                cv.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+                cv.getMeasuredHeight(), Bitmap.Config.ARGB_4444);
         Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.TRANSPARENT);
         cv.draw(canvas);
         return bitmap;
     }

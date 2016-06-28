@@ -12,7 +12,9 @@ import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.ListIterator;
+import java.util.Random;
 
 /**
  * Created by Meravici on 6/20/2016. yea
@@ -104,6 +106,7 @@ public class StubContentFetcher implements ContentFetcher {
                         new TangoData()
                                 .withScale((double) random.nextInt())
                                 .withRotation(new Double[]{})
-                                .withTranslation(new Double[]{}));
+                                .withTranslation(new Double[]{}))
+                .withCreationDate(new Date(random.nextLong()));
     }
 }
