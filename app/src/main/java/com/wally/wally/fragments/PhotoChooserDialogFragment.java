@@ -1,5 +1,6 @@
 package com.wally.wally.fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -39,8 +40,12 @@ public class PhotoChooserDialogFragment extends DialogFragment implements View.O
     @SuppressWarnings("unused")
     public static final String TAG = PhotoChooserDialogFragment.class.getSimpleName();
     private static final int ACTION_REQUEST_EXTERNAL_GALLERY = 102;
+    private static final int RC_PERMISSION_READ_EXTERNAL_STORAGE = 11;
+
     private ImagesRecyclerViewAdapter mAdapter;
     private String mExternalChosenImage;
+    private boolean mFlagDismissDialog = false;
+
     private AsyncTask<Void, Void, List<ImageData>> mLoadImageData = new AsyncTask<Void, Void, List<ImageData>>() {
 
         @Override
@@ -96,7 +101,7 @@ public class PhotoChooserDialogFragment extends DialogFragment implements View.O
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), getGridColumnCount()));
         mAdapter = new ImagesRecyclerViewAdapter();
         recyclerView.setAdapter(mAdapter);
-        mLoadImageData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        loadContent();
 
         builder.setView(dv);
         AlertDialog dialog = builder.create();
@@ -105,6 +110,26 @@ public class PhotoChooserDialogFragment extends DialogFragment implements View.O
         return dialog;
     }
 
+    private void loadContent() {
+        if (Utils.checkExternalStorageReadPermission(getContext())) {
+            mLoadImageData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } else {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    RC_PERMISSION_READ_EXTERNAL_STORAGE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == RC_PERMISSION_READ_EXTERNAL_STORAGE) {
+            if (Utils.checkExternalStorageReadPermission(getContext())) {
+                loadContent();
+            } else {
+                mFlagDismissDialog = true;
+            }
+        }
+    }
 
     private int getGridColumnCount() {
         // This is optimal quantity based on rotation.
@@ -126,7 +151,11 @@ public class PhotoChooserDialogFragment extends DialogFragment implements View.O
         super.onResume();
         if (!TextUtils.isEmpty(mExternalChosenImage)) {
             finishWithResult(mExternalChosenImage);
+        }
 
+        if (mFlagDismissDialog) {
+            mFlagDismissDialog = false;
+            finishWithResult(null);
         }
     }
 
