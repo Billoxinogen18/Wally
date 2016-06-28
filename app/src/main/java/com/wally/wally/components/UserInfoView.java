@@ -126,20 +126,27 @@ public class UserInfoView extends LinearLayout {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(imageSize / 4, 0, 0, 0);
-        mStatusView = new TextView(context);
-        mStatusView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize / 4 * 3);
-        mStatusView.setTextColor(Color.GRAY);
 
-        LinearLayout secondLayout = new LinearLayout(context);
-        secondLayout.setOrientation(LinearLayout.VERTICAL);
-        secondLayout.addView(mUserName);
-        secondLayout.addView(mStatusView);
-        secondLayout.setLayoutParams(lp);
+        View secondView = mUserName;
+        if (hasDateView) {
+            mStatusView = new TextView(context);
+            mStatusView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize / 4 * 3);
+            mStatusView.setTextColor(Color.GRAY);
+
+            LinearLayout secondLayout = new LinearLayout(context);
+            secondLayout.setOrientation(LinearLayout.VERTICAL);
+            secondLayout.addView(mUserName);
+            secondLayout.addView(mStatusView);
+            secondLayout.setLayoutParams(lp);
+
+            secondView = secondLayout;
+        }
+        secondView.setLayoutParams(lp);
 
         setGravity(Gravity.CENTER_VERTICAL);
         // Now add views to parent
         addView(mUserImage);
-        addView(secondLayout);
+        addView(secondView);
     }
 
     public void setAnonymousUser() {
