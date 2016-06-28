@@ -191,6 +191,13 @@ public class DataController {
         return new QueryContentFetcher(query);
     }
 
+    private ContentFetcher createFetcherForMySharedContent() {
+        User current = getCurrentUser();
+        FirebaseQuery authorQuery = new AuthorQuery(current.getId());
+        ContentQuery query = new ContentQuery(authorQuery, contents.child("Shared"));
+        return new QueryContentFetcher(query);
+    }
+
     private ContentFetcher createFetcherForPrivateContent(LatLng center, double radiusKm) {
         User current = getCurrentUser();
         DatabaseReference target = contents.child(current.getId().getId());
@@ -199,6 +206,12 @@ public class DataController {
             fetcher = new KeyPager(target);
         }
         return fetcher;
+    }
+
+    private ContentFetcher createFetcherForPrivateContent() {
+        User current = getCurrentUser();
+        DatabaseReference target = contents.child(current.getId().getId());
+        return new KeyPager(target);
     }
 
 
@@ -227,8 +240,12 @@ public class DataController {
     }
 
     public ContentFetcher createFetcherForMyContent() {
-        //TODO
-        return null;
+        User current = getCurrentUser();
+        PagerChain chain = new PagerChain();
+        chain.addPager(createFetcherForPrivateContent());
+        chain.addPager(createFetcherForMySharedContent());
+        chain.addPager(createFetcherForPublicContent(current));
+        return chain;
     }
 
     public ContentFetcher createFetcherForVisibleContent(LatLng center, double radiusKm) {
