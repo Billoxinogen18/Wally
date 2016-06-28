@@ -19,7 +19,7 @@ import org.rajawali3d.scene.RajawaliScene;
  */
 public class ActiveVisualContent extends VisualContent {
     private static final String TAG = ActiveVisualContent.class.getSimpleName();
-    private static final int MOVE_ANUMATION_DURATION = 300;
+    private static final int MOVE_ANUMATION_DURATION = 400;
     private Animation3D mMoveAnim = null;
     private SlerpAnimation3D mRotationAnim = null;
     private Pose mNewPose;
@@ -53,7 +53,7 @@ public class ActiveVisualContent extends VisualContent {
     private void moveAnimation(Animation3D anim, RajawaliScene scene){
         if (anim != null) {
             anim.pause();
-            scene.unregisterAnimation(mMoveAnim);
+            scene.unregisterAnimation(anim);
             anim = null;
         }
         anim = new TranslateAnimation3D(mNewPose.getPosition());

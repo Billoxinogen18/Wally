@@ -9,6 +9,7 @@ import com.projecttango.rajawali.Pose;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.Content;
 
+import org.rajawali3d.loader.awd.BlockSimpleMaterial;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
