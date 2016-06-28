@@ -78,6 +78,7 @@ public class VisualContent {
                 mVisual.setPosition(pose.getPosition());
                 mVisual.setRotation(pose.getOrientation());
             }
+            mVisual.setTransparent(true);
             refreshVisualScale();
         }
         return mVisual;
