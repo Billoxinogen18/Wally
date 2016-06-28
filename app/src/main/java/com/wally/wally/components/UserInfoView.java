@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,6 +41,7 @@ public class UserInfoView extends LinearLayout {
 
     private ImageView mUserImage;
     private TextView mUserName;
+    private TextView mStatusView;
 
     private SocialUser mUser;
     // This variable is to check if new request comes while loading user.
@@ -48,7 +50,6 @@ public class UserInfoView extends LinearLayout {
     public UserInfoView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
-
     }
 
     public UserInfoView(Context context, AttributeSet attrs, int defStyle) {
@@ -69,7 +70,8 @@ public class UserInfoView extends LinearLayout {
                 initFromCustomLayout(customLayoutRes);
             } else {
                 int sizeEnum = a.getInt(R.styleable.UserInfoView_view_size, 0);
-                initWithSize(sizeEnum);
+                boolean hasDateView = a.getBoolean(R.styleable.UserInfoView_has_date, false);
+                initWithSize(sizeEnum, hasDateView);
             }
         } finally {
             a.recycle();
@@ -79,6 +81,9 @@ public class UserInfoView extends LinearLayout {
         if (isInEditMode()) {
             mUserImage.setImageResource(R.drawable.sample_user_image);
             mUserName.setText("Giorgi Gogiashvili");
+            if (mStatusView != null) {
+                mStatusView.setText("12th June");
+            }
         }
 
     }
@@ -89,7 +94,7 @@ public class UserInfoView extends LinearLayout {
         mUserName = (TextView) findViewById(R.id.owner_name);
     }
 
-    private void initWithSize(int sizeEnum) {
+    private void initWithSize(int sizeEnum, boolean hasDateView) {
         Context context = getContext();
         // Choose resources according to xml attribute
         @DimenRes int imageSizeResId;
@@ -117,15 +122,24 @@ public class UserInfoView extends LinearLayout {
         mUserName.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         mUserName.setTextColor(Color.BLACK);
 
+
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(imageSize / 4, 0, 0, 0);
-        mUserName.setLayoutParams(lp);
-        setGravity(Gravity.CENTER_VERTICAL);
+        mStatusView = new TextView(context);
+        mStatusView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize / 4 * 3);
+        mStatusView.setTextColor(Color.GRAY);
 
+        LinearLayout secondLayout = new LinearLayout(context);
+        secondLayout.setOrientation(LinearLayout.VERTICAL);
+        secondLayout.addView(mUserName);
+        secondLayout.addView(mStatusView);
+        secondLayout.setLayoutParams(lp);
+
+        setGravity(Gravity.CENTER_VERTICAL);
         // Now add views to parent
         addView(mUserImage);
-        addView(mUserName);
+        addView(secondLayout);
     }
 
     public void setAnonymousUser() {
@@ -145,6 +159,7 @@ public class UserInfoView extends LinearLayout {
         mUserImage.setImageDrawable(null);
         mUserImage.setBackground(null);
         mUserName.setText(null);
+        mStatusView.setText(null);
     }
 
     /**
@@ -245,5 +260,9 @@ public class UserInfoView extends LinearLayout {
                     .into(mUserImage);
         }
         mUserName.setText(user.getDisplayName());
+    }
+
+    public void setStatus(String status) {
+        mStatusView.setText(status);
     }
 }

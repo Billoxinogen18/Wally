@@ -14,5 +14,6 @@
             <enum name="small" value="1" />
         </attr>
         <attr name="custom_layout" format="reference" />
+        <attr name="has_date" format="boolean"/>
     </declare-styleable>
 </resources>

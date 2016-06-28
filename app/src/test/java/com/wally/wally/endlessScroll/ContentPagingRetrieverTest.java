@@ -91,55 +91,6 @@ public class ContentPagingRetrieverTest {
         }
     }
 
-    @Test
-    public void PreviousEndTest(){
-        doAnswer(getEmptyAnswer()).when(contentFetcher).fetchPrev(anyInt(), any(FetchResultCallback.class));
-
-        assertEquals(6, mContentRetriever.size());
-        for (int i = 0; i < 6; i++) {
-            assertEquals("" + i, mContentRetriever.get(i).getTitle());
-        }
-
-        mContentRetriever.loadPrevious();
-
-        assertEquals(6, mContentRetriever.size());
-        for (int i = 0; i < 6; i++) {
-            assertEquals("" + i, mContentRetriever.get(i).getTitle());
-        }
-    }
-
-
-    @Test
-    public void PreviousAfterNextTest(){
-        doAnswer(getPreviousAnswer(4)).doAnswer(getPreviousAnswer(2)).doAnswer(getPreviousAnswer(0)).doAnswer(getPreviousAnswer(-2)).when(contentFetcher).fetchPrev(anyInt(), any(FetchResultCallback.class));
-
-        mContentRetriever.loadPrevious();
-
-        assertEquals(6, mContentRetriever.size());
-        for (int i = 0; i < 6; i++) {
-            assertEquals("" + (i-2), mContentRetriever.get(i).getTitle());
-        }
-
-        mContentRetriever.loadPrevious();
-
-        assertEquals(6, mContentRetriever.size());
-        for (int i = 0; i < 6; i++) {
-            assertEquals("" + (i-4), mContentRetriever.get(i).getTitle());
-        }
-    }
-
-
-    @Test
-    public void NextAfterPrevious(){
-        mContentRetriever.loadNext();
-        mContentRetriever.loadPrevious();
-
-        doAnswer(getNextAnswer(2)).doAnswer(getNextAnswer(4)).doAnswer(getNextAnswer(6)).when(contentFetcher).fetchNext(anyInt(), any(FetchResultCallback.class));
-    }
-
-
-
-
 
     private Answer getNextAnswer(final int start) {
         return new Answer() {
