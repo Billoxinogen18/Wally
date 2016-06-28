@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -43,6 +44,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     private long mLastSelectTime;
     private Content mSelectedContent; //TODO may be needed to remove
     private Content mContentToSave;
+    private long mNewContentButtonLastClickTime;
 
     public abstract void onDeleteContent(Content selectedContent);
 
@@ -162,9 +164,14 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
 
 
     public void onNewContentClick(View v) {
+
+        if (SystemClock.elapsedRealtime() - mNewContentButtonLastClickTime < 1000){
+            return;
+        }
+        mNewContentButtonLastClickTime = SystemClock.elapsedRealtime();
+
         NewContentDialogFragment.newInstance()
                 .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
-
     }
 
     public void onBtnMapClick(View v) {
