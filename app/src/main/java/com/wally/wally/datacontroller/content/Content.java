@@ -4,6 +4,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class Content implements Serializable {
     public static final String UPLOAD_URI_PREFIX = "file://";
@@ -19,6 +20,7 @@ public class Content implements Serializable {
     private SerializableLatLng location;
     private Visibility visibility;
     private String authorId;
+    private Date creationDate;
 
     public Content() {
     }
@@ -121,6 +123,15 @@ public class Content implements Serializable {
         return this;
     }
 
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public Content withCreationDate(Date date) {
+        creationDate = date;
+        return this;
+    }
+
     @Override
     public String toString() {
         return "Content{" +
@@ -159,5 +170,9 @@ public class Content implements Serializable {
 
     public boolean isPrivate() {
         return visibility.getSocialVisibility().getMode() == Visibility.SocialVisibility.PRIVATE;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
     }
 }
