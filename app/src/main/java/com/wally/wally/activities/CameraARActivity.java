@@ -35,14 +35,12 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int REQUEST_CODE_MY_LOCATION = 22;
     protected DataController mDataController;
+    protected GoogleApiClient mGoogleApiClient;
     private UserManager mUserManager;
     private SelectedMenuView mSelectedMenuView;
     private long mLastSelectTime;
     private Content mSelectedContent; //TODO may be needed to remove
     private Content mContentToSave;
-
-    private GoogleApiClient mGoogleApiClient;
-
 
     public abstract void onDeleteContent(Content selectedContent);
 

@@ -4,13 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
@@ -19,6 +19,9 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.WallyTangoUx;
+import com.wally.wally.datacontroller.adf.ADFService;
+import com.wally.wally.datacontroller.adf.AdfSyncInfo;
+import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
@@ -41,8 +44,9 @@ import java.util.List;
  */
 public class CameraARTangoActivity extends CameraARActivity implements ContentFitter.OnContentFitListener, LocalizationListener {
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
-    private static final String ARG_ADF_UUID = "ARG_ADF_UUID";
+    private static final String ARG_ADF_SYNC_INFO = "ARG_ADF_SYNC_INFO";
 
+    private AdfSyncInfo mAdfSyncInfo;
     private String mAdfUuid;
 
     private TangoManager mTangoManager;
@@ -64,9 +68,9 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         return ADFChooser.newIntent(context);
     }
 
-    public static Intent newIntent(Context context, @Nullable String uuid) {
+    public static Intent newIntent(Context context, AdfSyncInfo adfSyncInfo) {
         Intent i = new Intent(context, CameraARTangoActivity.class);
-        i.putExtra(ARG_ADF_UUID, uuid);
+        i.putExtra(ARG_ADF_SYNC_INFO, adfSyncInfo);
         return i;
     }
 
@@ -83,7 +87,8 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         Context context = getBaseContext();
 
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
-        mAdfUuid = getIntent().getStringExtra(ARG_ADF_UUID);
+        mAdfSyncInfo = (AdfSyncInfo) getIntent().getSerializableExtra(ARG_ADF_SYNC_INFO);
+        mAdfUuid = mAdfSyncInfo.getAdfMetaData().getUuid();
 
         mVisualContentManager = new VisualContentManager();
         fetchContentForAdf(context, mAdfUuid);
@@ -249,13 +254,60 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
                 Tango.TANGO_INTENT_ACTIVITYCODE);
     }
 
+    /**
+     * Just syncs adf on cloud.
+     * Note that we only sync when localized.
+     */
+    private void startUploadingAdf() {
+        mAdfSyncInfo.setIsSynchronized(true);
+        ADFService s = App.getInstance().getDataController().getADFService();
+        s.upload(Utils.getAdfFilePath(mAdfUuid), mAdfSyncInfo.getAdfMetaData(), new Callback<Void>() {
+            @Override
+            public void onResult(Void result) {
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+                mAdfSyncInfo.setIsSynchronized(false);
+            }
+        });
+    }
+
+    /**
+     * same {@link #localized()} method called in main thread.
+     */
+    public void localizedMainThread() {
+        // Sync adf when localized
+        if (!mAdfSyncInfo.isSynchronized()) {
+            // Get new position if possible, or otherwise upload with old location.
+            if (Utils.checkLocationPermission(this) && mGoogleApiClient.isConnected()) {
+                Utils.getNewLocation(mGoogleApiClient, new Callback<LatLng>() {
+                    @Override
+                    public void onResult(LatLng result) {
+                        mAdfSyncInfo.getAdfMetaData().setLatLng(result);
+                        startUploadingAdf();
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        startUploadingAdf();
+                    }
+                });
+            } else {
+                startUploadingAdf();
+            }
+        }
+        mVisualContentManager.localized();
+        mFinishFittingFab.setEnabled(true);
+    }
+
     @Override
     public void localized() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mVisualContentManager.localized();
-                mFinishFittingFab.setEnabled(true);
+                localizedMainThread();
             }
         });
     }

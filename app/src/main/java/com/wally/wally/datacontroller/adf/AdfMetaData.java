@@ -45,6 +45,10 @@ public class AdfMetaData implements Serializable {
         return SerializableLatLng.toLatLng(latLng);
     }
 
+    public void setLatLng(LatLng latLng) {
+        this.latLng = SerializableLatLng.fromLatLng(latLng);
+    }
+
     public void setLatLng(SerializableLatLng latLng) {
         this.latLng = latLng;
     }

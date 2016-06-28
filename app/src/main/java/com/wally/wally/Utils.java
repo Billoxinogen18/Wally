@@ -28,10 +28,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.atap.tangoservice.Tango;
 import com.wally.wally.datacontroller.adf.AdfSyncInfo;
+import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.userManager.SocialUser;
 
@@ -302,5 +307,25 @@ public final class Utils {
                 return distance1.compareTo(distance2);
             }
         });
+    }
+
+
+    @SuppressWarnings("MissingPermission")
+    public static void getNewLocation(final GoogleApiClient googleApiClient, final Callback<LatLng> callback) {
+        LocationListener locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                if (location != null) {
+                    LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+                    callback.onResult(Utils.extractLatLng(location));
+                }
+            }
+        };
+
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(0);
+        locationRequest.setFastestInterval(0);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, locationListener);
     }
 }
