@@ -42,6 +42,7 @@
                     android:imeOptions="actionNext|flagNoExtractUi"
                     android:inputType="text"
                     android:lines="1"
+                    android:maxLength="@integer/title_max_length"
                     android:maxLines="1"
                     android:nextFocusDown="@+id/tv_note"
                     android:padding="8dp"
