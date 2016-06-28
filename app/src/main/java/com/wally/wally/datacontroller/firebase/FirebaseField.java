@@ -77,4 +77,8 @@ public class FirebaseField {
     public FirebaseObject toFirebaseObject() {
         return (FirebaseObject) value;
     }
+
+    public long toLong() {
+        return (long)(Long) value;
+    }
 }

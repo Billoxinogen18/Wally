@@ -40,22 +40,47 @@
             tools:text="Gio Gogiashvili" />
     </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/my_location"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:background="@android:color/background_light"
-        android:onClick="onMyLocationClick"
-        android:src="@drawable/ic_my_location_black_24dp" />
+        android:orientation="vertical">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/update_area"
+            app:fabSize="mini"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="25dp"
+            app:backgroundTint="@android:color/background_light"
+            android:onClick="onAreaUpdateClick"
+            android:src="@drawable/ic_sync_black_24dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/my_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/fab_margin"
+            android:onClick="onMyLocationClick"
+            android:src="@drawable/ic_my_location_black_24dp" />
+
+
+    </LinearLayout>
+
+    <View android:id="@+id/fakeView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"/>
 
     <LinearLayout
         android:id="@+id/list"
+        android:minWidth="300dp"
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:background="@color/backgroundColor"
+        android:layout_alignRight="@id/fakeView"
+        android:layout_alignParentLeft="true"
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar

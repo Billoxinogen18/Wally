@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="25dp"
                 app:backgroundTint="@android:color/background_light"
-                android:onClick="onAreaUpdate"
+                android:onClick="onAreaUpdateClick"
                 android:src="@drawable/ic_sync_black_24dp" />
 
             <android.support.design.widget.FloatingActionButton

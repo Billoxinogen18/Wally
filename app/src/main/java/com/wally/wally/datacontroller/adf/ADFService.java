@@ -1,9 +1,6 @@
 package com.wally.wally.datacontroller.adf;
 
-import android.support.annotation.NonNull;
-
 import com.google.android.gms.maps.model.LatLng;
-import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
 
 import java.util.List;
@@ -25,7 +22,7 @@ public interface ADFService {
      * @param location filter parameter
      * @param callback callback with result
      */
-    void searchADfMetaDataNearLocation(@NonNull LatLng location, Callback<List<AdfMetaData>> callback);
+    void searchADfMetaDataNearLocation(LatLng location, Callback<List<AdfMetaData>> callback);
 
     /**
      * Uploads adf with it's meta data to server

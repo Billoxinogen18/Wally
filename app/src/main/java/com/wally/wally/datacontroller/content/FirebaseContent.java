@@ -1,11 +1,13 @@
 package com.wally.wally.datacontroller.content;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.ServerValue;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
 import com.wally.wally.datacontroller.user.Id;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class FirebaseContent extends FirebaseObject {
@@ -38,13 +40,15 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_ANONYMOUS      = "anonymous";
     public static final String K_SHARED         = "Shared";
 
-    public FirebaseContent() {
-    }
+    private static final String K_TIMESTAMP     = "timestamp";
+
+    public FirebaseContent() {}
 
     public FirebaseContent(Content c) {
         id = c.getId();
         put(K_ROOM, c.getUuid());
         put(K_AUTHOR, c.getAuthorId());
+        put(K_TIMESTAMP, ServerValue.TIMESTAMP);
         setNoteData(c);
         setLocation(c.getLocation());
         setTangoData(c.getTangoData());
@@ -89,11 +93,15 @@ public class FirebaseContent extends FirebaseObject {
         return containsKey(K_LOCATION) ? new LatLng(getLatitude(), getLongitude()) : null;
     }
 
+    public Date getCreationDate() {
+        long timestamp = get(K_TIMESTAMP).toLong();
+        return new Date(timestamp);
+    }
+
     private void setLocation(LatLng loc) {
         if (loc == null) return;
-        if (id == null) {
-            id = new GeoHash(loc.latitude, loc.longitude).getGeoHashString();
-        }
+        String hash = new GeoHash(loc.latitude, loc.longitude).getGeoHashString();
+        put(K_HASH, hash);
         getChild(K_LOCATION)
                 .put(K_LAT, loc.latitude)
                 .put(K_LNG, loc.longitude);
@@ -174,7 +182,8 @@ public class FirebaseContent extends FirebaseObject {
                 .withAuthorId(getAuthorId())
                 .withLocation(getLocation())
                 .withTangoData(getTangoData())
-                .withVisibility(getVisibility());
+                .withVisibility(getVisibility())
+                .withCreationDate(getCreationDate());
     }
 
     @Override
@@ -187,4 +196,5 @@ public class FirebaseContent extends FirebaseObject {
         }
         return child;
     }
+
 }

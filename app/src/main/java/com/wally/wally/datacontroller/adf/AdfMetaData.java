@@ -1,7 +1,5 @@
 package com.wally.wally.datacontroller.adf;
 
-import android.support.annotation.Nullable;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
@@ -17,10 +15,14 @@ public class AdfMetaData implements Serializable {
     private String uuid;
     private SerializableLatLng latLng;
 
-    public AdfMetaData(String name, String uuid, LatLng latLng) {
+    public AdfMetaData(String name, String uuid, SerializableLatLng latLng) {
         this.name = name;
         this.uuid = uuid;
-        this.latLng = SerializableLatLng.fromLatLng(latLng);
+        this.latLng = latLng;
+    }
+
+    public AdfMetaData(String name, String uuid, LatLng latLng) {
+        this(name, uuid, SerializableLatLng.fromLatLng(latLng));
     }
 
     public String getName() {
@@ -39,14 +41,28 @@ public class AdfMetaData implements Serializable {
         this.uuid = uuid;
     }
 
-    public
-    @Nullable
-    LatLng getLatLng() {
+    public LatLng getLatLng() {
         return SerializableLatLng.toLatLng(latLng);
     }
 
     public void setLatLng(SerializableLatLng latLng) {
         this.latLng = latLng;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AdfMetaData that = (AdfMetaData) o;
+
+        return uuid.equals(that.uuid);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return uuid.hashCode();
     }
 
     @Override

@@ -66,7 +66,6 @@ public class DebugUtils {
         int publicContentNumber = 0;
         for (int i = 0; i < n; i++) {
             Content content = generateRandomContent();
-            content.getVisibility().withSocialVisibility(Visibility.PRIVATE);
             if (content.isPublic()) {
                 content.withTitle("" + publicContentNumber++);
             } else if (!content.isPrivate()) {
@@ -185,18 +184,19 @@ public class DebugUtils {
         generateRandomContents(100, datacontroller);
     }
 
-    public static void sanityCheck(DataController datacontroller) {
-        DebugUtils.datacontroller = datacontroller;
-    }
 
     public static List<AdfMetaData> generateRandomAdfMetaData(int quantity) {
         List<AdfMetaData> list = new ArrayList<>(quantity);
         for (int i = 0; i < quantity; i++) {
             list.add(new AdfMetaData(
                     randomStr(10),
-                    randomStr(30),
+                    randomStr(20),
                     randomLatLngNearPoint(OFFICE_LAT_LNG)));
         }
         return list;
+    }
+
+    public static void sanityCheck(DataController datacontroller) {
+        DebugUtils.datacontroller = datacontroller;
     }
 }

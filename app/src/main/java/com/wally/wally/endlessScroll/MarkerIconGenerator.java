@@ -38,7 +38,7 @@ public class MarkerIconGenerator {
         defaultCache = new HashMap<>();
     }
 
-    public void getEnumeratedMarkerIcon(final String name, final int visibility, final MarkerIconGenerateListener markerIconGenerateListener) {
+    public synchronized void getEnumeratedMarkerIcon(final String name, final int visibility, final MarkerIconGenerateListener markerIconGenerateListener) {
         if (cache.containsKey(name)) {
             markerIconGenerateListener.onMarkerIconGenerate(cache.get(name));
         } else {

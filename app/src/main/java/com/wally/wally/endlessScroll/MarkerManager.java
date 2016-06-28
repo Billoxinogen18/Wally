@@ -78,16 +78,16 @@ public class MarkerManager {
     }
 
     private void hideObsoleteMarkers(int position) {
-        for(int i= position-LIMIT; i>= 0; i--){
+        for (int i = position - LIMIT; i >= 0; i--) {
             mMarkerList.get(i).marker.setVisible(false);
         }
 
-        for(int i= position + LIMIT; i<mMarkerList.size(); i++){
+        for (int i = position + LIMIT; i < mMarkerList.size(); i++) {
             mMarkerList.get(i).marker.setVisible(false);
         }
 
-        for(int i=position -LIMIT; i< position + LIMIT; i++){
-            if(i >= 0 && i<mMarkerList.size())
+        for (int i = position - LIMIT; i < position + LIMIT; i++) {
+            if (i >= 0 && i < mMarkerList.size())
                 mMarkerList.get(i).marker.setVisible(true);
         }
     }
@@ -115,6 +115,14 @@ public class MarkerManager {
         });
     }
 
+    public List<Marker> getVisibleMarkers() {
+        List<Marker> res = new ArrayList<>();
+        for (MarkerNameVisibility markerNameVisibility : mMarkerList) {
+            if (markerNameVisibility.marker.isVisible())
+                res.add(markerNameVisibility.marker);
+        }
+        return res;
+    }
 
     private class MarkerNameVisibility {
         public Marker marker;

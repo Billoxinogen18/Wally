@@ -31,11 +31,15 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.atap.tangoservice.Tango;
+import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.userManager.SocialUser;
 
 import java.io.File;
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Utility functions which are not specific to one part of the code goes here.
@@ -274,5 +278,29 @@ public final class Utils {
 
     public static String getAdfFilePath(String uuid) {
         return getAdfFilesFolder() + "/" + uuid;
+    }
+
+    /**
+     * Sorts Adf list with respect to location.
+     */
+    public static void sortWithLocation(ArrayList<AdfSyncInfo> list, final LatLng location) {
+        Collections.sort(list, new Comparator<AdfSyncInfo>() {
+            @Override
+            public int compare(AdfSyncInfo one, AdfSyncInfo two) {
+                LatLng loc1 = one.getAdfMetaData().getLatLng();
+                LatLng loc2 = two.getAdfMetaData().getLatLng();
+
+                float[] result1 = new float[3];
+                float[] result2 = new float[3];
+
+                Location.distanceBetween(loc1.latitude, loc1.longitude, location.latitude, location.longitude, result1);
+                Location.distanceBetween(loc2.latitude, loc2.longitude, location.latitude, location.longitude, result2);
+
+                Float distance1 = result1[0];
+                Float distance2 = result2[0];
+
+                return distance1.compareTo(distance2);
+            }
+        });
     }
 }
