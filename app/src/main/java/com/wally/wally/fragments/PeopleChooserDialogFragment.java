@@ -90,6 +90,7 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
     private void initViews(View v) {
         v.findViewById(R.id.btn_dismiss).setOnClickListener(this);
+        v.findViewById(R.id.btn_done).setOnClickListener(this);
 
         mAdapter = new PeopleListAdapter();
         mAdapter.setData(App.getInstance().getUserManager().getUser().getFriends());
@@ -123,8 +124,12 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
     @Override
     public void onClick(View v) {
+        Log.d(TAG, "onClick: " + v.getId() + ":" + R.id.btn_done);
         switch (v.getId()) {
             case R.id.btn_dismiss:
+                finishWithData(null);
+                break;
+            case R.id.btn_done:
                 finishWithData(mAdapter.getSelectedUsers());
                 break;
         }

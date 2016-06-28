@@ -33,6 +33,7 @@ import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -179,7 +180,8 @@ public class NewContentDialogFragment extends DialogFragment implements
                             mContent.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PRIVATE));
                         }
 
-                        mContent.getVisibility().getSocialVisibility().setMode(socialVisibilityMode);
+                        if (socialVisibilityMode != Visibility.SocialVisibility.PEOPLE)
+                            mContent.getVisibility().getSocialVisibility().setMode(socialVisibilityMode);
                         setDataOnSocialVisibilityButton(mContent.getVisibility().getSocialVisibility());
                         if (socialVisibilityMode == Visibility.SocialVisibility.PEOPLE) {
                             List<SocialUser> sharedWith = toSocialUserList(mContent.getVisibility().getSocialVisibility().getSharedWith());
@@ -325,14 +327,21 @@ public class NewContentDialogFragment extends DialogFragment implements
 
     @Override
     public void onPeopleChosen(List<SocialUser> users) {
-        // TODO update status
-        List<Id> sharedWith = new ArrayList<>();
-        for (SocialUser current : users) {
-            if (current.getBaseUser().getGgId() != null) {
-                sharedWith.add(current.getBaseUser().getGgId());
+        if (users != null) {
+            // TODO update status
+            if (!users.isEmpty()) {
+                List<Id> sharedWith = new ArrayList<>();
+                for (SocialUser current : users) {
+                    if (current.getBaseUser().getGgId() != null) {
+                        sharedWith.add(current.getBaseUser().getGgId());
+                    }
+                }
+                mContent.getVisibility().getSocialVisibility().withSharedWith(sharedWith);
+            } else {
+                mContent.getVisibility().getSocialVisibility().withSharedWith(Collections.EMPTY_LIST).setMode(Visibility.SocialVisibility.PRIVATE);
             }
         }
-        mContent.getVisibility().getSocialVisibility().withSharedWith(sharedWith);
+        updateViews();
         showDialog(true);
     }
 

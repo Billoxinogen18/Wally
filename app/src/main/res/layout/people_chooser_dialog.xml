@@ -25,11 +25,20 @@
         <TextView
             android:id="@+id/dialog_title"
             style="@style/TextAppearance.AppCompat.Title"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginLeft="12dp"
             android:padding="8dp"
             android:text="@string/people_chooser_dialog_title" />
+
+        <ImageButton
+            android:id="@+id/btn_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="8dp"
+            android:src="@drawable/ic_done_black_24dp" />
     </LinearLayout>
 
     <LinearLayout

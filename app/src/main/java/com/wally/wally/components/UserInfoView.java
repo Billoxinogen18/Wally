@@ -159,7 +159,6 @@ public class UserInfoView extends LinearLayout {
         mUserImage.setImageDrawable(null);
         mUserImage.setBackground(null);
         mUserName.setText(null);
-        mStatusView.setText(null);
     }
 
     /**
