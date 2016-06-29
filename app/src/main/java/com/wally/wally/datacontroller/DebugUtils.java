@@ -35,7 +35,7 @@ public class DebugUtils {
             "f", "g", "h", "i", "j",
             "k", "l", "m", "n", "o"
     };
-    private static DataController datacontroller;
+
     private static SecureRandom random = new SecureRandom();
 
 
@@ -144,10 +144,8 @@ public class DebugUtils {
         return debugCallback(DataController.TAG);
     }
 
-
-    public static FetchResultCallback fetchNextDebugCallback(final int count,
-                                                             final ContentFetcher fetcher,
-                                                             final FetchResultCallback callback) {
+    public static FetchResultCallback fetchNextDebugCallback(
+            final int count, final ContentFetcher fetcher, final FetchResultCallback callback) {
         return new FetchResultCallback() {
 
             @Override
@@ -162,29 +160,6 @@ public class DebugUtils {
         };
     }
 
-    public static FetchResultCallback fetchPrevDebugCallback(final int count,
-                                                             final ContentFetcher fetcher,
-                                                             final FetchResultCallback callback) {
-        return new FetchResultCallback() {
-
-            @Override
-            public void onResult(Collection<Content> result) {
-                DebugUtils.debugCallback().onResult(result);
-                fetcher.fetchPrev(count, callback);
-            }
-
-            @Override
-            public void onError(Exception e) {
-            }
-        };
-    }
-
-    public static void refreshContents(DatabaseReference contents, DataController datacontroller) {
-        contents.removeValue();
-        generateRandomContents(100, datacontroller);
-    }
-
-
     public static List<AdfMetaData> generateRandomAdfMetaData(int quantity) {
         List<AdfMetaData> list = new ArrayList<>(quantity);
         for (int i = 0; i < quantity; i++) {
@@ -196,7 +171,17 @@ public class DebugUtils {
         return list;
     }
 
+    public static void refreshContents(DatabaseReference contents, DataController datacontroller) {
+        contents.removeValue();
+        generateRandomContents(100, datacontroller);
+    }
+
     public static void sanityCheck(DataController datacontroller) {
-        DebugUtils.datacontroller = datacontroller;
+        ContentFetcher fetcher = datacontroller.createFetcherForVisibleContent(OFFICE_LAT_LNG, 10);
+        fetcher.fetchNext(7,
+                fetchNextDebugCallback(7, fetcher,
+                        fetchNextDebugCallback(100, fetcher,
+                                fetchNextDebugCallback(7, fetcher,
+                                        debugCallback()))));
     }
 }
