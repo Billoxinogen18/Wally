@@ -2,7 +2,6 @@ package com.wally.wally.datacontroller;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,34 +16,48 @@ import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.FirebaseContent;
+import com.wally.wally.datacontroller.content.ContentManager;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
-import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.queries.FirebaseQuery;
 import com.wally.wally.datacontroller.user.User;
+import com.wally.wally.datacontroller.user.UserManager;
 
 import java.util.Collections;
 import java.util.Map;
 
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
-
     private static DataController instance;
 
-    private User currentUser;
     private StorageReference storage;
     private FirebaseADFService adfService;
-    private DatabaseReference users, contents, rooms;
+    private DatabaseReference contents, rooms;
+    private UserManager userManager;
+    private ContentManager contentManager;
 
     private ContentFetcherFactory fetcherFactory;
 
-    private DataController(DatabaseReference database, StorageReference storage) {
+    public DataController withContentManager(ContentManager manager) {
+        this.contentManager = manager;
+        return this;
+    }
+
+    public DataController withUserManager(UserManager manager) {
+        this.userManager = manager;
+        return this;
+    }
+
+    public DataController withFetcherFactory(ContentFetcherFactory factory) {
+        this.fetcherFactory = factory;
+        return this;
+    }
+
+    public DataController(DatabaseReference database,
+                          StorageReference storage) {
         this.storage = storage;
-        users = database.child(Config.USERS_NODE);
         contents = database.child(Config.CONTENTS_NODE);
         rooms = database.child(Config.ROOMS_NODE);
-        fetcherFactory = new ContentFetcherFactory(contents, getCurrentUser());
 
         // Debug calls will be deleted in the end
 //        DebugUtils.refreshContents(contents.getParent(), this);
@@ -53,80 +66,40 @@ public class DataController {
 
     public static DataController create() {
         if (instance == null) {
+            DatabaseReference root = FirebaseDatabase.getInstance()
+                    .getReference().child(Config.DATABASE_ROOT);
+            StorageReference storage = FirebaseStorage.getInstance()
+                    .getReference().child(Config.STORAGE_ROOT);
+
+            UserManager uManager = new UserManager(
+                    FirebaseAuth.getInstance(),
+                    root.child(Config.USERS_NODE)
+            );
+
+            ContentManager cManager = new ContentManager(
+                    root.child(Config.ROOMS_NODE),
+                    root.child(Config.CONTENTS_NODE),
+                    storage
+            );
+
+            ContentFetcherFactory fFactory = new ContentFetcherFactory(
+                    root.child(Config.CONTENTS_NODE)
+            );
+
             instance = new DataController(
                     FirebaseDatabase.getInstance().getReference().child(Config.DATABASE_ROOT),
                     FirebaseStorage.getInstance().getReference().child(Config.STORAGE_ROOT)
-            );
+            ).withUserManager(uManager).withContentManager(cManager).withFetcherFactory(fFactory);
         }
         return instance;
     }
 
-    private void uploadImage(String imagePath, String folder, final Callback<String> callback) {
-        if (imagePath != null && imagePath.startsWith(Content.UPLOAD_URI_PREFIX)) {
-            String imgUriString = imagePath.substring(Content.UPLOAD_URI_PREFIX.length());
-            FirebaseDAL.uploadFile(storage.child(folder), imgUriString, callback);
-        } else {
-            callback.onResult(imagePath);
-        }
-    }
-
-    private DatabaseReference getContentReference(Content c) {
-        DatabaseReference target;
-        if (c.isPublic()) {
-            target = contents.child("Public");
-        } else if (c.isPrivate()) {
-            target = contents.child(c.getAuthorId());
-        } else {
-            target = contents.child("Shared");
-        }
-        return c.getId() != null ? target.child(c.getId()) : target.push();
-    }
-
-    private void addInRoom(String uuid, String id) {
-        rooms.child(uuid).child("Contents").child(id).setValue(true);
-    }
-
     public void save(final Content c) {
-        if (c.getId() != null) { delete(c); }
-        final DatabaseReference ref = getContentReference(c);
-        c.withId(ref.getKey());
-        uploadImage(
-                c.getImageUri(),
-                ref.getKey(),
-                new Callback<String>() {
-                    @Override
-                    public void onResult(String result) {
-                        c.withImageUri(result);
-                        new FirebaseContent(c).save(ref);
-                        if (c.getUuid() != null) {
-                            String extendedId = ref.getParent().getKey() + ":" + ref.getKey();
-                            addInRoom(c.getUuid(), extendedId);
-                        }
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        // Omitted Implementation:
-                        // If we are here image upload failed somehow
-                        // We decided to leave this case for now!
-                    }
-                }
-        );
+        contentManager.save(c);
     }
 
     public void delete(Content c) {
-        if (c.getId() == null) {
-            throw new IllegalArgumentException("Id of the content is null");
-        }
-        String extendedPublicId = "Public:" + c.getId();
-        String extendedSharedId = "Shared:" + c.getId();
-        String extendedPrivateId = c.getAuthorId() + ":" + c.getId();
-        rooms.child(c.getUuid()).child(extendedPublicId).removeValue();
-        rooms.child(c.getUuid()).child(extendedSharedId).removeValue();
-        rooms.child(c.getUuid()).child(extendedPrivateId).removeValue();
-        contents.child("Public").child(c.getId()).removeValue();
-        contents.child("Shared").child(c.getId()).removeValue();
-        contents.child(c.getAuthorId()).child(c.getId()).removeValue();
+        contentManager.delete(c);
     }
 
     public void fetchByUUID(String uuid, final FetchResultCallback callback) {
@@ -158,50 +131,32 @@ public class DataController {
     public ContentFetcher createFetcherForMyContent() {
         User current = getCurrentUser();
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForPrivate());
-        chain.addPager(fetcherFactory.createForSharedByMe());
+        chain.addPager(fetcherFactory.createForPrivate(current));
+        chain.addPager(fetcherFactory.createForSharedByMe(current));
         chain.addPager(fetcherFactory.createForPublic(current));
         return chain;
     }
 
     public ContentFetcher createFetcherForVisibleContent(LatLng center, double radiusKm) {
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForSharedWithMe(center, radiusKm));
+        chain.addPager(fetcherFactory.createForSharedWithMe(getCurrentUser(), center, radiusKm));
         chain.addPager(fetcherFactory.createForPublic(center, radiusKm));
         return chain;
     }
 
     public ContentFetcher createFetcherForUserContent(User user) {
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForSharedWithMe(user));
+        chain.addPager(fetcherFactory.createForSharedWithMe(getCurrentUser(), user));
         chain.addPager(fetcherFactory.createForPublic(user));
         return chain;
     }
 
     public User getCurrentUser() {
-        if (currentUser != null) return currentUser;
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) return null;
-        String id = user.getUid();
-        // .get(1) assumes only one provider (Google)
-        String ggId = user.getProviderData().get(1).getUid();
-        currentUser = new User(id).withGgId(ggId);
-        users.child(id).setValue(currentUser);
-        return currentUser;
+        return userManager.getCurrentUser();
     }
 
-    public void fetchUser(String id, final Callback<User> callback) {
-        users.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                callback.onResult(dataSnapshot.getValue(User.class));
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                callback.onError(databaseError.toException());
-            }
-        });
+    public void fetchUser(String id, Callback<User> callback) {
+        userManager.fetchUser(id, callback);
     }
 
     private void fetchContentAt(String path, DatabaseReference ref,
