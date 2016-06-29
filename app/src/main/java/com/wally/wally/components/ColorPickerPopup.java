@@ -3,7 +3,6 @@ package com.wally.wally.components;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +13,12 @@ import com.wally.wally.R;
 
 public class ColorPickerPopup implements View.OnClickListener {
 
+    @SuppressWarnings("unused")
     private static final String TAG = ColorPickerPopup.class.getSimpleName();
     private ColorPickerListener mListener;
     private PopupWindow mPopup;
 
-    public void show(ColorPickerListener listener, View anchor) {
+    public void show(View anchor, ColorPickerListener listener) {
         mListener = listener;
         Context context = anchor.getContext();
         View pickerLayout = LayoutInflater.from(context).inflate(R.layout.color_picker_layout, null);
@@ -28,17 +28,15 @@ public class ColorPickerPopup implements View.OnClickListener {
                 pickerLayout,
                 context.getResources().getDimensionPixelSize(R.dimen.color_picker_popup_width),
                 context.getResources().getDimensionPixelSize(R.dimen.color_picker_popup_height));
+
         // Closes the popup window when touch outside.
         mPopup.setOutsideTouchable(true);
         mPopup.setFocusable(true);
 
         // Removes default background.
-        mPopup.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mPopup.setElevation(context.getResources().getDimension(R.dimen.color_picker_popup_elevation));
-        }
-        mPopup.showAsDropDown(anchor);
-        // popupWindow.showAsDropDown(anchor, 0, -anchor.getHeight());//, Gravity.LEFT | Gravity.TOP);
+        mPopup.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+//        mPopup.showAsDropDown(anchor);
+        mPopup.showAsDropDown(anchor, 0, -anchor.getHeight());//, Gravity.LEFT | Gravity.TOP);
     }
 
     private void setUpListenerOnItems(View view) {

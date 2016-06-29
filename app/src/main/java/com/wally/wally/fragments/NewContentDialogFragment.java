@@ -180,9 +180,10 @@ public class NewContentDialogFragment extends DialogFragment implements
                             mContent.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PRIVATE));
                         }
 
-                        if (socialVisibilityMode != Visibility.SocialVisibility.PEOPLE)
+                        if (socialVisibilityMode != Visibility.SocialVisibility.PEOPLE) {
                             mContent.getVisibility().getSocialVisibility().setMode(socialVisibilityMode);
-                        setDataOnSocialVisibilityButton(mContent.getVisibility().getSocialVisibility());
+                            setDataOnSocialVisibilityButton(mContent.getVisibility().getSocialVisibility());
+                        }
                         if (socialVisibilityMode == Visibility.SocialVisibility.PEOPLE) {
                             List<SocialUser> sharedWith = toSocialUserList(mContent.getVisibility().getSocialVisibility().getSharedWith());
                             PeopleChooserDialogFragment.newInstance(sharedWith).show(getChildFragmentManager(), PeopleChooserDialogFragment.TAG);
@@ -212,13 +213,13 @@ public class NewContentDialogFragment extends DialogFragment implements
                 updateViews();
                 break;
             case R.id.btn_pallette:
-                new ColorPickerPopup().show(new ColorPickerPopup.ColorPickerListener() {
+                new ColorPickerPopup().show(v, new ColorPickerPopup.ColorPickerListener() {
                     @Override
                     public void colorPicked(int color) {
                         mContent.withColor(color);
                         updateViews();
                     }
-                }, v);
+                });
                 break;
             case R.id.btn_more_settings:
                 showDialog(false);
@@ -328,7 +329,8 @@ public class NewContentDialogFragment extends DialogFragment implements
     @Override
     public void onPeopleChosen(List<SocialUser> users) {
         if (users != null) {
-            // TODO update status
+            mContent.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PEOPLE));
+
             if (!users.isEmpty()) {
                 List<Id> sharedWith = new ArrayList<>();
                 for (SocialUser current : users) {

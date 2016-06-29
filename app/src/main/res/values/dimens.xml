@@ -22,8 +22,10 @@
     <dimen name="text_margin">16dp</dimen>
     <dimen name="spacing_normal">16dp</dimen>
     <dimen name="toolbar_left_padding">16dp</dimen>
+
     <dimen name="color_picker_popup_width">160dp</dimen>
     <dimen name="color_picker_popup_height">160dp</dimen>
+
     <dimen name="color_picker_popup_elevation">20dp</dimen>
     <dimen name="picker_color_item_size">36dp</dimen>
     <dimen name="picker_color_item_padding">12dp</dimen>
