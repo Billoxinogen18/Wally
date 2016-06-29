@@ -3,7 +3,6 @@ package com.wally.wally.activities;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -135,9 +134,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
         } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_LOCATION_REQUEST_CODE);
+            requestLocationPermission();
         }
 
         mMarkerManager = new MarkerManager(getBaseContext(), mMap);
@@ -186,7 +183,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void onMyLocationClick(View v) {
-        centerMapOnMyLocation(null);
+        if (!Utils.checkLocationPermission(this)) {
+            requestLocationPermission();
+        } else {
+            centerMapOnMyLocation(null);
+        }
     }
 
     public void onBtnCameraClick(View view) {
@@ -219,17 +220,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onAreaUpdateClick(View view) {
         loadContentNearLocation(mMap.getCameraPosition());
         mContentListView.startLoading();
-        Toast.makeText(getBaseContext(), "Updating area", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getBaseContext(), R.string.updating_area, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if (requestCode == MY_LOCATION_REQUEST_CODE) {
-            if (permissions.length == 1 &&
-                    permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (mUserProfile == null)
+            if (Utils.checkLocationPermission(this)) {
+                if (mUserProfile == null) {
                     centerMapOnMyLocation(defaultCenterMyLocationCallback);
+                }
             }
         }
     }
@@ -237,8 +237,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onConnected(Bundle connectionHint) {
         mGoogleApiClient.unregisterConnectionCallbacks(this);
-        if (mUserProfile == null)
+        if (mUserProfile == null) {
             centerMapOnMyLocation(defaultCenterMyLocationCallback);
+        }
     }
 
     @Override
@@ -346,11 +347,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             LatLng myPosition = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
 
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 16), 2000, callback);
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_LOCATION_REQUEST_CODE);
         }
+    }
+
+    private void requestLocationPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                MY_LOCATION_REQUEST_CODE);
     }
 
     private void centerMapOnVisibleMarkers() {
