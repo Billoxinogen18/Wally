@@ -23,20 +23,18 @@ import java.util.Collections;
 import java.util.Set;
 
 public class ContentFetcherFactory {
-    private final User current;
     private DatabaseReference contents;
     private DatabaseReference publicContents;
     private DatabaseReference sharedContents;
 
 
-    public ContentFetcherFactory(DatabaseReference contents, User current) {
-        this.current = current;
+    public ContentFetcherFactory(DatabaseReference contents) {
         this.contents = contents;
         this.publicContents = contents.child("Public");
         this.sharedContents = contents.child("Shared");
     }
 
-    public ContentFetcher createForPrivate() {
+    public ContentFetcher createForPrivate(User current) {
         return new KeyPager(contents.child(current.getId().getId()));
     }
 
@@ -52,26 +50,26 @@ public class ContentFetcherFactory {
         return fetcher;
     }
 
-    public ContentFetcher createForSharedByMe() {
+    public ContentFetcher createForSharedByMe(User current) {
         FirebaseQuery authorQuery = new AuthorQuery(current.getId());
         ContentQuery query = new ContentQuery(authorQuery, sharedContents);
         return new QueryContentFetcher(query);
     }
 
-    public ContentFetcher createForSharedWithMe(LatLng center, double radiusKm) {
+    public ContentFetcher createForSharedWithMe(User current, LatLng center, double radiusKm) {
         FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
         Predicate<Content> predicate = isLocationInRangePredicate(center, radiusKm);
         ContentQuery query = new ContentQuery(sharedWithQuery, sharedContents, predicate);
         return new QueryContentFetcher(query);
     }
 
-    public ContentFetcher createForSharedWithMe(User user) {
-        ContentFetcher sharedContentFetcher = createForSharedWithMe();
-        Predicate<Content> hasAuthorPredicate = hasAuthorPredicate(user.getId().getId());
+    public ContentFetcher createForSharedWithMe(User current, User other) {
+        ContentFetcher sharedContentFetcher = createForSharedWithMe(current);
+        Predicate<Content> hasAuthorPredicate = hasAuthorPredicate(other.getId().getId());
         return new FilteredFetcher(sharedContentFetcher, hasAuthorPredicate);
     }
 
-    public ContentFetcher createForSharedWithMe() {
+    public ContentFetcher createForSharedWithMe(User current) {
         FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
         ContentQuery query = new ContentQuery(sharedWithQuery, sharedContents);
         return new QueryContentFetcher(query);
