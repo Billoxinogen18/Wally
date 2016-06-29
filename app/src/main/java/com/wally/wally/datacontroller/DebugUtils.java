@@ -177,11 +177,5 @@ public class DebugUtils {
     }
 
     public static void sanityCheck(DataController datacontroller) {
-        ContentFetcher fetcher = datacontroller.createFetcherForVisibleContent(OFFICE_LAT_LNG, 10);
-        fetcher.fetchNext(7,
-                fetchNextDebugCallback(7, fetcher,
-                        fetchNextDebugCallback(100, fetcher,
-                                fetchNextDebugCallback(7, fetcher,
-                                        debugCallback()))));
     }
 }
