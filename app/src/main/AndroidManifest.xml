@@ -23,7 +23,6 @@
 
         <activity
             android:name=".activities.CameraARTangoActivity"
-            android:hardwareAccelerated="true"
             android:label="@string/app_name"
             android:screenOrientation="landscape" />
         <activity
