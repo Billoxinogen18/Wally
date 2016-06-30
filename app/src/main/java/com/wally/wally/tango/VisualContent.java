@@ -9,7 +9,6 @@ import com.projecttango.rajawali.Pose;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.Content;
 
-import org.rajawali3d.loader.awd.BlockSimpleMaterial;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
@@ -19,17 +18,11 @@ import org.rajawali3d.materials.textures.Texture;
  * Created by shota on 4/29/16.
  */
 public class VisualContent {
-    public enum RenderStatus {None, PendingRender, PendingRemove, Rendered}
-
     private static final String TAG = VisualContent.class.getSimpleName();
     private static final float PLANE_WIDTH = 1f;
-    private RenderStatus mStatus;
     protected ContentPlane mVisual;
     protected Content mContent;
-
-
-
-
+    private RenderStatus mStatus;
     public VisualContent(@NonNull Content content) {
         mContent = content;
         mStatus = RenderStatus.None;
@@ -58,7 +51,7 @@ public class VisualContent {
         }
         material.setColorInfluence(0);
         material.enableLighting(true);
-        material.setDiffuseMethod(new DiffuseMethod.Lambert());
+        material.setDiffuseMethod(new DiffuseMethod.Toon());
         Log.d(TAG, "createMaterial() returned: " + material);
         return material;
     }
@@ -96,9 +89,11 @@ public class VisualContent {
     public RenderStatus getStatus(){
         return mStatus;
     }
-    
+
     public void setStatus(RenderStatus status){
         this.mStatus = status;
     }
+
+    public enum RenderStatus {None, PendingRender, PendingRemove, Rendered}
 
 }
