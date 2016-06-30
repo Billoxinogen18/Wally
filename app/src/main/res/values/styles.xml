@@ -38,8 +38,8 @@
         <item name="colorControlNormal">@color/colorAccent</item>
         <!--<item name="colorControlActivated">#cc4343</item>-->
         <!--<item name="colorControlHighlight">#532727</item>-->
-        <item name="colorButtonNormal">@color/colorAccentLight</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="colorButtonNormal">@drawable/positive_button_color</item>
+        <item name="android:textColor">@drawable/positive_button_text_color</item>
     </style>
 
     <style name="AlertDialogStyle" parent="Base.Theme.AppCompat.Light.Dialog.Alert">

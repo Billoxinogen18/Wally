@@ -26,6 +26,7 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.ColorPickerPopup;
 import com.wally.wally.components.SocialVisibilityPopup;
+import com.wally.wally.components.TextChangeListenerAdapter;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Visibility;
 import com.wally.wally.datacontroller.user.Id;
@@ -46,7 +47,7 @@ import java.util.List;
 public class NewContentDialogFragment extends DialogFragment implements
         View.OnClickListener,
         PhotoChooserDialogFragment.PhotoChooserListener,
-        PeopleChooserDialogFragment.PeopleChooserListener {
+        PeopleChooserDialogFragment.PeopleChooserListener, TextChangeListenerAdapter.TextChangeListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
@@ -66,6 +67,7 @@ public class NewContentDialogFragment extends DialogFragment implements
     private Content mContent;
     private boolean isEditMode;
     private boolean mIsDialogShown = true;
+    private Button mPostCreateBtn;
 
     // Empty constructor required for DialogFragment
     public NewContentDialogFragment() {
@@ -93,7 +95,6 @@ public class NewContentDialogFragment extends DialogFragment implements
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
 
-
         dv.findViewById(R.id.btn_social_visibility).setOnClickListener(this);
         dv.findViewById(R.id.btn_add_image).setOnClickListener(this);
         dv.findViewById(R.id.btn_remove_image).setOnClickListener(this);
@@ -109,6 +110,12 @@ public class NewContentDialogFragment extends DialogFragment implements
         mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
         mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
         mSocialVisibilityBtn = (Button) dv.findViewById(R.id.btn_social_visibility);
+        mPostCreateBtn = (Button) dv.findViewById(R.id.btn_create_post);
+
+        // Listen to text changes
+        TextChangeListenerAdapter textChangeAdapter = new TextChangeListenerAdapter(this);
+        mTitleEt.addTextChangedListener(textChangeAdapter);
+        mNoteEt.addTextChangedListener(textChangeAdapter);
 
         if (isEditMode) {
             Button b = (Button) dv.findViewById(R.id.btn_create_post);
@@ -193,7 +200,7 @@ public class NewContentDialogFragment extends DialogFragment implements
                 });
                 break;
             case R.id.btn_discard_post:
-                if (!postIsEmpty() && !isEditMode) {
+                if (!isPostEmpty() && !isEditMode) {
                     DiscardDoubleCheckDialogFragment dialog = new DiscardDoubleCheckDialogFragment();
                     dialog.show(getChildFragmentManager(), DiscardDoubleCheckDialogFragment.TAG);
                 } else {
@@ -298,7 +305,7 @@ public class NewContentDialogFragment extends DialogFragment implements
      *
      * @return true if everything is untouched by user.
      */
-    public boolean postIsEmpty() {
+    public boolean isPostEmpty() {
         return TextUtils.isEmpty(mContent.getImageUri())
                 && TextUtils.isEmpty(mNoteEt.getText())
                 && TextUtils.isEmpty(mTitleEt.getText());
@@ -362,6 +369,22 @@ public class NewContentDialogFragment extends DialogFragment implements
             }
         }
         mIsDialogShown = show;
+    }
+
+    @Override
+    public void onTextChanged() {
+        onPostContentChanged();
+    }
+
+    /**
+     * This method is called whenever something is updated in the post.
+     */
+    public void onPostContentChanged() {
+        // Used XNOR there :D (Don't ever ask why)
+        boolean isPostEmpty = isPostEmpty();
+        if (!(isPostEmpty ^ mPostCreateBtn.isEnabled())) {
+            mPostCreateBtn.setEnabled(!isPostEmpty);
+        }
     }
 
     public interface NewContentDialogListener {
