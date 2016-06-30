@@ -34,7 +34,7 @@
         android:drawablePadding="8dp"
         android:drawableRight="@drawable/ic_add_white_24dp"
         android:onClick="startWithNewADF"
-        android:text="New ADF"
+        android:text="@string/new_adf"
         android:theme="@style/AppTheme.AccentButton" />
 
     <RelativeLayout
