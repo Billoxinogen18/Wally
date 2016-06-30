@@ -76,7 +76,7 @@ public class PagerChain implements ContentFetcher {
             currentPagerIndex++;
         }
 
-        pagerList.get(currentPagerIndex).fetchNext(count - tail.size(), new FetchResultCallback() {
+        pagerList.get(currentPagerIndex).fetchNext(count, new FetchResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
                 tail.addAll(result);
