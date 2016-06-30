@@ -1,7 +1,6 @@
 package com.wally.wally.activities;
 
 import android.Manifest;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -175,8 +174,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     }
 
     public void onBtnMapClick(View v) {
-        Intent mapIntent = new Intent(getBaseContext(), MapsActivity.class);
-        startActivity(mapIntent);
+        startActivity(MapsActivity.newIntent(getBaseContext(), null));
     }
 
     public void onShowProfileClick(View v) {
