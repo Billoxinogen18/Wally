@@ -51,7 +51,7 @@ public class VisualContent {
         }
         material.setColorInfluence(0);
         material.enableLighting(true);
-        material.setDiffuseMethod(new DiffuseMethod.Toon());
+        material.setDiffuseMethod(new DiffuseMethod.Lambert());
         Log.d(TAG, "createMaterial() returned: " + material);
         return material;
     }
