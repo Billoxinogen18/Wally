@@ -2,7 +2,8 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_margin">0dp</dimen>
+
     <dimen name="watermark_margin">16dp</dimen>
     <dimen name="gallery_image_padding">2dp</dimen>
     <dimen name="spinner_item_padding">8dp</dimen>
