@@ -100,7 +100,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mainThreadHandler = new Handler(getMainLooper());
 
         mUserProfile = (SocialUser) getIntent().getSerializableExtra(KEY_USER);
-        initUserProfileView();
+        initFeedTitle();
 
         if (mUserProfile != null) {
             findViewById(R.id.update_area).setVisibility(View.GONE);
@@ -265,7 +265,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void initUserProfileView() {
+    private void initFeedTitle() {
         ImageView ownerImage = (ImageView) findViewById(R.id.iv_owner_image);
         TextView ownerName = (TextView) findViewById(R.id.tv_owner_name);
 
@@ -282,7 +282,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             ownerImage.setVisibility(View.VISIBLE);
             ownerName.setText(mUserProfile.getDisplayName());
         } else {
-            findViewById(R.id.owner_profile_info).setVisibility(View.GONE);
+            ownerName.setText(R.string.map_feed_title);
+            ownerImage.setVisibility(View.GONE);
         }
     }
 
