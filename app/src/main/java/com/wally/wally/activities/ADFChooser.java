@@ -481,7 +481,6 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
     private void startArWithSelectedAdf() {
         mSelectedAdf.getAdfMetaData().setLatLng(mCurrentLocation);
         startActivity(CameraARTangoActivity.newIntent(this, mSelectedAdf));
-        finish();
     }
 
 
