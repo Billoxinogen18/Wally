@@ -80,6 +80,7 @@ public class ActiveVisualContent extends VisualContent {
         Pose currentPose = mContent.getTangoData().getPose();
         mVisual.setPosition(currentPose.getPosition());
         mVisual.setRotation(currentPose.getOrientation());
+        mVisual.setTransparent(true);
         return mVisual;
     }
 
