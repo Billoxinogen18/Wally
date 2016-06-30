@@ -1,6 +1,7 @@
 package com.wally.wally.endlessScroll;
 
 import android.os.Handler;
+import android.util.Log;
 
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
@@ -37,7 +38,7 @@ public class ContentPagingRetriever {
 
         this.handler = handler;
 
-        fetch();
+        loadNext(pageLength * 3);
     }
 
     public Content get(int i) {
@@ -76,6 +77,7 @@ public class ContentPagingRetriever {
         contentFetcher.fetchNext(num, new FetchResultCallback() {
             @Override
             public void onResult(final Collection<Content> result) {
+                Log.d(TAG, "onResult() called with: " + "result = [" + result + "]");
                 if (!result.isEmpty()) {
                     handler.post(new Runnable() {
                         @Override
@@ -83,9 +85,16 @@ public class ContentPagingRetriever {
                             current.addAll(result);
                             for (ContentPageRetrieveListener observer : observers) {
                                 observer.onNextPageLoad(result.size());
+                                if (result.size() < num) {
+                                    observer.onNextPageFail();
+                                }
                             }
                         }
                     });
+
+                    if (result.size() < num) {
+                        hasNext = false;
+                    }
                 } else {
                     hasNext = false;
                     for (ContentPageRetrieveListener observer : observers) {
@@ -104,33 +113,33 @@ public class ContentPagingRetriever {
         });
     }
 
-    private void fetch() {
-        contentFetcher.fetchNext(pageLength * 3, new FetchResultCallback() {
-            @Override
-            public void onResult(Collection<Content> result) {
-                if (result.size() != 0) {
-                    current.clear();
-
-                    current.addAll(result);
-
-                    for (ContentPageRetrieveListener observer : observers) {
-                        observer.onNextPageLoad(result.size());
-                    }
-                } else {
-                    for (ContentPageRetrieveListener observer : observers) {
-                        observer.onNextPageFail();
-                    }
-                }
-            }
-
-            @Override
-            public void onError(Exception e) {
-                for (ContentPageRetrieveListener observer : observers) {
-                    observer.onNextPageFail();
-                }
-            }
-        });
-    }
+//    private void fetch() {
+//        contentFetcher.fetchNext(pageLength * 3, new FetchResultCallback() {
+//            @Override
+//            public void onResult(Collection<Content> result) {
+//                if (result.size() != 0) {
+//                    current.clear();
+//
+//                    current.addAll(result);
+//
+//                    for (ContentPageRetrieveListener observer : observers) {
+//                        observer.onNextPageLoad(result.size());
+//                    }
+//                } else {
+//                    for (ContentPageRetrieveListener observer : observers) {
+//                        observer.onNextPageFail();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//                for (ContentPageRetrieveListener observer : observers) {
+//                    observer.onNextPageFail();
+//                }
+//            }
+//        });
+//    }
 
     public interface ContentPageRetrieveListener {
         void onNextPageLoad(int pageLength);
