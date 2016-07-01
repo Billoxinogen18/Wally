@@ -180,5 +180,8 @@
     <string name="synchronizing_adfs">Synchronizing</string>
     <string name="loading_adfs">Loading ADF\'s</string>
     <string name="updating_area">Updating area</string>
-    <string name="map_feed_title">Notes Feed</string>
+    <string name="map_feed_title">Notes</string>
+    <string name="map_feed_self_title">My Notes</string>
+    <string name="map_feed_profile_title">s Notes</string>
+    <string name="no_content">No content</string>
 </resources>

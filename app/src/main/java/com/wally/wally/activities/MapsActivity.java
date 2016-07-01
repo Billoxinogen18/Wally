@@ -280,7 +280,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .into(ownerImage);
 
             ownerImage.setVisibility(View.VISIBLE);
-            ownerName.setText(mUserProfile.getDisplayName());
+            String firstName = mUserProfile.getFirstName() == null ? mUserProfile.getDisplayName() : mUserProfile.getFirstName();
+            String title;
+            if(mUserProfile.equals(App.getInstance().getUserManager().getUser())){
+                title = getString(R.string.map_feed_self_title);
+            }else{
+                title = firstName + getString(R.string.map_feed_profile_title);
+            }
+
+            ownerName.setText(title);
         } else {
             ownerName.setText(R.string.map_feed_title);
             ownerImage.setVisibility(View.GONE);
