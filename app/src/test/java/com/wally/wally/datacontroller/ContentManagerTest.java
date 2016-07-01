@@ -12,9 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-
-import java.net.SocketAddress;
+import org.mockito.InOrder;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -25,6 +23,7 @@ public class ContentManagerTest {
     private ContentManager testSubject;
 
     private DatabaseReference rooms;
+    @SuppressWarnings("FieldCanBeLocal")
     private StorageReference storage;
     private DatabaseReference contents;
 
@@ -36,9 +35,10 @@ public class ContentManagerTest {
         when(rooms.child(anyString())).thenReturn(rooms);
 
         contents = mock(DatabaseReference.class);
-        when(contents.child(anyString())).thenReturn(contents);
         when(contents.push()).thenReturn(contents);
+        when(contents.getKey()).thenReturn(TEST_ID);
         when(contents.getParent()).thenReturn(contents);
+        when(contents.child(anyString())).thenReturn(contents);
 
         testSubject = new ContentManager(rooms, contents, storage);
     }
@@ -48,10 +48,69 @@ public class ContentManagerTest {
     public void finish() {}
 
     @Test
-    public void saveTest() {
-        final Content c = DebugUtils.generateRandomContent();
-        when(contents.getKey()).thenReturn(TEST_ID);
+    public void savePublicTest() {
+        Content c = DebugUtils.generateRandomContent();
+        c.getVisibility().withSocialVisibility(Visibility.PUBLIC);
+        saveTest(c, "Public");
+    }
+
+    @Test
+    public void savePrivateTest() {
+        Content c = DebugUtils.generateRandomContent();
+        c.getVisibility().withSocialVisibility(Visibility.PRIVATE);
+        saveTest(c, c.getAuthorId());
+    }
+
+    @Test
+    public void saveSharedTest() {
+        Content c = DebugUtils.generateRandomContent();
+        c.getVisibility().withSocialVisibility(Visibility.SHARED);
+        saveTest(c, "Shared");
+    }
+
+    @Test
+    public void updatePublicTest() {
+        Content c = DebugUtils.generateRandomContent().withId(TEST_ID);
+        c.getVisibility().withSocialVisibility(Visibility.PUBLIC);
+        updateTest(c, "Public");
+    }
+
+    @Test
+    public void updatePrivateTest() {
+        Content c = DebugUtils.generateRandomContent().withId(TEST_ID);
+        c.getVisibility().withSocialVisibility(Visibility.PRIVATE);
+        updateTest(c, c.getAuthorId());
+    }
+
+    @Test
+    public void updateSharedTest() {
+        Content c = DebugUtils.generateRandomContent().withId(TEST_ID);
+        c.getVisibility().withSocialVisibility(Visibility.SHARED);
+        updateTest(c, "Shared");
+    }
+
+    void updateTest(Content c, String node) {
         testSubject.save(c);
+        verifyUpdate(node);
+        validateSave(c);
+    }
+
+
+    void saveTest(Content c, String node) {
+        testSubject.save(c);
+        verifySave(node);
+        verifySaveInRoom(c);
+        validateSave(c);
+    }
+
+    void verifySave(String node) {
+        verify(contents, never()).child(TEST_ID);
+        InOrder inOrder = inOrder(contents);
+        inOrder.verify(contents).child(node);
+        inOrder.verify(contents).push();
+    }
+
+    void validateSave(Content c) {
         assertEquals(TEST_ID, c.getId());
         ArgumentCaptor<FirebaseObject> captor =
                 ArgumentCaptor.forClass(FirebaseObject.class);
@@ -61,35 +120,19 @@ public class ContentManagerTest {
         assertEquals(c.getNote(), object.getNote());
     }
 
-    @Test
-    public void savePublicTest() {
-        final Content c = DebugUtils.generateRandomContent();
-        c.getVisibility().withSocialVisibility(Visibility.PUBLIC);
-        testSubject.save(c);
-        verify(contents, never()).child(TEST_ID);
-        verify(contents).push();
-        verify(contents).child("Public");
+    void verifyUpdate(String node) {
+        verify(contents, never()).push();
+        InOrder inOrder = inOrder(contents);
+        inOrder.verify(contents).child(node);
+        inOrder.verify(contents).child(TEST_ID);
     }
 
-    @Test
-    public void savePrivateTest() {
-        final Content c = DebugUtils.generateRandomContent();
-        c.getVisibility().withSocialVisibility(Visibility.PRIVATE);
-        testSubject.save(c);
-        verify(contents, never()).child(TEST_ID);
-        verify(contents, times(1)).push();
-        verify(contents).child(c.getAuthorId());
+    void verifySaveInRoom(Content c) {
+        InOrder inOrder = inOrder(rooms);
+        inOrder.verify(rooms).child(c.getUuid());
+        inOrder.verify(rooms).child("Contents");
+        inOrder.verify(rooms).child(anyString());
+        inOrder.verify(rooms).setValue(true);
     }
 
-    @Test
-    public void saveSharedTest() {
-        final Content c = DebugUtils.generateRandomContent();
-        Visibility.SocialVisibility shared =
-                new Visibility.SocialVisibility(Visibility.SocialVisibility.PEOPLE);
-        c.getVisibility().withSocialVisibility(shared);
-        testSubject.save(c);
-        verify(contents, never()).child(TEST_ID);
-        verify(contents, times(1)).push();
-        verify(contents).child("Shared");
-    }
 }
