@@ -18,6 +18,8 @@ public class Visibility implements Serializable {
 
     public static final SocialVisibility PUBLIC = new SocialVisibility(SocialVisibility.PUBLIC);
     public static final SocialVisibility PRIVATE = new SocialVisibility(SocialVisibility.PRIVATE);
+    public static final SocialVisibility SHARED = new SocialVisibility(SocialVisibility.PEOPLE);
+
     private SocialVisibility socialVisibility;
     private Date visibleUntil;
     private boolean isAuthorAnonymous;
