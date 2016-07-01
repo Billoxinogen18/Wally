@@ -11,7 +11,7 @@
         android:layout_gravity="center_horizontal"
         android:foreground="?attr/selectableItemBackground">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="400dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -31,9 +31,18 @@
                 style="@style/TextAppearance.AppCompat.Caption"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_name"
                 android:textSize="14sp"
                 tools:text="231s:13131:123131:1231312:123" />
-        </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ic_adf_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_margin="8dp"
+                tools:src="@drawable/ic_adf_on_cloud_24dp" />
+        </RelativeLayout>
 
     </android.support.v7.widget.CardView>
 

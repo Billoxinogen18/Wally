@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -555,10 +556,21 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
 
         @Override
         public void onBindViewHolder(ADFViewHolder holder, int position) {
-            AdfMetaData data = mData.get(position).getAdfMetaData();
+            AdfSyncInfo syncInfo = mData.get(position);
+            AdfMetaData data = syncInfo.getAdfMetaData();
 
             holder.name.setText(data.getName());
             holder.uuid.setText(data.getUuid());
+
+            int statusResId;
+            if (syncInfo.isSynchronized()) {
+                statusResId = R.drawable.ic_adf_synchronized_24dp;
+            } else if (syncInfo.isLocal()) {
+                statusResId = R.drawable.ic_adf_on_device_24dp;
+            } else {
+                statusResId = R.drawable.ic_adf_on_cloud_24dp;
+            }
+            holder.status.setImageResource(statusResId);
         }
 
         @Override
@@ -570,11 +582,13 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
 
             TextView name;
             TextView uuid;
+            ImageView status;
 
             public ADFViewHolder(View itemView) {
                 super(itemView);
                 name = (TextView) itemView.findViewById(R.id.tv_name);
                 uuid = (TextView) itemView.findViewById(R.id.tv_uuid);
+                status = (ImageView) itemView.findViewById(R.id.ic_adf_status);
                 itemView.setOnClickListener(this);
             }
 
