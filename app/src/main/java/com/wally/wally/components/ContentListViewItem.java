@@ -91,6 +91,7 @@ public class ContentListViewItem extends CardView {
                     .fitCenter()
                     .crossFade()
                     .placeholder(R.drawable.ic_image_placeholer)
+                    .dontAnimate()
                     .into(noteImage);
 
             noteImage.setVisibility(View.VISIBLE);

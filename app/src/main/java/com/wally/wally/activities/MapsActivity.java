@@ -276,6 +276,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .fitCenter()
                     .thumbnail(0.1f)
                     .placeholder(R.drawable.ic_account_circle_black_24dp)
+                    .dontAnimate()
                     .transform(new CircleTransform(getBaseContext()))
                     .into(ownerImage);
 

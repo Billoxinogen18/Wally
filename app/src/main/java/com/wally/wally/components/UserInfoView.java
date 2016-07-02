@@ -262,6 +262,7 @@ public class UserInfoView extends LinearLayout {
                     .fitCenter()
                     .thumbnail(0.1f)
                     .placeholder(R.drawable.ic_account_circle_black_24dp)
+                    .dontAnimate()
                     .transform(new CircleTransform(getContext()))
                     .into(mUserImage);
         }
