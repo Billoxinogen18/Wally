@@ -1,29 +1,21 @@
 {
   "project_info": {
-    "project_number": "55413750712",
-    "firebase_url": "https://wally-virtual-notes.firebaseio.com",
-    "project_id": "wally-virtual-notes",
-    "storage_bucket": "wally-virtual-notes.appspot.com"
+    "project_number": "412027996654",
+    "firebase_url": "https://wally-virtual-notes-d73d7.firebaseio.com",
+    "project_id": "wally-virtual-notes-d73d7",
+    "storage_bucket": "wally-virtual-notes-d73d7.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:55413750712:android:bb939bb44a247b3b",
+        "mobilesdk_app_id": "1:412027996654:android:bb939bb44a247b3b",
         "android_client_info": {
           "package_name": "com.wally.wally"
         }
       },
       "oauth_client": [
         {
-          "client_id": "55413750712-jg4q5rov9kdvk6h4ptefifvkolo69td9.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.wally.wally",
-            "certificate_hash": "3F45B6C7992EC02C091D0597BF237AC932CDCFEE"
-          }
-        },
-        {
-          "client_id": "55413750712-03pdciev4hh9f96q5752795fg63n0qve.apps.googleusercontent.com",
+          "client_id": "412027996654-46cs37nfgb7hl1j1u4ur02ve93e26ck0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.wally.wally",
@@ -31,60 +23,13 @@
           }
         },
         {
-          "client_id": "55413750712-f6r6n5haar7qgmr5624vlf6319bsljeu.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
-          "client_id": "55413750712-ao9ic31vvsm3revppb7h8vdketi49ja9.apps.googleusercontent.com",
+          "client_id": "412027996654-qe0vg2qm1lti226vhb9bhi40bhtnuj8v.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCOU6NkRUoU9ArqUR6jp48nUSvbw3xF9yQ"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 1
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:55413750712:android:f983ef6d400b32a1",
-        "android_client_info": {
-          "package_name": "com.wally.shit"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "55413750712-8d0spmkdbo0khdfgghui0n3gmq57hetr.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.wally.shit",
-            "certificate_hash": "276286F617A027254FACC0EB3BF6B5BDB20E413C"
-          }
-        },
-        {
-          "client_id": "55413750712-f6r6n5haar7qgmr5624vlf6319bsljeu.apps.googleusercontent.com",
-          "client_type": 3
-        },
-        {
-          "client_id": "55413750712-ao9ic31vvsm3revppb7h8vdketi49ja9.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyBCC457DT2Y2e-9K69EVP60yfBctonk-tU"
+          "current_key": "AIzaSyB-uuF4nBpy-wfFpSbhHqdAs0py1WPS4nQ"
         }
       ],
       "services": {
@@ -95,7 +40,7 @@
           "status": 2,
           "other_platform_oauth_client": [
             {
-              "client_id": "55413750712-f6r6n5haar7qgmr5624vlf6319bsljeu.apps.googleusercontent.com",
+              "client_id": "412027996654-qe0vg2qm1lti226vhb9bhi40bhtnuj8v.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

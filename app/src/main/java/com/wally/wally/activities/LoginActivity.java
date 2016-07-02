@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.auth.api.Auth;
@@ -77,6 +78,7 @@ public class LoginActivity extends GoogleApiClientActivity implements
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
+                Log.d(TAG, "onActivityResult: " + result.getSignInAccount().getEmail());
                 firebaseAuthWithGoogle(result.getSignInAccount());
             } else {
                 requestSignIn();
@@ -109,6 +111,7 @@ public class LoginActivity extends GoogleApiClientActivity implements
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "onComplete: " + task.getException());
                         mLoadingView.setVisibility(View.INVISIBLE);
                         trySignIn();
                     }
