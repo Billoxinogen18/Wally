@@ -37,7 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:padding="8dp"
-            android:text="Visibility"
+            android:text="@string/visibility"
             android:textColor="@color/colorPrimary" />
 
         <CheckBox

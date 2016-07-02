@@ -26,11 +26,17 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
- * Created by ioane5 on 5/31/16.
+ * People chooser dialog for selecting social users.
+ * <p/>
+ * Created by Meravici on 5/31/16.
  */
-public class PeopleChooserDialogFragment extends DialogFragment implements View.OnClickListener, UserSelectListener, ChipsView.ChipsListener {
+public class PeopleChooserDialogFragment extends DialogFragment implements
+        View.OnClickListener,
+        UserSelectListener,
+        ChipsView.ChipsListener {
 
     public static final String TAG = PeopleChooserDialogFragment.class.getSimpleName();
 
@@ -124,7 +130,6 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
     @Override
     public void onClick(View v) {
-        Log.d(TAG, "onClick: " + v.getId() + ":" + R.id.btn_done);
         switch (v.getId()) {
             case R.id.btn_dismiss:
                 finishWithData(null);
@@ -137,7 +142,6 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
     @Override
     public void onUserSelect(SocialUser user) {
-        Log.d(TAG, "onUserSelect() called with: " + "user = [" + user + "]");
         mChipsView.addChip(user.getDisplayName(), user.getAvatarUrl(), user);
     }
 
@@ -153,7 +157,6 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
 
     @Override
     public void onChipDeleted(ChipsView.Chip chip) {
-        Log.d(TAG, "onChipDeleted() called with: " + "chip = [" + chip + "]");
         mAdapter.deselectUser((SocialUser) chip.getData());
     }
 
@@ -193,9 +196,10 @@ public class PeopleChooserDialogFragment extends DialogFragment implements View.
         protected List<SocialUser> filterData(String query) {
             ArrayList<SocialUser> filtered = new ArrayList<>();
             if (!TextUtils.isEmpty(query)) {
-                query = query.toLowerCase();
+                query = query.toLowerCase(Locale.US);
                 for (SocialUser user : getFullData()) {
-                    if (user.getDisplayName() != null && user.getDisplayName().toLowerCase().contains(query))
+                    if (user.getDisplayName() != null &&
+                            user.getDisplayName().toLowerCase(Locale.US).contains(query))
                         filtered.add(user);
                 }
             } else {

@@ -62,20 +62,20 @@ public class DebugUtils {
                                 .withTranslation(randomDoubleArray()));
     }
 
-    public static void generateRandomContents(int n, DataController controller) {
-        int publicContentNumber = 0;
+    public static Collection<Content> generateRandomContents(int n, DataController controller) {
+        Collection<Content> contents = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             Content content = generateRandomContent();
-            if (content.isPublic()) {
-                content.withTitle("" + publicContentNumber++);
-            } else if (!content.isPrivate()) {
+            if (!content.isPublic() && !content.isPrivate()) {
                 List<Id> sharedWith = new ArrayList<>();
                 sharedWith.add(USERS[1].getGgId());
                 sharedWith.add(USERS[3].getGgId());
                 content.getVisibility().getSocialVisibility().withSharedWith(sharedWith);
             }
+            contents.add(content);
             controller.save(content.withImageUri(null));
         }
+        return contents;
     }
 
     private static String randomRoom() {

@@ -11,7 +11,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
  * Created by shota on 5/20/16.
  */
 //TODO rename!
-public class GoogleApiClientActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public abstract class GoogleApiClientActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = GoogleApiClientActivity.class.getSimpleName();
 
 

@@ -1,6 +1,5 @@
 package com.wally.wally.components;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.wally.wally.R;
 
 /**
- * Created by Xato on 6/23/2016.
+ * Created by Meravici on 6/23/2016.
  */
 public class MapWindowAdapter implements GoogleMap.InfoWindowAdapter {
     private Context context = null;

@@ -10,7 +10,9 @@ import com.wally.wally.datacontroller.firebase.FirebaseObject;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 
@@ -18,6 +20,7 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ContentManagerTest {
     private static final String TEST_ID = "Test_Id";
     private ContentManager testSubject;
@@ -31,6 +34,7 @@ public class ContentManagerTest {
     public void init() {
         storage = mock(StorageReference.class);
         when(storage.child(anyString())).thenReturn(storage);
+
         rooms = mock(DatabaseReference.class);
         when(rooms.child(anyString())).thenReturn(rooms);
 
@@ -42,7 +46,6 @@ public class ContentManagerTest {
 
         testSubject = new ContentManager(rooms, contents, storage);
     }
-
 
     @After
     public void finish() {}

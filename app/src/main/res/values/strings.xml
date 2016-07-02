@@ -1,13 +1,8 @@
 <resources>
     <string name="app_name">Wally</string>
-    <string name="action_settings">Settings</string>
     <string name="title_activity_maps">Map</string>
-    <string name="error_gallery_storage_denied">Gallery needs storage access</string>
     <!--<string name="google_app_id">unified-cortex-126421</string>-->
-    <string name="action_new_note">Note</string>
-    <string name="action_new_photo">Photo</string>
     <string name="title_activity_choose_photo">Select Photo</string>
-    <string name="error_fetch_failed">Couldn\'t load</string>
     <string name="post_create">Create</string>
     <string name="discard">Discard</string>
     <string name="note_hint">Note</string>
@@ -15,24 +10,13 @@
     <string name="dialog_message_discard_post_doublecheck">Do you really want to discard this post?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="exception_out_of_date">Tango service outdated!</string>
-    <string name="app_name_long">Java Point To Point Measurement Example</string>
-    <string name="failed_measurement">Failed to place point</string>
-    <string name="failed_permissions">Permissions required!</string>
-    <string name="measurement">DISTANCE: </string>
     <string name="title_activity_adfchooser">Select the Room</string>
     <string name="new_adf">New ADF</string>
 
-
     <string name="tango_error">"Tango Exception! Try again!"</string>
-    <string name="no_adfs_tango_error">No ADF UUIDs</string>
-    <string name="no_uuid_tango_error">"No ADF with that UUID!"</string>
     <string name="post_update">Update</string>
     <string name="loading">Loading…</string>
-    <string name="loading_message">Loading</string>
     <string name="content_meta_info_dialog_title">More</string>
-    <string name="checked_preview_on_map">Show preview on map</string>
-    <string name="unchecked_preview_on_map">Don\'t show preview on map</string>
     <string name="empty_note_time_visibility">Click to set delete Date</string>
     <string name="note_time_visibility">The note will be deleted at: %s</string>
 
@@ -46,123 +30,10 @@
         <item>@string/people_visibility</item>
     </string-array>
 
-    <string-array name="visibility_ranges">
-        <item>Here</item>
-        <item>Near</item>
-        <item>Local</item>
-        <item>Distant</item>
-        <item>Far</item>
-    </string-array>
-    <string name="title_activity_profile">ProfileActivity</string>
-    <string name="large_text">
-        "Material is the metaphor.\n\n"
-
-        "A material metaphor is the unifying theory of a rationalized space and a system of motion."
-        "The material is grounded in tactile reality, inspired by the study of paper and ink, yet "
-        "technologically advanced and open to imagination and magic.\n"
-        "Surfaces and edges of the material provide visual cues that are grounded in reality. The "
-        "use of familiar tactile attributes helps users quickly understand affordances. Yet the "
-        "flexibility of the material creates new affordances that supercede those in the physical "
-        "world, without breaking the rules of physics.\n"
-        "The fundamentals of light, surface, and movement are key to conveying how objects move, "
-        "interact, and exist in space and in relation to each other. Realistic lighting shows "
-        "seams, divides space, and indicates moving parts.\n\n"
-
-        "Bold, graphic, intentional.\n\n"
-
-        "The foundational elements of print based design typography, grids, space, scale, color, "
-        "and use of imagery guide visual treatments. These elements do far more than please the "
-        "eye. They create hierarchy, meaning, and focus. Deliberate color choices, edge to edge "
-        "imagery, large scale typography, and intentional white space create a bold and graphic "
-        "interface that immerse the user in the experience.\n"
-        "An emphasis on user actions makes core functionality immediately apparent and provides "
-        "waypoints for the user.\n\n"
-
-        "Motion provides meaning.\n\n"
-
-        "Motion respects and reinforces the user as the prime mover. Primary user actions are "
-        "inflection points that initiate motion, transforming the whole design.\n"
-        "All action takes place in a single environment. Objects are presented to the user without "
-        "breaking the continuity of experience even as they transform and reorganize.\n"
-        "Motion is meaningful and appropriate, serving to focus attention and maintain continuity. "
-        "Feedback is subtle yet clear. Transitions are efﬁcient yet coherent.\n\n"
-
-        "3D world.\n\n"
-
-        "The material environment is a 3D space, which means all objects have x, y, and z "
-        "dimensions. The z-axis is perpendicularly aligned to the plane of the display, with the "
-        "positive z-axis extending towards the viewer. Every sheet of material occupies a single "
-        "position along the z-axis and has a standard 1dp thickness.\n"
-        "On the web, the z-axis is used for layering and not for perspective. The 3D world is "
-        "emulated by manipulating the y-axis.\n\n"
-
-        "Light and shadow.\n\n"
-
-        "Within the material environment, virtual lights illuminate the scene. Key lights create "
-        "directional shadows, while ambient light creates soft shadows from all angles.\n"
-        "Shadows in the material environment are cast by these two light sources. In Android "
-        "development, shadows occur when light sources are blocked by sheets of material at "
-        "various positions along the z-axis. On the web, shadows are depicted by manipulating the "
-        "y-axis only. The following example shows the card with a height of 6dp.\n\n"
-
-        "Resting elevation.\n\n"
-
-        "All material objects, regardless of size, have a resting elevation, or default elevation "
-        "that does not change. If an object changes elevation, it should return to its resting "
-        "elevation as soon as possible.\n\n"
-
-        "Component elevations.\n\n"
-
-        "The resting elevation for a component type is consistent across apps (e.g., FAB elevation "
-        "does not vary from 6dp in one app to 16dp in another app).\n"
-        "Components may have different resting elevations across platforms, depending on the depth "
-        "of the environment (e.g., TV has a greater depth than mobile or desktop).\n\n"
-
-        "Responsive elevation and dynamic elevation offsets.\n\n"
-
-        "Some component types have responsive elevation, meaning they change elevation in response "
-        "to user input (e.g., normal, focused, and pressed) or system events. These elevation "
-        "changes are consistently implemented using dynamic elevation offsets.\n"
-        "Dynamic elevation offsets are the goal elevation that a component moves towards, relative "
-        "to the component’s resting state. They ensure that elevation changes are consistent "
-        "across actions and component types. For example, all components that lift on press have "
-        "the same elevation change relative to their resting elevation.\n"
-        "Once the input event is completed or cancelled, the component will return to its resting "
-        "elevation.\n\n"
-
-        "Avoiding elevation interference.\n\n"
-
-        "Components with responsive elevations may encounter other components as they move between "
-        "their resting elevations and dynamic elevation offsets. Because material cannot pass "
-        "through other material, components avoid interfering with one another any number of ways, "
-        "whether on a per component basis or using the entire app layout.\n"
-        "On a component level, components can move or be removed before they cause interference. "
-        "For example, a floating action button (FAB) can disappear or move off screen before a "
-        "user picks up a card, or it can move if a snackbar appears.\n"
-        "On the layout level, design your app layout to minimize opportunities for interference. "
-        "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
-        "when a user tries to pick up one of cards.\n\n"
-    </string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="post_cancel_edit">Cancel</string>
 
-    <string name="sort_by_location">By Location</string>
-    <string name="sort_by_date">By Date</string>
-    <string name="sort_dialog_title">Sort Content</string>
-    <string name="sort">Sort</string>
-    <string-array name="sort_options">
-        <item>@string/sort_by_date</item>
-        <item>@string/sort_by_location</item>
-    </string-array>
-
-    <string name="sign_out">Sign out</string>
-    <string name="loading_your_contents">Loading your Contents</string>
-    <string name="try_again">Try again</string>
-    <string name="loading_failed">Loading failed</string>
-    <string name="filter">Filter</string>
-    <string name="content_filter_hint">Search Notes</string>
-    <string name="show_on_map">Show on Map</string>
     <string name="photo_chooser_dialog_title">Select photo</string>
     <string name="people_chooser_dialog_title">Share with</string>
     <string name="anonymous">Anonymous</string>
@@ -173,12 +44,18 @@
     <string name="close_application">Close Application</string>
     <string name="give_permission">Give permission</string>
     <string name="explain_location_permission">The application needs Location to download proper Area description files</string>
-    <string name="explain_adf_import_permission">Without Importing ADF from cloud we won\'t be able to show you any content</string>
-    <string name="open_settings">Open Settings</string>
-    <string name="explain_adf_export_permission">Without exporting ADF we won\'t be able to show or share your contents</string>
-    <string name="explain_adf_permission">Wally uses ADF\'s to show you exciting augmented reality contents on the wall</string>
     <string name="synchronizing_adfs">Synchronizing</string>
     <string name="loading_adfs">Loading ADF\'s</string>
     <string name="updating_area">Updating area</string>
-    <string name="map_feed_title">Notes Feed</string>
+    <string name="map_feed_title">Notes</string>
+    <string name="map_feed_self_title">My Notes</string>
+    <string name="map_feed_profile_title">s Notes</string>
+    <string name="no_content">No content</string>
+
+    <string name="error_msg_no_tango_device">Camera Disabled! No Tango Device!</string>
+    <string name="error_msg_invalid_pose">Hold Still!</string>
+    <string name="error_msg_not_localized">Walk around!</string>
+    <string name="visibility">Visibility</string>
+    <string name="share_to">To</string>
+    <string name="explain_adf_permission">Wally uses ADF\'s to show you exciting augmented reality contents on the wall</string>
 </resources>

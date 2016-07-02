@@ -15,6 +15,7 @@
  */
 package com.projecttango.rajawali.renderables.primitives;
 
+import android.annotation.SuppressLint;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 
@@ -61,6 +62,7 @@ public class Points extends Object3D {
 
     // Update the geometry of the points based on the provided points float buffer and corresponding
     // colors based on the provided float array.
+    @SuppressLint("DefaultLocale")
     public void updatePoints(int pointCount, FloatBuffer points, float[] colors) {
         if (pointCount > mMaxNumberOfVertices) {
             throw new RuntimeException(
