@@ -65,13 +65,15 @@
             android:layout_height="1dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="8dp"
-            android:background="@color/dividerColor" />
+            android:background="@color/dividerColor"
+            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tv_note_delete_time"
