@@ -100,7 +100,7 @@ public final class Utils {
     public static String formatDateSmart(Context context, long date) {
         long now = System.currentTimeMillis();
         if (DateUtils.isToday(date)) {
-            return DateUtils.formatSameDayTime(date, now, DateFormat.MEDIUM, DateFormat.MEDIUM).toString();
+            return DateUtils.getRelativeTimeSpanString(date, now, 0L, DateUtils.FORMAT_ABBREV_ALL).toString();
         } else {
             return DateUtils.formatDateTime(context, date, DateUtils.FORMAT_ABBREV_RELATIVE);
         }
