@@ -40,7 +40,7 @@
     <string name="preview_visibility_checkbox">Preview Is visible on map</string>
     <string name="anonymous_author_checkbox">Anonymous author</string>
     <string name="content_not_visible_title">Content Not visible</string>
-    <string name="content_not_visible_note">Move directly with camera to see</string>
+    <string name="content_not_visible_note">Visible only with a camera</string>
     <string name="close_application">Close Application</string>
     <string name="give_permission">Give permission</string>
     <string name="explain_location_permission">The application needs Location to download proper Area description files</string>
