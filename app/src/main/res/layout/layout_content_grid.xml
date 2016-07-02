@@ -7,7 +7,8 @@
     android:foreground="?attr/selectableItemBackground"
     android:stateListAnimator="@anim/raise"
     app:cardElevation="2dp"
-    app:cardUseCompatPadding="true">
+    app:cardUseCompatPadding="true"
+    tools:targetApi="lollipop">
 
     <FrameLayout
         android:layout_width="match_parent"

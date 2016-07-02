@@ -64,7 +64,8 @@
             android:contentInsetLeft="0dp"
             android:contentInsetStart="0dp"
             app:contentInsetLeft="0dp"
-            app:contentInsetStart="0dp">
+            app:contentInsetStart="0dp"
+            tools:targetApi="lollipop">
 
             <ImageButton
                 android:id="@+id/back"

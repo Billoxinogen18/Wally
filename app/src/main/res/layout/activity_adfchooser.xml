@@ -43,7 +43,8 @@
         android:layout_height="match_parent"
         android:background="@color/backgroundColor"
         android:elevation="8dp"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:targetApi="lollipop">
 
         <TextView
             android:id="@+id/loading_text"

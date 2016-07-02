@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:clipToPadding="false"
     android:orientation="vertical">
 
@@ -12,7 +13,8 @@
         android:background="#fff"
         android:elevation="4dp"
         android:orientation="horizontal"
-        android:padding="4dp">
+        android:padding="4dp"
+        tools:targetApi="lollipop">
 
         <ImageButton
             android:id="@+id/btn_dismiss"
@@ -27,8 +29,8 @@
             style="@style/TextAppearance.AppCompat.Title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_marginLeft="12dp"
+            android:layout_weight="1"
             android:padding="8dp"
             android:text="@string/people_chooser_dialog_title" />
 
@@ -44,19 +46,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
+        android:background="@color/paper"
         android:elevation="6dp"
         android:orientation="horizontal"
-        android:background="@color/paper"
-        >
+        android:paddingLeft="16dp"
+        tools:targetApi="lollipop">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="8dp"
-            android:text="To"
-            />
+            android:text="@string/share_to" />
 
         <com.doodle.android.chips.ChipsView
             android:id="@+id/people_chips_view"
@@ -64,8 +65,7 @@
             android:layout_height="wrap_content"
             android:overScrollMode="never"
             app:cv_max_height="120dp"
-            app:cv_vertical_spacing="2dp"
-            />
+            app:cv_vertical_spacing="2dp" />
 
     </LinearLayout>
 

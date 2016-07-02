@@ -184,4 +184,10 @@
     <string name="map_feed_self_title">My Notes</string>
     <string name="map_feed_profile_title">s Notes</string>
     <string name="no_content">No content</string>
+
+    <string name="error_msg_no_tango_device">Camera Disabled! No Tango Device!</string>
+    <string name="error_msg_invalid_pose">Hold Still!</string>
+    <string name="error_msg_not_localized">Walk around!</string>
+    <string name="visibility">Visibility</string>
+    <string name="share_to">To</string>
 </resources>

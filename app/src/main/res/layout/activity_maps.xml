@@ -12,7 +12,8 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="@android:color/background_light"
-        android:elevation="10dp">
+        android:elevation="10dp"
+        tools:targetApi="lollipop">
 
         <fragment
             android:id="@+id/map"
