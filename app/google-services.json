@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "412027996654-5j1vvhc6em1eng9pnfam2qj25t3t26b0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wally.wally",
+            "certificate_hash": "3F45B6C7992EC02C091D0597BF237AC932CDCFEE"
+          }
+        },
+        {
           "client_id": "412027996654-46cs37nfgb7hl1j1u4ur02ve93e26ck0.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

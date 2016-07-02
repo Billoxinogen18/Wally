@@ -90,10 +90,10 @@ dependencies {
     compile 'com.android.support:palette-v7:24.0.0'
     compile 'com.google.maps.android:android-maps-utils:0.4.3'
     // Google API libs
-    compile 'com.google.android.gms:play-services-plus:9.0.2'
-    compile 'com.google.android.gms:play-services-location:9.0.2'
-    compile 'com.google.android.gms:play-services-maps:9.0.2'
-    compile 'com.google.android.gms:play-services-auth:9.0.2'
+    compile 'com.google.android.gms:play-services-plus:9.2.0'
+    compile 'com.google.android.gms:play-services-location:9.2.0'
+    compile 'com.google.android.gms:play-services-maps:9.2.0'
+    compile 'com.google.android.gms:play-services-auth:9.2.0'
     // 3rd parties
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'de.hdodenhof:circleimageview:2.0.0'
@@ -101,9 +101,9 @@ dependencies {
     // Firebase
 
     //    compile 'com.google.firebase:firebase-core:9.0.2'
-    compile 'com.google.firebase:firebase-storage:9.0.2'
-    compile 'com.google.firebase:firebase-auth:9.0.2'
-    compile 'com.google.firebase:firebase-database:9.0.2'
+    compile 'com.google.firebase:firebase-storage:9.2.0'
+    compile 'com.google.firebase:firebase-auth:9.2.0'
+    compile 'com.google.firebase:firebase-database:9.2.0'
 }
 
 apply plugin: 'com.google.gms.google-services'
