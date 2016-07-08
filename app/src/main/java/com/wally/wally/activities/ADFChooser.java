@@ -4,7 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,6 +31,7 @@ import com.google.atap.tangoservice.TangoErrorException;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.adfCreator.AdfCreatorActivity;
 import com.wally.wally.datacontroller.adf.ADFService;
 import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.adf.AdfSyncInfo;
@@ -56,8 +56,7 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
     private static final int RC_REQ_LOCATION = 18;
     private static final int RC_REQ_ADF_IMPORT = 19;
     private static final int RC_REQ_ADF_EXPORT = 20;
-
-    private static final String EXPLORER_PACKAGE_NAME = "com.projecttango.tangoexplorer";
+    private static final int RC_REQ_ADF_CREATE = 21;
 
     private static final String INTENT_CLASSPACKAGE = "com.projecttango.tango";
     private static final String INTENT_IMPORTEXPORT_CLASSNAME = "com.google.atap.tango.RequestImportExportActivity";
@@ -197,6 +196,12 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
         } else if (requestCode == RC_REQ_ADF_EXPORT) {
             if (resultCode == RESULT_OK) {
                 onAdfExported();
+            }
+        } else if (requestCode == RC_REQ_ADF_CREATE) {
+            if (resultCode == RESULT_OK) {
+                String uuid = data.getData().toString();
+                Toast.makeText(getBaseContext(), "Shit yea", Toast.LENGTH_SHORT).show();
+                //TODO export adf and start camera
             }
         }
     }
@@ -394,11 +399,8 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
     }
 
     public void startWithNewADF(View v) {
-        Intent intent = getPackageManager().getLaunchIntentForPackage(EXPLORER_PACKAGE_NAME);
-        if (intent == null) {
-            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + EXPLORER_PACKAGE_NAME));
-        }
-        startActivity(intent);
+        Intent intent = AdfCreatorActivity.newIntent(getBaseContext());
+        startActivityForResult(intent, RC_REQ_ADF_CREATE);
     }
 
     private void requestADFPermission() {

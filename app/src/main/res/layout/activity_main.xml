@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:context=".activities.CameraARTangoActivity"
     android:animateLayoutChanges="true">
 
     <TextView
@@ -19,26 +20,6 @@
         android:layout_gravity="center"
         app:frameRate="60.0"
         app:renderMode="RENDER_WHEN_DIRTY" />
-
-    <TextView
-        android:id="@+id/pose_invalid"
-        style="@style/TextAppearance.AppCompat.Display1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/uxOverlayBackgroundColor"
-        android:gravity="center"
-        android:text="@string/error_msg_invalid_pose"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/not_localized"
-        style="@style/TextAppearance.AppCompat.Display1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/uxOverlayBackgroundColor"
-        android:gravity="center"
-        android:text="@string/error_msg_not_localized"
-        android:visibility="gone" />
 
     <com.wally.wally.components.SelectedMenuView
         android:id="@+id/selected_menu_view"
