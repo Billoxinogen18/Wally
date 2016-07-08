@@ -1,16 +1,12 @@
 package com.wally.wally.userManager;
 
-import android.os.AsyncTask;
-
-import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
- * Created by Meravici on 5/12/2016.
+ * Created by Meravici on 5/12/2016. yea
  */
 public class CompoundUser implements SocialUser {
     List<SocialUser> socialUsers;
@@ -50,6 +46,14 @@ public class CompoundUser implements SocialUser {
     public String getAvatarUrl() {
         if (socialUsers.size() > 0) {
             return socialUsers.get(0).getAvatarUrl();
+        }
+        return null;
+    }
+
+    @Override
+    public String getAvatarUrl(int size) {
+        if (socialUsers.size() > 0) {
+            return socialUsers.get(0).getAvatarUrl(size);
         }
         return null;
     }

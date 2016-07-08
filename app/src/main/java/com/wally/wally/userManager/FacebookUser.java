@@ -1,13 +1,11 @@
 package com.wally.wally.userManager;
 
-import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
-import java.net.URL;
 import java.util.List;
 
 /**
- * Created by Meravici on 5/12/2016.
+ * Created by Meravici on 5/12/2016. yea
  */
 public class FacebookUser extends AbstractSocialUser {
     public FacebookUser(User baseUser) {
@@ -27,6 +25,11 @@ public class FacebookUser extends AbstractSocialUser {
 
     @Override
     public String getAvatarUrl() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getAvatarUrl(int size) {
         throw new UnsupportedOperationException();
     }
 
