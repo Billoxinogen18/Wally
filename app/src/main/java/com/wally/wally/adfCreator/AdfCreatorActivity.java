@@ -2,19 +2,16 @@ package com.wally.wally.adfCreator;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
-import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoConfig;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
@@ -32,18 +29,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AdfCreatorActivity extends AppCompatActivity implements SetAdfNameDialog.CallbackListener,
         SaveAdfTask.SaveAdfListener {
+
+    public static final String KEY_ADF_NAME = "ADF_NAME";
+    public static final String KEY_ADF_UUID = "ADF_UUID";
     private static final String TAG = AdfCreatorActivity.class.getSimpleName();
     private static final long DELAY_TIME = 5000;
-
+    private static final int INVALID_TEXTURE_ID = 0;
     private Tango mTango;
     private WallyTangoUx mTangoUx;
     private TangoConfig mConfig;
-
     // Long-running task to save the ADF.
     private SaveAdfTask mSaveAdfTask;
-
-    private static final int INVALID_TEXTURE_ID = 0;
-
     private GLSurfaceView mSurfaceView;
     private AdfCreatorRenderer mRenderer;
 
@@ -93,7 +89,8 @@ public class AdfCreatorActivity extends AppCompatActivity implements SetAdfNameD
      */
     @Override
     public void onAdfNameCancelled() {
-        // Continue running.
+        setResult(RESULT_CANCELED);
+        finish();
     }
 
     @Override
@@ -314,7 +311,9 @@ public class AdfCreatorActivity extends AppCompatActivity implements SetAdfNameD
         mSaveAdfTask = null;
 
         Intent data = new Intent();
-        data.setData(Uri.parse(adfUuid));
+        data.putExtra(KEY_ADF_UUID, adfUuid);
+        data.putExtra(KEY_ADF_NAME, adfName);
+
         setResult(RESULT_OK, data);
         finish();
     }
@@ -323,14 +322,6 @@ public class AdfCreatorActivity extends AppCompatActivity implements SetAdfNameD
      * Shows a dialog for setting the ADF name.
      */
     private void showSetAdfNameDialog() {
-        Bundle bundle = new Bundle();
-        bundle.putString(TangoAreaDescriptionMetaData.KEY_NAME, "New ADF");
-        // UUID is generated after the ADF is saved.
-        bundle.putString(TangoAreaDescriptionMetaData.KEY_UUID, "");
-
-        FragmentManager manager = getSupportFragmentManager();
-        SetAdfNameDialog setAdfNameDialog = new SetAdfNameDialog();
-        setAdfNameDialog.setArguments(bundle);
-        setAdfNameDialog.show(manager, "ADFNameDialog");
+        SetAdfNameDialog.newInstance().show(getSupportFragmentManager(), SetAdfNameDialog.TAG);
     }
 }

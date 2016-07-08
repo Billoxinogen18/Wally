@@ -184,11 +184,14 @@ public class ADFChooser extends AppCompatActivity implements
             if (resultCode != RESULT_OK) {
                 mExplainAdfPermission = true;
             }
-        }else if (requestCode == RC_REQ_ADF_CREATE) {
+        } else if (requestCode == RC_REQ_ADF_CREATE) {
             if (resultCode == RESULT_OK) {
-                String uuid = data.getData().toString();
-                Toast.makeText(getBaseContext(), "Shit yea", Toast.LENGTH_SHORT).show();
-                //TODO export adf and start camera
+                String uuid = data.getStringExtra(AdfCreatorActivity.KEY_ADF_UUID);
+                String name = data.getStringExtra(AdfCreatorActivity.KEY_ADF_NAME);
+
+                AdfSyncInfo syncInfo = new AdfSyncInfo(
+                        new AdfMetaData(name, uuid, mCurrentLocation), true);
+                onAdfSelected(syncInfo);
             }
         }
     }

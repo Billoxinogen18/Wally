@@ -71,7 +71,7 @@
     <string name="set_name_dialog_title">Set the ADF name</string>
     <string name="cancel">Cancel</string>
     <string name="save_adf">Save ADF</string>
-    <string name="name">Name</string>
+    <string name="enter_adf_name">ADF name</string>
     <string name="ok">OK</string>
     <string name="start_config">Start</string>
     <string name="manage_adfs">Manage ADFs</string>

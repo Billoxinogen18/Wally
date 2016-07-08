@@ -26,4 +26,7 @@
     <dimen name="picker_color_item_size">36dp</dimen>
     <dimen name="picker_color_item_margin">4dp</dimen>
     <dimen name="person_grid_width">120dp</dimen>
+
+    <dimen name="adf_name_dialog_width">350dp</dimen>
+    <dimen name="adf_name_dialog_height">220dp</dimen>
 </resources>

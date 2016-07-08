@@ -1,16 +1,17 @@
 package com.wally.wally.adfCreator;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
 import com.wally.wally.R;
 
 /**
@@ -18,16 +19,54 @@ import com.wally.wally.R;
  */
 public class SetAdfNameDialog extends DialogFragment {
 
-    EditText mNameEditText;
-    TextView mUuidTextView;
-    CallbackListener mCallbackListener;
-    Button mOkButton;
-    Button mCancelButton;
+    public static final String TAG = SetAdfNameDialog.class.getSimpleName();
+    private CallbackListener mCallbackListener;
 
-    interface CallbackListener {
-        void onAdfNameOk(String name, String uuid);
+    public static SetAdfNameDialog newInstance() {
+        return new SetAdfNameDialog();
+    }
 
-        void onAdfNameCancelled();
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        View dv = LayoutInflater.from(getActivity()).inflate(R.layout.set_name_dialog, null, false);
+
+        TextView title = (TextView) dv.findViewById(R.id.tv_title);
+        title.setText(R.string.set_name_dialog_title);
+
+        final TextInputEditText nameEditText = (TextInputEditText) dv.findViewById(R.id.et_adf_name);
+
+        Button okButton = (Button) dv.findViewById(R.id.btn_ok);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCallbackListener.onAdfNameOk(nameEditText.getText().toString(), null);
+                dismiss();
+            }
+        });
+
+        Button cancelButton = (Button) dv.findViewById(R.id.btn_cancel);
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mCallbackListener.onAdfNameCancelled();
+                dismiss();
+            }
+        });
+
+        setCancelable(false);
+
+        builder.setView(dv);
+        return builder.create();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        int width = getResources().getDimensionPixelSize(R.dimen.adf_name_dialog_width);
+        int height = getResources().getDimensionPixelSize(R.dimen.adf_name_dialog_height);
+        getDialog().getWindow().setLayout(width, height);
     }
 
     @Override
@@ -36,40 +75,9 @@ public class SetAdfNameDialog extends DialogFragment {
         mCallbackListener = (CallbackListener) activity;
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflator, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View dialogView = inflator.inflate(R.layout.set_name_dialog, container, false);
-        getDialog().setTitle(R.string.set_name_dialog_title);
-        mNameEditText = (EditText) dialogView.findViewById(R.id.name);
-        mUuidTextView = (TextView) dialogView.findViewById(R.id.uuidDisplay);
-        setCancelable(false);
-        mOkButton = (Button) dialogView.findViewById(R.id.ok);
-        mOkButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCallbackListener.onAdfNameOk(
-                        mNameEditText.getText().toString(),
-                        mUuidTextView.getText().toString());
-                dismiss();
-            }
-        });
-        mCancelButton = (Button) dialogView.findViewById(R.id.cancel);
-        mCancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCallbackListener.onAdfNameCancelled();
-                dismiss();
-            }
-        });
-        String name = this.getArguments().getString(TangoAreaDescriptionMetaData.KEY_NAME);
-        String id = this.getArguments().getString(TangoAreaDescriptionMetaData.KEY_UUID);
-        if (name != null) {
-            mNameEditText.setText(name);
-        }
-        if (id != null) {
-            mUuidTextView.setText(id);
-        }
-        return dialogView;
+    interface CallbackListener {
+        void onAdfNameOk(String name, String uuid);
+
+        void onAdfNameCancelled();
     }
 }
