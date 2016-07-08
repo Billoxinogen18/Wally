@@ -59,7 +59,13 @@
     <string name="share_to">To</string>
     <string name="explain_adf_permission">Wally uses ADF\'s to show you exciting augmented reality contents on the wall</string>
 
+    <string name="adf_import_explain_title">ADF Import Permission</string>
+    <string name="adf_import_explain_message">Wally needs ADF Import permission to show you exciting AR notes created by our users.</string>
+    <string name="adf_export_explain_title">ADF Export Permission</string>
+    <string name="adf_export_explain_message">Wally needs ADF Export permission to share your notes with other users.\n Our cloud service will share your room with other wally users</string>
+    <string name="got_it">Got It</string>
 
+    <!-- TODO remove strings -->
     <string name="app_name_long">Java Hello Area Description Example</string>
     <string name="start">Start</string>
     <string name="set_name_dialog_title">Set the ADF name</string>

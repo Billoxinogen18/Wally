@@ -9,11 +9,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,20 +36,24 @@ import com.wally.wally.datacontroller.adf.ADFService;
 import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.fragments.ImportExportPermissionDialogFragment;
 import com.wally.wally.fragments.PersistentDialogFragment;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class ADFChooser extends AppCompatActivity implements PersistentDialogFragment.PersistentDialogListener, GoogleApiClient.ConnectionCallbacks {
+public class ADFChooser extends AppCompatActivity implements
+        PersistentDialogFragment.PersistentDialogListener,
+        GoogleApiClient.ConnectionCallbacks,
+        ImportExportPermissionDialogFragment.ImportExportPermissionListener {
 
     private static final String TAG = ADFChooser.class.getSimpleName();
 
     // Permission Denied explain codes
     private static final int RC_EXPLAIN_LOCATION = 13;
     private static final int RC_EXPLAIN_ADF = 14;
-    private static final int RC_EXPLAIN_ADF_IMPORT = 15;
-    private static final int RC_EXPLAIN_ADF_EXPORT = 16;
 
     // Permission Request codes
     private static final int RC_REQ_AREA_LEARNING = 17;
@@ -58,12 +62,6 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
     private static final int RC_REQ_ADF_EXPORT = 20;
     private static final int RC_REQ_ADF_CREATE = 21;
 
-    private static final String INTENT_CLASSPACKAGE = "com.projecttango.tango";
-    private static final String INTENT_IMPORTEXPORT_CLASSNAME = "com.google.atap.tango.RequestImportExportActivity";
-
-    private static final String EXTRA_KEY_SOURCEFILE = "SOURCE_FILE";
-    private static final String EXTRA_KEY_SOURCEUUID = "SOURCE_UUID";
-    private static final String EXTRA_KEY_DESTINATIONFILE = "DESTINATION_FILE";
     private final Object adfLoadLock = new Object();
     private AdfSyncInfo mSelectedAdf;
     private Tango mTango;
@@ -186,18 +184,7 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
             if (resultCode != RESULT_OK) {
                 mExplainAdfPermission = true;
             }
-        } else if (requestCode == RC_REQ_ADF_IMPORT) {
-            if (resultCode == RESULT_OK) {
-                if (TextUtils.equals(data.getDataString(), mSelectedAdf.getAdfMetaData().getUuid())) {
-                    throw new IllegalStateException("Selected ADF uuid is different from imported one");
-                }
-                startArWithSelectedAdf();
-            }
-        } else if (requestCode == RC_REQ_ADF_EXPORT) {
-            if (resultCode == RESULT_OK) {
-                onAdfExported();
-            }
-        } else if (requestCode == RC_REQ_ADF_CREATE) {
+        }else if (requestCode == RC_REQ_ADF_CREATE) {
             if (resultCode == RESULT_OK) {
                 String uuid = data.getData().toString();
                 Toast.makeText(getBaseContext(), "Shit yea", Toast.LENGTH_SHORT).show();
@@ -226,12 +213,6 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
                 break;
             case RC_EXPLAIN_ADF:
                 requestADFPermission();
-                break;
-            case RC_EXPLAIN_ADF_IMPORT:
-                requestImportPermission();
-                break;
-            case RC_EXPLAIN_ADF_EXPORT:
-                requestExportPermission();
                 break;
         }
     }
@@ -383,17 +364,13 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
                 synchronizedList.add(syncInfo);
             }
         }
-        mServerAdfMetaData.removeAll(synchronizedList);
-        mLocalAdfMetaData.removeAll(synchronizedList);
-        // Sort with location.
-        Utils.sortWithLocation(synchronizedList, mCurrentLocation);
-        Utils.sortWithLocation(mServerAdfMetaData, mCurrentLocation);
-        Utils.sortWithLocation(mLocalAdfMetaData, mCurrentLocation);
+        Set<AdfSyncInfo> syncInfoSet = new HashSet<>();
+        syncInfoSet.addAll(synchronizedList);
+        syncInfoSet.addAll(mServerAdfMetaData);
+        syncInfoSet.addAll(mLocalAdfMetaData);
 
-        List<AdfSyncInfo> list = new ArrayList<>(mServerAdfMetaData.size() + mLocalAdfMetaData.size());
-        list.addAll(synchronizedList);
-        list.addAll(mServerAdfMetaData);
-        list.addAll(mLocalAdfMetaData);
+        ArrayList<AdfSyncInfo> list = new ArrayList<>(syncInfoSet);
+        Utils.sortWithLocation(list, mCurrentLocation);
 
         mAdapter.setData(list);
     }
@@ -464,21 +441,30 @@ public class ADFChooser extends AppCompatActivity implements PersistentDialogFra
 
     private void requestImportPermission() {
         String uuid = mSelectedAdf.getAdfMetaData().getUuid();
-
-        Intent importIntent = new Intent();
-        importIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
-        importIntent.putExtra(EXTRA_KEY_SOURCEFILE, Utils.getAdfFilePath(uuid));
-        startActivityForResult(importIntent, RC_REQ_ADF_IMPORT);
+        DialogFragment df = ImportExportPermissionDialogFragment
+                .newInstance(uuid, ImportExportPermissionDialogFragment.IMPORT, RC_REQ_ADF_IMPORT);
+        df.show(getSupportFragmentManager(), ImportExportPermissionDialogFragment.TAG);
     }
 
     private void requestExportPermission() {
         String uuid = mSelectedAdf.getAdfMetaData().getUuid();
+        DialogFragment df = ImportExportPermissionDialogFragment
+                .newInstance(uuid, ImportExportPermissionDialogFragment.EXPORT, RC_REQ_ADF_EXPORT);
+        df.show(getSupportFragmentManager(), ImportExportPermissionDialogFragment.TAG);
+    }
 
-        Intent exportIntent = new Intent();
-        exportIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
-        exportIntent.putExtra(EXTRA_KEY_SOURCEUUID, uuid);
-        exportIntent.putExtra(EXTRA_KEY_DESTINATIONFILE, Utils.getAdfFilesFolder());
-        startActivityForResult(exportIntent, RC_REQ_ADF_EXPORT);
+    @Override
+    public void onPermissionGranted(int reqCode) {
+        if (reqCode == RC_REQ_ADF_IMPORT) {
+            startArWithSelectedAdf();
+        } else if (reqCode == RC_REQ_ADF_EXPORT) {
+            onAdfExported();
+        }
+    }
+
+    @Override
+    public void onPermissionDenied(int reqCode) {
+        // Just leave it as is
     }
 
     private void startArWithSelectedAdf() {
