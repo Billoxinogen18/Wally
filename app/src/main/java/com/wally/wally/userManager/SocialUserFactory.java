@@ -20,7 +20,6 @@ import java.util.Map;
 
 public class SocialUserFactory {
     public static final String TAG = SocialUserFactory.class.getSimpleName();
-    private static final int DEFAULT_AVATAR_SIZE = 256;
     private Map<Id, SocialUser> userCache;
 
     public SocialUserFactory() {
@@ -92,15 +91,18 @@ public class SocialUserFactory {
     }
 
     private SocialUser toSocialUser(User baseUser, Person person){
-        SocialUser socialUser = new GoogleUser(baseUser)
-                .withDisplayName(person.getDisplayName())
-                .withAvatar(person.getImage().getUrl() + "&sz=" + DEFAULT_AVATAR_SIZE);
+        SocialUser socialUser = new GoogleUser(baseUser);
+
+        if(person.hasDisplayName())
+                socialUser.withDisplayName(person.getDisplayName());
+        if(person.hasImage())
+                socialUser.withAvatar(person.getImage().getUrl());
 
         if(person.hasCover() && person.getCover().hasCoverPhoto()){
             socialUser.withCover(person.getCover().getCoverPhoto().getUrl());
         }
 
-        if(person.hasName()){
+        if(person.hasName() && person.getName().hasGivenName()){
             socialUser.withFirstName(person.getName().getGivenName());
         }
 

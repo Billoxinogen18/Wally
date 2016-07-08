@@ -1,14 +1,15 @@
 package com.wally.wally.userManager;
 
-import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.List;
 
 /**
- * Created by Meravici on 5/12/2016.
+ * Created by Meravici on 5/12/2016. yea
  */
 public class GoogleUser extends AbstractSocialUser {
+    private static final int DEFAULT_AVATAR_SIZE = 256;
+
     private String mDisplayName;
     private String mAvatarUrl;
     private String mCoverUrl;
@@ -35,7 +36,12 @@ public class GoogleUser extends AbstractSocialUser {
 
     @Override
     public String getAvatarUrl() {
-        return mAvatarUrl;
+        return mAvatarUrl + "&sz=" + DEFAULT_AVATAR_SIZE;
+    }
+
+    @Override
+    public String getAvatarUrl(int size) {
+        return mAvatarUrl + "&sz=" + size;
     }
 
     @Override

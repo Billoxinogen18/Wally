@@ -2,11 +2,8 @@ package com.wally.wally.userManager;
 
 import com.wally.wally.datacontroller.user.User;
 
-import java.net.URL;
-import java.util.List;
-
 /**
- * Created by Meravici on 5/12/2016.
+ * Created by Meravici on 5/12/2016. yea
  */
 public abstract class AbstractSocialUser implements SocialUser {
     protected User mBaseUser;
