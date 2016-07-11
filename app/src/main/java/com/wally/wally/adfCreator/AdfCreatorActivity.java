@@ -33,7 +33,7 @@ public class AdfCreatorActivity extends AppCompatActivity implements SetAdfNameD
     public static final String KEY_ADF_NAME = "ADF_NAME";
     public static final String KEY_ADF_UUID = "ADF_UUID";
     private static final String TAG = AdfCreatorActivity.class.getSimpleName();
-    private static final long DELAY_TIME = 5000;
+    private static final long DELAY_TIME = 180000;
     private static final int INVALID_TEXTURE_ID = 0;
     private Tango mTango;
     private WallyTangoUx mTangoUx;
