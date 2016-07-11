@@ -25,6 +25,7 @@ import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by shota on 4/21/16.
@@ -57,6 +58,11 @@ public class TangoManager {
     private TangoUpdater mTangoUpdater;
     private TangoFactory mTangoFactory;
 
+    //testing adflist
+    private List mADfList;
+
+
+
     public TangoManager(TangoUpdater tangoUpdater, TangoPointCloudManager pointCloudManager, WallyRenderer wallyRenderer,
                         WallyTangoUx tangoUx, TangoFactory tangoFactory, String adfUuid) {
         mTangoUpdater = tangoUpdater;
@@ -65,6 +71,7 @@ public class TangoManager {
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
         mTangoFactory = tangoFactory;
+        mADfList = null;
     }
 
     /**

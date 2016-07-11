@@ -35,6 +35,7 @@ import com.wally.wally.tango.WallyRenderer;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -58,6 +59,10 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
     private ContentFitter mContentFitter;
     private VisualContentManager mVisualContentManager;
+
+
+    //testing
+    private List<AdfSyncInfo> mAdfList;
 
 
     /**
@@ -90,6 +95,10 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         mAdfSyncInfo = (AdfSyncInfo) getIntent().getSerializableExtra(ARG_ADF_SYNC_INFO);
         mAdfUuid = mAdfSyncInfo.getAdfMetaData().getUuid();
 
+        //testing
+        mAdfList = new ArrayList<>();
+        mAdfList.add(mAdfSyncInfo);
+
         mVisualContentManager = new VisualContentManager();
         fetchContentForAdf(context, mAdfUuid);
 
@@ -102,7 +111,9 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
         tangoUx.setLayout(mTangoUxLayout);
 
-        TangoUpdater tangoUpdater = new TangoUpdater(tangoUx, mSurfaceView, pointCloudManager, this);
+        TangoUpdater tangoUpdater = new TangoUpdater(tangoUx, mSurfaceView, pointCloudManager);
+        tangoUpdater.addLocalizationListener(this);
+        
         TangoFactory tangoFactory = new TangoFactory(context);
         mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, mAdfUuid);
         restoreState(savedInstanceState);

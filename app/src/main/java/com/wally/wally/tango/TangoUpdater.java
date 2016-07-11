@@ -13,6 +13,9 @@ import com.wally.wally.components.WallyTangoUx;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 import org.rajawali3d.surface.RajawaliTextureView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by shota on 5/27/16.
  */
@@ -24,14 +27,14 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private boolean mIsFrameAvailableTangoThread;
     private RajawaliSurfaceView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
-    private LocalizationListener mLocalizator;
+    private List<LocalizationListener> mLocalizator;
 
 
-    public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager, LocalizationListener localizator) {
+    public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager) {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
-        mLocalizator = localizator;
+        mLocalizator = new ArrayList<>();
     }
 
     @Override
@@ -101,10 +104,18 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         if (isLocalized != localization) {
             isLocalized = localization;
             if (isLocalized) {
-                mLocalizator.localized();
+                for(LocalizationListener listener : mLocalizator) {
+                    listener.localized();
+                }
             } else {
-                mLocalizator.notLocalized();
+                for(LocalizationListener listener : mLocalizator) {
+                    listener.notLocalized();
+                }
             }
         }
+    }
+
+    public synchronized void addLocalizationListener(LocalizationListener listener){
+        mLocalizator.add(listener);
     }
 }
