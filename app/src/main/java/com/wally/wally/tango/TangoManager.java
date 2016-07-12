@@ -17,7 +17,10 @@ import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
+import com.wally.wally.adfCreator.AdfInfo;
+import com.wally.wally.adfCreator.AdfManager;
 import com.wally.wally.components.WallyTangoUx;
+import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 
 
 import org.rajawali3d.math.Quaternion;
@@ -30,12 +33,14 @@ import java.util.List;
 /**
  * Created by shota on 4/21/16.
  */
-public class TangoManager {
+public class TangoManager implements LocalizationListener{
     public static final TangoCoordinateFramePair FRAME_PAIR = new TangoCoordinateFramePair(
             TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
             TangoPoseData.COORDINATE_FRAME_DEVICE);
     private static final String TAG = TangoManager.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
+    private static final long ADF_LOCALIZAION_TIMEOUT = 15000;
+
 
     private TangoCameraIntrinsics mIntrinsics;
     private DeviceExtrinsics mExtrinsics;
@@ -59,7 +64,11 @@ public class TangoManager {
     private TangoFactory mTangoFactory;
 
     //testing adflist
-    private List mADfList;
+    private AdfManager mAdfManager;
+    private AdfInfo currentAdf = null;
+    private AdfInfo savedAdf = null;
+
+    private boolean mIsLocalized;
 
 
 
@@ -71,7 +80,7 @@ public class TangoManager {
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
         mTangoFactory = tangoFactory;
-        mADfList = null;
+        mAdfManager = null;
     }
 
     /**
@@ -143,6 +152,47 @@ public class TangoManager {
 
     }
 
+    private void resume(){
+        if (savedAdf != null){
+            currentAdf = savedAdf;
+            localizeWithAdf(currentAdf);
+        } else {
+            while(mAdfManager.hasAdf()){
+                if (mAdfManager.isAdfReady()){
+                    currentAdf = mAdfManager.getAdf();
+                    long localizationStarted = System.currentTimeMillis();
+                    localizeWithAdf(currentAdf);
+
+                    waitForLocalizationOrTimeout(localizationStarted, ADF_LOCALIZAION_TIMEOUT);
+                    if (mIsLocalized){
+                        break;
+                    } else {
+                        
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void waitForLocalizationOrTimeout(long localizationStarted, long timeout){
+        while (true){
+            sleep(100);
+            if (mIsLocalized) break;
+            long timeNow = System.currentTimeMillis();
+            if (localizationStarted - timeNow > timeout){
+                break;
+            }
+        }
+    }
+
+    private void sleep(long milis){
+        try {
+            Thread.sleep(milis);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     public boolean isConnected() {
         return mIsConnected;
@@ -325,4 +375,14 @@ public class TangoManager {
     }
 
 
+    @Override
+    public synchronized void localized() {
+        mIsLocalized = true;
+        savedAdf = currentAdf;
+    }
+
+    @Override
+    public synchronized void notLocalized() {
+        mIsLocalized = false;
+    }
 }

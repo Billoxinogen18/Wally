@@ -113,7 +113,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
         TangoUpdater tangoUpdater = new TangoUpdater(tangoUx, mSurfaceView, pointCloudManager);
         tangoUpdater.addLocalizationListener(this);
-        
+
         TangoFactory tangoFactory = new TangoFactory(context);
         mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, mAdfUuid);
         restoreState(savedInstanceState);
