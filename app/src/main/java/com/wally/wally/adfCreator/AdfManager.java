@@ -1,5 +1,6 @@
 package com.wally.wally.adfCreator;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.adf.ADFService;
 import com.wally.wally.datacontroller.callbacks.Callback;
@@ -66,5 +67,8 @@ public class AdfManager {
                 // No more adf will be downloaded anymore
             }
         });
+    }
+
+    public void startWithLocation(LatLng location) {
     }
 }

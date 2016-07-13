@@ -23,6 +23,7 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adfCreator.AdfCreatorActivity;
+import com.wally.wally.adfCreator.AdfManager;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.adf.ADFService;
 import com.wally.wally.datacontroller.adf.AdfMetaData;
@@ -74,6 +75,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     private WallyRenderer mRenderer;
     private WallyTangoUx mTangoUx;
     private TangoFactory mTangoFactory;
+    private AdfManager mAdfManager;
 
 
     //testing
@@ -129,7 +131,9 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         mTangoUpdater.addLocalizationListener(this);
 
         mTangoFactory = new TangoFactory(context);
-        mTangoManager = new TangoManager(mTangoUpdater, mPointCloudManager, mRenderer, mTangoUx, mTangoFactory, mAdfUuid);
+
+        mAdfManager = new AdfManager(App.getInstance().getDataController().getADFService()); // TODO refactor
+        mTangoManager = new TangoManager(mTangoUpdater, mPointCloudManager, mRenderer, mTangoUx, mTangoFactory, mAdfManager);
         restoreState(savedInstanceState);
 
 
@@ -403,5 +407,10 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     @Override
     public void onPermissionDenied(int reqCode, String uuid) {
 
+    }
+
+    @Override
+    protected void onLocationAvailable(LatLng location){
+        mAdfManager.startWithLocation(location);
     }
 }

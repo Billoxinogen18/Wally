@@ -5,6 +5,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.wally.wally.Utils;
 import com.wally.wally.components.SelectedMenuView;
 import com.wally.wally.components.UserInfoView;
 import com.wally.wally.datacontroller.DataController;
+import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.OnVisualContentSelectedListener;
@@ -33,7 +35,7 @@ import java.util.Date;
 /**
  * Created by shota on 5/21/16.
  */
-public abstract class CameraARActivity extends GoogleApiClientActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, SelectedMenuView.OnSelectedMenuActionListener {
+public abstract class CameraARActivity extends GoogleApiClientActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, SelectedMenuView.OnSelectedMenuActionListener, GoogleApiClient.ConnectionCallbacks {
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int REQUEST_CODE_MY_LOCATION = 22;
     protected DataController mDataController;
@@ -44,6 +46,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     private Content mSelectedContent; //TODO may be needed to remove
     private Content mContentToSave;
     private long mNewContentButtonLastClickTime;
+    private LatLng mLocation;
 
     public abstract void onDeleteContent(Content selectedContent);
 
@@ -72,6 +75,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
                 .addScope(Plus.SCOPE_PLUS_PROFILE)
                 .addApi(Plus.API)
                 .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
                 .build();
     }
 
@@ -241,4 +245,31 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         infoView.setVisibility(View.VISIBLE);
         infoView.setUser(user);
     }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Utils.getNewLocation(mGoogleApiClient, new Callback<LatLng>() {
+            @Override
+            public void onResult(LatLng result) {
+                mLocation = result;
+                onLocationAvailable(mLocation);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG, "onError() called with: " + "e = [" + e + "]");
+            }
+        });
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    public LatLng getLocation(){
+        return mLocation;
+    }
+
+    protected abstract void onLocationAvailable(LatLng location);
 }

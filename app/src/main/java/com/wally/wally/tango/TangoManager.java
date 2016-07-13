@@ -185,6 +185,7 @@ public class TangoManager implements LocalizationListener{
                         }
                     } else {
                         mTangoUx.showCustomMessage("Waiting for ADF to download");
+                        Utils.sleep(500);
                     }
                 }
             }
