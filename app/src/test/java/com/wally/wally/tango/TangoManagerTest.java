@@ -7,6 +7,7 @@ import android.test.suitebuilder.annotation.SmallTest;
 
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
+import com.google.atap.tangoservice.TangoConfig;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.Utils;
 import com.wally.wally.adfCreator.AdfInfo;
@@ -17,7 +18,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
+import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Mockito.*;
 
 
@@ -25,7 +29,6 @@ import static org.mockito.Mockito.*;
  * Created by shota on 5/24/16.
  */
 
-@SmallTest
 public class TangoManagerTest {
     private TangoManager mTangoManager;
 
@@ -38,6 +41,8 @@ public class TangoManagerTest {
     private AdfManager adfManager;
     private Tango tango;
     private String uid;
+    AdfInfo adf;
+
 
 
     @Before
@@ -49,23 +54,16 @@ public class TangoManagerTest {
         tangoUpdater = mock(TangoUpdater.class);
         tangoFactory = mock(TangoFactory.class);
         adfManager = mock(AdfManager.class);
-    }
+        adf = mock(AdfInfo.class);
 
-    @Test
-    public void findPlaneInMiddleTest1(){
-//        when(pointCloudManager.getLatestXyzIj()).thenReturn(null);
-//        mTangoManager = new TangoManager(context, rajawaliSurfaceView, tangoUxLayout,
-//                pointCloudManager, visualContentManager, renderer, tangoUx, tango, uid);
-//        assertNull(mTangoManager.findPlaneInMiddle());
-;    }
+    }
 
 
     @Test
     public void adfTest1(){
-        AdfInfo adf = new AdfInfo();
         when(adf.isImported()).thenReturn(true);
         when(adf.getUuid()).thenReturn("someUuid");
-        when(adfManager.hasAdf()).thenReturn(true);
+        when(adfManager.hasAdf()).thenReturn(true).thenReturn(false);
         when(adfManager.isAdfReady()).thenReturn(true);
         when(adfManager.getAdf()).thenReturn(adf);
         mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
@@ -73,6 +71,24 @@ public class TangoManagerTest {
         Utils.sleep(100);
         //tangoUpdater.
 
+    }
+
+    @Test
+    public void adfTest2(){
+        when(adfManager.hasAdf()).thenReturn(false);
+        when(tangoFactory.getTango(any(Runnable.class))).thenReturn(tango);
+        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
+        mTangoManager.onResume();
+
+        assertThat(tango.getConfig(0).getBoolean(TangoConfig.KEY_BOOLEAN_LEARNINGMODE)
+                , is(true));
+    }
+
+    @Test
+    public void adfTest3(){
+        when(adfManager.hasAdf()).thenReturn(false);
+        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
+        mTangoManager.onResume();
     }
 
 

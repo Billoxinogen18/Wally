@@ -333,16 +333,6 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_MY_LOCATION) {
-            if (Utils.checkLocationPermission(this)) {
-                setLocalizationLocation();
-            }
-            // TODO show error that user can't add content without location permission
-        }
-    }
 
     @Override
     public void notLocalized() {
@@ -359,4 +349,16 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     protected void onLocationAvailable(LatLng location) {
         mAdfManager.startWithLocation(location);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_MY_LOCATION) {
+            if (Utils.checkLocationPermission(this)) {
+                setLocalizationLocation();
+            }
+            // TODO show error that user can't add content without location permission
+        }
+    }
+
 }

@@ -70,5 +70,6 @@ public class AdfManager {
     }
 
     public void startWithLocation(LatLng location) {
+
     }
 }
