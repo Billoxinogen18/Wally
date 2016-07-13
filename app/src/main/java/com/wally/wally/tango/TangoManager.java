@@ -152,7 +152,7 @@ public class TangoManager implements LocalizationListener{
 
     }
 
-    private void resume(){
+    private synchronized void resume(){
         if (savedAdf != null){
             currentAdf = savedAdf;
             localizeWithAdf(currentAdf);
@@ -167,11 +167,36 @@ public class TangoManager implements LocalizationListener{
                     if (mIsLocalized){
                         break;
                     } else {
-                        
+
                     }
 
                 }
             }
+        }
+    }
+
+    private void localizeWithAdf(AdfInfo adf){
+        // Synchronize against disconnecting while the service is being used in the OpenGL thread or
+        // in the UI thread.
+        if (!mIsConnected) {
+            TangoUx.StartParams params = new TangoUx.StartParams();
+            params.showConnectionScreen = false;
+            mTangoUx.start(params);
+            mTango = mTangoFactory.getTango(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        TangoSupport.initialize();
+                        connectTango();
+                        connectRenderer();
+                        mIsConnected = true;
+                    } catch (TangoOutOfDateException e) {
+                        if (mTangoUx != null) {
+                            mTangoUx.showTangoOutOfDate();
+                        }
+                    }
+                }
+            });
         }
     }
 

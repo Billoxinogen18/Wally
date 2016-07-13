@@ -60,5 +60,10 @@ public class TangoManagerTest {
 ;    }
 
 
+    @Test
+    public void adfTest1(){
+        mTangoManager.onResume();
+    }
+
 
 }
