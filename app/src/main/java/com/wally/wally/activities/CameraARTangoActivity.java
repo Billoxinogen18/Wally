@@ -312,7 +312,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
                 mFinishFittingFab.setEnabled(true);
             }
         });
-        fetchContentForAdf(getBaseContext(), mTangoManager.getCurrentAdf().getUuid());
+        if(!mTangoManager.isLearningMode()) fetchContentForAdf(getBaseContext(), mTangoManager.getCurrentAdf().getUuid());
         setLocalizationLocation();
     }
 

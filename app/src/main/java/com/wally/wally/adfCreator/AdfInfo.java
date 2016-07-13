@@ -49,4 +49,11 @@ public class AdfInfo implements Serializable {
     public AdfMetaData getMetaData() {
         return adfMetaData;
     }
+
+    @Override
+    public String toString(){
+        return "path: " + path + "; " +
+                "uuid: " + uuid + "; " +
+                "AdfMetaData: " + adfMetaData + ".";
+    }
 }

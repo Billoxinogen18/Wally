@@ -1,5 +1,7 @@
 package com.wally.wally.adfCreator;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.adf.ADFService;
@@ -14,6 +16,8 @@ import java.util.concurrent.CountDownLatch;
  * Created by shota on 7/11/16.
  */
 public class AdfManager {
+    private static final String TAG = AdfManager.class.getSimpleName();
+
     private CountDownLatch latch;
     private List<String> uuids;
     private ADFService adfService;
@@ -31,11 +35,15 @@ public class AdfManager {
     }
 
     public boolean hasAdf(){
-        return uuids.size() > 0;
+        boolean res = uuids.size() > 0;
+        Log.d(TAG, "hasAdf() called - return: " + res);
+        return res;
     }
 
     public boolean isAdfReady(){
-        return latch.getCount() == 0;
+        boolean res = latch.getCount() == 0;
+        Log.d(TAG, "isAdfReady() called - return: " + res);
+        return res;
     }
 
     public AdfInfo getAdf(){
@@ -46,6 +54,7 @@ public class AdfManager {
         }
         AdfInfo result = new AdfInfo(current);
         downloadNext();
+        Log.d(TAG, "getAdf() called - return: " + result);
         return result;
     }
 
