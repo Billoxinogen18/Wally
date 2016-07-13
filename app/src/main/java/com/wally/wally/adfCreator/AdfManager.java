@@ -3,6 +3,7 @@ package com.wally.wally.adfCreator;
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.adf.ADFService;
+import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
 
 import java.util.LinkedList;
@@ -24,10 +25,8 @@ public class AdfManager {
         this.uuids = new LinkedList<>();
     }
 
-    public AdfManager withUuids(List<String> uuids) {
-        this.uuids.addAll(uuids);
-        downloadNext();
-        return this;
+    public void addUuid(String uuid) {
+        uuids.add(uuid);
     }
 
     public boolean hasAdf(){
@@ -70,6 +69,19 @@ public class AdfManager {
     }
 
     public void startWithLocation(LatLng location) {
+        adfService.searchADfMetaDataNearLocation(location, new Callback<List<AdfMetaData>>() {
+            @Override
+            public void onResult(List<AdfMetaData> result) {
+                for (AdfMetaData d : result) {
+                    addUuid(d.getUuid());
+                }
+                downloadNext();
+            }
 
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
     }
 }
