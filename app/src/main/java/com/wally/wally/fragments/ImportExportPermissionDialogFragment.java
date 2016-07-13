@@ -157,9 +157,9 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
             e.apply();
 
             if (resultCode == Activity.RESULT_OK) {
-                mListener.onPermissionGranted(mReqCode);
+                mListener.onPermissionGranted(mReqCode, mUUID);
             } else {
-                mListener.onPermissionDenied(mReqCode);
+                mListener.onPermissionDenied(mReqCode, mUUID);
             }
             dismiss();
         }
@@ -184,8 +184,8 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     }
 
     public interface ImportExportPermissionListener {
-        void onPermissionGranted(int reqCode);
+        void onPermissionGranted(int reqCode, String uuid);
 
-        void onPermissionDenied(int reqCode);
+        void onPermissionDenied(int reqCode, String uuid);
     }
 }
