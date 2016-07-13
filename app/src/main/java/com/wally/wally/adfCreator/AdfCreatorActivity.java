@@ -32,6 +32,7 @@ public class AdfCreatorActivity extends AppCompatActivity implements SetAdfNameD
 
     public static final String KEY_ADF_NAME = "ADF_NAME";
     public static final String KEY_ADF_UUID = "ADF_UUID";
+    public static final String KEY_SET_NAME = "SET_NAME";
     private static final String TAG = AdfCreatorActivity.class.getSimpleName();
     private static final long DELAY_TIME = 5000;
     private static final int INVALID_TEXTURE_ID = 0;
@@ -51,21 +52,30 @@ public class AdfCreatorActivity extends AppCompatActivity implements SetAdfNameD
     private Runnable mFinishLearningRunnable = new Runnable() {
         @Override
         public void run() {
-            showSetAdfNameDialog();
+            if(mSetName) {
+                showSetAdfNameDialog();
+            }else{
+                saveAdf(null);
+            }
         }
     };
 
     private Handler mMainThreadHandler = new Handler(Looper.getMainLooper());
+    private boolean mSetName;
 
 
-    public static Intent newIntent(Context from) {
-        return new Intent(from, AdfCreatorActivity.class);
+    public static Intent newIntent(Context from, boolean setName) {
+        Intent intent = new Intent(from, AdfCreatorActivity.class);
+        intent.putExtra(KEY_SET_NAME, setName);
+        return intent;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adf_creator);
+
+        mSetName = getIntent().getBooleanExtra(KEY_SET_NAME, true);
 
         mSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceview);
         setupRenderer();
@@ -80,7 +90,7 @@ public class AdfCreatorActivity extends AppCompatActivity implements SetAdfNameD
      * Implements SetAdfNameDialog.CallbackListener.
      */
     @Override
-    public void onAdfNameOk(String name, String uuid) {
+    public void onAdfNameOk(String name) {
         saveAdf(name);
     }
 

@@ -56,6 +56,8 @@ public class SaveAdfTask extends AsyncTask<Void, Integer, String> {
             // Save the ADF.
             adfUuid = mTango.saveAreaDescription();
 
+            if(mAdfName == null) mAdfName = adfUuid;
+
             // Read the ADF Metadata, set the desired name, and save it back.
             TangoAreaDescriptionMetaData metadata = mTango.loadAreaDescriptionMetaData(adfUuid);
             metadata.set(TangoAreaDescriptionMetaData.KEY_NAME, mAdfName.getBytes());

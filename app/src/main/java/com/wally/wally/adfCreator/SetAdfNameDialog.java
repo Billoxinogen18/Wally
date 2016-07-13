@@ -41,7 +41,7 @@ public class SetAdfNameDialog extends DialogFragment {
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCallbackListener.onAdfNameOk(nameEditText.getText().toString(), null);
+                mCallbackListener.onAdfNameOk(nameEditText.getText().toString());
                 dismiss();
             }
         });
@@ -76,7 +76,7 @@ public class SetAdfNameDialog extends DialogFragment {
     }
 
     interface CallbackListener {
-        void onAdfNameOk(String name, String uuid);
+        void onAdfNameOk(String name);
 
         void onAdfNameCancelled();
     }

@@ -457,7 +457,7 @@ public class ADFChooser extends AppCompatActivity implements
     }
 
     @Override
-    public void onPermissionGranted(int reqCode) {
+    public void onPermissionGranted(int reqCode, String uuid) {
         if (reqCode == RC_REQ_ADF_IMPORT) {
             startArWithSelectedAdf();
         } else if (reqCode == RC_REQ_ADF_EXPORT) {
@@ -466,7 +466,7 @@ public class ADFChooser extends AppCompatActivity implements
     }
 
     @Override
-    public void onPermissionDenied(int reqCode) {
+    public void onPermissionDenied(int reqCode, String uuid) {
         // Just leave it as is
     }
 
