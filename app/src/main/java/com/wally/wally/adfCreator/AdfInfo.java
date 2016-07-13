@@ -1,9 +1,14 @@
 package com.wally.wally.adfCreator;
 
 
-public class AdfInfo {
+import com.wally.wally.datacontroller.adf.AdfMetaData;
+
+import java.io.Serializable;
+
+public class AdfInfo implements Serializable {
     private String path;
     private String uuid;
+    private AdfMetaData adfMetaData;
 
     public AdfInfo() {
 
@@ -24,6 +29,11 @@ public class AdfInfo {
         return this;
     }
 
+    public AdfInfo withMetaData(AdfMetaData adfMetaData) {
+        this.adfMetaData = adfMetaData;
+        return this;
+    }
+
     public String getPath(){
         return path;
     }
@@ -36,4 +46,7 @@ public class AdfInfo {
         return true;
     }
 
+    public AdfMetaData getMetaData() {
+        return adfMetaData;
+    }
 }

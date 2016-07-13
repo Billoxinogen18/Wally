@@ -1,8 +1,9 @@
 package com.wally.wally.tango;
 
-import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
+import com.bumptech.glide.util.Util;
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
@@ -21,15 +22,13 @@ import com.wally.wally.Utils;
 import com.wally.wally.adfCreator.AdfInfo;
 import com.wally.wally.adfCreator.AdfManager;
 import com.wally.wally.components.WallyTangoUx;
-import com.wally.wally.datacontroller.adf.AdfSyncInfo;
-
+import com.wally.wally.datacontroller.adf.AdfMetaData;
 
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by shota on 4/21/16.
@@ -190,9 +189,22 @@ public class TangoManager implements LocalizationListener{
                 }
             }
             if (!mIsLocalized){
-                //learn ADF!!!
+                startAreaLearning();
+                initFinishThread();
             }
         }
+    }
+
+    private void initFinishThread() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Utils.sleep(20000);
+                String uuid = mTango.saveAreaDescription();
+                AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
+                localizeWithAdf(adfInfo);
+            }
+        });
     }
 
     private void localizeWithAdf(final AdfInfo adf){
@@ -208,6 +220,32 @@ public class TangoManager implements LocalizationListener{
                     try {
                         TangoSupport.initialize();
                         connectTango(adf);
+                        connectRenderer();
+                        mIsConnected = true;
+                    } catch (TangoOutOfDateException e) {
+                        if (mTangoUx != null) {
+                            mTangoUx.showTangoOutOfDate();
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+
+    private void startAreaLearning(){
+        // Synchronize against disconnecting while the service is being used in the OpenGL thread or
+        // in the UI thread.
+        if (!mIsConnected) {
+            TangoUx.StartParams params = new TangoUx.StartParams();
+            params.showConnectionScreen = false;
+            mTangoUx.start(params);
+            mTango = mTangoFactory.getTango(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        TangoSupport.initialize();
+                        connectTangoForAreaLearning();
                         connectRenderer();
                         mIsConnected = true;
                     } catch (TangoOutOfDateException e) {
@@ -282,6 +320,33 @@ public class TangoManager implements LocalizationListener{
                 new TangoCoordinateFramePair(
                         TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
                         TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE));
+        framePairs.add(
+                new TangoCoordinateFramePair(
+                        TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE,
+                        TangoPoseData.COORDINATE_FRAME_DEVICE
+                ));
+        mTango.connectListener(framePairs, mTangoUpdater);
+
+        // Get extrinsics from device for use in transforms. This needs
+        // to be done after connecting Tango and listeners.
+        mExtrinsics = setupExtrinsics(mTango);
+        mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
+    }
+
+
+    private void connectTangoForAreaLearning() {
+        TangoConfig config = mTango.getConfig(
+                TangoConfig.CONFIG_TYPE_DEFAULT);
+        config.putBoolean(TangoConfig.KEY_BOOLEAN_LOWLATENCYIMUINTEGRATION, true);
+        config.putBoolean(TangoConfig.KEY_BOOLEAN_DEPTH, true);
+        config.putBoolean(TangoConfig.KEY_BOOLEAN_COLORCAMERA, true);
+        config.putBoolean(TangoConfig.KEY_BOOLEAN_AUTORECOVERY, true);
+        config.putBoolean(TangoConfig.KEY_BOOLEAN_LEARNINGMODE, true);
+
+
+        mTango.connect(config);
+
+        ArrayList<TangoCoordinateFramePair> framePairs = new ArrayList<>();
         framePairs.add(
                 new TangoCoordinateFramePair(
                         TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE,
@@ -420,5 +485,10 @@ public class TangoManager implements LocalizationListener{
     @Override
     public synchronized void notLocalized() {
         mIsLocalized = false;
+    }
+
+
+    public AdfInfo getCurrentAdf() {
+        return currentAdf;
     }
 }
