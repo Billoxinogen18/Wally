@@ -8,6 +8,9 @@ import android.test.suitebuilder.annotation.SmallTest;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.projecttango.tangosupport.TangoPointCloudManager;
+import com.wally.wally.Utils;
+import com.wally.wally.adfCreator.AdfInfo;
+import com.wally.wally.adfCreator.AdfManager;
 import com.wally.wally.components.WallyTangoUx;
 
 import org.junit.Before;
@@ -27,13 +30,12 @@ public class TangoManagerTest {
     private TangoManager mTangoManager;
 
 
-    private Context context;
-    private RajawaliSurfaceView rajawaliSurfaceView;
-    private TangoUxLayout tangoUxLayout;
     private WallyRenderer renderer;
-    private VisualContentManager visualContentManager;
-    TangoPointCloudManager pointCloudManager;
+    private TangoPointCloudManager pointCloudManager;
+    private TangoUpdater tangoUpdater;
     private WallyTangoUx tangoUx;
+    private TangoFactory tangoFactory;
+    private AdfManager adfManager;
     private Tango tango;
     private String uid;
 
@@ -41,14 +43,12 @@ public class TangoManagerTest {
     @Before
     public void init(){
         pointCloudManager = mock(TangoPointCloudManager.class);
-        context = mock(Context.class);
-        rajawaliSurfaceView = mock(RajawaliSurfaceView.class);
-        tangoUxLayout = mock(TangoUxLayout.class);
         renderer = mock(WallyRenderer.class);
-        visualContentManager = mock(VisualContentManager.class);
         tangoUx = mock(WallyTangoUx.class);
         tango = TangoMock.getTango();
-
+        tangoUpdater = mock(TangoUpdater.class);
+        tangoFactory = mock(TangoFactory.class);
+        adfManager = mock(AdfManager.class);
     }
 
     @Test
@@ -62,7 +62,17 @@ public class TangoManagerTest {
 
     @Test
     public void adfTest1(){
+        AdfInfo adf = new AdfInfo();
+        when(adf.isImported()).thenReturn(true);
+        when(adf.getUuid()).thenReturn("someUuid");
+        when(adfManager.hasAdf()).thenReturn(true);
+        when(adfManager.isAdfReady()).thenReturn(true);
+        when(adfManager.getAdf()).thenReturn(adf);
+        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
         mTangoManager.onResume();
+        Utils.sleep(100);
+        //tangoUpdater.
+
     }
 
 
