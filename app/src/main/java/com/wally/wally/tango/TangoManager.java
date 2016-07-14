@@ -127,7 +127,7 @@ public class TangoManager implements LocalizationListener {
             // in the OpenGL thread after resume
             mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
         }
-        mTango.disconnect();
+        if (mTango != null) mTango.disconnect();
         mTangoUx.stop();
 
         mTangoUpdater.setTangoLocalization(false);
@@ -411,12 +411,14 @@ public class TangoManager implements LocalizationListener {
 
     @Override
     public synchronized void localized() {
+        Log.d(TAG, "localized() called with: " + "");
         mIsLocalized = true;
         localizer.interrupt();
     }
 
     @Override
     public synchronized void notLocalized() {
+        Log.d(TAG, "notLocalized() called with: " + "");
         mIsLocalized = false;
     }
 
@@ -476,10 +478,12 @@ public class TangoManager implements LocalizationListener {
         @Override
         public void run() {
             while (!isInterrupted()) {
+                Log.d(TAG, "Localizer()");
                 if (mIsLocalized) break;
                 mAdfManager.getAdf(new Callback<AdfInfo>() {
                     @Override
                     public void onResult(AdfInfo result) {
+                        Log.d(TAG, "Localizer onResult() called with: " + "result = [" + result + "]");
                         if (result == null) {
                             startLearning();
                         } else {
@@ -489,10 +493,11 @@ public class TangoManager implements LocalizationListener {
 
                     @Override
                     public void onError(Exception e) {
-                        startLearning();
+                        Log.d(TAG, "Localizer onError() called with: " + "e = [" + e + "]");
                     }
 
                     private void startLearning() {//TODO Buggy startleraning maybe called twice.
+                        Log.d(TAG, "startLearning() called with: " + "");
                         localizer.interrupt();
                         tryToLocalizeWithAdf(null);
                     }

@@ -58,40 +58,40 @@ public class TangoManagerTest {
 
     }
 
-
-    @Test
-    public void adfTest1(){
-        when(adf.isImported()).thenReturn(true);
-        when(adf.getUuid()).thenReturn("someUuid");
-        when(adfManager.hasAdf()).thenReturn(true).thenReturn(false);
-        when(adfManager.isAdfReady()).thenReturn(true);
-        when(adfManager.getAdf()).thenReturn(adf);
-        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
-        mTangoManager.onResume();
-        Utils.sleep(100);
-        //tangoUpdater.
-
-    }
-
-    @Test
-    public void adfTest2(){
-        when(adfManager.hasAdf()).thenReturn(false);
-        when(tangoFactory.getTango(any(Runnable.class))).thenReturn(tango);
-        mTangoManager.startTango(null);
-        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
-        mTangoManager.onResume();
-
-
-        assertThat(tango.getConfig(0).getBoolean(TangoConfig.KEY_BOOLEAN_LEARNINGMODE)
-                , is(true));
-    }
-
-    @Test
-    public void adfTest3(){
-        when(adfManager.hasAdf()).thenReturn(false);
-        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
-        mTangoManager.onResume();
-    }
+//
+//    @Test
+//    public void adfTest1(){
+//        when(adf.isImported()).thenReturn(true);
+//        when(adf.getUuid()).thenReturn("someUuid");
+//        when(adfManager.hasAdf()).thenReturn(true).thenReturn(false);
+//        when(adfManager.isAdfReady()).thenReturn(true);
+//        when(adfManager.getAdf()).thenReturn(adf);
+//        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
+//        mTangoManager.onResume();
+//        Utils.sleep(100);
+//        //tangoUpdater.
+//
+//    }
+//
+//    @Test
+//    public void adfTest2(){
+//        when(adfManager.hasAdf()).thenReturn(false);
+//        when(tangoFactory.getTango(any(Runnable.class))).thenReturn(tango);
+//        mTangoManager.startTango(null);
+//        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
+//        mTangoManager.onResume();
+//
+//
+//        assertThat(tango.getConfig(0).getBoolean(TangoConfig.KEY_BOOLEAN_LEARNINGMODE)
+//                , is(true));
+//    }
+//
+//    @Test
+//    public void adfTest3(){
+//        when(adfManager.hasAdf()).thenReturn(false);
+//        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
+//        mTangoManager.onResume();
+//    }
 
 
 }

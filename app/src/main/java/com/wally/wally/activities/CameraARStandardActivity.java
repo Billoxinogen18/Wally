@@ -41,8 +41,4 @@ public class CameraARStandardActivity extends CameraARActivity {
         ((ViewGroup) mSurfaceView.getParent()).removeView(mSurfaceView); //TODO should not delete rajawali
     }
 
-    @Override
-    protected void onLocationAvailable(LatLng location) {
-
-    }
 }

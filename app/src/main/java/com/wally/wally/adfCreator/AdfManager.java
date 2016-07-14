@@ -1,5 +1,7 @@
 package com.wally.wally.adfCreator;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.adf.ADFService;
@@ -13,6 +15,8 @@ import java.util.List;
  * Lazy retrieval of ADF files from the cloud.
  */
 public class AdfManager {
+    private static final String TAG = AdfManager.class.getSimpleName();
+
     private List<String> uuids;
     private ADFService adfService;
     private LinkedList<AdfInfo> cache;
@@ -29,6 +33,7 @@ public class AdfManager {
     }
 
     public void getAdf(Callback<AdfInfo> callback){
+        Log.d(TAG, "getAdf() called with: " + uuids.size());
         if (uuids.size() < 1) {
             callback.onResult(null);
             return;
