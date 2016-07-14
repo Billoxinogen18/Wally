@@ -108,7 +108,7 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     private void requestExportPermission() {
         Intent exportIntent = new Intent();
         exportIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
-        exportIntent.putExtra(EXTRA_KEY_SOURCEUUID, mAdfInfo);
+        exportIntent.putExtra(EXTRA_KEY_SOURCEUUID, mAdfInfo.getUuid());
         exportIntent.putExtra(EXTRA_KEY_DESTINATIONFILE, Utils.getAdfFilesFolder());
         startActivityForResult(exportIntent, mReqCode);
     }
