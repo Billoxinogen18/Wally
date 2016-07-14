@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
+import com.wally.wally.adfCreator.AdfManager;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.userManager.UserManager;
 import com.wally.wally.userManager.SocialUserFactory;
@@ -18,6 +19,7 @@ public class App extends Application {
 
     private DataController dataController;
     private UserManager userManager;
+    private AdfManager adfManager;
 
     public static App getInstance() {
         return sInstance;
@@ -49,5 +51,13 @@ public class App extends Application {
 
     public UserManager getUserManager() {
         return userManager;
+    }
+
+    public void setAdfManager(AdfManager adfManager) {
+        this.adfManager = adfManager;
+    }
+
+    public AdfManager getAdfManager() {
+        return adfManager;
     }
 }

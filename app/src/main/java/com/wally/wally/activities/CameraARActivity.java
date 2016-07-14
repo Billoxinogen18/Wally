@@ -248,18 +248,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        Utils.getNewLocation(mGoogleApiClient, new Callback<LatLng>() {
-            @Override
-            public void onResult(LatLng result) {
-                mLocation = result;
-                onLocationAvailable(mLocation);
-            }
 
-            @Override
-            public void onError(Exception e) {
-                Log.e(TAG, "onError() called with: " + "e = [" + e + "]");
-            }
-        });
     }
 
     @Override
@@ -267,9 +256,4 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
 
     }
 
-    public LatLng getLocation(){
-        return mLocation;
-    }
-
-    protected abstract void onLocationAvailable(LatLng location);
 }

@@ -103,7 +103,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
         TangoFactory tangoFactory = new TangoFactory(context);
 
-        mAdfManager = new AdfManager(App.getInstance().getDataController().getADFService()); // TODO refactor
+        mAdfManager = App.getInstance().getAdfManager();
         mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, mRenderer, tangoUx, tangoFactory, mAdfManager);
         restoreState(savedInstanceState);
 
@@ -345,22 +345,6 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         });
     }
 
-    @Override
-    protected void onLocationAvailable(LatLng location) {
-        //mAdfManager.startWithLocation(location);
-        //TODO refactor App.getInstance
-        AdfManager.createWithLocation(location, App.getInstance().getDataController().getADFService(), new Callback<AdfManager>() {
-            @Override
-            public void onResult(AdfManager result) {
-                mTangoManager.setAdfManager(result);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.e(TAG, "onError() called with: " + "e = [" + e + "]");
-            }
-        });
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
