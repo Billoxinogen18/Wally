@@ -1,9 +1,12 @@
 package com.wally.wally.activities;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -40,6 +43,7 @@ public class LoginActivity extends GoogleApiClientActivity implements
     @SuppressWarnings("unused")
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 100;
+    private static final int REQ_CODE_LOCATION = 129;
     /**
      * Tango
      */
@@ -89,6 +93,18 @@ public class LoginActivity extends GoogleApiClientActivity implements
                 firebaseAuthWithGoogle(result.getSignInAccount());
             } else {
                 requestSignIn();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_CODE_LOCATION) {
+            if (Utils.checkLocationPermission(this)) {
+                createAdfManager();
+            } else {
+                // TODO show user that program needs Location and exit
             }
         }
     }
@@ -143,6 +159,13 @@ public class LoginActivity extends GoogleApiClientActivity implements
 
     private void createAdfManager() {
         mLoadingView.setVisibility(View.VISIBLE);
+
+        if (!Utils.checkLocationPermission(this)) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQ_CODE_LOCATION);
+            return;
+        }
         Utils.getNewLocation(mGoogleApiClient, new Callback<LatLng>() {
             @Override
             public void onResult(LatLng result) {
