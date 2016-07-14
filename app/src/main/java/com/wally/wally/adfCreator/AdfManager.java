@@ -29,9 +29,15 @@ public class AdfManager {
     }
 
     public void getAdf(Callback<AdfInfo> callback){
-        if (this.callback != null) {
-            this.callback.onError(new In);
+        if (uuids.size() < 1) {
+            callback.onResult(null);
+            return;
         }
+
+        if (this.callback != null) {
+            this.callback.onError(new Exception("getAdf called twice"));
+        }
+
         if (cache.size() > 0) {
             callback.onResult(cache.remove());
             downloadNext();
