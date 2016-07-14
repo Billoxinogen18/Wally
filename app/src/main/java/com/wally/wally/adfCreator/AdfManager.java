@@ -1,7 +1,5 @@
 package com.wally.wally.adfCreator;
 
-import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.adf.ADFService;
@@ -10,16 +8,11 @@ import com.wally.wally.datacontroller.callbacks.Callback;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * Lazy retrieval of ADF files from the cloud.
- * Created by shota on 7/11/16.
  */
 public class AdfManager {
-    private static final String TAG = AdfManager.class.getSimpleName();
-
-    private CountDownLatch latch;
     private List<String> uuids;
     private ADFService adfService;
     private AdfInfo current;
@@ -34,38 +27,29 @@ public class AdfManager {
     }
 
     public boolean hasAdf(){
-        boolean res = uuids.size() > 0;
-        Log.d(TAG, "hasAdf() called - return: " + res);
-        return res;
+        return isAdfReady() || uuids.size() > 0;
     }
 
     public boolean isAdfReady(){
-        boolean res = latch.getCount() == 0;
-        Log.d(TAG, "isAdfReady() called - return: " + res);
-        return res;
+        return current != null;
     }
 
     public AdfInfo getAdf(){
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        AdfInfo result = new AdfInfo(current);
+        AdfInfo result = current;
+        current = null;
         downloadNext();
-        Log.d(TAG, "getAdf() called - return: " + result);
         return result;
     }
 
     private void downloadNext() {
-        latch = new CountDownLatch(1);
+        if (uuids.size() < 1) return;
         final String uuid = uuids.get(0);
         final String path = Utils.getAdfFilePath(uuid);
         adfService.download(path, uuid, new Callback<Void>() {
             @Override
             public void onResult(Void result) {
                 current = new AdfInfo().withUuid(uuid).withPath(path);
-                latch.countDown();
+                uuids.remove(0);
             }
 
             @Override
