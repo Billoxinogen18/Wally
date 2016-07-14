@@ -82,6 +82,7 @@ public class AdfManager {
                 for (AdfMetaData d : result) {
                     adfManager.addUuid(d.getUuid());
                 }
+                Log.d("TTest", adfManager.uuids.toString());
                 adfManager.downloadNext();
                 callback.onResult(adfManager);
             }

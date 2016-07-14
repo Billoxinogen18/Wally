@@ -509,6 +509,7 @@ public class TangoManager implements LocalizationListener {
                     private void startLearning() {//TODO Buggy startleraning maybe called twice.
                         Log.d(TAG, "startLearning() called with: " + "");
                         localizer.interrupt();
+                        mIsLearningMode = true;
                         tryToLocalizeWithAdf(null);
                     }
                 });
