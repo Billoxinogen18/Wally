@@ -1,6 +1,7 @@
 package com.wally.wally.tango;
 
 import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 
 import com.bumptech.glide.util.Util;
@@ -23,6 +24,7 @@ import com.wally.wally.adfCreator.AdfInfo;
 import com.wally.wally.adfCreator.AdfManager;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.adf.AdfMetaData;
+import com.wally.wally.datacontroller.callbacks.Callback;
 
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
@@ -50,7 +52,6 @@ public class TangoManager implements LocalizationListener {
 
     private WallyRenderer mRenderer;
 
-    private String mAdfUuid;
     private double mCameraPoseTimestamp = 0;
 
     private boolean mIsConnected;
@@ -65,8 +66,7 @@ public class TangoManager implements LocalizationListener {
 
     //testing adflist
     private AdfManager mAdfManager;
-    private AdfInfo currentAdf = null;
-    private AdfInfo savedAdf = null;
+    private AdfInfo currentAdf;
     private long mLocalizationTimeout = ADF_LOCALIZAION_TIMEOUT;
 
     private boolean mIsLocalized;
@@ -120,11 +120,6 @@ public class TangoManager implements LocalizationListener {
         // will block here until all Tango callback calls are finished. If you lock against this
         // object in a Tango callback thread it will cause a deadlock.
         if (mIsConnected) {
-            if (mIsLocalized) {
-                savedAdf = currentAdf;
-            } else {
-                savedAdf = null;
-            }
             mIsConnected = false;
             mRenderer.getCurrentScene().clearFrameCallbacks();
             mTango.disconnectCamera(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
@@ -162,65 +157,40 @@ public class TangoManager implements LocalizationListener {
 //            });
 //        }
 
+//        mIsLearningMode = false;
+//        Log.d(TAG, "resume() called : " + "");
+//        if (savedAdf != null) {
+//            Log.d(TAG, "resume() ADF saved");
+//            currentAdf = savedAdf;
+//            localizeWithAdf(currentAdf);
+//        }
+
         resume();
     }
 
     private synchronized void resume() {
-        mIsLearningMode = false;
-        Log.d(TAG, "resume() called : " + "");
-        if (savedAdf != null) {
-            Log.d(TAG, "resume() ADF saved");
-            currentAdf = savedAdf;
-            localizeWithAdf(currentAdf);
-        } else {
-            while (mAdfManager.hasAdf()) {
-                Log.d(TAG, "resume() has ADF");
-                if (mAdfManager.isAdfReady()) {
-                    Log.d(TAG, "resume() ADF is ready");
-                    currentAdf = mAdfManager.getAdf();
-                    long localizationStarted = System.currentTimeMillis();
-                    localizeWithAdf(currentAdf);
-                    waitForLocalizationOrTimeout(localizationStarted, ADF_LOCALIZAION_TIMEOUT);
-                    if (mIsLocalized) {
-                        Log.d(TAG, "resume() localized");
-                        break;
-                    } else {
-                        if (!mAdfManager.hasAdf()) {
-                            Log.d(TAG, "resume() cant localize");
-                            break;
-                        }
-                    }
-                } else {
-                    mTangoUx.showCustomMessage("Waiting for ADF to download");
-                    Utils.sleep(500);
-                }
-            }
-            if (!mIsLocalized) {
-                Log.d(TAG, "resume() learn ADF");
-                mIsLearningMode = true;
-                localizeWithAdf(null);
-                initFinishThread();
-            }
-        }
+        localizer = new Localizer(mAdfManager);
+        localizer.start();
     }
 
-    private void initFinishThread() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Utils.sleep(20000);
-                Log.d(TAG, "initFinishThread() 20 sec");
-                String uuid = mTango.saveAreaDescription();
-                AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
-                currentAdf = adfInfo;
-                localizeWithAdf(currentAdf);
-            }
-        }).start();
-    }
+//    private void initFinishThread() {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Utils.sleep(20000);
+//                Log.d(TAG, "initFinishThread() 20 sec");
+//                String uuid = mTango.saveAreaDescription();
+//                AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
+//                currentAdf = adfInfo;
+//                localizeWithAdf(currentAdf);
+//            }
+//        }).start();
+//    }
 
-    private void localizeWithAdf(final AdfInfo adf) {
+    private synchronized void tryToLocalizeWithAdf(final AdfInfo adf) {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
+        currentAdf = adf;
         if (mIsConnected) {
             onPause();
         }
@@ -245,16 +215,16 @@ public class TangoManager implements LocalizationListener {
 
     }
 
-    private void waitForLocalizationOrTimeout(long localizationStarted, long timeout) {
-        while (true) {
-            Utils.sleep(100);
-            if (mIsLocalized) break;
-            long timeNow = System.currentTimeMillis();
-            if (localizationStarted - timeNow > timeout) {
-                break;
-            }
-        }
-    }
+//    private void waitForLocalizationOrTimeout(long localizationStarted, long timeout) {
+//        while (true) {
+//            Utils.sleep(100);
+//            if (mIsLocalized) break;
+//            long timeNow = System.currentTimeMillis();
+//            if (localizationStarted - timeNow > timeout) {
+//                break;
+//            }
+//        }
+//    }
 
     public boolean isConnected() {
         return mIsConnected;
@@ -301,7 +271,7 @@ public class TangoManager implements LocalizationListener {
 
         mTango.connect(config);
 
-        if (adf != null && !adf.isImported()){
+        if (adf != null && !adf.isImported()) {
             mTango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
         }
 
@@ -442,7 +412,7 @@ public class TangoManager implements LocalizationListener {
     @Override
     public synchronized void localized() {
         mIsLocalized = true;
-        savedAdf = currentAdf;
+        localizer.interrupt();
     }
 
     @Override
@@ -458,4 +428,84 @@ public class TangoManager implements LocalizationListener {
     public boolean isLearningMode() {
         return mIsLearningMode;
     }
+
+//    public void setAdfManager(AdfManager adfManager) {
+//        this.mAdfManager = adfManager;
+//        startAdfSelection();
+//    }
+
+//    private synchronized void startAdfSelection() {
+//        while (mAdfManager.hasAdf()) {
+//            Log.d(TAG, "resume() has ADF");
+//            if (mAdfManager.isAdfReady()) {
+//                Log.d(TAG, "resume() ADF is ready");
+//                currentAdf = mAdfManager.getAdf();
+//                long localizationStarted = System.currentTimeMillis();
+//                localizeWithAdf(currentAdf);
+//                waitForLocalizationOrTimeout(localizationStarted, ADF_LOCALIZAION_TIMEOUT);
+//                if (mIsLocalized) {
+//                    Log.d(TAG, "resume() localized");
+//                    break;
+//                } else {
+//                    if (!mAdfManager.hasAdf()) {
+//                        Log.d(TAG, "resume() cant localize");
+//                        break;
+//                    }
+//                }
+//            } else {
+//                mTangoUx.showCustomMessage("Waiting for ADF to download");
+//                Utils.sleep(500);
+//            }
+//        }
+//
+//        if (!mIsLocalized) {
+//            Log.d(TAG, "resume() learn ADF");
+//            mIsLearningMode = true;
+//            localizeWithAdf(null);
+//            initFinishThread();
+//        }
+//    }
+
+    class Localizer extends Thread {
+        private AdfManager mAdfManager;
+
+        public Localizer(AdfManager adfManager) {
+            this.mAdfManager = adfManager;
+        }
+
+        @Override
+        public void run() {
+            while (!isInterrupted()) {
+                if (mIsLocalized) break;
+                mAdfManager.getAdf(new Callback<AdfInfo>() {
+                    @Override
+                    public void onResult(AdfInfo result) {
+                        if (result == null) {
+                            startLearning();
+                        } else {
+                            tryToLocalizeWithAdf(result);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        startLearning();
+                    }
+
+                    private void startLearning() {//TODO Buggy startleraning maybe called twice.
+                        localizer.interrupt();
+                        tryToLocalizeWithAdf(null);
+                    }
+                });
+                try {
+                    Thread.sleep(mLocalizationTimeout);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private Localizer localizer;
+
 }

@@ -34,11 +34,11 @@ public class AdfManager {
         return current != null;
     }
 
-    public AdfInfo getAdf(){
+    public void getAdf(Callback<AdfInfo> callback){
         AdfInfo result = current;
         current = null;
         downloadNext();
-        return result;
+        return ;
     }
 
     private void downloadNext() {
@@ -61,6 +61,7 @@ public class AdfManager {
         });
     }
 
+    @Deprecated
     public void startWithLocation(LatLng location) {
         adfService.searchADfMetaDataNearLocation(location, new Callback<List<AdfMetaData>>() {
             @Override
@@ -74,6 +75,25 @@ public class AdfManager {
             @Override
             public void onError(Exception e) {
 
+            }
+        });
+    }
+
+    public static void createWithLocation(LatLng location, final ADFService adfService, final Callback<AdfManager> callback){
+        adfService.searchADfMetaDataNearLocation(location, new Callback<List<AdfMetaData>>() {
+            @Override
+            public void onResult(List<AdfMetaData> result) {
+                AdfManager adfManager = new AdfManager(adfService);
+                for (AdfMetaData d : result) {
+                    adfManager.addUuid(d.getUuid());
+                }
+                adfManager.downloadNext();
+                callback.onResult(adfManager);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                callback.onError(e);
             }
         });
     }

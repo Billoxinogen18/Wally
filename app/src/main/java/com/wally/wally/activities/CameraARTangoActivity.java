@@ -347,7 +347,19 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
     @Override
     protected void onLocationAvailable(LatLng location) {
-        mAdfManager.startWithLocation(location);
+        //mAdfManager.startWithLocation(location);
+        //TODO refactor App.getInstance
+        AdfManager.createWithLocation(location, App.getInstance().getDataController().getADFService(), new Callback<AdfManager>() {
+            @Override
+            public void onResult(AdfManager result) {
+                mTangoManager.setAdfManager(result);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG, "onError() called with: " + "e = [" + e + "]");
+            }
+        });
     }
 
     @Override

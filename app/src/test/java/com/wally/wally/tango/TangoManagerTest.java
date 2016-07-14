@@ -77,8 +77,10 @@ public class TangoManagerTest {
     public void adfTest2(){
         when(adfManager.hasAdf()).thenReturn(false);
         when(tangoFactory.getTango(any(Runnable.class))).thenReturn(tango);
+        mTangoManager.startTango(null);
         mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, adfManager, 200);
         mTangoManager.onResume();
+
 
         assertThat(tango.getConfig(0).getBoolean(TangoConfig.KEY_BOOLEAN_LEARNINGMODE)
                 , is(true));
