@@ -15,66 +15,50 @@ import java.util.List;
 public class AdfManager {
     private List<String> uuids;
     private ADFService adfService;
-    private AdfInfo current;
+    private LinkedList<AdfInfo> cache;
+    private Callback<AdfInfo> callback;
 
     public AdfManager(ADFService adfService) {
         this.adfService = adfService;
         this.uuids = new LinkedList<>();
+        this.cache = new LinkedList<>();
     }
 
     public void addUuid(String uuid) {
         uuids.add(uuid);
     }
 
-    public boolean hasAdf(){
-        return isAdfReady() || uuids.size() > 0;
-    }
-
-    public boolean isAdfReady(){
-        return current != null;
-    }
-
     public void getAdf(Callback<AdfInfo> callback){
-        AdfInfo result = current;
-        current = null;
-        downloadNext();
-        return ;
+        if (this.callback != null) {
+            this.callback.onError(new In);
+        }
+        if (cache.size() > 0) {
+            callback.onResult(cache.remove());
+            downloadNext();
+        } else {
+            this.callback = callback;
+        }
     }
 
     private void downloadNext() {
-        if (uuids.size() < 1) return;
+        if (uuids.size() < 1 || cache.size() > 1) return;
         final String uuid = uuids.get(0);
         final String path = Utils.getAdfFilePath(uuid);
         adfService.download(path, uuid, new Callback<Void>() {
             @Override
             public void onResult(Void result) {
-                current = new AdfInfo().withUuid(uuid).withPath(path);
+                cache.add(new AdfInfo().withUuid(uuid).withPath(path));
                 uuids.remove(0);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                // TODO leave empty for now
-                // Warning: if we somehow get here
-                // No more adf will be downloaded anymore
-            }
-        });
-    }
-
-    @Deprecated
-    public void startWithLocation(LatLng location) {
-        adfService.searchADfMetaDataNearLocation(location, new Callback<List<AdfMetaData>>() {
-            @Override
-            public void onResult(List<AdfMetaData> result) {
-                for (AdfMetaData d : result) {
-                    addUuid(d.getUuid());
+                if (callback != null) {
+                    callback.onResult(cache.remove());
+                    callback = null;
                 }
-                downloadNext();
             }
 
             @Override
             public void onError(Exception e) {
-
+                callback.onError(e);
+                callback = null;
             }
         });
     }
