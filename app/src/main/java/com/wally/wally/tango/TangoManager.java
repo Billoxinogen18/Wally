@@ -173,19 +173,18 @@ public class TangoManager implements LocalizationListener {
         localizer.start();
     }
 
-//    private void initFinishThread() {
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Utils.sleep(20000);
-//                Log.d(TAG, "initFinishThread() 20 sec");
-//                String uuid = mTango.saveAreaDescription();
-//                AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
-//                currentAdf = adfInfo;
-//                localizeWithAdf(currentAdf);
-//            }
-//        }).start();
-//    }
+    private void initFinishThread() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Utils.sleep(20000);
+                Log.d(TAG, "initFinishThread() 20 sec");
+                String uuid = mTango.saveAreaDescription();
+                AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
+                tryToLocalizeWithAdf(adfInfo);
+            }
+        }).start();
+    }
 
     private synchronized void tryToLocalizeWithAdf(final AdfInfo adf) {
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
@@ -510,6 +509,7 @@ public class TangoManager implements LocalizationListener {
                         Log.d(TAG, "startLearning() called with: " + "");
                         localizer.interrupt();
                         mIsLearningMode = true;
+                        initFinishThread();
                         tryToLocalizeWithAdf(null);
                     }
                 });
