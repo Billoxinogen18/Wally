@@ -262,7 +262,7 @@ public class TangoManager implements LocalizationListener {
 
 
         if (adf != null) {
-            if (adf.isImported()) {
+            if (isAdfImported(adf)) {
                 config.putString(TangoConfig.KEY_STRING_AREADESCRIPTION, adf.getUuid());
             }
         } else {
@@ -291,6 +291,16 @@ public class TangoManager implements LocalizationListener {
         // to be done after connecting Tango and listeners.
         mExtrinsics = setupExtrinsics(mTango);
         mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
+    }
+
+    private boolean isAdfImported(AdfInfo adf){
+        String uuid = adf.getUuid();
+        if (uuid == null) return false;
+        ArrayList<String> l  = mTango.listAreaDescriptions();
+        for (String id : l){
+            if (id.equals(uuid)) return true;
+        }
+        return false;
     }
 
     /**
