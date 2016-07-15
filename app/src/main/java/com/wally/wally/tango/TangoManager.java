@@ -115,6 +115,7 @@ public class TangoManager implements LocalizationListener {
 
 
     public synchronized void onPause() {
+        Log.d(TAG, "onPause!!!");
         // Synchronize against disconnecting while the service is being used in the OpenGL thread or
         // in the UI thread.
         // NOTE: DO NOT lock against this same object in the Tango callback thread. Tango.disconnect
@@ -135,6 +136,7 @@ public class TangoManager implements LocalizationListener {
     }
 
     public synchronized void onResume() {
+        Log.d(TAG, "onResume");
         if (savedAdf != null){
             tryToLocalizeWithAdf(savedAdf); //TODO ra xdeba roca ver moxerxda meored lokalizeba?
         } else {
@@ -149,10 +151,13 @@ public class TangoManager implements LocalizationListener {
             public void run() {
                 Utils.sleep(20000);
                 Log.d(TAG, "initFinishThread() 20 sec");
-                String uuid = mTango.saveAreaDescription();
-                AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
-                mTangoUx.showCustomMessage("New room was learned. Trying to localize...");
-                tryToLocalizeWithAdf(adfInfo);
+                synchronized (TangoManager.this) {
+                    String uuid = mTango.saveAreaDescription();
+                    AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
+                    savedAdf = adfInfo;
+                    mTangoUx.showCustomMessage("New room was learned.");
+                }
+                //tryToLocalizeWithAdf(adfInfo);
             }
         }).start();
     }
@@ -162,6 +167,7 @@ public class TangoManager implements LocalizationListener {
         // in the UI thread.
         currentAdf = adf;
         if (mIsConnected) {
+            Log.d(TAG, "about to pause. adf = " + adf);
             onPause();
         }
         TangoUx.StartParams params = new TangoUx.StartParams();
@@ -411,43 +417,6 @@ public class TangoManager implements LocalizationListener {
     public boolean isLearningMode() {
         return mIsLearningMode;
     }
-
-//    public void setAdfManager(AdfManager adfManager) {
-//        this.mAdfManager = adfManager;
-//        startAdfSelection();
-//    }
-
-//    private synchronized void startAdfSelection() {
-//        while (mAdfManager.hasAdf()) {
-//            Log.d(TAG, "resume() has ADF");
-//            if (mAdfManager.isAdfReady()) {
-//                Log.d(TAG, "resume() ADF is ready");
-//                currentAdf = mAdfManager.getAdf();
-//                long localizationStarted = System.currentTimeMillis();
-//                localizeWithAdf(currentAdf);
-//                waitForLocalizationOrTimeout(localizationStarted, ADF_LOCALIZAION_TIMEOUT);
-//                if (mIsLocalized) {
-//                    Log.d(TAG, "resume() localized");
-//                    break;
-//                } else {
-//                    if (!mAdfManager.hasAdf()) {
-//                        Log.d(TAG, "resume() cant localize");
-//                        break;
-//                    }
-//                }
-//            } else {
-//                mTangoUx.showCustomMessage("Waiting for ADF to download");
-//                Utils.sleep(500);
-//            }
-//        }
-//
-//        if (!mIsLocalized) {
-//            Log.d(TAG, "resume() learn ADF");
-//            mIsLearningMode = true;
-//            localizeWithAdf(null);
-//            initFinishThread();
-//        }
-//    }
 
     class Localizer extends Thread {
         private AdfManager mAdfManager;
