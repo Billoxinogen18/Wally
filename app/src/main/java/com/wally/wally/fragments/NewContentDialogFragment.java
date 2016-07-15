@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -44,10 +45,11 @@ import java.util.List;
  * Created by ioane5 on 4/7/16.
  */
 @SuppressWarnings("ALL")
-public class NewContentDialogFragment extends DialogFragment implements
+public class NewContentDialogFragment extends TiltDialogFragment implements
         View.OnClickListener,
         PhotoChooserDialogFragment.PhotoChooserListener,
-        PeopleChooserDialogFragment.PeopleChooserListener, TextChangeListenerAdapter.TextChangeListener {
+        PeopleChooserDialogFragment.PeopleChooserListener,
+        TextChangeListenerAdapter.TextChangeListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
@@ -92,7 +94,7 @@ public class NewContentDialogFragment extends DialogFragment implements
         initContent(savedInstanceState);
         mAuthor = App.getInstance().getUserManager().getUser().getBaseUser();
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.CustomDialogTheme);
         View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
 
         dv.findViewById(R.id.btn_social_visibility).setOnClickListener(this);
@@ -112,6 +114,7 @@ public class NewContentDialogFragment extends DialogFragment implements
         mSocialVisibilityBtn = (Button) dv.findViewById(R.id.btn_social_visibility);
         mPostCreateBtn = (Button) dv.findViewById(R.id.btn_create_post);
 
+        setUpTiltingDialog(mRootView);
         // Listen to text changes
         TextChangeListenerAdapter textChangeAdapter = new TextChangeListenerAdapter(this);
         mTitleEt.addTextChangedListener(textChangeAdapter);
@@ -126,6 +129,8 @@ public class NewContentDialogFragment extends DialogFragment implements
         builder.setView(dv);
         Dialog dialog = builder.create();
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         dialog.setCanceledOnTouchOutside(false);
         setCancelable(false);
         return dialog;
@@ -160,6 +165,7 @@ public class NewContentDialogFragment extends DialogFragment implements
         super.onStart();
         updateViews();
         showDialog(mIsDialogShown);
+        getDialog().getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
     }
 
     @Override

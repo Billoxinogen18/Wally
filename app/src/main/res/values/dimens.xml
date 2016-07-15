@@ -29,4 +29,5 @@
 
     <dimen name="adf_name_dialog_width">350dp</dimen>
     <dimen name="adf_name_dialog_height">220dp</dimen>
+    <dimen name="new_content_dialog_width">350dp</dimen>
 </resources>
