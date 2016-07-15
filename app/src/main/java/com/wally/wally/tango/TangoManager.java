@@ -67,6 +67,7 @@ public class TangoManager implements LocalizationListener {
     //testing adflist
     private AdfManager mAdfManager;
     private AdfInfo currentAdf;
+    private AdfInfo savedAdf;
     private long mLocalizationTimeout = ADF_LOCALIZAION_TIMEOUT;
 
     private boolean mIsLocalized;
@@ -169,6 +170,9 @@ public class TangoManager implements LocalizationListener {
     }
 
     private synchronized void resume() {
+        if (savedAdf != null){
+            tryToLocalizeWithAdf(savedAdf); //TODO ra xdeba roca ver moxerxda meored lokalizeba?
+        }
         localizer = new Localizer(mAdfManager);
         localizer.start();
     }
@@ -181,6 +185,7 @@ public class TangoManager implements LocalizationListener {
                 Log.d(TAG, "initFinishThread() 20 sec");
                 String uuid = mTango.saveAreaDescription();
                 AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
+                mTangoUx.showCustomMessage("New room was learned. Trying to localize...");
                 tryToLocalizeWithAdf(adfInfo);
             }
         }).start();
@@ -422,6 +427,7 @@ public class TangoManager implements LocalizationListener {
     public synchronized void localized() {
         Log.d(TAG, "localized() called with: " + "");
         mIsLocalized = true;
+        savedAdf = currentAdf;
         localizer.interrupt();
     }
 
@@ -429,6 +435,7 @@ public class TangoManager implements LocalizationListener {
     public synchronized void notLocalized() {
         Log.d(TAG, "notLocalized() called with: " + "");
         mIsLocalized = false;
+        savedAdf = null;
     }
 
 
@@ -510,6 +517,7 @@ public class TangoManager implements LocalizationListener {
                         localizer.interrupt();
                         mIsLearningMode = true;
                         initFinishThread();
+                        mTangoUx.showCustomMessage("Started learning new room");
                         tryToLocalizeWithAdf(null);
                     }
                 });
