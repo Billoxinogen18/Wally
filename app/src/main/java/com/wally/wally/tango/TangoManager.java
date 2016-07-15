@@ -393,7 +393,7 @@ public class TangoManager implements LocalizationListener {
     public synchronized void localized() {
         Log.d(TAG, "localized() called with: " + "");
         mIsLocalized = true;
-        savedAdf = currentAdf;
+        if (currentAdf != null) savedAdf = currentAdf;
         localizer.interrupt();
     }
 

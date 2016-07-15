@@ -210,7 +210,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
         content.withUuid(adfInfo.getUuid());
         requestExportPermission(adfInfo);
-        //TODO show export permission and upload ADF
     }
 
     private void requestExportPermission(AdfInfo adfInfo) {
@@ -227,7 +226,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public void onPermissionDenied(AdfInfo adfInfo) {
-
+//TODO !!!
     }
 
     @Override
