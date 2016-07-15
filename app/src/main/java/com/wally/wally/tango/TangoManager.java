@@ -156,8 +156,8 @@ public class TangoManager implements LocalizationListener {
                     AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
                     savedAdf = adfInfo;
                     mTangoUx.showCustomMessage("New room was learned.");
+                    tryToLocalizeWithAdf(adfInfo);
                 }
-                //tryToLocalizeWithAdf(adfInfo);
             }
         }).start();
     }
