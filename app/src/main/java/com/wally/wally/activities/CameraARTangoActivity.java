@@ -33,6 +33,7 @@ import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.fragments.ImportExportPermissionDialogFragment;
+import com.wally.wally.fragments.PersistentDialogFragment;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.LocalizationListener;
@@ -50,11 +51,23 @@ import java.util.List;
 
 /**
  * Created by shota on 5/21/16. .
- *
  */
-public class CameraARTangoActivity extends CameraARActivity implements ContentFitter.OnContentFitListener, LocalizationListener, ImportExportPermissionDialogFragment.ImportExportPermissionListener {
+public class CameraARTangoActivity extends CameraARActivity implements
+        ContentFitter.OnContentFitListener,
+        LocalizationListener,
+        ImportExportPermissionDialogFragment.ImportExportPermissionListener,
+        PersistentDialogFragment.PersistentDialogListener {
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
     private int REQUEST_CODE_MY_LOCATION = 1;
+
+
+    // Permission Denied explain codes
+    private static final int RC_EXPLAIN_ADF = 14;
+
+    // Permission Request codes
+    private static final int RC_REQ_AREA_LEARNING = 17;
+
+    private boolean mExplainAdfPermission;
 
     private TangoManager mTangoManager;
     private FloatingActionButton mFinishFitting;
@@ -125,6 +138,38 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
             requestADFPermission();
         }
+    }
+
+
+    private void requestADFPermission() {
+        startActivityForResult(
+                Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE), RC_REQ_AREA_LEARNING);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_REQ_AREA_LEARNING) {
+            if (resultCode != RESULT_OK) {
+                mExplainAdfPermission = true;
+            }
+        }
+    }
+
+
+    @Override
+    public void onDialogPositiveClicked(int requestCode) {
+        switch (requestCode) {
+            case RC_EXPLAIN_ADF:
+                requestADFPermission();
+                break;
+        }
+    }
+
+    @Override
+    public void onDialogNegativeClicked(int requestCode) {
+        finish();
+        System.exit(0);
     }
 
     private void fetchContentForAdf(Context context, String adfUuid) {
@@ -215,16 +260,30 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     @Override
     protected void onResume() {
         super.onResume();
-        mTangoManager.onResume();
+        if (mExplainAdfPermission) {
+            mExplainAdfPermission = false;
+            PersistentDialogFragment.newInstance(
+                    this,
+                    RC_EXPLAIN_ADF,
+                    R.string.explain_adf_permission,
+                    R.string.give_permission,
+                    R.string.close_application)
+                    .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
+        }
 
-        if (mContentFitter != null) {
-            if (mContentFitter.isCancelled()) {
-                mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager, mVisualContentManager, this);
+        if (Utils.hasADFPermissions(this)) {
+            mTangoManager.onResume();
+
+            if (mContentFitter != null) {
+                if (mContentFitter.isCancelled()) {
+                    mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager, mVisualContentManager, this);
+                }
+                mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                onFitStatusChange(true);
             }
-            mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            onFitStatusChange(true);
         }
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -271,12 +330,6 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         onFitStatusChange(false);
     }
 
-    private void requestADFPermission() {
-        startActivityForResult(
-                Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
-                Tango.TANGO_INTENT_ACTIVITYCODE);
-    }
-
     /**
      * Just syncs adf on cloud.
      * Note that we only sync when localized.
@@ -312,7 +365,8 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
                 mFinishFittingFab.setEnabled(true);
             }
         });
-        if(!mTangoManager.isLearningMode()) fetchContentForAdf(getBaseContext(), mTangoManager.getCurrentAdf().getUuid());
+        if (!mTangoManager.isLearningMode())
+            fetchContentForAdf(getBaseContext(), mTangoManager.getCurrentAdf().getUuid());
         setLocalizationLocation();
     }
 
