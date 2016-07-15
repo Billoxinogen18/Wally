@@ -388,9 +388,9 @@ public class TangoManager implements LocalizationListener {
     @Override
     public synchronized void localized() {
         Log.d(TAG, "localized() called with: " + "");
+        localizer.interrupt();
         mIsLocalized = true;
         if (currentAdf != null) savedAdf = currentAdf;
-        localizer.interrupt();
     }
 
     @Override
@@ -425,10 +425,12 @@ public class TangoManager implements LocalizationListener {
                     @Override
                     public void onResult(AdfInfo result) {
                         Log.d(TAG, "Localizer onResult() called with: " + "result = [" + result + "]");
-                        if (result == null) {
-                            startLearning();
-                        } else {
-                            tryToLocalizeWithAdf(result);
+                        if (!Localizer.this.isInterrupted()) {
+                            if (result == null) {
+                                startLearning();
+                            } else {
+                                tryToLocalizeWithAdf(result);
+                            }
                         }
                     }
 
