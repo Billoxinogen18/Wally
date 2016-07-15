@@ -135,41 +135,6 @@ public class TangoManager implements LocalizationListener {
     }
 
     public synchronized void onResume() {
-        // Synchronize against disconnecting while the service is being used in the OpenGL thread or
-        // in the UI thread.
-//        if (!mIsConnected) {
-//            TangoUx.StartParams params = new TangoUx.StartParams();
-//            params.showConnectionScreen = false;
-//            mTangoUx.start(params);
-//            mTango = mTangoFactory.getTango(new Runnable() {
-//                @Override
-//                public void run() {
-//                    try {
-//                        TangoSupport.initialize();
-//                        connectTango();
-//                        connectRenderer();
-//                        mIsConnected = true;
-//                    } catch (TangoOutOfDateException e) {
-//                        if (mTangoUx != null) {
-//                            mTangoUx.showTangoOutOfDate();
-//                        }
-//                    }
-//                }
-//            });
-//        }
-
-//        mIsLearningMode = false;
-//        Log.d(TAG, "resume() called : " + "");
-//        if (savedAdf != null) {
-//            Log.d(TAG, "resume() ADF saved");
-//            currentAdf = savedAdf;
-//            localizeWithAdf(currentAdf);
-//        }
-
-        resume();
-    }
-
-    private synchronized void resume() {
         if (savedAdf != null){
             tryToLocalizeWithAdf(savedAdf); //TODO ra xdeba roca ver moxerxda meored lokalizeba?
         }
