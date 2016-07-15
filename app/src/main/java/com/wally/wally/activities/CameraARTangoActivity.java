@@ -209,7 +209,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         adfInfo.getMetaData().setLatLng(mLocalizationLocation);
 
         content.withUuid(adfInfo.getUuid());
-        requestExportPermission(adfInfo);
+        if (!adfInfo.isUploaded()) requestExportPermission(adfInfo);
     }
 
     private void requestExportPermission(AdfInfo adfInfo) {
@@ -222,6 +222,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     @Override
     public void onPermissionGranted(AdfInfo adfInfo) {
         startUploadingAdf(adfInfo);
+        adfInfo.withUploaded(true);
     }
 
     @Override

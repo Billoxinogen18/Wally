@@ -9,6 +9,7 @@ public class AdfInfo implements Serializable {
     private String path;
     private String uuid;
     private AdfMetaData adfMetaData;
+    private boolean isUploaded;
 
     public AdfInfo() {
 
@@ -34,15 +35,20 @@ public class AdfInfo implements Serializable {
         return this;
     }
 
-    public String getPath(){
+    public AdfInfo withUploaded(boolean uploaded) {
+        this.isUploaded = uploaded;
+        return this;
+    }
+
+    public String getPath() {
         return path;
     }
 
-    public String getUuid(){
+    public String getUuid() {
         return uuid;
     }
 
-    public boolean isImported(){
+    public boolean isImported() {
         return true;
     }
 
@@ -50,8 +56,12 @@ public class AdfInfo implements Serializable {
         return adfMetaData;
     }
 
+    public boolean isUploaded() {
+        return isUploaded;
+    }
+
     @Override
-    public String toString(){
+    public String toString() {
         return "path: " + path + "; " +
                 "uuid: " + uuid + "; " +
                 "AdfMetaData: " + adfMetaData + ".";

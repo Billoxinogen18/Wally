@@ -145,14 +145,15 @@ public class TangoManager implements LocalizationListener {
         }
     }
 
-    private void initFinishThread() {
+    private void learningFinishThread() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Utils.sleep(20000);
-                Log.d(TAG, "initFinishThread() 20 sec");
+                Log.d(TAG, "learningFinishThread() 20 sec");
                 synchronized (TangoManager.this) {
                     String uuid = mTango.saveAreaDescription();
+                    mIsLearningMode = false;
                     AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
                     savedAdf = adfInfo;
                     mTangoUx.showCustomMessage("New room was learned.");
@@ -190,17 +191,6 @@ public class TangoManager implements LocalizationListener {
         });
 
     }
-
-//    private void waitForLocalizationOrTimeout(long localizationStarted, long timeout) {
-//        while (true) {
-//            Utils.sleep(100);
-//            if (mIsLocalized) break;
-//            long timeNow = System.currentTimeMillis();
-//            if (localizationStarted - timeNow > timeout) {
-//                break;
-//            }
-//        }
-//    }
 
     public boolean isConnected() {
         return mIsConnected;
@@ -451,7 +441,7 @@ public class TangoManager implements LocalizationListener {
                         Log.d(TAG, "startLearning() called with: " + "");
                         localizer.interrupt();
                         mIsLearningMode = true;
-                        initFinishThread();
+                        learningFinishThread();
                         mTangoUx.showCustomMessage("Started learning new room");
                         tryToLocalizeWithAdf(null);
                     }

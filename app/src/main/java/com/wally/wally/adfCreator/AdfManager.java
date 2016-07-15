@@ -58,7 +58,7 @@ public class AdfManager {
         adfService.download(path, uuid, new Callback<Void>() {
             @Override
             public void onResult(Void result) {
-                cache.add(new AdfInfo().withUuid(uuid).withPath(path));
+                cache.add(new AdfInfo().withUuid(uuid).withPath(path).withUploaded(true));
                 uuids.remove(0);
                 if (callback != null) {
                     callback.onResult(cache.remove());
