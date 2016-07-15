@@ -401,7 +401,6 @@ public class TangoManager implements LocalizationListener {
     public synchronized void notLocalized() {
         Log.d(TAG, "notLocalized() called with: " + "");
         mIsLocalized = false;
-        savedAdf = null;
     }
 
 
@@ -459,6 +458,7 @@ public class TangoManager implements LocalizationListener {
 
         @Override
         public void run() {
+            Log.d(TAG, "Localizer started");
             while (!isInterrupted()) {
                 Log.d(TAG, "Localizer()");
                 if (mIsLocalized) break;
