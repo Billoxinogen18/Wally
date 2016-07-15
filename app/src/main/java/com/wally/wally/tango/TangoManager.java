@@ -137,9 +137,10 @@ public class TangoManager implements LocalizationListener {
     public synchronized void onResume() {
         if (savedAdf != null){
             tryToLocalizeWithAdf(savedAdf); //TODO ra xdeba roca ver moxerxda meored lokalizeba?
+        } else {
+            localizer = new Localizer(mAdfManager);
+            localizer.start();
         }
-        localizer = new Localizer(mAdfManager);
-        localizer.start();
     }
 
     private void initFinishThread() {
