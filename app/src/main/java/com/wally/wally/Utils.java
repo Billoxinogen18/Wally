@@ -365,7 +365,7 @@ public final class Utils {
             @Override
             protected void onPostExecute(String s) {
                 super.onPostExecute(s);
-                if (TextUtils.isEmpty(s)) {
+                if (!TextUtils.isEmpty(s)) {
                     callback.onResult(s);
                 } else {
                     callback.onError(null);
