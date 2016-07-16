@@ -58,18 +58,15 @@ public class CameraARTangoActivity extends CameraARActivity implements
         ImportExportPermissionDialogFragment.ImportExportPermissionListener,
         PersistentDialogFragment.PersistentDialogListener {
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
-    private int REQUEST_CODE_MY_LOCATION = 1;
-
-
     // Permission Denied explain codes
     private static final int RC_EXPLAIN_ADF = 14;
-
     // Permission Request codes
     private static final int RC_REQ_AREA_LEARNING = 17;
-
+    private int REQUEST_CODE_MY_LOCATION = 1;
     private boolean mExplainAdfPermission;
 
     private TangoManager mTangoManager;
+    private FloatingActionButton mCreateNewContent;
     private FloatingActionButton mFinishFitting;
     private View mLayoutFitting;
     private FloatingActionButton mFinishFittingFab;
@@ -92,6 +89,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
         mLayoutFitting = findViewById(R.id.layout_fitting);
         mFinishFittingFab = (FloatingActionButton) mLayoutFitting.findViewById(R.id.btn_finish_fitting);
+        mCreateNewContent = (FloatingActionButton) findViewById(R.id.btn_new_post);
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
@@ -342,7 +340,19 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 @Override
                 public void onResult(LatLng result) {
                     adfInfo.getMetaData().setLatLng(result);
-                    s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
+                    Utils.getAddressForLocation(CameraARTangoActivity.this, result, new Callback<String>() {
+                        @Override
+                        public void onResult(String address) {
+                            adfInfo.getMetaData().setName(address);
+                            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            adfInfo.getMetaData().setName(null);
+                            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
+                        }
+                    });
                 }
 
                 @Override
@@ -363,6 +373,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
             public void run() {
                 mVisualContentManager.localized();
                 mFinishFittingFab.setEnabled(true);
+                mCreateNewContent.setVisibility(View.VISIBLE);
             }
         });
         if (!mTangoManager.isLearningMode())
@@ -393,8 +404,10 @@ public class CameraARTangoActivity extends CameraARActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "run() called with: " + "");
                 mVisualContentManager.notLocalized();
                 mFinishFittingFab.setEnabled(false);
+                mCreateNewContent.setVisibility(View.GONE);
             }
         });
     }
