@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
@@ -12,8 +13,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -57,6 +56,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
 
     private NewContentDialogListener mListener;
 
+    private View mNoteView;
     private View mRootView;
     private View mBottomPanel;
     private View mImageContainer;
@@ -96,44 +96,47 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.CustomDialogTheme);
         View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
+        initViews(dv);
+        setUpTiltingDialog(dv.findViewById(R.id.scroll_view));
 
-        dv.findViewById(R.id.btn_social_visibility).setOnClickListener(this);
-        dv.findViewById(R.id.btn_add_image).setOnClickListener(this);
-        dv.findViewById(R.id.btn_remove_image).setOnClickListener(this);
-        dv.findViewById(R.id.btn_pallette).setOnClickListener(this);
-        dv.findViewById(R.id.btn_discard_post).setOnClickListener(this);
-        dv.findViewById(R.id.btn_create_post).setOnClickListener(this);
-        dv.findViewById(R.id.btn_more_settings).setOnClickListener(this);
+        builder.setView(dv);
+        Dialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
+        setCancelable(false);
+        return dialog;
+    }
 
-        mRootView = dv.findViewById(R.id.root);
-        mBottomPanel = dv.findViewById(R.id.bottom_panel);
-        mImageView = (ImageView) dv.findViewById(R.id.image);
-        mImageContainer = dv.findViewById(R.id.image_container);
-        mTitleEt = (EditText) dv.findViewById(R.id.tv_title);
-        mNoteEt = (EditText) dv.findViewById(R.id.tv_note);
-        mSocialVisibilityBtn = (Button) dv.findViewById(R.id.btn_social_visibility);
-        mPostCreateBtn = (Button) dv.findViewById(R.id.btn_create_post);
+    private void initViews(View v) {
+        v.findViewById(R.id.btn_social_visibility).setOnClickListener(this);
+        v.findViewById(R.id.btn_add_image).setOnClickListener(this);
+        v.findViewById(R.id.btn_remove_image).setOnClickListener(this);
+        v.findViewById(R.id.btn_pallette).setOnClickListener(this);
+        v.findViewById(R.id.btn_discard_post).setOnClickListener(this);
+        v.findViewById(R.id.btn_create_post).setOnClickListener(this);
+        v.findViewById(R.id.btn_more_settings).setOnClickListener(this);
 
-        setUpTiltingDialog(mRootView);
+        mNoteView = v.findViewById(R.id.note_view);
+        mRootView = v.findViewById(R.id.root);
+        mBottomPanel = v.findViewById(R.id.bottom_panel);
+        mImageView = (ImageView) v.findViewById(R.id.image);
+        mImageContainer = v.findViewById(R.id.image_container);
+        mTitleEt = (EditText) v.findViewById(R.id.tv_title);
+        mNoteEt = (EditText) v.findViewById(R.id.tv_note);
+        mSocialVisibilityBtn = (Button) v.findViewById(R.id.btn_social_visibility);
+        mPostCreateBtn = (Button) v.findViewById(R.id.btn_create_post);
+
         // Listen to text changes
         TextChangeListenerAdapter textChangeAdapter = new TextChangeListenerAdapter(this);
         mTitleEt.addTextChangedListener(textChangeAdapter);
         mNoteEt.addTextChangedListener(textChangeAdapter);
 
+        mRootView.getBackground().setDither(true);
         if (isEditMode) {
-            Button b = (Button) dv.findViewById(R.id.btn_create_post);
+            Button b = (Button) v.findViewById(R.id.btn_create_post);
             b.setText(R.string.post_update);
-            b = (Button) dv.findViewById(R.id.btn_discard_post);
+            b = (Button) v.findViewById(R.id.btn_discard_post);
             b.setText(R.string.post_cancel_edit);
         }
-        builder.setView(dv);
-        Dialog dialog = builder.create();
-        dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialog.setCanceledOnTouchOutside(false);
-        setCancelable(false);
-        return dialog;
     }
 
     private void initContent(Bundle savedInstanceState) {
@@ -165,7 +168,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         super.onStart();
         updateViews();
         showDialog(mIsDialogShown);
-        getDialog().getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        getDialog().getWindow().setFormat(PixelFormat.RGBA_8888);
     }
 
     @Override
@@ -247,7 +250,6 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     private List<SocialUser> toSocialUserList(List<Id> sharedWith) {
         List<SocialUser> friendList = App.getInstance().getUserManager().getUser().getFriends();
         List<SocialUser> result = new ArrayList<>();
-
         for (Id id : sharedWith) {
             if (id.getProvider().equals(Id.PROVIDER_GOOGLE)) {
                 for (SocialUser current : friendList) {
@@ -287,9 +289,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         mTitleEt.setText(mContent.getTitle());
 
         if (mContent.getColor() != null) {
-            View v = (View) mRootView.getParent();
-            v.setBackgroundColor(mContent.getColor());
-            mBottomPanel.setBackgroundColor(mContent.getColor());
+            mNoteView.setBackgroundColor(mContent.getColor());
         }
 
         if (TextUtils.isEmpty(mContent.getImageUri())) {
