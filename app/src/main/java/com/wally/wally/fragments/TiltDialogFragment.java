@@ -6,8 +6,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 /**
@@ -20,10 +20,12 @@ import android.view.animation.AccelerateDecelerateInterpolator;
  */
 public abstract class TiltDialogFragment extends DialogFragment implements SensorEventListener {
 
+    @SuppressWarnings("unused")
     private static final String TAG = TiltDialogFragment.class.getSimpleName();
 
     private View mRootView;
     private long mLastAnimationTime;
+    private int mOrientation;
 
     private static int numSign(float f) {
         return f >= 0 ? 1 : -1;
@@ -34,9 +36,18 @@ public abstract class TiltDialogFragment extends DialogFragment implements Senso
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        mOrientation = ((WindowManager) getContext().getApplicationContext()
+                .getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-
+        if (mRootView == null) {
+            return;
+        }
         SensorManager sm = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         Sensor la = sm.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         sm.registerListener(this, la, SensorManager.SENSOR_DELAY_GAME);
@@ -57,29 +68,39 @@ public abstract class TiltDialogFragment extends DialogFragment implements Senso
 
     @Override
     public void onSensorChanged(SensorEvent ev) {
-        if (System.currentTimeMillis() - mLastAnimationTime < 250) {
+        if (System.currentTimeMillis() - mLastAnimationTime < 400) {
             return;
         }
-        float x = ev.values[0];
-        float y = -ev.values[1];
-        float z = ((ev.values[2] / 16f) + 1f);
-
-        if (Math.abs(x) > 0.3) {
+        float x;
+        float y;
+        float z;
+        // Note that each orientation has it's own default coordinate system
+        if (mOrientation == 1) {
+            x = ev.values[0];
+            y = -ev.values[1];
+            z = ev.values[2];
+        } else {
+            x = ev.values[1];
+            y = ev.values[0];
+            z = ev.values[2];
+        }
+        if (Math.abs(x) > 0.4) {
             x = numSign(x) * 50;
         }
-        if (Math.abs(y) > 0.3) {
+        if (Math.abs(y) > 0.4) {
             y = numSign(y) * 30;
         }
-        if (Math.abs(z) > 1.3) {
+        if (Math.abs(z) > 1.4) {
             z = numSign(z) > 0 ? 1.05f : 0.95f;
         }
-        Log.d(TAG, String.format("x - [%f] ; y - [%f] ; z - [%f]", x, y, z));
-        mRootView.clearAnimation();
+        //noinspection UnusedAssignment
+        z = ((z / 16f) + 1f);
+        // Log.d(TAG, String.format("x - [%f] ; y - [%f] ; z - [%f]", x, y, z));
         mRootView.animate()
-                .x(x).y(y)
-                .scaleX(z)
-                .scaleY(z)
-                .setDuration(300)
+                .translationX(x).translationY(y)
+//                .scaleX(z)
+//                .scaleY(z)
+                .setDuration(400)
                 .setInterpolator(new AccelerateDecelerateInterpolator()).start();
 
         mLastAnimationTime = System.currentTimeMillis();
