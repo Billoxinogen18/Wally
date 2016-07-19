@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.R;
@@ -21,6 +20,7 @@ import com.wally.wally.components.SelectedMenuView;
 import com.wally.wally.components.UserInfoView;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.OnVisualContentSelectedListener;
 import com.wally.wally.tango.VisualContent;
@@ -218,7 +218,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
                 Log.e(TAG, "saveActiveContent: Cannot get user location");
                 return;
             } else {
-                content.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
+                content.withLocation(new SerializableLatLng(myLocation.getLatitude(), myLocation.getLongitude()));
             }
 
             if(content.getCreationDate() == null) {

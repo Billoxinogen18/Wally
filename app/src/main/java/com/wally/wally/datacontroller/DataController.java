@@ -1,6 +1,5 @@
 package com.wally.wally.datacontroller;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,6 +21,7 @@ import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.queries.FirebaseQuery;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.user.UserManager;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.util.Collections;
 import java.util.Map;
@@ -137,7 +137,7 @@ public class DataController {
         return chain;
     }
 
-    public ContentFetcher createFetcherForVisibleContent(LatLng center, double radiusKm) {
+    public ContentFetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForSharedWithMe(getCurrentUser(), center, radiusKm));
         chain.addPager(fetcherFactory.createForPublic(center, radiusKm));

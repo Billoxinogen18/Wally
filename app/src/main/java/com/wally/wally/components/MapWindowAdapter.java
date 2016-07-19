@@ -4,14 +4,14 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.Marker;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.wally.wally.R;
 
 /**
  * Created by Meravici on 6/23/2016.
  */
-public class MapWindowAdapter implements GoogleMap.InfoWindowAdapter {
+public class MapWindowAdapter implements MapboxMap.InfoWindowAdapter {
     private Context context = null;
 
     public MapWindowAdapter(Context context) {
@@ -22,10 +22,5 @@ public class MapWindowAdapter implements GoogleMap.InfoWindowAdapter {
     @Override
     public View getInfoWindow(Marker marker) {
         return LayoutInflater.from(context).inflate(R.layout.no_info_window, null);
-    }
-
-    @Override
-    public View getInfoContents(Marker marker) {
-        return null;
     }
 }

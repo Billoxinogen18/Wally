@@ -2,7 +2,8 @@ package com.wally.wally.datacontroller.utils;
 
 import android.support.annotation.Nullable;
 
-import com.google.android.gms.maps.model.LatLng;
+
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.io.Serializable;
 
@@ -17,6 +18,14 @@ public class SerializableLatLng implements Serializable {
     public SerializableLatLng(double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
+    }
+
+    public double getLatitude(){
+        return lat;
+    }
+
+    public double getLongitude(){
+        return lng;
     }
 
     public static
@@ -34,7 +43,7 @@ public class SerializableLatLng implements Serializable {
         if (ll == null) {
             return null;
         }
-        return new SerializableLatLng(ll.latitude, ll.longitude);
+        return new SerializableLatLng(ll.getLatitude(), ll.getLongitude());
     }
 
     @Override

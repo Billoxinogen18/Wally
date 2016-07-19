@@ -1,6 +1,5 @@
 package com.wally.wally.datacontroller;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
@@ -18,6 +17,7 @@ import com.wally.wally.datacontroller.queries.FirebaseQuery;
 import com.wally.wally.datacontroller.queries.SharedWithQuery;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.Predicate;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.util.Collections;
 import java.util.Set;
@@ -44,7 +44,7 @@ public class ContentFetcherFactory {
         return new QueryContentFetcher(query);
     }
 
-    public ContentFetcher createForPublic(LatLng center, double radiusKm) {
+    public ContentFetcher createForPublic(SerializableLatLng center, double radiusKm) {
         ContentFetcher fetcher = createForLocation(center, radiusKm, publicContents);
         if (fetcher == null) { fetcher = new KeyPager(publicContents); }
         return fetcher;
@@ -56,7 +56,7 @@ public class ContentFetcherFactory {
         return new QueryContentFetcher(query);
     }
 
-    public ContentFetcher createForSharedWithMe(User current, LatLng center, double radiusKm) {
+    public ContentFetcher createForSharedWithMe(User current, SerializableLatLng center, double radiusKm) {
         FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
         Predicate<Content> predicate = isLocationInRangePredicate(center, radiusKm);
         ContentQuery query = new ContentQuery(sharedWithQuery, sharedContents, predicate);
@@ -76,7 +76,7 @@ public class ContentFetcherFactory {
     }
 
     private ContentFetcher createForLocation(
-            LatLng center, double radiusKm, DatabaseReference target) {
+            SerializableLatLng center, double radiusKm, DatabaseReference target) {
         // We decided that too big radius (>2500 km)
         // means we don't need to filter by location
         if (radiusKm > Config.RADIUS_MAX_KM) { return null; }
@@ -108,7 +108,7 @@ public class ContentFetcherFactory {
     }
 
     private Predicate<Content> isLocationInRangePredicate(
-            final LatLng center, final double radiusKm) {
+            final SerializableLatLng center, final double radiusKm) {
         return new Predicate<Content>() {
             private double radius = radiusKm * 1000;
 

@@ -21,3 +21,9 @@
   **[] $VALUES;
   public *;
 }
+
+-keep class com.google.atap.** { *; }
+-keep interface com.google.atap.** { *; }
+
+-dontwarn javax.annotation.**
+-dontwarn sun.misc.Unsafe

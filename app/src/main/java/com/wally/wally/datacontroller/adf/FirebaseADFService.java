@@ -3,7 +3,6 @@ package com.wally.wally.datacontroller.adf;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -18,6 +17,7 @@ import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class FirebaseADFService implements ADFService {
      * {@inheritDoc}
      */
     @Override
-    public void searchADfMetaDataNearLocation(LatLng location, final Callback<List<AdfMetaData>> callback) {
+    public void searchADfMetaDataNearLocation(SerializableLatLng location, final Callback<List<AdfMetaData>> callback) {
         Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(location, SEARCH_RADIUS_M);
         ValueEventListener aggregator = getMetaDataAggregatorCallback(queries.size(), callback);
         for (GeoHashQuery q : queries) {
@@ -129,25 +129,25 @@ public class FirebaseADFService implements ADFService {
     }
 
     private void saveMetaData(AdfMetaData obj) {
-        LatLng l = obj.getLatLng();
-        String hash = new GeoHash(l.latitude, l.longitude).getGeoHashString();
+        SerializableLatLng l = obj.getLatLng();
+        String hash = new GeoHash(l.getLatitude(), l.getLongitude()).getGeoHashString();
         db.child(obj.getUuid()).updateChildren(toFirebaseObject(obj).put("hash", hash));
     }
 
     private FirebaseObject toFirebaseObject(AdfMetaData obj) {
-        LatLng l = obj.getLatLng();
+        SerializableLatLng l = obj.getLatLng();
         return new FirebaseObject()
                 .put("name", obj.getName())
                 .put("uuid", obj.getUuid())
-                .put("location/latitude", l.latitude)
-                .put("location/longitude", l.longitude);
+                .put("location/latitude", l.getLatitude())
+                .put("location/longitude", l.getLongitude());
     }
 
     private AdfMetaData toAdfMetaData(DataSnapshot snapshot) {
         return new AdfMetaData(
                 snapshot.child("name").getValue(String.class),
                 snapshot.child("uuid").getValue(String.class),
-                new LatLng(
+                new SerializableLatLng(
                         snapshot.child("location/latitude").getValue(Double.class),
                         snapshot.child("location/longitude").getValue(Double.class)
                 )

@@ -24,7 +24,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
 import com.google.atap.tangoservice.TangoErrorException;
@@ -36,6 +35,7 @@ import com.wally.wally.datacontroller.adf.ADFService;
 import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.fragments.ImportExportPermissionDialogFragment;
 import com.wally.wally.fragments.PersistentDialogFragment;
 
@@ -74,7 +74,7 @@ public class ADFChooser extends AppCompatActivity implements
 
     private ArrayList<AdfSyncInfo> mServerAdfMetaData;
     private ArrayList<AdfSyncInfo> mLocalAdfMetaData;
-    private LatLng mCurrentLocation;
+    private SerializableLatLng mCurrentLocation;
     private boolean mIsLoading = false;
     private View mLoadingView;
 
@@ -266,9 +266,9 @@ public class ADFChooser extends AppCompatActivity implements
             return;
         }
         mShouldLoadServerAdfs = false;
-        Utils.getNewLocation(mGoogleApiClient, new Callback<LatLng>() {
+        Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
             @Override
-            public void onResult(LatLng result) {
+            public void onResult(SerializableLatLng result) {
                 mCurrentLocation = result;
                 loadServerADfList(mCurrentLocation);
             }
@@ -280,7 +280,7 @@ public class ADFChooser extends AppCompatActivity implements
         });
     }
 
-    private void loadServerADfList(LatLng location) {
+    private void loadServerADfList(SerializableLatLng location) {
         updateLoadingAdfsStatus(true);
 
         ADFService s = App.getInstance().getDataController().getADFService();
@@ -508,7 +508,7 @@ public class ADFChooser extends AppCompatActivity implements
 
         outState.putSerializable("mServerAdfMetaData", mServerAdfMetaData);
         outState.putSerializable("mLocalAdfMetaData", mLocalAdfMetaData);
-        outState.putParcelable("mCurrentLocation", mCurrentLocation);
+        outState.putSerializable("mCurrentLocation", mCurrentLocation);
     }
 
     @SuppressWarnings("unchecked")

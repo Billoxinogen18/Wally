@@ -1,7 +1,7 @@
 package com.wally.wally.datacontroller.adf;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.util.List;
 
@@ -22,7 +22,7 @@ public interface ADFService {
      * @param location filter parameter
      * @param callback callback with result
      */
-    void searchADfMetaDataNearLocation(LatLng location, Callback<List<AdfMetaData>> callback);
+    void searchADfMetaDataNearLocation(SerializableLatLng location, Callback<List<AdfMetaData>> callback);
 
 
     /**

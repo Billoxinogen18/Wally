@@ -16,15 +16,17 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
+import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.wally.wally.App;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 import com.wally.wally.components.UserInfoView;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.user.User;
@@ -71,8 +73,10 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
                     .build();
         }
 
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        MapView mapFragment = (MapView) findViewById(R.id.map);
+
+        MapboxAccountManager.start(getBaseContext(), "pk.eyJ1Ijoid2FsbHlub3RlcyIsImEiOiJjaXFydnB1OHYwMDg3aHRubTYyZXNnZmo3In0.fvgLu8rLKJdX0j8N3QFAwg");
+
         mapFragment.getMapAsync(this);
 
         User currentUser = App.getInstance().getDataController().getCurrentUser();
@@ -158,8 +162,8 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        LatLng pos = mContent.getLocation();
+    public void onMapReady(MapboxMap googleMap) {
+        LatLng pos = Utils.serializableLatLngToLatLng(mContent.getLocation());
         googleMap.addMarker(new MarkerOptions()
                 .position(pos)
                 .title(mContent.getTitle()));

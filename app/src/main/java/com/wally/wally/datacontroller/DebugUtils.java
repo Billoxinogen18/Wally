@@ -2,7 +2,6 @@ package com.wally.wally.datacontroller;
 
 import android.util.Log;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
@@ -13,6 +12,7 @@ import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.firebase.geofire.GeoUtils;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -29,7 +29,7 @@ public class DebugUtils {
             new User("uSlLJUtZqbRDTMeLU4MdcToS8ZZ2").withGgId("112058086965911533829"), // Misha
     };
     public static final User DEBUG_USER = USERS[3];
-    public static final LatLng OFFICE_LAT_LNG = new LatLng(41.8057582f, 44.7681694f);
+    public static final SerializableLatLng OFFICE_LAT_LNG = new SerializableLatLng(41.8057582f, 44.7681694f);
     public static String[] ROOMS = new String[]{
             "a", "b", "c", "d", "e",
             "f", "g", "h", "i", "j",
@@ -92,10 +92,10 @@ public class DebugUtils {
         return new Double[]{random.nextDouble(), random.nextDouble(), random.nextDouble()};
     }
 
-    public static LatLng randomLatLngNearPoint(LatLng point) {
-        double randomLat = point.latitude + nextSign() * (random.nextDouble() % 100) / 500;
-        double randomLng = point.longitude + nextSign() * (random.nextDouble() % 100) / 500;
-        return new LatLng(randomLat, randomLng);
+    public static SerializableLatLng randomLatLngNearPoint(SerializableLatLng point) {
+        double randomLat = point.getLatitude() + nextSign() * (random.nextDouble() % 100) / 500;
+        double randomLng = point.getLongitude() + nextSign() * (random.nextDouble() % 100) / 500;
+        return new SerializableLatLng(randomLat, randomLng);
     }
 
     private static int nextSign() {

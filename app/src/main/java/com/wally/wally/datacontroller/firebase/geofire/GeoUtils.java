@@ -1,6 +1,7 @@
 package com.wally.wally.datacontroller.firebase.geofire;
 
-import com.google.android.gms.maps.model.LatLng;
+
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 /**
  * Original source of the class is part of GeoFire library
@@ -10,8 +11,8 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class GeoUtils {
 
-    public static double distance(LatLng location1, LatLng location2) {
-        return distance(location1.latitude, location1.longitude, location2.latitude, location2.longitude);
+    public static double distance(SerializableLatLng location1, SerializableLatLng location2) {
+        return distance(location1.getLatitude(), location1.getLongitude(), location2.getLatitude(), location2.getLongitude());
     }
 
     public static double distance(double lat1, double long1, double lat2, double long2) {

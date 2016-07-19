@@ -10,7 +10,6 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
@@ -24,6 +23,7 @@ import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.LocalizationListener;
@@ -282,9 +282,9 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         if (!mAdfSyncInfo.isSynchronized()) {
             // Get new position if possible, or otherwise upload with old location.
             if (Utils.checkLocationPermission(this) && mGoogleApiClient.isConnected()) {
-                Utils.getNewLocation(mGoogleApiClient, new Callback<LatLng>() {
+                Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
                     @Override
-                    public void onResult(LatLng result) {
+                    public void onResult(SerializableLatLng result) {
                         mAdfSyncInfo.getAdfMetaData().setLatLng(result);
                         startUploadingAdf();
                     }

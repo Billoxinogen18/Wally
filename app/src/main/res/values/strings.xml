@@ -109,5 +109,6 @@
     <string name="localized">Localized</string>
     <string name="not_localized">Not Localized</string>
     <string name="tango_not_ready">"Tango is not ready yet!"</string>
+    <string name="mapbox_api_key">pk.eyJ1Ijoid2FsbHlub3RlcyIsImEiOiJjaXFyc2xlbmcwMDlraTRubWU3NXJheXEwIn0.qPK5k2VO_36p8HnoC9d4EA</string>
 
 </resources>

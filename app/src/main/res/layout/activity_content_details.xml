@@ -109,12 +109,11 @@
                 app:cardElevation="1dp"
                 app:cardUseCompatPadding="true">
 
-                <fragment
+                <FrameLayout
                     android:id="@+id/map"
-                    class="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="112dp"
-                    app:liteMode="true" />
+                    android:layout_height="match_parent" />
+
             </android.support.v7.widget.CardView>
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
