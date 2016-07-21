@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Created by Meravici on 5/26/2016. yea
  */
 public class WallyTangoUx extends TangoUx {
+    private static final String TAG = WallyTangoUx.class.getSimpleName();
     public static final int SHORT = 2000;
     public static final int LONG = 5000;
 
@@ -34,7 +35,7 @@ public class WallyTangoUx extends TangoUx {
         @Override
         public void run() {
             mTextView.setText("");
-            mTextView.setVisibility(View.GONE);
+//            mTextView.setVisibility(View.GONE);
             mMessageQueue.poll();
             if(!mMessageQueue.isEmpty()){
                 showNextMessage();
@@ -59,9 +60,11 @@ public class WallyTangoUx extends TangoUx {
     }
 
     public void showCustomMessage(final String message, int durationMs){
+        boolean isFirst = mMessageQueue.isEmpty();
+
         mMessageQueue.add(new Pair<>(durationMs, message));
 
-        if(mMessageQueue.isEmpty()){
+        if(isFirst){
             showNextMessage();
         }
     }
