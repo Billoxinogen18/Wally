@@ -37,15 +37,17 @@ public class AdfScheduler extends Thread {
 
     public void finish() {
         this.done = true;
+        interrupt();
     }
 
     @Override
     public void run() {
-        while (!isInterrupted() && !done) {
+        while (!done && !isInterrupted()) {
             Log.d(TAG, "Localizer step");
             mAdfManager.getAdf(new Callback<AdfInfo>() {
                 @Override
                 public void onResult(AdfInfo result) {
+                    if (done || isInterrupted()) return;
                     Log.d(TAG, "onResult: " + result);
                     for (Callback<AdfInfo> c : callbackList) {
                         c.onResult(result);
