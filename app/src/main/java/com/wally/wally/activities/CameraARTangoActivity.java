@@ -36,6 +36,7 @@ import com.wally.wally.fragments.ImportExportPermissionDialogFragment;
 import com.wally.wally.fragments.PersistentDialogFragment;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
+import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.LocalizationListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoManager;
@@ -49,9 +50,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Created by shota on 5/21/16. .
- */
 public class CameraARTangoActivity extends CameraARActivity implements
         ContentFitter.OnContentFitListener,
         LocalizationListener,
@@ -76,7 +74,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private ContentFitter mContentFitter;
     private VisualContentManager mVisualContentManager;
     private WallyRenderer mRenderer;
-    private AdfManager mAdfManager;
     private LatLng mLocalizationLocation;
 
     public static Intent newIntent(Context context) {
@@ -105,6 +102,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
         mSurfaceView.setSurfaceRenderer(mRenderer);
         WallyTangoUx tangoUx = new WallyTangoUx(context);
+        LearningEvaluator evaluator = new LearningEvaluator();
 
         TangoPointCloudManager pointCloudManager = new TangoPointCloudManager();
 
@@ -114,8 +112,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
         TangoFactory tangoFactory = new TangoFactory(context);
 
-        mAdfManager = App.getInstance().getAdfManager();
-        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, mRenderer, tangoUx, tangoFactory, mAdfManager);
+        AdfManager adfManager = App.getInstance().getAdfManager();
+        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, mRenderer, tangoUx,
+                tangoFactory, adfManager, evaluator);
         restoreState(savedInstanceState);
 
 

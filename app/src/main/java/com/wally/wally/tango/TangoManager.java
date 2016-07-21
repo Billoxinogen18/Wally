@@ -16,7 +16,6 @@ import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
-import com.wally.wally.Utils;
 import com.wally.wally.adfCreator.AdfInfo;
 import com.wally.wally.adfCreator.AdfManager;
 import com.wally.wally.components.WallyTangoUx;
@@ -64,29 +63,36 @@ public class TangoManager implements LocalizationListener {
     private AdfInfo savedAdf;
     private AdfInfo currentAdf;
     private AdfManager mAdfManager;
-    private long mLocalizationTimeout = ADF_LOCALIZAION_TIMEOUT_MS;
 
     private boolean mIsLocalized;
 
     private boolean mIsLearningMode;
     private AdfScheduler mAdfScheduler;
+    private LearningEvaluator mLearningEvaluator;
 
 
-    public TangoManager(TangoUpdater tangoUpdater, TangoPointCloudManager pointCloudManager, WallyRenderer wallyRenderer,
-                        WallyTangoUx tangoUx, TangoFactory tangoFactory, AdfManager adfManager, long localizationTimeout) {
+    public TangoManager(
+            TangoUpdater tangoUpdater,
+            TangoPointCloudManager pointCloudManager,
+            WallyRenderer wallyRenderer,
+            WallyTangoUx tangoUx,
+            TangoFactory tangoFactory,
+            AdfManager adfManager,
+            LearningEvaluator evaluator
+    ) {
         mTangoUpdater = tangoUpdater;
         mRenderer = wallyRenderer;
         mTangoUx = tangoUx;
         mPointCloudManager = pointCloudManager;
         mTangoFactory = tangoFactory;
         mAdfManager = adfManager;
-        mLocalizationTimeout = localizationTimeout;
+        mLearningEvaluator = evaluator;
     }
 
-    public TangoManager(TangoUpdater tangoUpdater, TangoPointCloudManager pointCloudManager, WallyRenderer wallyRenderer,
-                        WallyTangoUx tangoUx, TangoFactory tangoFactory, AdfManager adfManager) {
-        this(tangoUpdater, pointCloudManager, wallyRenderer, tangoUx, tangoFactory, adfManager, ADF_LOCALIZAION_TIMEOUT_MS);
-    }
+//    public TangoManager(TangoUpdater tangoUpdater, TangoPointCloudManager pointCloudManager, WallyRenderer wallyRenderer,
+//                        WallyTangoUx tangoUx, TangoFactory tangoFactory, AdfManager adfManager, LearningEvaluator evaluator) {
+//        this(tangoUpdater, pointCloudManager, wallyRenderer, tangoUx, tangoFactory, adfManager, evaluator);
+//    }
 
     /**
      * Calculates and stores the fixed transformations between the device and
@@ -169,7 +175,24 @@ public class TangoManager implements LocalizationListener {
         if (adf == null) {
             mAdfScheduler.finish();
             mIsLearningMode = true;
-            learningFinishThread();
+            mLearningEvaluator.addCallback(new Callback<Object>() {
+                @Override
+                public void onResult(Object result) {
+                    synchronized (TangoManager.this) {
+                        String uuid = mTango.saveAreaDescription();
+                        mIsLearningMode = false;
+                        AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
+                        savedAdf = adfInfo;
+                        mTangoUx.showCustomMessage("New room was learned.");
+                        tryToLocalizeWithAdf(adfInfo);
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    e.printStackTrace();
+                }
+            });
             mTangoUx.showCustomMessage("Learning new room...");
         }
         // Synchronize against disconnecting while the service is being used
@@ -412,21 +435,4 @@ public class TangoManager implements LocalizationListener {
         return mIsLearningMode;
     }
 
-    private void learningFinishThread() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Utils.sleep(20000);
-                Log.d(TAG, "learningFinishThread() 20 sec");
-                synchronized (TangoManager.this) {
-                    String uuid = mTango.saveAreaDescription();
-                    mIsLearningMode = false;
-                    AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
-                    savedAdf = adfInfo;
-                    mTangoUx.showCustomMessage("New room was learned.");
-                    tryToLocalizeWithAdf(adfInfo);
-                }
-            }
-        }).start();
-    }
 }
