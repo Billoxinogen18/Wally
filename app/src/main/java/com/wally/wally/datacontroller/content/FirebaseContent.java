@@ -16,6 +16,7 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_NOTE           = "note";
     public static final String K_TITLE          = "title";
     public static final String K_COLOR          = "color";
+    public static final String K_TEXT_COLOR          = "color";
     public static final String K_IMGURI         = "image";
     public static final String K_ROOM           = "roomId";
     public static final String K_AUTHOR         = "authorId";
@@ -71,6 +72,10 @@ public class FirebaseContent extends FirebaseObject {
 
     public Integer getColor() {
         return getChild(K_NOTE_DATA).get(K_COLOR).toInteger();
+    }
+
+    public Integer getTextColor() {
+        return getChild(K_NOTE_DATA).get(K_TEXT_COLOR).toInteger();
     }
 
     public String getImageUri() {
@@ -168,7 +173,8 @@ public class FirebaseContent extends FirebaseObject {
                 .put(K_NOTE, c.getNote())
                 .put(K_TITLE, c.getTitle())
                 .put(K_IMGURI, c.getImageUri())
-                .put(K_COLOR, c.getColor());
+                .put(K_COLOR, c.getColor())
+                .put(K_TEXT_COLOR, c.getTextColor());
     }
 
     public Content toContent() {
@@ -178,6 +184,7 @@ public class FirebaseContent extends FirebaseObject {
                 .withNote(getNote())
                 .withTitle(getTitle())
                 .withColor(getColor())
+                .withTextColor(getTextColor())
                 .withImageUri(getImageUri())
                 .withAuthorId(getAuthorId())
                 .withLocation(getLocation())
