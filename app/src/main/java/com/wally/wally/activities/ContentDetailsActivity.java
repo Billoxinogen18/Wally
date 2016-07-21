@@ -47,6 +47,8 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
     private TextView mNote;
     private CardView mCard;
 
+    private MapView mMapView;
+
     public static Intent newIntent(Context from, Content content) {
         Intent i = new Intent(from, ContentDetailsActivity.class);
         i.putExtra(KEY_CONTENT, content);
@@ -56,6 +58,8 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MapboxAccountManager.start(getBaseContext(), getString(R.string.mapbox_api_key));
         setContentView(R.layout.activity_content_details);
 
         mContent = (Content) getIntent().getSerializableExtra(KEY_CONTENT);
@@ -73,11 +77,9 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
                     .build();
         }
 
-        MapView mapFragment = (MapView) findViewById(R.id.map);
-
-        MapboxAccountManager.start(getBaseContext(), "pk.eyJ1Ijoid2FsbHlub3RlcyIsImEiOiJjaXFydnB1OHYwMDg3aHRubTYyZXNnZmo3In0.fvgLu8rLKJdX0j8N3QFAwg");
-
-        mapFragment.getMapAsync(this);
+        mMapView = (MapView) findViewById(R.id.map);
+        mMapView.onCreate(savedInstanceState);
+        mMapView.getMapAsync(this);
 
         User currentUser = App.getInstance().getDataController().getCurrentUser();
         if (currentUser.getId() != null) {
@@ -87,6 +89,42 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
 
         bindViews();
         initViewsWithContent();
+    }
+
+    // Add the mapView lifecycle to the activity's lifecycle methods
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mMapView != null)
+            mMapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mMapView != null)
+            mMapView.onPause();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mMapView != null)
+            mMapView.onLowMemory();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mMapView != null)
+            mMapView.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mMapView != null)
+            mMapView.onSaveInstanceState(outState);
     }
 
     @Override
@@ -162,12 +200,12 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     @Override
-    public void onMapReady(MapboxMap googleMap) {
+    public void onMapReady(MapboxMap map) {
         LatLng pos = Utils.serializableLatLngToLatLng(mContent.getLocation());
-        googleMap.addMarker(new MarkerOptions()
+        map.addMarker(new MarkerOptions()
                 .position(pos)
                 .title(mContent.getTitle()));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 10f));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 10f));
     }
 
     private void onDeleteContent() {

@@ -1,57 +1,26 @@
 package com.wally.wally.activities;
 
-import android.Manifest;
-import android.app.FragmentTransaction;
-import android.content.Context;
-import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.ViewGroup;
 
-import com.bumptech.glide.Glide;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.plus.Plus;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdate;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.geometry.VisibleRegion;
-import com.mapbox.mapboxsdk.maps.MapFragment;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.wally.wally.App;
 import com.wally.wally.R;
-import com.wally.wally.Utils;
-import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.ContentListView;
-import com.wally.wally.components.ContentListViewItem;
-import com.wally.wally.components.MapWindowAdapter;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.endlessScroll.ContentPagingRetriever;
 import com.wally.wally.endlessScroll.EndlessRecyclerOnScrollListener;
-import com.wally.wally.endlessScroll.EndlessScrollAdapter;
 import com.wally.wally.endlessScroll.MarkerManager;
 import com.wally.wally.userManager.SocialUser;
 
-import java.util.List;
-
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback
+public class MapsFragmentt extends Fragment implements OnMapReadyCallback
 //        GoogleApiClient.ConnectionCallbacks,
 //        GoogleApiClient.OnConnectionFailedListener,
 //        MapboxMap.OnCameraChangeListener,
@@ -59,7 +28,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        ContentListViewItem.OnClickListener, ContentListView.OnScrollSettleListener
 {
 
-    private static final String TAG = MapsActivity.class.getSimpleName();
+    private static final String TAG = MapsFragmentt.class.getSimpleName();
     private static final String KEY_USER = "USER";
     private static final int MY_LOCATION_REQUEST_CODE = 22;
     private static final int PAGE_LENGTH = 5;
@@ -92,18 +61,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     /**
      * Start to see user profile
      */
-    public static Intent newIntent(Context from, SocialUser user) {
-        Intent i = new Intent(from, MapsActivity.class);
-        i.putExtra(KEY_USER, user);
-        return i;
+    public static MapsFragmentt newInstance(SocialUser user) {
+        Bundle args = new Bundle();
+        args.putSerializable(KEY_USER, user);
+        MapsFragmentt mf = new MapsFragmentt();
+        mf.setArguments(args);
+        // TODO read args
+        return mf;
     }
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        MapboxAccountManager.start(this, getString(R.string.mapbox_api_key));
-
-        setContentView(R.layout.activity_maps);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        MapboxAccountManager.start(getContext(), getString(R.string.mapbox_api_key));
+        View v = inflater.inflate(R.layout.fragment_maps, container, false);
 
 //        mainThreadHandler = new Handler(getMainLooper());
 //
@@ -127,9 +98,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //
 
 
-        mMapView = (MapView) findViewById(R.id.map);
+        mMapView = (MapView) v.findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
+        return v;
     }
 
 
@@ -153,13 +125,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         mMapView.onDestroy();
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mMapView.onSaveInstanceState(outState);
     }
@@ -169,13 +141,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 //        if (content.getVisibility().isPreviewVisible()) {
 //            startActivity(ContentDetailsActivity.newIntent(this, content));
 //        } else {
-//            Toast.makeText(MapsActivity.this, R.string.content_not_visible_note, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(MapsFragment.this, R.string.content_not_visible_note, Toast.LENGTH_SHORT).show();
 //        }
 //    }
 //
 //    @Override
 //    public void onProfileClicked(SocialUser user) {
-//        startActivity(MapsActivity.newIntent(this, user));
+//        startActivity(MapsFragment.newIntent(this, user));
 //    }
 //
 //    public void onMyLocationClick(View v) {

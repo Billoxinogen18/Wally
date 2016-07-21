@@ -46,7 +46,7 @@ public class LoginActivity extends GoogleApiClientActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dispacher_activity);
+        setContentView(R.layout.activity_login);
         mLoadingView = findViewById(R.id.loading_view);
     }
 

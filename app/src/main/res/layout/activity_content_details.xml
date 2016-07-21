@@ -109,10 +109,11 @@
                 app:cardElevation="1dp"
                 app:cardUseCompatPadding="true">
 
-                <FrameLayout
+                <com.mapbox.mapboxsdk.maps.MapView
                     android:id="@+id/map"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    tools:style_url="mapbox://styles/mapbox/streets-v9" />
 
             </android.support.v7.widget.CardView>
         </LinearLayout>

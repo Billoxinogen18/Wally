@@ -56,7 +56,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="4dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:onClick="onBtnCameraClick"
             android:padding="8dp"
             android:src="@drawable/ic_arrow_back_black_24dp" />
 
@@ -74,7 +73,6 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:onClick="onAreaUpdateClick"
                 android:src="@drawable/ic_sync_black_24dp"
                 app:backgroundTint="@android:color/background_light"
                 app:fabSize="mini" />
@@ -85,7 +83,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:onClick="onMyLocationClick"
                 android:src="@drawable/ic_my_location_black_24dp" />
         </RelativeLayout>
 
@@ -93,6 +90,7 @@
 
 
     <com.wally.wally.components.ContentListView
+        android:background="#efff"
         android:id="@+id/content_list_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"

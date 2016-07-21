@@ -525,7 +525,7 @@ public class ADFChooser extends AppCompatActivity implements
 
             mServerAdfMetaData = (ArrayList<AdfSyncInfo>) savedInstanceState.getSerializable("mServerAdfMetaData");
             mLocalAdfMetaData = (ArrayList<AdfSyncInfo>) savedInstanceState.getSerializable("mLocalAdfMetaData");
-            mCurrentLocation = savedInstanceState.getParcelable("mCurrentLocation");
+            mCurrentLocation = (SerializableLatLng) savedInstanceState.getSerializable("mCurrentLocation");
         }
     }
 
