@@ -102,11 +102,14 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     }
 
     public synchronized void setTangoLocalization(boolean localization) {
+        Log.d(TAG, "setTangoLocalization() called with: " + "localization = [" + localization + "]");
         if (isLocalized != localization) {
             isLocalized = localization;
             if (isLocalized) {
                 for(LocalizationListener listener : mLocalizator) {
+                    Log.d(TAG, "setTangoLocalization() called with: " + "listener = [" + listener + "]");
                     listener.localized();
+                    Log.d(TAG, "setTangoLocalization() after localized" );
                 }
             } else {
                 for(LocalizationListener listener : mLocalizator) {

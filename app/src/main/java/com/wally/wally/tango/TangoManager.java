@@ -171,19 +171,23 @@ public class TangoManager implements LocalizationListener {
     }
 
     private synchronized void tryToLocalizeWithAdf(final AdfInfo adf) {
-        if (mIsLocalized) { return; }
         Log.d(TAG, "tryToLocalizeWithAdf(" + adf + ")");
         if (adf == null) {
             mAdfScheduler.finish();
+            Log.d(TAG, "tryToLocalizeWithAdf mAdfScheduler.finish()");
             mIsLearningMode = true;
             mLearningEvaluator.addCallback(new Callback<Object>() {
                 @Override
                 public void onResult(Object result) {
+                    Log.d(TAG, "onResult() called with: " + "result = [" + result + "]");
                     synchronized (TangoManager.this) {
+                        Log.d(TAG, "onResult() in synchronize");
                         String uuid = mTango.saveAreaDescription();
+                        Log.d(TAG, "onResult() adf saved");
                         mIsLearningMode = false;
                         AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
                         savedAdf = adfInfo;
+                        currentAdf = adfInfo;
                         mTangoUx.showCustomMessage("New room was learned.");
                         tryToLocalizeWithAdf(adfInfo);
                     }
@@ -194,7 +198,9 @@ public class TangoManager implements LocalizationListener {
                     e.printStackTrace();
                 }
             });
+            Log.d(TAG, "tryToLocalizeWithAdf() learn new room");
             mTangoUx.showCustomMessage("Learning new room...");
+            Log.d(TAG, "tryToLocalizeWithAdf() adf null finished");
         }
         // Synchronize against disconnecting while the service is being used
         // in OpenGL thread or in UI thread.
@@ -285,6 +291,7 @@ public class TangoManager implements LocalizationListener {
         // to be done after connecting Tango and listeners.
         mExtrinsics = setupExtrinsics(mTango);
         mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
+        Log.d(TAG, "connectTango() called with: " + "adf = [" + adf + "]");
     }
 
     private boolean isAdfImported(AdfInfo adf){
@@ -414,15 +421,16 @@ public class TangoManager implements LocalizationListener {
 
 
     @Override
-    public synchronized void localized() {
+    public void localized() {
         Log.d(TAG, "localized() called with: " + "");
         mIsLocalized = true;
         mAdfScheduler.finish();
+        Log.d(TAG, "localized() mAdfScheduler.finish() was called");
         if (currentAdf != null) savedAdf = currentAdf;
     }
 
     @Override
-    public synchronized void notLocalized() {
+    public void notLocalized() {
         Log.d(TAG, "notLocalized() called with: " + "");
         mIsLocalized = false;
     }

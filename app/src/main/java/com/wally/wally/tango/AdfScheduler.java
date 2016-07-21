@@ -31,6 +31,7 @@ public class AdfScheduler extends Thread {
     }
 
     public AdfScheduler addCallback(Callback<AdfInfo> callback) {
+        Log.d(TAG, "addCallback() called with: " + "callback = [" + callback + "]");
         callbackList.add(callback);
         return this;
     }
@@ -38,6 +39,7 @@ public class AdfScheduler extends Thread {
     public void finish() {
         this.done = true;
         interrupt();
+        Log.d(TAG, "finish() after interupt");
     }
 
     @Override
