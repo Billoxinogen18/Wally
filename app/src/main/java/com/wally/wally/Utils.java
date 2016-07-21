@@ -33,12 +33,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.atap.tangoservice.Tango;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
 
 import java.io.File;
@@ -253,18 +253,18 @@ public final class Utils {
     }
 
 
-    public static double getRadius(LatLngBounds bounds) {
-        LatLng center = bounds.getCenter();
-        LatLng ne = bounds.northeast;
+    public static double getRadius(LatLng center, LatLng northEast) {
+        SerializableLatLng c = SerializableLatLng.fromLatLng(center);
+        SerializableLatLng ne = SerializableLatLng.fromLatLng(northEast);
 
         // r = radius of the earth in statute miles
         double r = 3963.0;
 
         // Convert lat or lng from decimal degrees into radians (divide by 57.2958)
-        double lat1 = center.latitude / 57.2958;
-        double lon1 = center.longitude / 57.2958;
-        double lat2 = ne.latitude / 57.2958;
-        double lon2 = ne.longitude / 57.2958;
+        double lat1 = center.getLatitude() / 57.2958;
+        double lon1 = center.getLongitude() / 57.2958;
+        double lat2 = northEast.getLatitude() / 57.2958;
+        double lon2 = northEast.getLongitude() / 57.2958;
 
         // distance = circle radius from center to Northeast corner of bounds
         return r * Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
@@ -284,8 +284,8 @@ public final class Utils {
                 TextUtils.equals(userId, currentUser.getBaseUser().getId().getId());
     }
 
-    public static LatLng extractLatLng(@NonNull Location location) {
-        return new LatLng(location.getLatitude(), location.getLongitude());
+    public static SerializableLatLng extractLatLng(@NonNull Location location) {
+        return new SerializableLatLng(location.getLatitude(), location.getLongitude());
     }
 
     public static String getAdfFilesFolder() {
@@ -306,18 +306,18 @@ public final class Utils {
     /**
      * Sorts Adf list with respect to location.
      */
-    public static void sortWithLocation(ArrayList<AdfSyncInfo> list, final LatLng location) {
+    public static void sortWithLocation(ArrayList<AdfSyncInfo> list, final SerializableLatLng location) {
         Collections.sort(list, new Comparator<AdfSyncInfo>() {
             @Override
             public int compare(AdfSyncInfo one, AdfSyncInfo two) {
-                LatLng loc1 = one.getAdfMetaData().getLatLng();
-                LatLng loc2 = two.getAdfMetaData().getLatLng();
+                SerializableLatLng loc1 = one.getAdfMetaData().getLatLng();
+                SerializableLatLng loc2 = two.getAdfMetaData().getLatLng();
 
                 float[] result1 = new float[3];
                 float[] result2 = new float[3];
 
-                Location.distanceBetween(loc1.latitude, loc1.longitude, location.latitude, location.longitude, result1);
-                Location.distanceBetween(loc2.latitude, loc2.longitude, location.latitude, location.longitude, result2);
+                Location.distanceBetween(loc1.getLatitude(), loc1.getLongitude(), location.getLatitude() , location.getLongitude(), result1);
+                Location.distanceBetween(loc2.getLatitude(), loc2.getLongitude(), location.getLatitude(), location.getLongitude(), result2);
 
                 Float distance1 = result1[0];
                 Float distance2 = result2[0];
@@ -329,7 +329,7 @@ public final class Utils {
 
 
     @SuppressWarnings("MissingPermission")
-    public static void getNewLocation(final GoogleApiClient googleApiClient, final Callback<LatLng> callback) {
+    public static void getNewLocation(final GoogleApiClient googleApiClient, final Callback<SerializableLatLng> callback) {
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 if (location != null) {
@@ -349,5 +349,12 @@ public final class Utils {
 
     public static int dpToPx(Context context, int dp) {
         return (int) ((dp * context.getResources().getDisplayMetrics().density) + 0.5);
+    }
+
+    public static LatLng serializableLatLngToLatLng(SerializableLatLng location) {
+        return new LatLng(location.getLatitude(), location.getLongitude());
+    }
+    public static SerializableLatLng latLngToSerializableLatLng(LatLng location) {
+        return new SerializableLatLng(location.getLatitude(), location.getLongitude());
     }
 }

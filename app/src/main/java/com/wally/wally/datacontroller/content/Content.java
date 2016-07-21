@@ -1,6 +1,5 @@
 package com.wally.wally.datacontroller.content;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.io.Serializable;
@@ -105,12 +104,12 @@ public class Content implements Serializable {
         return this;
     }
 
-    public LatLng getLocation() {
-        return SerializableLatLng.toLatLng(location);
+    public SerializableLatLng getLocation() {
+        return location;
     }
 
-    public Content withLocation(LatLng location) {
-        this.location = SerializableLatLng.fromLatLng(location);
+    public Content withLocation(SerializableLatLng location) {
+        this.location = location;
         return this;
     }
 

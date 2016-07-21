@@ -1,6 +1,5 @@
 package com.wally.wally.datacontroller.adf;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.io.Serializable;
@@ -21,10 +20,6 @@ public class AdfMetaData implements Serializable {
         this.latLng = latLng;
     }
 
-    public AdfMetaData(String name, String uuid, LatLng latLng) {
-        this(name, uuid, SerializableLatLng.fromLatLng(latLng));
-    }
-
     public String getName() {
         return name;
     }
@@ -41,12 +36,8 @@ public class AdfMetaData implements Serializable {
         this.uuid = uuid;
     }
 
-    public LatLng getLatLng() {
-        return SerializableLatLng.toLatLng(latLng);
-    }
-
-    public void setLatLng(LatLng latLng) {
-        this.latLng = SerializableLatLng.fromLatLng(latLng);
+    public SerializableLatLng getLatLng() {
+        return latLng;
     }
 
     public void setLatLng(SerializableLatLng latLng) {

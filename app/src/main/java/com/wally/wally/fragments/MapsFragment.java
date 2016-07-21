@@ -1,38 +1,43 @@
-package com.wally.wally.activities;
+package com.wally.wally.fragments;
+
 
 import android.Manifest;
-import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.CameraPosition;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.plus.Plus;
+import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdate;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.VisibleRegion;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.activities.CameraARActivity;
+import com.wally.wally.activities.ContentDetailsActivity;
 import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.ContentListView;
 import com.wally.wally.components.ContentListViewItem;
@@ -47,21 +52,27 @@ import com.wally.wally.userManager.SocialUser;
 
 import java.util.List;
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback,
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link MapsFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class MapsFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        GoogleMap.OnCameraChangeListener,
         ContentPagingRetriever.ContentPageRetrieveListener,
-        ContentListViewItem.OnClickListener, ContentListView.OnScrollSettleListener {
+        ContentListViewItem.OnClickListener,
+        ContentListView.OnScrollSettleListener,
+        View.OnClickListener, OnMapReadyCallback {
 
-    private static final String TAG = MapsActivity.class.getSimpleName();
+    private static final String TAG = MapsFragment.class.getSimpleName();
     private static final String KEY_USER = "USER";
-    private static final int MY_LOCATION_REQUEST_CODE = 22;
+    private static final int MY_LOCATION_REQUEST_CODE = 222;
     private static final int PAGE_LENGTH = 5;
 
     private SocialUser mUserProfile;
 
-    private GoogleMap mMap;
+    private MapView mMapView;
+    private MapboxMap mMap;
     private GoogleApiClient mGoogleApiClient;
 
     private ContentListView mContentListView;
@@ -71,7 +82,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private Handler mainThreadHandler;
     private MarkerManager mMarkerManager;
-    private GoogleMap.CancelableCallback defaultCenterMyLocationCallback = new GoogleMap.CancelableCallback() {
+    private MapboxMap.CancelableCallback defaultCenterMyLocationCallback = new MapboxMap.CancelableCallback() {
         @Override
         public void onFinish() {
             loadContentNearLocation(mMap.getCameraPosition());
@@ -83,61 +94,106 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     };
 
-    /**
-     * Start to see user profile
-     */
-    public static Intent newIntent(Context from, SocialUser user) {
-        Intent i = new Intent(from, MapsActivity.class);
-        i.putExtra(KEY_USER, user);
-        return i;
+    public MapsFragment() {
+        // Required empty public constructor
+    }
+
+
+    public static MapsFragment newInstance(SocialUser user) {
+        MapsFragment fragment = new MapsFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(KEY_USER, user);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
-
-        mainThreadHandler = new Handler(getMainLooper());
-
-        mUserProfile = (SocialUser) getIntent().getSerializableExtra(KEY_USER);
-        initFeedTitle();
-
-        if (mUserProfile != null) {
-            findViewById(R.id.update_area).setVisibility(View.GONE);
+        if (getArguments() != null) {
+            mUserProfile = (SocialUser) getArguments().getSerializable(KEY_USER);
         }
 
-        mContentListView = (ContentListView) findViewById(R.id.content_list_view);
+        mainThreadHandler = new Handler(Looper.getMainLooper());
+    }
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        MapboxAccountManager.start(getContext(), getString(R.string.mapbox_api_key));
+        View v = inflater.inflate(R.layout.fragment_maps, container, false);
+
+        initFeedTitle(v);
+
+        if (mUserProfile != null) {
+            v.findViewById(R.id.update_area).setVisibility(View.GONE);
+        }
+
+        mContentListView = (ContentListView) v.findViewById(R.id.content_list_view);
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getContext())
                 .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .addScope(Plus.SCOPE_PLUS_PROFILE)
                 .addApi(Plus.API)
                 .build();
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-//        mapFragment.setRetainInstance(true);
+
+        mMapView = (MapView) v.findViewById(R.id.map);
+        mMapView.onCreate(savedInstanceState);
+        mMapView.getMapAsync(this);
+        return v;
+    }
+
+    // Add the mapView lifecycle to the activity's lifecycle methods
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mMapView != null)
+            mMapView.onResume();
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-        mMap.setOnCameraChangeListener(this);
-        mMap.setInfoWindowAdapter(new MapWindowAdapter(this));
+    public void onPause() {
+        super.onPause();
+        if (mMapView != null)
+            mMapView.onPause();
+    }
 
-        mMap.getUiSettings().setMapToolbarEnabled(false);
-        if (Utils.checkLocationPermission(this)) {
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mMapView != null)
+            mMapView.onLowMemory();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mMapView != null)
+            mMapView.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mMapView != null)
+            mMapView.onSaveInstanceState(outState);
+    }
+
+
+    @Override
+    public void onMapReady(MapboxMap mapboxMap) {
+        mMap = mapboxMap;
+        mMap.setInfoWindowAdapter(new MapWindowAdapter(getContext()));
+
+        if (Utils.checkLocationPermission(getContext())) {
             mMap.setMyLocationEnabled(true);
-            mMap.getUiSettings().setMyLocationButtonEnabled(false);
         } else {
             requestLocationPermission();
         }
 
-        mMarkerManager = new MarkerManager(getBaseContext(), mMap);
+        mMarkerManager = new MarkerManager(getContext(), mMap);
         mContentScrollListener = new EndlessRecyclerOnScrollListener(PAGE_LENGTH) {
             int markerCounter = 0;
 
@@ -157,7 +213,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         };
 
-        mContentListView.setLayoutManager(new LinearLayoutManager(this));
+        mContentListView.setLayoutManager(new LinearLayoutManager(getContext()));
         mContentListView.addOnScrollListener(mContentScrollListener);
         mContentListView.setOnScrollSettleListener(this);
 
@@ -171,32 +227,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onContentClicked(Content content) {
         if (content.getVisibility().isPreviewVisible()) {
-            startActivity(ContentDetailsActivity.newIntent(this, content));
+            startActivity(ContentDetailsActivity.newIntent(getContext(), content));
         } else {
-            Toast.makeText(MapsActivity.this, R.string.content_not_visible_note, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.content_not_visible_note, Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onProfileClicked(SocialUser user) {
-        startActivity(MapsActivity.newIntent(this, user));
+        ((CameraARActivity) getActivity()).showMapFragment(user);
     }
 
-    public void onMyLocationClick(View v) {
-        if (!Utils.checkLocationPermission(this)) {
+    public void onMyLocationClick() {
+        if (!Utils.checkLocationPermission(getContext())) {
             requestLocationPermission();
         } else {
             centerMapOnMyLocation(null);
         }
-    }
-
-    public void onBtnCameraClick(View view) {
-        onBackPressed();
-    }
-
-    @Override
-    public void onCameraChange(CameraPosition cameraPosition) {
-
     }
 
     @Override
@@ -217,16 +264,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mContentScrollListener.loadingNextFinished();
     }
 
-    public void onAreaUpdateClick(View view) {
+    public void onAreaUpdateClick() {
         loadContentNearLocation(mMap.getCameraPosition());
         mContentListView.startLoading();
-        Toast.makeText(getBaseContext(), R.string.updating_area, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), R.string.updating_area, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         if (requestCode == MY_LOCATION_REQUEST_CODE) {
-            if (Utils.checkLocationPermission(this)) {
+            if (Utils.checkLocationPermission(getContext())) {
                 if (mUserProfile == null) {
                     centerMapOnMyLocation(defaultCenterMyLocationCallback);
                 }
@@ -237,7 +284,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onConnected(Bundle connectionHint) {
         mGoogleApiClient.unregisterConnectionCallbacks(this);
-        if (mUserProfile == null) {
+        if (mUserProfile == null && mMap != null) {
             centerMapOnMyLocation(defaultCenterMyLocationCallback);
         }
     }
@@ -248,44 +295,39 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
-
-    @Override
     public void onStart() {
-        mGoogleApiClient.connect();
         super.onStart();
+        mGoogleApiClient.connect();
     }
 
     @Override
     public void onStop() {
-        mGoogleApiClient.disconnect();
         super.onStop();
+        mGoogleApiClient.disconnect();
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void initFeedTitle() {
-        ImageView ownerImage = (ImageView) findViewById(R.id.iv_owner_image);
-        TextView ownerName = (TextView) findViewById(R.id.tv_owner_name);
+    private void initFeedTitle(View v) {
+        ImageView ownerImage = (ImageView) v.findViewById(R.id.iv_owner_image);
+        TextView ownerName = (TextView) v.findViewById(R.id.tv_owner_name);
 
         if (mUserProfile != null) {
-            Glide.with(getBaseContext())
+            Glide.with(getContext())
                     .load(mUserProfile.getAvatarUrl())
                     .crossFade()
                     .fitCenter()
                     .thumbnail(0.1f)
                     .placeholder(R.drawable.ic_account_circle_black_24dp)
                     .dontAnimate()
-                    .transform(new CircleTransform(getBaseContext()))
+                    .transform(new CircleTransform(getContext()))
                     .into(ownerImage);
 
             ownerImage.setVisibility(View.VISIBLE);
             String firstName = mUserProfile.getFirstName() == null ? mUserProfile.getDisplayName() : mUserProfile.getFirstName();
             String title;
-            if(mUserProfile.equals(App.getInstance().getUserManager().getUser())){
+            if (mUserProfile.equals(App.getInstance().getUserManager().getUser())) {
                 title = getString(R.string.map_feed_self_title);
-            }else{
+            } else {
                 title = firstName + getString(R.string.map_feed_profile_title);
             }
 
@@ -297,7 +339,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void loadNewPageMarkers(final int pageLength) {
-        runOnUiThread(new Runnable() {
+        mainThreadHandler.post(new Runnable() {
             @Override
             public void run() {
                 int size = mContentRetriever.size();
@@ -307,7 +349,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (int i = 0; i < contentList.size(); i++) {
                     Content c = contentList.get(i);
                     int visibility = mContentRetriever.get(i).getVisibility().getSocialVisibility().getMode();
-                    mMarkerManager.addMarker("" + (size - pageLength + i + 1), visibility, c.getLocation());
+                    mMarkerManager.addMarker("" + (size - pageLength + i + 1), visibility, Utils.serializableLatLngToLatLng(c.getLocation()));
                 }
             }
         });
@@ -319,7 +361,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mContentRetriever = new ContentPagingRetriever(contentFetcher, mainThreadHandler, PAGE_LENGTH);
         mContentRetriever.registerLoadListener(this);
         mContentRetriever.registerLoadListener(mContentListView);
-        EndlessScrollAdapter adapter = new EndlessScrollAdapter(getBaseContext(), mGoogleApiClient, mContentRetriever);
+        EndlessScrollAdapter adapter = new EndlessScrollAdapter(getContext(), mGoogleApiClient, mContentRetriever);
         adapter.setUserProfile(mUserProfile);
         adapter.setOnClickListener(this);
         mContentListView.setAdapter(adapter);
@@ -328,7 +370,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
-        double radius = Utils.getRadius(mMap.getProjection().getVisibleRegion().latLngBounds);
+        VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
+        double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
         ContentFetcher contentFetcher;
 
         if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
@@ -339,15 +382,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .createFetcherForUserContent(mUserProfile.getBaseUser());
         } else {
             contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
-                    cameraPosition.target,
+                    Utils.latLngToSerializableLatLng(cameraPosition.target),
                     radius
             );
         }
         return contentFetcher;
     }
 
-    private void centerMapOnMyLocation(GoogleMap.CancelableCallback callback) {
-        if (Utils.checkLocationPermission(this)) {
+    private void centerMapOnMyLocation(MapboxMap.CancelableCallback callback) {
+        if (Utils.checkLocationPermission(getContext())) {
             Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
             if (myLocation == null) {
@@ -355,13 +398,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return;
             }
             LatLng myPosition = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
-
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 16), 2000, callback);
         }
     }
 
     private void requestLocationPermission() {
-        ActivityCompat.requestPermissions(this,
+        ActivityCompat.requestPermissions(getActivity(),
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                 MY_LOCATION_REQUEST_CODE);
     }
@@ -377,6 +419,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
         mMap.animateCamera(cu);
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        if(view.getId() == R.id.back)
+            getActivity().getSupportFragmentManager().popBackStack();
+        else if(view.getId() == R.id.my_location)
+            onMyLocationClick();
+        else if(view.getId() == R.id.update_area)
+            onAreaUpdateClick();
 
     }
 }

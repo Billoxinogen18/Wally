@@ -1,10 +1,10 @@
 package com.wally.wally.datacontroller.content;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.ServerValue;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
 import com.wally.wally.datacontroller.user.Id;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,6 +16,7 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_NOTE           = "note";
     public static final String K_TITLE          = "title";
     public static final String K_COLOR          = "color";
+    public static final String K_TEXT_COLOR          = "color";
     public static final String K_IMGURI         = "image";
     public static final String K_ROOM           = "roomId";
     public static final String K_AUTHOR         = "authorId";
@@ -73,6 +74,10 @@ public class FirebaseContent extends FirebaseObject {
         return getChild(K_NOTE_DATA).get(K_COLOR).toInteger();
     }
 
+    public Integer getTextColor() {
+        return getChild(K_NOTE_DATA).get(K_TEXT_COLOR).toInteger();
+    }
+
     public String getImageUri() {
         return getChild(K_NOTE_DATA).get(K_IMGURI).toString();
     }
@@ -89,8 +94,8 @@ public class FirebaseContent extends FirebaseObject {
         return getChild(K_LOCATION).get(K_LNG).toDouble();
     }
 
-    public LatLng getLocation() {
-        return containsKey(K_LOCATION) ? new LatLng(getLatitude(), getLongitude()) : null;
+    public SerializableLatLng getLocation() {
+        return containsKey(K_LOCATION) ? new SerializableLatLng(getLatitude(), getLongitude()) : null;
     }
 
     public Date getCreationDate() {
@@ -98,13 +103,13 @@ public class FirebaseContent extends FirebaseObject {
         return new Date(timestamp);
     }
 
-    private void setLocation(LatLng loc) {
+    private void setLocation(SerializableLatLng loc) {
         if (loc == null) return;
-        String hash = new GeoHash(loc.latitude, loc.longitude).getGeoHashString();
+        String hash = new GeoHash(loc.getLatitude(), loc.getLongitude()).getGeoHashString();
         put(K_HASH, hash);
         getChild(K_LOCATION)
-                .put(K_LAT, loc.latitude)
-                .put(K_LNG, loc.longitude);
+                .put(K_LAT, loc.getLatitude())
+                .put(K_LNG, loc.getLongitude());
     }
 
     public TangoData getTangoData() {
@@ -168,7 +173,8 @@ public class FirebaseContent extends FirebaseObject {
                 .put(K_NOTE, c.getNote())
                 .put(K_TITLE, c.getTitle())
                 .put(K_IMGURI, c.getImageUri())
-                .put(K_COLOR, c.getColor());
+                .put(K_COLOR, c.getColor())
+                .put(K_TEXT_COLOR, c.getTextColor());
     }
 
     public Content toContent() {
@@ -178,6 +184,7 @@ public class FirebaseContent extends FirebaseObject {
                 .withNote(getNote())
                 .withTitle(getTitle())
                 .withColor(getColor())
+                .withTextColor(getTextColor())
                 .withImageUri(getImageUri())
                 .withAuthorId(getAuthorId())
                 .withLocation(getLocation())

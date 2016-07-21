@@ -1,8 +1,8 @@
 package com.wally.wally.datacontroller.adf;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
 import com.wally.wally.LocationConverter;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -35,7 +35,7 @@ public class AdfSyncInfo implements Serializable {
             ecef[i] = wrapped.getDouble(i);
         }
         double[] lla = LocationConverter.ecefToLla(ecef);
-        LatLng loc = new LatLng(lla[0], lla[1]);
+        SerializableLatLng loc = new SerializableLatLng(lla[0], lla[1]);
 
         return new AdfSyncInfo(new AdfMetaData(name, uuid, loc), true);
     }

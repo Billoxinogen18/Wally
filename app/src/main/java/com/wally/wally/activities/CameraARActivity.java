@@ -6,13 +6,13 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.R;
@@ -21,6 +21,8 @@ import com.wally.wally.components.SelectedMenuView;
 import com.wally.wally.components.UserInfoView;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.fragments.MapsFragment;
 import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.tango.OnVisualContentSelectedListener;
 import com.wally.wally.tango.VisualContent;
@@ -164,7 +166,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
 
     public void onNewContentClick(View v) {
 
-        if (SystemClock.elapsedRealtime() - mNewContentButtonLastClickTime < 1000){
+        if (SystemClock.elapsedRealtime() - mNewContentButtonLastClickTime < 1000) {
             return;
         }
         mNewContentButtonLastClickTime = SystemClock.elapsedRealtime();
@@ -174,7 +176,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     }
 
     public void onBtnMapClick(View v) {
-        startActivity(MapsActivity.newIntent(getBaseContext(), null));
+        showMapFragment(null);
     }
 
     public void onShowProfileClick(View v) {
@@ -203,7 +205,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     }
 
     public void onProfileClick(SocialUser user) {
-        startActivity(MapsActivity.newIntent(this, user));
+        showMapFragment(user);
     }
 
     protected void saveActiveContent(Content content) {
@@ -218,10 +220,10 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
                 Log.e(TAG, "saveActiveContent: Cannot get user location");
                 return;
             } else {
-                content.withLocation(new LatLng(myLocation.getLatitude(), myLocation.getLongitude()));
+                content.withLocation(new SerializableLatLng(myLocation.getLatitude(), myLocation.getLongitude()));
             }
 
-            if(content.getCreationDate() == null) {
+            if (content.getCreationDate() == null) {
                 content.withCreationDate(new Date(System.currentTimeMillis()));
             }
             onSaveContent(content);
@@ -240,5 +242,19 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         UserInfoView infoView = (UserInfoView) findViewById(R.id.profile_bar);
         infoView.setVisibility(View.VISIBLE);
         infoView.setUser(user);
+    }
+
+    public void showMapFragment(SocialUser user){
+        MapsFragment mf = MapsFragment.newInstance(user);
+
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+        // Replace whatever is in the fragment_container view with this fragment,
+        // and add the transaction to the back stack so the user can navigate back
+        transaction.replace(R.id.fragment_container, mf);
+        transaction.addToBackStack(null);
+
+        // Commit the transaction
+        transaction.commit();
     }
 }

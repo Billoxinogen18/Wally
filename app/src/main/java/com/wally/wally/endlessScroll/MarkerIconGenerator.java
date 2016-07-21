@@ -2,12 +2,12 @@ package com.wally.wally.endlessScroll;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 
-import com.google.maps.android.ui.IconGenerator;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 
@@ -50,17 +50,20 @@ public class MarkerIconGenerator {
 
                 @Override
                 protected Bitmap doInBackground(Void... voids) {
-                    IconGenerator iconGenerator = new IconGenerator(context);
-                    iconGenerator.setTextAppearance(R.style.Bubble_TextAppearance_Light);
+//                    IconGenerator iconGenerator = new IconGenerator(context);
+//                    iconGenerator.setTextAppearance(R.style.Bubble_TextAppearance_Light);
+//
+//                    if (isCancelled()) {
+//                        return null;
+//                    }
+//                    int color = COLORS[visibility];
+//                    iconGenerator.setColor(color);
+//
+//                    Bitmap icon = iconGenerator.makeIcon(name);
+//                    cache.put(name, icon);
 
-                    if (isCancelled()) {
-                        return null;
-                    }
-                    int color = COLORS[visibility];
-                    iconGenerator.setColor(color);
-
-                    Bitmap icon = iconGenerator.makeIcon(name);
-                    cache.put(name, icon);
+                    Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
+                            R.drawable.map_marker);
 
                     return icon;
                 }

@@ -1,6 +1,6 @@
 package com.wally.wally.datacontroller.firebase.geofire;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,10 +27,10 @@ public class GeoHashQuery {
             return (Math.abs(degrees) > 0) ? Math.max(1, Math.log(360/degrees)/Math.log(2)) : 1;
         }
 
-        public static int bitsForBoundingBox(LatLng location, double size) {
+        public static int bitsForBoundingBox(SerializableLatLng location, double size) {
             double latitudeDegreesDelta = GeoUtils.distanceToLatitudeDegrees(size);
-            double latitudeNorth = Math.min(90, location.latitude + latitudeDegreesDelta);
-            double latitudeSouth = Math.max(-90, location.latitude - latitudeDegreesDelta);
+            double latitudeNorth = Math.min(90, location.getLatitude() + latitudeDegreesDelta);
+            double latitudeSouth = Math.max(-90, location.getLatitude() - latitudeDegreesDelta);
             int bitsLatitude = ((int)Math.floor(Utils.bitsLatitude(size)))*2;
             int bitsLongitudeNorth = ((int)Math.floor(Utils.bitsLongitude(size, latitudeNorth)))*2 - 1;
             int bitsLongitudeSouth = ((int)Math.floor(Utils.bitsLongitude(size, latitudeSouth)))*2 - 1;
@@ -70,12 +70,12 @@ public class GeoHashQuery {
         return new GeoHashQuery(startHash, endHash);
     }
 
-    public static Set<GeoHashQuery> queriesAtLocation(LatLng location, double radius) {
+    public static Set<GeoHashQuery> queriesAtLocation(SerializableLatLng location, double radius) {
         int queryBits = Math.max(1, Utils.bitsForBoundingBox(location, radius));
         int geoHashPrecision = (int)(Math.ceil(queryBits/Base32Utils.BITS_PER_BASE32_CHAR));
 
-        double latitude = location.latitude;
-        double longitude = location.longitude;
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
         double latitudeDegrees = radius/Constants.METERS_PER_DEGREE_LATITUDE;
         double latitudeNorth = Math.min(90, latitude + latitudeDegrees);
         double latitudeSouth = Math.max(-90, latitude - latitudeDegrees);

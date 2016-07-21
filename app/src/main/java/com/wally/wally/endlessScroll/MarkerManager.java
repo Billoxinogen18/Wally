@@ -3,11 +3,11 @@ package com.wally.wally.endlessScroll;
 import android.content.Context;
 import android.graphics.Bitmap;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +20,14 @@ public class MarkerManager {
     private List<MarkerNameVisibility> mMarkerList;
 
     private MarkerIconGenerator mMarkerIconGenerator;
-    private GoogleMap mMap;
+    private MapboxMap mMap;
+    private IconFactory iconFactory;
 
     private int mSelectedMarker = 0;
 
-    public MarkerManager(Context context, GoogleMap map) {
+    public MarkerManager(Context context, MapboxMap map) {
         mMarkerIconGenerator = new MarkerIconGenerator(context);
+        iconFactory = IconFactory.getInstance(context);
         mMap = map;
         mMarkerList = new ArrayList<>();
     }
@@ -33,7 +35,7 @@ public class MarkerManager {
     public void reset() {
         mSelectedMarker = 0;
         for (MarkerNameVisibility markerNameVisibility : mMarkerList) {
-            markerNameVisibility.marker.remove();
+            markerNameVisibility.markerOptions.getMarker().remove();
         }
         mMarkerList.clear();
     }
@@ -49,28 +51,30 @@ public class MarkerManager {
         mMarkerIconGenerator.getDefaultMarkerIcon(oldSelect.visibility, new MarkerIconGenerator.MarkerIconGenerateListener() {
             @Override
             public void onMarkerIconGenerate(Bitmap icon) {
-                Marker marker = mMap.addMarker(
-                        new MarkerOptions()
-                                .position(oldSelect.marker.getPosition())
-                                .icon(BitmapDescriptorFactory.fromBitmap(icon))
-                                .anchor(0.5f, 1f));
-                oldSelect.marker.remove();
-                oldSelect.marker = marker;
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(oldSelect.markerOptions.getMarker().getPosition())
+                        .icon(iconFactory.fromBitmap(icon));
+//                        .anchor(0.5f, 1f);
+
+                mMap.addMarker(markerOptions);
+
+                oldSelect.markerOptions.getMarker().remove();
+                oldSelect.markerOptions = markerOptions;
             }
         });
 
         mMarkerIconGenerator.getEnumeratedMarkerIcon(newSelect.name, newSelect.visibility, new MarkerIconGenerator.MarkerIconGenerateListener() {
             @Override
             public void onMarkerIconGenerate(Bitmap icon) {
-                Marker marker = mMap.addMarker(
-                        new MarkerOptions()
-                                .position(newSelect.marker.getPosition())
-                                .icon(BitmapDescriptorFactory.fromBitmap(icon))
-                                .anchor(0.5f, 1f));
-                newSelect.marker.remove();
-                newSelect.marker = marker;
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(newSelect.markerOptions.getMarker().getPosition())
+                        .icon(iconFactory.fromBitmap(icon));
+//                        .anchor(0.5f, 1f);
+
+                mMap.addMarker(markerOptions);
+                newSelect.markerOptions.getMarker().remove();
+                newSelect.markerOptions = markerOptions;
                 mSelectedMarker = position;
-                marker.showInfoWindow();
 
                 hideObsoleteMarkers(position);
             }
@@ -79,16 +83,16 @@ public class MarkerManager {
 
     private void hideObsoleteMarkers(int position) {
         for (int i = position - LIMIT; i >= 0; i--) {
-            mMarkerList.get(i).marker.setVisible(false);
+            mMap.removeMarker(mMarkerList.get(i).markerOptions.getMarker());
         }
 
         for (int i = position + LIMIT; i < mMarkerList.size(); i++) {
-            mMarkerList.get(i).marker.setVisible(false);
+            mMap.removeMarker(mMarkerList.get(i).markerOptions.getMarker());
         }
 
         for (int i = position - LIMIT; i < position + LIMIT; i++) {
             if (i >= 0 && i < mMarkerList.size())
-                mMarkerList.get(i).marker.setVisible(true);
+                mMap.addMarker(mMarkerList.get(i).markerOptions);
         }
     }
 
@@ -97,13 +101,15 @@ public class MarkerManager {
         mMarkerIconGenerator.getDefaultMarkerIcon(visibility, new MarkerIconGenerator.MarkerIconGenerateListener() {
             @Override
             public void onMarkerIconGenerate(Bitmap icon) {
-                final Marker marker = mMap.addMarker(
-                        new MarkerOptions()
-                                .position(location)
-                                .anchor(0.5f, 1)
-                                .icon(BitmapDescriptorFactory.fromBitmap(icon)));
+                MarkerOptions markerOptions = new MarkerOptions()
+                        .position(location)
+                        .icon(iconFactory.fromBitmap(icon));
+//                        .anchor(0.5f, 1);
+
+                mMap.addMarker(markerOptions);
+
                 MarkerNameVisibility markerNameVisibility = new MarkerNameVisibility();
-                markerNameVisibility.marker = marker;
+                markerNameVisibility.markerOptions = markerOptions;
                 markerNameVisibility.name = name;
                 markerNameVisibility.visibility = visibility;
                 mMarkerList.add(markerNameVisibility);
@@ -116,16 +122,12 @@ public class MarkerManager {
     }
 
     public List<Marker> getVisibleMarkers() {
-        List<Marker> res = new ArrayList<>();
-        for (MarkerNameVisibility markerNameVisibility : mMarkerList) {
-            if (markerNameVisibility.marker.isVisible())
-                res.add(markerNameVisibility.marker);
-        }
-        return res;
+        return mMap.getMarkers();
     }
 
     private class MarkerNameVisibility {
-        public Marker marker;
+        //        public Marker marker;
+        public MarkerOptions markerOptions;
         public int visibility;
         public String name;
     }

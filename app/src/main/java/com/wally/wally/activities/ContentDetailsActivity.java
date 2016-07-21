@@ -16,15 +16,17 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.plus.Plus;
+import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.wally.wally.App;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 import com.wally.wally.components.UserInfoView;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.user.User;
@@ -45,6 +47,8 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
     private TextView mNote;
     private CardView mCard;
 
+    private MapView mMapView;
+
     public static Intent newIntent(Context from, Content content) {
         Intent i = new Intent(from, ContentDetailsActivity.class);
         i.putExtra(KEY_CONTENT, content);
@@ -54,6 +58,8 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        MapboxAccountManager.start(getBaseContext(), getString(R.string.mapbox_api_key));
         setContentView(R.layout.activity_content_details);
 
         mContent = (Content) getIntent().getSerializableExtra(KEY_CONTENT);
@@ -71,9 +77,9 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
                     .build();
         }
 
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        mMapView = (MapView) findViewById(R.id.map);
+        mMapView.onCreate(savedInstanceState);
+        mMapView.getMapAsync(this);
 
         User currentUser = App.getInstance().getDataController().getCurrentUser();
         if (currentUser.getId() != null) {
@@ -83,6 +89,42 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
 
         bindViews();
         initViewsWithContent();
+    }
+
+    // Add the mapView lifecycle to the activity's lifecycle methods
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mMapView != null)
+            mMapView.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mMapView != null)
+            mMapView.onPause();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        if (mMapView != null)
+            mMapView.onLowMemory();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mMapView != null)
+            mMapView.onDestroy();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (mMapView != null)
+            mMapView.onSaveInstanceState(outState);
     }
 
     @Override
@@ -158,12 +200,12 @@ public class ContentDetailsActivity extends AppCompatActivity implements OnMapRe
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        LatLng pos = mContent.getLocation();
-        googleMap.addMarker(new MarkerOptions()
+    public void onMapReady(MapboxMap map) {
+        LatLng pos = Utils.serializableLatLngToLatLng(mContent.getLocation());
+        map.addMarker(new MarkerOptions()
                 .position(pos)
                 .title(mContent.getTitle()));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 10f));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 10f));
     }
 
     private void onDeleteContent() {

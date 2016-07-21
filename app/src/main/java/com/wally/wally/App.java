@@ -2,6 +2,7 @@ package com.wally.wally;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDex;
 
 import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
 import com.wally.wally.datacontroller.DataController;
@@ -29,6 +30,7 @@ public class App extends Application {
 
     @Override
     public void onCreate() {
+        MultiDex.install(getApplicationContext());
         super.onCreate();
         // TODO: DataController.create()
         // Is implemented with singleton

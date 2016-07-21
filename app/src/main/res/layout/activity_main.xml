@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.CameraARTangoActivity"
-    android:animateLayoutChanges="true">
+    android:animateLayoutChanges="true"
+    tools:context=".activities.CameraARTangoActivity">
 
     <TextView
         android:layout_width="wrap_content"
@@ -104,6 +104,13 @@
 
     <com.google.atap.tango.ux.TangoUxLayout
         android:id="@+id/layout_tango_ux"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:alpha="0.95"
+        android:elevation="30dp"
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </FrameLayout>
