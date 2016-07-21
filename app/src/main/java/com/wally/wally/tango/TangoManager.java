@@ -87,6 +87,7 @@ public class TangoManager implements LocalizationListener {
         mTangoFactory = tangoFactory;
         mAdfManager = adfManager;
         mLearningEvaluator = evaluator;
+        mTangoUpdater.addLocalizationListener(this);
     }
 
 //    public TangoManager(TangoUpdater tangoUpdater, TangoPointCloudManager pointCloudManager, WallyRenderer wallyRenderer,
