@@ -51,7 +51,8 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         } else if (pose.baseFrame == TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION && pose.targetFrame == TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE) {
             setTangoLocalization(true);
             if (mTangoUx != null) {
-                mTangoUx.hideCustomMessage();
+                //TODO hide message no longer exists
+//                mTangoUx.hideCustomMessage();
             }
         } else if (!isTangoLocalized()) {
             if (mTangoUx != null) {

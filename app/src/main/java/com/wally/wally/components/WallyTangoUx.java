@@ -4,31 +4,49 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.AttributeSet;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.wally.wally.R;
 
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 /**
- * Created by Meravici on 5/26/2016.
+ * Created by Meravici on 5/26/2016. yea
  */
 public class WallyTangoUx extends TangoUx {
+    public static final int SHORT = 2000;
+    public static final int LONG = 5000;
+
+
     private Handler mMainThreadHandler;
     private TextView mTextView;
     private Context mContext;
+    private Queue<Pair<Integer, String>> mMessageQueue;
+    private Runnable onMessageTimeout = new Runnable() {
+        @Override
+        public void run() {
+            mTextView.setText("");
+            mTextView.setVisibility(View.GONE);
+            mMessageQueue.poll();
+            if(!mMessageQueue.isEmpty()){
+                showNextMessage();
+            }
+        }
+    };
 
     public WallyTangoUx(Context context) {
         super(context);
         mContext = context;
         mMainThreadHandler = new Handler(Looper.getMainLooper());
+        mMessageQueue = new ConcurrentLinkedQueue<>();
 
     }
 
@@ -40,26 +58,42 @@ public class WallyTangoUx extends TangoUx {
 
     }
 
-    public void showCustomMessage(final String message){
-        if(!mTextView.getText().equals(message) || mTextView.getVisibility() != View.VISIBLE){
+    public void showCustomMessage(final String message, int durationMs){
+        mMessageQueue.add(new Pair<>(durationMs, message));
+
+        if(mMessageQueue.isEmpty()){
+            showNextMessage();
+        }
+    }
+//
+//    public void hideCustomMessage(){
+//        if(mTextView.getVisibility() != View.GONE)
+//            mMainThreadHandler.post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mTextView.setVisibility(View.GONE);
+//                }
+//            });
+//    }
+
+
+    private void showNextMessage(){
+        final Pair<Integer, String> pair = mMessageQueue.peek();
+        if(!mTextView.getText().equals(pair.second)){
             mMainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    mTextView.setText(message);
+                    mTextView.setText(pair.second);
                     mTextView.setVisibility(View.VISIBLE);
                 }
             });
         }
+
+        waitFor(pair.first);
     }
 
-    public void hideCustomMessage(){
-        if(mTextView.getVisibility() != View.GONE)
-            mMainThreadHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mTextView.setVisibility(View.GONE);
-                }
-            });
+    private void waitFor(int duration){
+        mMainThreadHandler.postDelayed(onMessageTimeout, duration);
     }
 
     private void addTextView(TangoUxLayout tangoUxLayout) {
@@ -74,4 +108,7 @@ public class WallyTangoUx extends TangoUx {
     }
 
 
+    public void showCustomMessage(String message) {
+        showCustomMessage(message, SHORT);
+    }
 }

@@ -1,10 +1,7 @@
 package com.wally.wally.tango;
 
-import android.net.Uri;
-import android.os.Handler;
 import android.util.Log;
 
-import com.bumptech.glide.util.Util;
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
