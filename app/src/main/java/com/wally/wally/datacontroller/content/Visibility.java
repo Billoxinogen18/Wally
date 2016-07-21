@@ -101,14 +101,29 @@ public class Visibility implements Serializable {
 
         public static
         @DrawableRes
-        int toDrawableRes(@SocialVisibilityMode int range) {
-            switch (range) {
+        int toDrawableRes(@SocialVisibilityMode int mode) {
+            switch (mode) {
                 case PUBLIC:
                     return R.drawable.ic_public_visibility_24dp;
                 case PRIVATE:
-                    return R.drawable.ic_private_visibility_black_24dp;
+                    return R.drawable.ic_private_visibility_24dp;
                 case PEOPLE:
-                    return R.drawable.ic_people_visibility_black;
+                    return R.drawable.ic_people_visibility_24dp;
+                default:
+                    throw new IllegalArgumentException("Unsupported image");
+            }
+        }
+
+        public static
+        @DrawableRes
+        int toSmallDrawableRes(@SocialVisibilityMode int mode) {
+            switch (mode) {
+                case PUBLIC:
+                    return R.drawable.ic_public_visibility_18dp;
+                case PRIVATE:
+                    return R.drawable.ic_private_visibility_18dp;
+                case PEOPLE:
+                    return R.drawable.ic_people_visibility_18dp;
                 default:
                     throw new IllegalArgumentException("Unsupported image");
             }

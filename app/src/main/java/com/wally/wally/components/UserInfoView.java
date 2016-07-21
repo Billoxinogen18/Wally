@@ -46,6 +46,7 @@ public class UserInfoView extends LinearLayout {
     private SocialUser mUser;
     // This variable is to check if new request comes while loading user.
     private String mLastUserId;
+    private Integer textColor;
 
     public UserInfoView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -269,7 +270,12 @@ public class UserInfoView extends LinearLayout {
         mUserName.setText(user.getDisplayName());
     }
 
-    public void setStatus(String status) {
+    public void setStatus(CharSequence status) {
         mStatusView.setText(status);
+    }
+
+    public void setTextColor(Integer textColor) {
+        mUserName.setTextColor(textColor);
+        mStatusView.setTextColor(textColor);
     }
 }

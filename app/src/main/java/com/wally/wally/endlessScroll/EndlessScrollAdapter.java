@@ -17,6 +17,7 @@ import com.wally.wally.userManager.SocialUser;
 /**
  * Created by Meravici on 6/20/2016. yea
  */
+// TODO change name with EndlessNoteAdapter
 public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ContentPagingRetriever.ContentPageRetrieveListener {
     public static final String TAG = EndlessScrollAdapter.class.getSimpleName();
     private static final int PROGRESS_VIEW_TYPE = 73;

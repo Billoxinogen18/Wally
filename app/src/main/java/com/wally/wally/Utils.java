@@ -42,7 +42,6 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.userManager.SocialUser;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -100,7 +99,17 @@ public final class Utils {
     public static String formatDateSmart(Context context, long date) {
         long now = System.currentTimeMillis();
         if (DateUtils.isToday(date)) {
-            return DateUtils.getRelativeTimeSpanString(date, now, 0L, DateUtils.FORMAT_ABBREV_ALL).toString();
+            return DateUtils.getRelativeDateTimeString(context, date, now, 0L, DateUtils.FORMAT_ABBREV_RELATIVE).toString();
+        } else {
+            return DateUtils.formatDateTime(context, date, DateUtils.FORMAT_ABBREV_RELATIVE);
+        }
+    }
+
+    public static String formatDateSmartShort(Context context, long date) {
+        long now = System.currentTimeMillis();
+        if (DateUtils.isToday(date)) {
+            return DateUtils.getRelativeTimeSpanString(date, now, 0L, DateUtils.FORMAT_ABBREV_RELATIVE).toString()
+                    .replace("ago", "");
         } else {
             return DateUtils.formatDateTime(context, date, DateUtils.FORMAT_ABBREV_RELATIVE);
         }
@@ -109,6 +118,7 @@ public final class Utils {
     public static boolean hasADFPermissions(Context context) {
         return Tango.hasPermission(context, Tango.PERMISSIONTYPE_ADF_LOAD_SAVE);
     }
+
 
     public static Bitmap createBitmapFromContent(Content content) {
         Context context = App.getContext();
@@ -158,11 +168,17 @@ public final class Utils {
         );
         cv.layout(0, 0, cv.getMeasuredWidth(), cv.getMeasuredHeight());
 
-        final Bitmap bitmap = Bitmap.createBitmap(cv.getMeasuredWidth(),
-                cv.getMeasuredHeight(), Bitmap.Config.ARGB_4444);
+        return createBitmapFromView(cv);
+    }
+
+    public static Bitmap createBitmapFromView(View v) {
+        int w = v.getMeasuredHeight();
+        int h = v.getMeasuredHeight();
+
+        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_4444);
         Canvas canvas = new Canvas(bitmap);
         canvas.drawColor(Color.TRANSPARENT);
-        cv.draw(canvas);
+        v.draw(canvas);
         return bitmap;
     }
 
@@ -329,5 +345,9 @@ public final class Utils {
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, locationListener);
+    }
+
+    public static int dpToPx(Context context, int dp) {
+        return (int) ((dp * context.getResources().getDisplayMetrics().density) + 0.5);
     }
 }
