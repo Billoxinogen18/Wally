@@ -16,6 +16,7 @@ public class Content implements Serializable {
     private String imageUri;
     private String uuid;
     private Integer color;
+    private Integer textColor;
     private TangoData tangoData;
     private SerializableLatLng location;
     private Visibility visibility;
@@ -51,8 +52,17 @@ public class Content implements Serializable {
         return color;
     }
 
+    public Integer getTextColor() {
+        return textColor;
+    }
+
     public Content withColor(Integer color) {
         this.color = color;
+        return this;
+    }
+
+    public Content withTextColor(Integer textColor) {
+        this.textColor = textColor;
         return this;
     }
 
@@ -127,6 +137,10 @@ public class Content implements Serializable {
         return creationDate;
     }
 
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
     public Content withCreationDate(Date date) {
         creationDate = date;
         return this;
@@ -170,9 +184,5 @@ public class Content implements Serializable {
 
     public boolean isPrivate() {
         return visibility.getSocialVisibility().getMode() == Visibility.SocialVisibility.PRIVATE;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
     }
 }
