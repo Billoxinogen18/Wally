@@ -17,10 +17,7 @@
 
         <com.mapbox.mapboxsdk.maps.MapView
             android:id="@+id/map"
-            tools:center_latitude="40.73581"
-            tools:center_longitude="-73.99155"
-            tools:style_url="mapbox://styles/mapbox/streets-v9"
-            tools:zoom="11"
+            app:style_url="mapbox://styles/mapbox/dark-v9"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
