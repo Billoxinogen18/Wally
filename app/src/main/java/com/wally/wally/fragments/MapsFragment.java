@@ -36,7 +36,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.wally.wally.App;
 import com.wally.wally.R;
-import com.wally.wally.StubContentFetcher;
 import com.wally.wally.Utils;
 import com.wally.wally.activities.CameraARActivity;
 import com.wally.wally.activities.ContentDetailsActivity;
@@ -130,6 +129,11 @@ public class MapsFragment extends Fragment implements
         if (mUserProfile != null) {
             v.findViewById(R.id.update_area).setVisibility(View.GONE);
         }
+
+
+        v.findViewById(R.id.back).setOnClickListener(this);
+        v.findViewById(R.id.my_location).setOnClickListener(this);
+        v.findViewById(R.id.update_area).setOnClickListener(this);
 
         mContentListView = (ContentListView) v.findViewById(R.id.content_list_view);
 
@@ -372,25 +376,23 @@ public class MapsFragment extends Fragment implements
     }
 
     private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
-//        VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
-//        double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
-//        ContentFetcher contentFetcher;
-//
-//        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
-//            contentFetcher = App.getInstance().getDataController()
-//                    .createFetcherForMyContent();
-//        } else if (mUserProfile != null) {
-//            contentFetcher = App.getInstance().getDataController()
-//                    .createFetcherForUserContent(mUserProfile.getBaseUser());
-//        } else {
-//            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
-//                    Utils.latLngToSerializableLatLng(cameraPosition.target),
-//                    radius
-//            );
-//        }
-//        return contentFetcher;
+        VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
+        double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
+        ContentFetcher contentFetcher;
 
-        return new StubContentFetcher();
+        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
+            contentFetcher = App.getInstance().getDataController()
+                    .createFetcherForMyContent();
+        } else if (mUserProfile != null) {
+            contentFetcher = App.getInstance().getDataController()
+                    .createFetcherForUserContent(mUserProfile.getBaseUser());
+        } else {
+            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
+                    Utils.latLngToSerializableLatLng(cameraPosition.target),
+                    radius
+            );
+        }
+        return contentFetcher;
     }
 
     private void centerMapOnMyLocation(MapboxMap.CancelableCallback callback) {
