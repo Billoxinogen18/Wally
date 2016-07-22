@@ -65,6 +65,7 @@ public class TangoManager implements LocalizationListener {
     private AdfManager mAdfManager;
 
     private boolean mIsLocalized;
+    private boolean mIsReadyToSaveAdf;
 
     private boolean mIsLearningMode;
     private AdfScheduler mAdfScheduler;
@@ -180,9 +181,10 @@ public class TangoManager implements LocalizationListener {
         mLearningEvaluator.addCallback(new LearningEvaluator.LearningEvaluatorListener() {
             @Override
             public void onLearningFinish() {
-                saveAdf();
-                mTangoUx.showCustomMessage("New room was learned.");
-                startLocalizing(currentAdf);
+                mIsReadyToSaveAdf = true;
+                if (isLocalized()) {
+                    finishLearning();
+                }
             }
 
             @Override
@@ -193,12 +195,19 @@ public class TangoManager implements LocalizationListener {
         mTangoUx.showCustomMessage("Learning new room...");
     }
 
+    private void finishLearning(){
+        saveAdf();
+        mTangoUx.showCustomMessage("New room was learned.");
+        startLocalizing(currentAdf);
+    }
+
     private synchronized void saveAdf(){
         String uuid = mTango.saveAreaDescription();
         mIsLearningMode = false;
         AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
         savedAdf = adfInfo;
         currentAdf = adfInfo;
+        mIsReadyToSaveAdf = false;
     }
 
     private synchronized void startLearning(){
@@ -432,12 +441,19 @@ public class TangoManager implements LocalizationListener {
         mAdfScheduler.finish();
         Log.d(TAG, "localized() mAdfScheduler.finish() was called");
         if (currentAdf != null) savedAdf = currentAdf;
+        if(mIsReadyToSaveAdf && mIsLearningMode){
+            finishLearning();
+        }
     }
 
     @Override
     public void notLocalized() {
         Log.d(TAG, "notLocalized() called with: " + "");
         mIsLocalized = false;
+    }
+
+    public synchronized boolean isLocalized(){
+        return mIsLocalized;
     }
 
 
