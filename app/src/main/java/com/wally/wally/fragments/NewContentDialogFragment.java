@@ -5,9 +5,11 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
@@ -231,8 +233,9 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
             case R.id.btn_pallette:
                 new ColorPickerPopup().show(v, new ColorPickerPopup.ColorPickerListener() {
                     @Override
-                    public void colorPicked(int color) {
+                    public void colorPicked(int color, int textColor) {
                         mContent.withColor(color);
+                        mContent.withTextColor(textColor);
                         updateViews();
                     }
                 });
@@ -290,6 +293,15 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
 
         if (mContent.getColor() != null) {
             mNoteView.setBackgroundColor(mContent.getColor());
+        }
+
+        if (mContent.getTextColor() != null) {
+            int textColor = mContent.getTextColor();
+            int hintColor = Utils.modifyAlpha(textColor, 96);
+            mNoteEt.setTextColor(textColor);
+            mNoteEt.setHintTextColor(hintColor);
+            mTitleEt.setTextColor(textColor);
+            mTitleEt.setHintTextColor(hintColor);
         }
 
         if (TextUtils.isEmpty(mContent.getImageUri())) {
@@ -363,7 +375,13 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     private void setDataOnSocialVisibilityButton(Visibility.SocialVisibility visibility) {
         int mode = visibility.getMode();
         mSocialVisibilityBtn.setText(Visibility.SocialVisibility.getStringRepresentation(mode));
-        mSocialVisibilityBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(Visibility.SocialVisibility.toDrawableRes(mode), 0, 0, 0);
+
+        Drawable drawable = ContextCompat.getDrawable(getContext(), Visibility.SocialVisibility.toDrawableRes(mode));
+        if (mContent.getTextColor() != null) {
+            drawable = Utils.tintDrawable(drawable, mContent.getTextColor());
+            mSocialVisibilityBtn.setTextColor(mContent.getTextColor());
+        }
+        mSocialVisibilityBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null);
     }
 
     public void showDialog(boolean show) {

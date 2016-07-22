@@ -20,11 +20,11 @@
     <dimen name="spacing_normal">16dp</dimen>
     <dimen name="toolbar_left_padding">16dp</dimen>
 
-    <dimen name="color_picker_popup_width">160dp</dimen>
-    <dimen name="color_picker_popup_height">160dp</dimen>
+    <dimen name="color_picker_popup_width">360dp</dimen>
+    <dimen name="color_picker_popup_height">220dp</dimen>
 
-    <dimen name="picker_color_item_size">36dp</dimen>
-    <dimen name="picker_color_item_margin">4dp</dimen>
+    <dimen name="picker_color_item_size">48dp</dimen>
+    <dimen name="picker_color_item_margin">8dp</dimen>
     <dimen name="person_grid_width">120dp</dimen>
 
     <dimen name="adf_name_dialog_width">350dp</dimen>
