@@ -8,6 +8,8 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 
@@ -21,8 +23,8 @@ public class MarkerIconGenerator {
     private Context context;
 
     private AsyncTask mMarkerGeneratorTask;
-    private Map<String, Bitmap> cache;
-    private Map<Integer, Bitmap> defaultCache;
+    private Map<String, Icon> cache;
+    private Map<Integer, Icon> defaultCache;
     private final int[] COLORS;
 
     public MarkerIconGenerator(Context context) {
@@ -46,10 +48,10 @@ public class MarkerIconGenerator {
                 mMarkerGeneratorTask.cancel(true);
             }
 
-            mMarkerGeneratorTask = new AsyncTask<Void, Void, Bitmap>() {
+            mMarkerGeneratorTask = new AsyncTask<Void, Void, Icon>() {
 
                 @Override
-                protected Bitmap doInBackground(Void... voids) {
+                protected Icon doInBackground(Void... voids) {
 //                    IconGenerator iconGenerator = new IconGenerator(context);
 //                    iconGenerator.setTextAppearance(R.style.Bubble_TextAppearance_Light);
 //
@@ -62,14 +64,11 @@ public class MarkerIconGenerator {
 //                    Bitmap icon = iconGenerator.makeIcon(name);
 //                    cache.put(name, icon);
 
-                    Bitmap icon = BitmapFactory.decodeResource(context.getResources(),
-                            R.drawable.map_marker);
-
-                    return icon;
+                    return IconFactory.getInstance(context).fromDrawable(ContextCompat.getDrawable(context, R.drawable.map_marker));
                 }
 
                 @Override
-                protected void onPostExecute(Bitmap icon) {
+                protected void onPostExecute(Icon icon) {
                     super.onPostExecute(icon);
                     if (icon == null) {
                         return;
@@ -87,21 +86,14 @@ public class MarkerIconGenerator {
         }else {
             Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_marker_dot);
             drawable = Utils.tintDrawable(drawable, COLORS[visibility]);
-            Bitmap bitmap;
+            Icon icon = IconFactory.getInstance(context).fromDrawable(drawable);
+            defaultCache.put(visibility, icon);
 
-            bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-
-            Canvas canvas = new Canvas(bitmap);
-            drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            drawable.draw(canvas);
-
-            defaultCache.put(visibility, bitmap);
-
-            markerIconGenerateListener.onMarkerIconGenerate(bitmap);
+            markerIconGenerateListener.onMarkerIconGenerate(icon);
         }
     }
 
     public interface MarkerIconGenerateListener {
-        void onMarkerIconGenerate(Bitmap icon);
+        void onMarkerIconGenerate(Icon icon);
     }
 }
