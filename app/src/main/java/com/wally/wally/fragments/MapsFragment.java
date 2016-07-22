@@ -24,6 +24,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.plus.Plus;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -412,7 +413,7 @@ public class MapsFragment extends Fragment implements
     }
 
     private void centerMapOnVisibleMarkers() {
-        List<Marker> markers = mMarkerManager.getVisibleMarkers();
+        List<MarkerView> markers = mMarkerManager.getVisibleMarkers();
         if(markers.size() > 0) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (Marker marker : markers) {

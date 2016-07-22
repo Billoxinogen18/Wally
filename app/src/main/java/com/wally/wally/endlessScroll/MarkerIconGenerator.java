@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.content.ContextCompat;
 
+import com.google.maps.android.ui.IconGenerator;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.wally.wally.R;
@@ -52,19 +53,21 @@ public class MarkerIconGenerator {
 
                 @Override
                 protected Icon doInBackground(Void... voids) {
-//                    IconGenerator iconGenerator = new IconGenerator(context);
-//                    iconGenerator.setTextAppearance(R.style.Bubble_TextAppearance_Light);
-//
-//                    if (isCancelled()) {
-//                        return null;
-//                    }
-//                    int color = COLORS[visibility];
-//                    iconGenerator.setColor(color);
-//
-//                    Bitmap icon = iconGenerator.makeIcon(name);
-//                    cache.put(name, icon);
+                    IconGenerator iconGenerator = new IconGenerator(context);
+                    iconGenerator.setTextAppearance(R.style.Bubble_TextAppearance_Light);
 
-                    return IconFactory.getInstance(context).fromDrawable(ContextCompat.getDrawable(context, R.drawable.map_marker));
+                    if (isCancelled()) {
+                        return null;
+                    }
+                    int color = COLORS[visibility];
+                    iconGenerator.setColor(color);
+
+                    Bitmap bitmap = iconGenerator.makeIcon(name);
+                    Icon icon = IconFactory.getInstance(context).fromBitmap(bitmap);
+
+                    cache.put(name, icon);
+
+                    return icon;
                 }
 
                 @Override

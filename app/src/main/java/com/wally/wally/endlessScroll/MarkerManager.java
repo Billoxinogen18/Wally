@@ -3,8 +3,8 @@ package com.wally.wally.endlessScroll;
 import android.content.Context;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
+import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
@@ -82,9 +82,7 @@ public class MarkerManager {
 //                newSelect.marker = marker;
                 mSelectedMarker = position;
 
-//                mMap.getMarkerViewManager().select(newSelect.marker);
-                mMap.selectMarker(newSelect.marker);
-
+                mMap.getMarkerViewManager().select(newSelect.marker);
 
                 hideObsoleteMarkers(position);
             }
@@ -117,12 +115,12 @@ public class MarkerManager {
         mMarkerIconGenerator.getDefaultMarkerIcon(visibility, new MarkerIconGenerator.MarkerIconGenerateListener() {
             @Override
             public void onMarkerIconGenerate(Icon icon) {
-                MarkerOptions markerOptions = new MarkerOptions()
+                MarkerViewOptions markerOptions = new MarkerViewOptions()
                         .position(location)
                         .icon(icon);
-//                        .anchor(0.5f, 1);
+                // TODO .anchor(1, 0.5f);
 
-                Marker marker = mMap.addMarker(markerOptions);
+                MarkerView marker = mMap.addMarker(markerOptions);
 
                 MarkerNameVisibility markerNameVisibility = new MarkerNameVisibility();
                 markerNameVisibility.markerOptions = markerOptions;
@@ -139,14 +137,19 @@ public class MarkerManager {
         });
     }
 
-    public List<Marker> getVisibleMarkers() {
-        return mMap.getMarkers();
+    public List<MarkerView> getVisibleMarkers() {
+        List<MarkerView> res = new ArrayList<>();
+        for (MarkerNameVisibility markerNameVisibility : mMarkerList) {
+            res.add(markerNameVisibility.marker);
+        }
+        return res;
+
     }
 
     private class MarkerNameVisibility {
         public boolean isAdded;
-        public Marker marker;
-        public MarkerOptions markerOptions;
+        public MarkerView marker;
+        public MarkerViewOptions markerOptions;
         public int visibility;
         public String name;
     }
