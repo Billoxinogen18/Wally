@@ -5,15 +5,20 @@ import com.wally.wally.datacontroller.callbacks.Callback;
 
 public class LearningEvaluator {
 
-    public void addCallback(final Callback<Object> callback) {
+    public void addCallback(final LearningEvaluatorListener listener) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Thread.sleep(20000);
                 } catch (InterruptedException e) {}
-                callback.onResult("");
+                listener.onLearningFinish();
             }
         }).start();
+    }
+
+    interface LearningEvaluatorListener{
+        void onLearningFinish();
+        void onLearningFailed();
     }
 }

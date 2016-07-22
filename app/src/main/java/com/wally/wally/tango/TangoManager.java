@@ -143,7 +143,7 @@ public class TangoManager implements LocalizationListener {
     public synchronized void onResume() {
         Log.d(TAG, "Enter onResume()");
         if (savedAdf != null){
-            tryToLocalizeWithAdf(savedAdf);
+            startLocalizing(savedAdf);
             // TODO: what happens if can't localize on saved ADF?
         } else {
             mAdfScheduler = new AdfScheduler(mAdfManager)
@@ -160,7 +160,11 @@ public class TangoManager implements LocalizationListener {
             public void onResult(AdfInfo result) {
                 if (mIsLocalized) { return; }
                 Log.d(TAG, "adfSchedulerCallback onResult: " + result);
-                tryToLocalizeWithAdf(result);
+                if (result == null){
+                    startLearning();
+                } else {
+                    startLocalizing(result);
+                }
             }
 
             @Override
@@ -170,38 +174,39 @@ public class TangoManager implements LocalizationListener {
         };
     }
 
-    private synchronized void tryToLocalizeWithAdf(final AdfInfo adf) {
-        Log.d(TAG, "tryToLocalizeWithAdf(" + adf + ")");
-        if (adf == null) {
-            mAdfScheduler.finish();
-            Log.d(TAG, "tryToLocalizeWithAdf mAdfScheduler.finish()");
-            mIsLearningMode = true;
-            mLearningEvaluator.addCallback(new Callback<Object>() {
-                @Override
-                public void onResult(Object result) {
-                    Log.d(TAG, "onResult() called with: " + "result = [" + result + "]");
-                    synchronized (TangoManager.this) {
-                        Log.d(TAG, "onResult() in synchronize");
-                        String uuid = mTango.saveAreaDescription();
-                        Log.d(TAG, "onResult() adf saved");
-                        mIsLearningMode = false;
-                        AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
-                        savedAdf = adfInfo;
-                        currentAdf = adfInfo;
-                        mTangoUx.showCustomMessage("New room was learned.");
-                        tryToLocalizeWithAdf(adfInfo);
-                    }
-                }
+    private synchronized void prepareForLearning(){
+        mAdfScheduler.finish();
+        mIsLearningMode = true;
+        mLearningEvaluator.addCallback(new LearningEvaluator.LearningEvaluatorListener() {
+            @Override
+            public void onLearningFinish() {
+                saveAdf();
+                mTangoUx.showCustomMessage("New room was learned.");
+                startLocalizing(currentAdf);
+            }
 
-                @Override
-                public void onError(Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            Log.d(TAG, "tryToLocalizeWithAdf() learn new room");
-            mTangoUx.showCustomMessage("Learning new room...");
-            Log.d(TAG, "tryToLocalizeWithAdf() adf null finished");
-        }
+            @Override
+            public void onLearningFailed() {
+                //TODO
+            }
+        });
+        mTangoUx.showCustomMessage("Learning new room...");
+    }
+
+    private synchronized void saveAdf(){
+        String uuid = mTango.saveAreaDescription();
+        mIsLearningMode = false;
+        AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
+        savedAdf = adfInfo;
+        currentAdf = adfInfo;
+    }
+
+    private synchronized void startLearning(){
+        prepareForLearning();
+        startLocalizing(null);
+    }
+
+    private synchronized void startLocalizing(final AdfInfo adf) {
         // Synchronize against disconnecting while the service is being used
         // in OpenGL thread or in UI thread.
         currentAdf = adf;
