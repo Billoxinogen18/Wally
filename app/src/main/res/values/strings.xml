@@ -122,4 +122,5 @@
     <string name="note_color_pink">Pink</string>
     <string name="note_color_blue_grey">Blue Grey</string>
     <string name="select_color">Select Color</string>
+    <string name="select_share_visibility">Share Visibility</string>
 </resources>

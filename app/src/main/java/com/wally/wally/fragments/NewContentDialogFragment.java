@@ -191,7 +191,8 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         updateContent();
         switch (v.getId()) {
             case R.id.btn_social_visibility:
-                new SocialVisibilityPopup().show(v, new SocialVisibilityPopup.SocialVisibilityListener() {
+                Visibility.SocialVisibility sv = mContent.getVisibility().getSocialVisibility();
+                new SocialVisibilityPopup().show(v, sv, new SocialVisibilityPopup.SocialVisibilityListener() {
                     @Override
                     public void onVisibilityChosen(int socialVisibilityMode) {
                         if (mContent.getVisibility().getSocialVisibility() == null) {

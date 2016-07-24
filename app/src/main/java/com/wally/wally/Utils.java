@@ -375,12 +375,13 @@ public final class Utils {
             float startRadius;
             float finalRadius;
             float hypot = (float) Math.hypot(targetView.getWidth(), targetView.getHeight());
+            float radius = from.getWidth() / 3;
             if (start) {
-                startRadius = 0;
+                startRadius = radius;
                 finalRadius = hypot;
             } else {
                 startRadius = hypot;
-                finalRadius = 0;
+                finalRadius = radius;
             }
 
             Rect center = new Rect();
