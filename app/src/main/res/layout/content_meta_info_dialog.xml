@@ -1,98 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:animateLayoutChanges="true"
+    android:background="@drawable/pickers_background"
     android:padding="8dp"
     tools:context=".activities.CameraARActivity">
-
-    <ImageButton
-        android:id="@+id/btn_dismiss"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"
-        android:src="@drawable/ic_arrow_back_black_24dp" />
 
     <TextView
         android:id="@+id/dialog_title"
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_toRightOf="@+id/btn_dismiss"
-        android:padding="8dp"
-        android:text="@string/content_meta_info_dialog_title" />
+        android:layout_above="@+id/more_options_container"
+        android:layout_alignLeft="@+id/more_options_container"
+        android:layout_marginBottom="2dp"
+        android:layout_marginLeft="16dp"
+        android:text="@string/content_meta_info_dialog_title"
+        android:textColor="@android:color/white" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/more_options_container"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/dialog_title"
-        android:layout_marginTop="12dp"
+        android:layout_centerInParent="true"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:padding="8dp"
-            android:text="@string/visibility"
-            android:textColor="@color/colorPrimary" />
-
-        <CheckBox
-            android:id="@+id/checkbox_anonymous_author"
+        <Switch
+            android:id="@+id/switch_anonymous_author"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:button="@null"
-            android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
             android:padding="16dp"
-            android:text="@string/anonymous_author_checkbox" />
+            android:text="@string/anonymous_author_checkbox"
+            android:textColor="@android:color/white" />
 
-        <CheckBox
-            android:id="@+id/checkbox_map_preview"
+        <Switch
+            android:id="@+id/switch_map_preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackground"
-            android:button="@null"
-            android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
             android:padding="16dp"
-            android:text="@string/preview_visibility_checkbox" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="8dp"
-            android:background="@color/dividerColor"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/tv_note_delete_time"
-                style="@style/TextAppearance.AppCompat.Body1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="?attr/selectableItemBackground"
-                android:padding="16dp"
-                tools:text="The Note will be deleted at: 12/04/2016" />
-
-            <ImageButton
-                android:id="@+id/btn_reset_delete_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="13dp"
-                android:src="@drawable/ic_clear_black_24dp" />
-        </LinearLayout>
+            android:text="@string/preview_visibility_checkbox"
+            android:textColor="@android:color/white" />
     </LinearLayout>
 </RelativeLayout>

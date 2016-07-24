@@ -16,17 +16,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.ColorPickerPopup;
+import com.wally.wally.components.ContentMetaInfoPopup;
 import com.wally.wally.components.SocialVisibilityPopup;
 import com.wally.wally.components.TextChangeListenerAdapter;
 import com.wally.wally.datacontroller.content.Content;
@@ -37,7 +35,6 @@ import com.wally.wally.userManager.SocialUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -192,7 +189,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         switch (v.getId()) {
             case R.id.btn_social_visibility:
                 Visibility.SocialVisibility sv = mContent.getVisibility().getSocialVisibility();
-                new SocialVisibilityPopup().show(v, sv, new SocialVisibilityPopup.SocialVisibilityListener() {
+                new SocialVisibilityPopup().show(v, mContent.getVisibility().getSocialVisibility(), new SocialVisibilityPopup.SocialVisibilityListener() {
                     @Override
                     public void onVisibilityChosen(int socialVisibilityMode) {
                         if (mContent.getVisibility().getSocialVisibility() == null) {
@@ -242,8 +239,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
                 });
                 break;
             case R.id.btn_more_settings:
-                showDialog(false);
-                MetaInfoDialogFragment.newInstance(mContent).show(getChildFragmentManager(), MetaInfoDialogFragment.TAG);
+                new ContentMetaInfoPopup().show(v, mContent);
                 break;
             default:
                 Log.e(TAG, "onClick: " + v.getId());
@@ -336,11 +332,6 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         updateContent();
         outState.putSerializable("mContent", mContent);
         outState.putBoolean("mIsDialogShown", mIsDialogShown);
-    }
-
-    public void onMetaInfoDialogDismiss(Content content) {
-        mContent = content;
-        showDialog(true);
     }
 
     @Override
@@ -448,139 +439,6 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
             AlertDialog dialog = builder.create();
             dialog.setCanceledOnTouchOutside(false);
             return dialog;
-        }
-    }
-
-    public static class MetaInfoDialogFragment extends DialogFragment implements
-            DatePickerDialogFragment.DatePickListener {
-
-        public static final String TAG = MetaInfoDialogFragment.class.getSimpleName();
-
-        private Content mCont;
-        private TextView mNoteDeleteTime;
-        private View mNoteDeleteTimeClear;
-
-        public MetaInfoDialogFragment() {
-        }
-
-        public static MetaInfoDialogFragment newInstance(Content content) {
-            Bundle args = new Bundle();
-            args.putSerializable(ARG_EDIT_CONTENT, content);
-            MetaInfoDialogFragment fragment = new MetaInfoDialogFragment();
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @SuppressLint("InflateParams")
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            mCont = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
-            //noinspection ConstantConditions
-            if (mCont.getVisibility() == null) {
-                mCont.withVisibility(new Visibility());
-            }
-            if (savedInstanceState != null) {
-                mCont = (Content) savedInstanceState.getSerializable("mContent");
-            }
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            View dv = LayoutInflater.from(getContext())
-                    .inflate(R.layout.content_meta_info_dialog, null, false);
-
-            initViews(dv);
-
-            builder.setView(dv);
-            AlertDialog dialog = builder.create();
-            dialog.setCanceledOnTouchOutside(false);
-            return dialog;
-        }
-
-        private void initViews(View v) {
-            v.findViewById(R.id.btn_dismiss).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dismiss();
-                }
-            });
-
-            CheckBox checkBoxAnonymousAuthor = (CheckBox) v.findViewById(R.id.checkbox_anonymous_author);
-            checkBoxAnonymousAuthor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    mCont.getVisibility().withAnonymousAuthor(isChecked);
-                }
-            });
-
-            // init map preview
-            CheckBox checkBoxMapPreview = (CheckBox) v.findViewById(R.id.checkbox_map_preview);
-            checkBoxMapPreview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    mCont.getVisibility().withVisiblePreview(isChecked);
-                }
-            });
-
-
-            // init time to live view
-            mNoteDeleteTime = (TextView) v.findViewById(R.id.tv_note_delete_time);
-            mNoteDeleteTime.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    DatePickerDialogFragment.newInstance().show(getChildFragmentManager(),
-                            DatePickerDialogFragment.TAG);
-                }
-            });
-            mNoteDeleteTimeClear = v.findViewById(R.id.btn_reset_delete_time);
-            mNoteDeleteTimeClear.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onDateSelected(null);
-                }
-            });
-
-            // Init views from model
-            Visibility visibility = mCont.getVisibility();
-
-            checkBoxAnonymousAuthor.setChecked(visibility.isAuthorAnonymous());
-            checkBoxMapPreview.setChecked(visibility.isPreviewVisible());
-            updateTimeVisibilityView();
-        }
-
-        @Override
-        public void onDismiss(DialogInterface dialog) {
-            super.onDismiss(dialog);
-            NewContentDialogFragment frag = (NewContentDialogFragment) getParentFragment();
-            frag.onMetaInfoDialogDismiss(mCont);
-        }
-
-        @Override
-        public void onSaveInstanceState(Bundle outState) {
-            super.onSaveInstanceState(outState);
-            outState.putSerializable("mContent", mCont);
-        }
-
-        // Called when time picker dismisses
-        @Override
-        public void onDateSelected(Date selectedDate) {
-            mCont.getVisibility().withTimeVisibility(selectedDate);
-            updateTimeVisibilityView();
-        }
-
-        // Just update time visibility view with date from content
-        @SuppressWarnings("ConstantConditions")
-        private void updateTimeVisibilityView() {
-            Date date = mCont.getVisibility().getVisibleUntil();
-            String text;
-            if (date == null) {
-                text = getString(R.string.empty_note_time_visibility);
-                mNoteDeleteTimeClear.setVisibility(View.INVISIBLE);
-            } else {
-                text = String.format(getString(R.string.note_time_visibility),
-                        Utils.formatDateSmart(getContext(), date.getTime()));
-                mNoteDeleteTimeClear.setVisibility(View.VISIBLE);
-            }
-            mNoteDeleteTime.setText(text);
         }
     }
 }

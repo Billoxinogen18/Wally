@@ -16,7 +16,7 @@
     <string name="tango_error">"Tango Exception! Try again!"</string>
     <string name="post_update">Update</string>
     <string name="loading">Loading…</string>
-    <string name="content_meta_info_dialog_title">More</string>
+    <string name="content_meta_info_dialog_title">More Options</string>
     <string name="empty_note_time_visibility">Click to set delete Date</string>
     <string name="note_time_visibility">The note will be deleted at: %s</string>
 
