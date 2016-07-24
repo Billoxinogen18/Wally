@@ -1,33 +1,27 @@
 package com.wally.wally.components;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.wally.wally.R;
-
-import java.util.concurrent.Callable;
+import com.wally.wally.Utils;
+import com.wally.wally.datacontroller.callbacks.Callback;
 
 public class ColorPickerPopup implements View.OnClickListener {
 
@@ -54,7 +48,7 @@ public class ColorPickerPopup implements View.OnClickListener {
         mAnchor = anchor;
 
         Context context = mAnchor.getContext();
-        View pickerLayout = LayoutInflater.from(context).inflate(R.layout.color_picker_layout, null);
+        final View pickerLayout = LayoutInflater.from(context).inflate(R.layout.color_picker_layout, null);
         setUpColors(context, (ViewGroup) pickerLayout.findViewById(R.id.colors_container));
         // Creating the PopupWindow
         mPopup = new PopupWindow(
@@ -72,7 +66,14 @@ public class ColorPickerPopup implements View.OnClickListener {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
             mPopup.setAnimationStyle(android.R.style.Animation_Dialog);
         } else {
-            addCircularReveal(mAnchor, mPopup.getContentView(), true);
+            pickerLayout.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right,
+                                           int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    v.removeOnLayoutChangeListener(this);
+                    Utils.addCircularReveal(mAnchor, pickerLayout, true, null);
+                }
+            });
         }
 
         mPopup.showAtLocation((View) mAnchor.getParent(), Gravity.FILL, 0, 0);
@@ -88,79 +89,19 @@ public class ColorPickerPopup implements View.OnClickListener {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
             mPopup.dismiss();
         } else {
-            addCircularReveal(mAnchor, mPopup.getContentView(), false);
+            Utils.addCircularReveal(mAnchor, mPopup.getContentView(), false, new Callback<Void>() {
+                @Override
+                public void onResult(Void result) {
+                    mPopup.dismiss();
+                }
+
+                @Override
+                public void onError(Exception e) {
+
+                }
+            });
         }
         mListener = null;
-    }
-
-    /**
-     * Tries to add circular reveal effect if possible.
-     *
-     * @param from       circular reveal from
-     * @param targetView target view that will be revealed
-     */
-    private void addCircularReveal(final View from, final View targetView, final boolean start) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            final Callable<Object> startReveal = new Callable<Object>() {
-                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                public Void call() throws Exception {
-                    float startRadius;
-                    float finalRadius;
-                    float hypot = (float) Math.hypot(targetView.getWidth(), targetView.getHeight());
-                    if (start) {
-                        startRadius = 0;
-                        finalRadius = hypot;
-                    } else {
-                        startRadius = hypot;
-                        finalRadius = 0;
-                    }
-
-                    Rect center = new Rect();
-                    from.getGlobalVisibleRect(center);
-
-                    Animator anim = ViewAnimationUtils.createCircularReveal(
-                            targetView,
-                            (int) center.exactCenterX(),
-                            (int) center.exactCenterY(),
-                            startRadius, finalRadius);
-
-                    if (!start) {
-                        anim.addListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-                                mPopup.dismiss();
-                            }
-                        });
-                    }
-                    anim.start();
-                    return null;
-                }
-            };
-            // We need to start reveal after we have layout change!
-            // Because view is not attached at that time.
-            if (start) {
-                targetView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-                    @Override
-                    public void onLayoutChange(View v, int left, int top, int right,
-                                               int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        v.removeOnLayoutChangeListener(this);
-                        try {
-                            startReveal.call();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            } else {
-                try {
-                    startReveal.call();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     private void setUpColors(Context context, ViewGroup colorsContainer) {

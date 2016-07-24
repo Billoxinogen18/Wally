@@ -1,6 +1,8 @@
 package com.wally.wally;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -9,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Environment;
@@ -24,6 +27,7 @@ import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -316,7 +320,7 @@ public final class Utils {
                 float[] result1 = new float[3];
                 float[] result2 = new float[3];
 
-                Location.distanceBetween(loc1.getLatitude(), loc1.getLongitude(), location.getLatitude() , location.getLongitude(), result1);
+                Location.distanceBetween(loc1.getLatitude(), loc1.getLongitude(), location.getLatitude(), location.getLongitude(), result1);
                 Location.distanceBetween(loc2.getLatitude(), loc2.getLongitude(), location.getLatitude(), location.getLongitude(), result2);
 
                 Float distance1 = result1[0];
@@ -354,7 +358,50 @@ public final class Utils {
     public static LatLng serializableLatLngToLatLng(SerializableLatLng location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
+
     public static SerializableLatLng latLngToSerializableLatLng(LatLng location) {
         return new SerializableLatLng(location.getLatitude(), location.getLongitude());
+    }
+
+
+    /**
+     * Tries to add circular reveal effect if possible.
+     *
+     * @param from       circular reveal from
+     * @param targetView target view that will be revealed
+     */
+    public static void addCircularReveal(final View from, final View targetView, final boolean start, @Nullable final Callback<Void> animationEndCallback) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            float startRadius;
+            float finalRadius;
+            float hypot = (float) Math.hypot(targetView.getWidth(), targetView.getHeight());
+            if (start) {
+                startRadius = 0;
+                finalRadius = hypot;
+            } else {
+                startRadius = hypot;
+                finalRadius = 0;
+            }
+
+            Rect center = new Rect();
+            from.getGlobalVisibleRect(center);
+
+            Animator anim = ViewAnimationUtils.createCircularReveal(
+                    targetView,
+                    (int) center.exactCenterX(),
+                    center.top,
+                    startRadius, finalRadius);
+
+            anim.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    if (animationEndCallback != null) {
+                        animationEndCallback.onResult(null);
+                    }
+                }
+            });
+            anim.start();
+        }
     }
 }
