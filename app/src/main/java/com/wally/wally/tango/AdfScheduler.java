@@ -42,6 +42,18 @@ public class AdfScheduler extends Thread {
         Log.d(TAG, "finish() after interupt");
     }
 
+    private void fireSuccess(AdfInfo info) {
+        for (Callback<AdfInfo> c : callbackList) {
+            c.onResult(info);
+        }
+    }
+
+    private void fireError(Exception e){
+        for (Callback<AdfInfo> c : callbackList) {
+            c.onError(e);
+        }
+    }
+
     @Override
     public void run() {
         while (!done && !isInterrupted()) {
@@ -51,16 +63,12 @@ public class AdfScheduler extends Thread {
                 public void onResult(AdfInfo result) {
                     if (done || isInterrupted()) return;
                     Log.d(TAG, "onResult: " + result);
-                    for (Callback<AdfInfo> c : callbackList) {
-                        c.onResult(result);
-                    }
+                    fireSuccess(result);
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    for (Callback<AdfInfo> c : callbackList) {
-                        c.onError(e);
-                    }
+                    fireError(e);
                 }
             });
             try {
