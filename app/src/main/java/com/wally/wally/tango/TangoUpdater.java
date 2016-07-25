@@ -45,7 +45,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         if (pose.statusCode != TangoPoseData.POSE_VALID) {
             setTangoLocalization(false);
             if (mTangoUx != null) {
-                //mTangoUx.showCustomMessage("Hold Still");
+                mTangoUx.showCustomMessage("Hold Still");
                 //setTangoLocalization(false);
             }
         } else if (pose.baseFrame == TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION && pose.targetFrame == TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE) {
@@ -55,7 +55,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
             }
         } else if (!isTangoLocalized()) {
             if (mTangoUx != null) {
-               // mTangoUx.showCustomMessage("Walk around!");
+                mTangoUx.showCustomMessage("Walk around!");
             }
         }
     }
@@ -101,14 +101,11 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     }
 
     public synchronized void setTangoLocalization(boolean localization) {
-        Log.d(TAG, "setTangoLocalization() called with: " + "localization = [" + localization + "]");
         if (isLocalized != localization) {
             isLocalized = localization;
             if (isLocalized) {
                 for(LocalizationListener listener : mLocalizator) {
-                    Log.d(TAG, "setTangoLocalization() called with: " + "listener = [" + listener + "]");
                     listener.localized();
-                    Log.d(TAG, "setTangoLocalization() after localized" );
                 }
             } else {
                 for(LocalizationListener listener : mLocalizator) {
