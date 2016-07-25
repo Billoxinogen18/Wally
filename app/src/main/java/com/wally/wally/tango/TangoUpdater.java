@@ -129,10 +129,12 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         mValidPoseListeners.remove(listener);
     }
 
-    private void fireOnValidPose(TangoPoseData poseData) {
-        for (ValidPoseListener listener : mValidPoseListeners) {
-            listener.onValidPose(poseData);
-        }
+    private void fireOnValidPose(final TangoPoseData poseData) {
+
+                for (ValidPoseListener listener : mValidPoseListeners) {
+                    listener.onValidPose(poseData);
+                }
+
     }
 
     public interface ValidPoseListener {
