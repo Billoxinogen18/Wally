@@ -56,7 +56,9 @@ public abstract class TiltDialogFragment extends DialogFragment implements Senso
     @Override
     public void onPause() {
         super.onPause();
-
+        if (mRootView == null) {
+            return;
+        }
         SensorManager sm = (SensorManager) getActivity().getSystemService(Context.SENSOR_SERVICE);
         sm.unregisterListener(this);
     }

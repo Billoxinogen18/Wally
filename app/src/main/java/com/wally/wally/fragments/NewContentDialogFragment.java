@@ -96,7 +96,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.CustomDialogTheme);
         View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
         initViews(dv);
-        setUpTiltingDialog(dv.findViewById(R.id.scroll_view));
+        // setUpTiltingDialog(dv.findViewById(R.id.scroll_view));
 
         builder.setView(dv);
         Dialog dialog = builder.create();
