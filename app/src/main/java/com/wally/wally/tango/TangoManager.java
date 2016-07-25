@@ -178,10 +178,12 @@ public class TangoManager implements LocalizationListener {
     private synchronized void prepareForLearning(){
         mAdfScheduler.finish();
         mIsLearningMode = true;
+        mTangoUpdater.addValidPoseListener(mLearningEvaluator);
         mLearningEvaluator.addCallback(new LearningEvaluator.LearningEvaluatorListener() {
             @Override
             public void onLearningFinish() {
                 mIsReadyToSaveAdf = true;
+                mTangoUpdater.removeValidPoserListener(mLearningEvaluator);
                 if (isLocalized()) {
                     finishLearning();
                 }

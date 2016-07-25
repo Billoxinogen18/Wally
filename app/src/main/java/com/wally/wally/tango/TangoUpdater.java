@@ -11,14 +11,10 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.components.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
-import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by shota on 5/27/16.
- */
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private static final String TAG = TangoUpdater.class.getSimpleName();
 
@@ -27,14 +23,16 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private boolean mIsFrameAvailableTangoThread;
     private RajawaliSurfaceView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
-    private List<LocalizationListener> mLocalizator;
+    private List<LocalizationListener> mLocalizationListeners;
+    private List<ValidPoseListener> mValidPoseListeners;
 
 
     public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager) {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
-        mLocalizator = new ArrayList<>();
+        mLocalizationListeners = new ArrayList<>();
+        mValidPoseListeners = new ArrayList<>();
     }
 
     @Override
@@ -57,6 +55,10 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
             if (mTangoUx != null) {
                 mTangoUx.showCustomMessage("Walk around!");
             }
+        }
+
+        if (pose.statusCode == TangoPoseData.POSE_VALID) {
+            fireOnValidPose(pose);
         }
     }
 
@@ -104,11 +106,11 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         if (isLocalized != localization) {
             isLocalized = localization;
             if (isLocalized) {
-                for(LocalizationListener listener : mLocalizator) {
+                for(LocalizationListener listener : mLocalizationListeners) {
                     listener.localized();
                 }
             } else {
-                for(LocalizationListener listener : mLocalizator) {
+                for(LocalizationListener listener : mLocalizationListeners) {
                     listener.notLocalized();
                 }
             }
@@ -116,6 +118,24 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     }
 
     public synchronized void addLocalizationListener(LocalizationListener listener){
-        mLocalizator.add(listener);
+        mLocalizationListeners.add(listener);
+    }
+
+    public void addValidPoseListener(ValidPoseListener listener) {
+        mValidPoseListeners.add(listener);
+    }
+
+    public void removeValidPoserListener(ValidPoseListener listener) {
+        mValidPoseListeners.remove(listener);
+    }
+
+    private void fireOnValidPose(TangoPoseData poseData) {
+        for (ValidPoseListener listener : mValidPoseListeners) {
+            listener.onValidPose(poseData);
+        }
+    }
+
+    public interface ValidPoseListener {
+        void onValidPose(TangoPoseData data);
     }
 }
