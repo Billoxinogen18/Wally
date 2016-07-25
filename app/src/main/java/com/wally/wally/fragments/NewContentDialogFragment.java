@@ -1,8 +1,9 @@
 package com.wally.wally.fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
@@ -25,6 +26,7 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.ColorPickerPopup;
 import com.wally.wally.components.ContentMetaInfoPopup;
+import com.wally.wally.components.PhotoChooserPopup;
 import com.wally.wally.components.SocialVisibilityPopup;
 import com.wally.wally.components.TextChangeListenerAdapter;
 import com.wally.wally.datacontroller.content.Content;
@@ -34,7 +36,6 @@ import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,16 +43,16 @@ import java.util.List;
  * <p/>
  * Created by ioane5 on 4/7/16.
  */
-@SuppressWarnings("ALL")
 public class NewContentDialogFragment extends TiltDialogFragment implements
         View.OnClickListener,
-        PhotoChooserDialogFragment.PhotoChooserListener,
+        PhotoChooserPopup.PhotoChooserListener,
         PeopleChooserDialogFragment.PeopleChooserListener,
         TextChangeListenerAdapter.TextChangeListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
-    private static final int REQUEST_CODE_CHOOSE_PHOTO = 129;
+    private static final int RC_PERMISSION_READ_EXTERNAL_STORAGE = 11;
+
 
     private NewContentDialogListener mListener;
 
@@ -59,6 +60,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     private View mRootView;
     private View mBottomPanel;
     private View mImageContainer;
+    private View mBtnPhotoChooser;
     private ImageView mImageView;
     private EditText mTitleEt;
     private EditText mNoteEt;
@@ -106,8 +108,9 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     }
 
     private void initViews(View v) {
+        mBtnPhotoChooser = v.findViewById(R.id.btn_add_image);
+        mBtnPhotoChooser.setOnClickListener(this);
         v.findViewById(R.id.btn_social_visibility).setOnClickListener(this);
-        v.findViewById(R.id.btn_add_image).setOnClickListener(this);
         v.findViewById(R.id.btn_remove_image).setOnClickListener(this);
         v.findViewById(R.id.btn_pallette).setOnClickListener(this);
         v.findViewById(R.id.btn_discard_post).setOnClickListener(this);
@@ -131,9 +134,8 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
 
         mRootView.getBackground().setDither(true);
         if (isEditMode) {
-            Button b = (Button) v.findViewById(R.id.btn_create_post);
-            b.setText(R.string.post_update);
-            b = (Button) v.findViewById(R.id.btn_discard_post);
+            mPostCreateBtn.setText(R.string.post_update);
+            Button b = (Button) v.findViewById(R.id.btn_discard_post);
             b.setText(R.string.post_cancel_edit);
         }
     }
@@ -171,13 +173,23 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mListener = (NewContentDialogListener) activity;
+            mListener = (NewContentDialogListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement NewContentDialogListener");
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == RC_PERMISSION_READ_EXTERNAL_STORAGE) {
+            if (Utils.checkExternalStorageReadPermission(getContext())) {
+                new PhotoChooserPopup().show(mBtnPhotoChooser, this);
+            }
         }
     }
 
@@ -189,7 +201,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         switch (v.getId()) {
             case R.id.btn_social_visibility:
                 Visibility.SocialVisibility sv = mContent.getVisibility().getSocialVisibility();
-                new SocialVisibilityPopup().show(v, mContent.getVisibility().getSocialVisibility(), new SocialVisibilityPopup.SocialVisibilityListener() {
+                new SocialVisibilityPopup().show(v, sv, new SocialVisibilityPopup.SocialVisibilityListener() {
                     @Override
                     public void onVisibilityChosen(int socialVisibilityMode) {
                         if (mContent.getVisibility().getSocialVisibility() == null) {
@@ -221,8 +233,11 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
                 mListener.onContentCreated(mContent, isEditMode);
                 break;
             case R.id.btn_add_image:
-                showDialog(false);
-                PhotoChooserDialogFragment.newInstance().show(getChildFragmentManager(), PhotoChooserDialogFragment.TAG);
+                if (Utils.checkExternalStorageReadPermission(getContext())) {
+                    new PhotoChooserPopup().show(v, this);
+                } else {
+                    requestExternalStoragePermissions();
+                }
                 break;
             case R.id.btn_remove_image:
                 mContent.withImageUri(null);
@@ -348,16 +363,16 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         if (users != null) {
             mContent.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PEOPLE));
 
+            List<Id> sharedWith = new ArrayList<>();
+            mContent.getVisibility().getSocialVisibility().withSharedWith(sharedWith);
             if (!users.isEmpty()) {
-                List<Id> sharedWith = new ArrayList<>();
                 for (SocialUser current : users) {
                     if (current.getBaseUser().getGgId() != null) {
                         sharedWith.add(current.getBaseUser().getGgId());
                     }
                 }
-                mContent.getVisibility().getSocialVisibility().withSharedWith(sharedWith);
             } else {
-                mContent.getVisibility().getSocialVisibility().withSharedWith(Collections.EMPTY_LIST).setMode(Visibility.SocialVisibility.PRIVATE);
+                mContent.getVisibility().getSocialVisibility().setMode(Visibility.SocialVisibility.PRIVATE);
             }
         }
         updateViews();
@@ -396,11 +411,15 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
      * This method is called whenever something is updated in the post.
      */
     public void onPostContentChanged() {
-        // Used XNOR there :D (Don't ever ask why)
         boolean isPostEmpty = isPostEmpty();
-        if (!(isPostEmpty ^ mPostCreateBtn.isEnabled())) {
+        if (isPostEmpty == mPostCreateBtn.isEnabled()) {
             mPostCreateBtn.setEnabled(!isPostEmpty);
         }
+    }
+
+    private void requestExternalStoragePermissions() {
+        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                RC_PERMISSION_READ_EXTERNAL_STORAGE);
     }
 
     public interface NewContentDialogListener {

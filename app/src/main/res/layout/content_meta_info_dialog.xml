@@ -18,7 +18,9 @@
         android:layout_marginBottom="2dp"
         android:layout_marginLeft="16dp"
         android:text="@string/content_meta_info_dialog_title"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:id="@+id/more_options_container"

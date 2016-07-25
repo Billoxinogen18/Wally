@@ -5,7 +5,7 @@
     <dimen name="fab_margin">0dp</dimen>
 
     <dimen name="watermark_margin">16dp</dimen>
-    <dimen name="gallery_image_padding">2dp</dimen>
+    <dimen name="gallery_image_padding">8dp</dimen>
     <dimen name="new_content_dialog_max_height">300dp</dimen>
     <dimen name="content_dialog_min_width">300dp</dimen>
 
