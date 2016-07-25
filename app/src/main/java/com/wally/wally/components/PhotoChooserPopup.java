@@ -66,7 +66,6 @@ public class PhotoChooserPopup extends RevealPopup {
     };
 
     public void show(View anchor, PhotoChooserListener listener) {
-        // TODO change name
         setUp(anchor, R.layout.photo_chooser_popup);
         mContext = anchor.getContext();
         mListener = listener;
