@@ -11,17 +11,17 @@ import java.util.List;
 
 public class AdfScheduler extends Thread {
     public static final String TAG = AdfScheduler.class.getSimpleName();
-    public static final int DEFAULT_TIMEOUT = 15000;
+    public static final int DEFAULT_TIMEOUT = 1000;
 
-    private AdfManager mAdfManager;
     private boolean done;
     private int timeout;
+    private AdfManager mAdfManager;
     private List<Callback<AdfInfo>> callbackList;
 
     public AdfScheduler(AdfManager adfManager) {
         done = false;
-        this.mAdfManager = adfManager;
         timeout = DEFAULT_TIMEOUT;
+        this.mAdfManager = adfManager;
         callbackList = new ArrayList<>();
     }
 
@@ -31,7 +31,6 @@ public class AdfScheduler extends Thread {
     }
 
     public AdfScheduler addCallback(Callback<AdfInfo> callback) {
-        Log.d(TAG, "addCallback() called with: " + "callback = [" + callback + "]");
         callbackList.add(callback);
         return this;
     }
@@ -39,10 +38,14 @@ public class AdfScheduler extends Thread {
     public void finish() {
         this.done = true;
         interrupt();
-        Log.d(TAG, "finish() after interupt");
     }
 
     private void fireSuccess(AdfInfo info) {
+        if (info != null) {
+            Log.d(TAG, info.getUuid());
+        } else {
+            Log.d(TAG, "end");
+        }
         for (Callback<AdfInfo> c : callbackList) {
             c.onResult(info);
         }
@@ -57,15 +60,12 @@ public class AdfScheduler extends Thread {
     @Override
     public void run() {
         while (!done && !isInterrupted()) {
-            Log.d(TAG, "Localizer step");
             mAdfManager.getAdf(new Callback<AdfInfo>() {
                 @Override
                 public void onResult(AdfInfo result) {
                     if (done || isInterrupted()) return;
-                    Log.d(TAG, "onResult: " + result);
                     fireSuccess(result);
                 }
-
                 @Override
                 public void onError(Exception e) {
                     fireError(e);
