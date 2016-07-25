@@ -10,7 +10,6 @@ import com.google.maps.android.ui.IconGenerator;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.wally.wally.R;
-import com.wally.wally.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,10 +23,21 @@ public class MarkerIconGenerator {
     private AsyncTask mMarkerGeneratorTask;
     private Map<String, Icon> cache;
     private Map<Integer, Icon> defaultCache;
+    private final int[] DRAWABLES;
     private final int[] COLORS;
+    private final static int ANONYMOUS_DRAWABLE = 3;
+    private final static int NO_PREVIEW_DRAWABLE = 4;
 
     public MarkerIconGenerator(Context context) {
         this.context = context;
+
+        DRAWABLES = new int[]{
+                R.drawable.public_content_marker,
+                R.drawable.private_content_marker,
+                R.drawable.friends_content_marker,
+                R.drawable.anonymous_content_marker,
+                R.drawable.no_preview_content_marker
+        };
 
         COLORS = new int[]{
                 ContextCompat.getColor(context, R.color.public_content_marker_color),
@@ -35,7 +45,7 @@ public class MarkerIconGenerator {
                 ContextCompat.getColor(context, R.color.people_content_marker_color)
         };
 
-        cache = new HashMap<>();
+                cache = new HashMap<>();
         defaultCache = new HashMap<>();
     }
 
@@ -81,12 +91,14 @@ public class MarkerIconGenerator {
     }
 
 
-    public void getDefaultMarkerIcon(int visibility, MarkerIconGenerateListener markerIconGenerateListener) {
-        if(defaultCache.containsKey(visibility)){
+    public void getDefaultMarkerIcon(int visibility, boolean isAnonymous,
+                                     boolean isNoPreviewVisible,
+                                     MarkerIconGenerateListener markerIconGenerateListener) {
+        visibility = isAnonymous ? ANONYMOUS_DRAWABLE : isNoPreviewVisible ? NO_PREVIEW_DRAWABLE : visibility;
+        if (defaultCache.containsKey(visibility)) {
             markerIconGenerateListener.onMarkerIconGenerate(defaultCache.get(visibility));
-        }else {
-            Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_marker_dot);
-            drawable = Utils.tintDrawable(drawable, COLORS[visibility]);
+        } else {
+            Drawable drawable = ContextCompat.getDrawable(context, DRAWABLES[visibility]);
             Icon icon = IconFactory.getInstance(context).fromDrawable(drawable);
             defaultCache.put(visibility, icon);
 

@@ -354,8 +354,14 @@ public class MapsFragment extends Fragment implements
 
                 for (int i = 0; i < contentList.size(); i++) {
                     Content c = contentList.get(i);
-                    int visibility = mContentRetriever.get(i).getVisibility().getSocialVisibility().getMode();
-                    mMarkerManager.addMarker("" + (size - pageLength + i + 1), visibility, Utils.serializableLatLngToLatLng(c.getLocation()));
+                    Content content = mContentRetriever.get(i);
+                    int visibility = content.getVisibility().getSocialVisibility().getMode();
+                    mMarkerManager.addMarker(
+                            "" + (size - pageLength + i + 1),
+                            visibility,
+                            content.getVisibility().isAuthorAnonymous(),
+                            !content.getVisibility().isPreviewVisible(),
+                            Utils.serializableLatLngToLatLng(c.getLocation()));
                 }
             }
         });

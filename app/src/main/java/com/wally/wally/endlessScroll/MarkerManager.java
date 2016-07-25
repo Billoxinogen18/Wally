@@ -45,7 +45,10 @@ public class MarkerManager {
         final MarkerNameVisibility newSelect = mMarkerList.get(position);
 
 
-        mMarkerIconGenerator.getDefaultMarkerIcon(oldSelect.visibility, new MarkerIconGenerator.MarkerIconGenerateListener() {
+        mMarkerIconGenerator.getDefaultMarkerIcon(oldSelect.visibility,
+                oldSelect.isAnonymous,
+                oldSelect.isNoPreviewVisible,
+                new MarkerIconGenerator.MarkerIconGenerateListener() {
             @Override
             public void onMarkerIconGenerate(Icon icon) {
                 oldSelect.marker.setIcon(icon);
@@ -111,8 +114,11 @@ public class MarkerManager {
     }
 
 
-    public void addMarker(final String name, final int visibility, final LatLng location) {
-        mMarkerIconGenerator.getDefaultMarkerIcon(visibility, new MarkerIconGenerator.MarkerIconGenerateListener() {
+    public void addMarker(final String name, final int visibility, final boolean isAnonymous, final boolean isNoPreviewVisible, final LatLng location) {
+        mMarkerIconGenerator.getDefaultMarkerIcon(visibility,
+                isAnonymous,
+                isNoPreviewVisible,
+                new MarkerIconGenerator.MarkerIconGenerateListener() {
             @Override
             public void onMarkerIconGenerate(Icon icon) {
                 MarkerViewOptions markerOptions = new MarkerViewOptions()
@@ -127,6 +133,9 @@ public class MarkerManager {
                 markerNameVisibility.marker = marker;
                 markerNameVisibility.name = name;
                 markerNameVisibility.visibility = visibility;
+                markerNameVisibility.isAnonymous = isAnonymous;
+                markerNameVisibility.isNoPreviewVisible = isNoPreviewVisible;
+
                 markerNameVisibility.isAdded = true;
                 mMarkerList.add(markerNameVisibility);
 
@@ -152,6 +161,8 @@ public class MarkerManager {
         public MarkerViewOptions markerOptions;
         public int visibility;
         public String name;
+        public boolean isAnonymous;
+        public boolean isNoPreviewVisible;
     }
 
 }
