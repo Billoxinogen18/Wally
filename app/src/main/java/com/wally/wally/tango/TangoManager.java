@@ -444,12 +444,20 @@ public class TangoManager implements LocalizationListener {
         if(mIsReadyToSaveAdf && mIsLearningMode){
             finishLearning();
         }
+        if (!mIsLearningMode){
+            mTangoUx.hideCustomMessage();
+        }
     }
 
     @Override
     public void notLocalized() {
         Log.d(TAG, "notLocalized() called with: " + "");
         mIsLocalized = false;
+        if (mIsLearningMode){
+            mTangoUx.showCustomMessage("Learning New Room. Walk Around");
+        } else {
+            mTangoUx.showCustomMessage("Walk Around");
+        }
     }
 
     public synchronized boolean isLocalized(){
