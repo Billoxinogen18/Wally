@@ -1,17 +1,12 @@
 package com.wally.wally.tango;
 
 
-import android.util.Log;
-
-import com.google.atap.tangoservice.TangoConfig;
 import com.google.atap.tangoservice.TangoPoseData;
 
 import org.rajawali3d.math.Quaternion;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
     public static final String TAG = LearningEvaluator.class.getSimpleName();
@@ -27,21 +22,6 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
     private long startTime;
     private long latestUpdateTime;
     private LearningEvaluatorListener listener;
-
-//    public void addCallback(final LearningEvaluatorListener listener) {
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(TIMEOUT_S * 1000);
-//                } catch (InterruptedException e) {
-//                    listener.onLearningFailed();
-//                }
-//                listener.onLearningFinish();
-//            }
-//        }).start();
-//    }
 
     public void addLearningEvaluatorListener(final LearningEvaluatorListener listener){
         this.listener = listener;
@@ -61,17 +41,17 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
         c.x = x;
         c.y = y;
         Quaternion q = new Quaternion(pose.rotation[0],pose.rotation[1],pose.rotation[2],pose.rotation[3]);
-        double pitch = Math.toDegrees(Math.asin(-2.0*(q.x*q.z - q.w*q.y)));
-        if (pitch < 0) pitch += 360;
-        int angleIndex = (int)(pitch / 360 * ANGLE_RESOLUTION) % ANGLE_RESOLUTION;
+        double yaw = Math.toDegrees(q.getYaw());
+        if (yaw < 0) yaw += 360;
+        int angleIndex = ((int)(yaw / 360 * ANGLE_RESOLUTION)) % ANGLE_RESOLUTION;
         c.angleVisited[angleIndex] = true;
         int index = cells.indexOf(c);
         if (index == -1){
             cells.add(c);
         } else {
-            cells.get(index).angleVisited = c.angleVisited;
+            cells.get(index).angleVisited[angleIndex] = true;
         }
-        Log.d(TAG, "onValidPose() getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
+//        Log.d(TAG, "pose = " + Arrays.toString(pose.translation) + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
 
         if (canFinish()) {
             new Thread(new Runnable() {
