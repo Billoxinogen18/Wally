@@ -1,8 +1,8 @@
 package com.wally.wally.components;
 
+import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.Switch;
 
 import com.wally.wally.R;
 import com.wally.wally.datacontroller.content.Content;
@@ -20,7 +20,7 @@ public class ContentMetaInfoPopup extends RevealPopup {
     }
 
     private void initViews(View v) {
-        Switch anonymousAuthor = (Switch) v.findViewById(R.id.switch_anonymous_author);
+        SwitchCompat anonymousAuthor = (SwitchCompat) v.findViewById(R.id.switch_anonymous_author);
         anonymousAuthor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -29,7 +29,7 @@ public class ContentMetaInfoPopup extends RevealPopup {
         });
 
         // init map preview
-        Switch preview = (Switch) v.findViewById(R.id.switch_map_preview);
+        SwitchCompat preview = (SwitchCompat) v.findViewById(R.id.switch_map_preview);
         preview.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -47,10 +47,5 @@ public class ContentMetaInfoPopup extends RevealPopup {
     @Override
     protected void onDismiss() {
 
-    }
-
-    // TODO delete
-    public interface MetaInfoDialogListener {
-        void onMetaInfoDialogResult(Content content);
     }
 }

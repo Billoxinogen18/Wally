@@ -4,15 +4,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.plus.model.people.PersonBuffer;
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.wally.wally.R;
@@ -69,7 +66,7 @@ public class WallyTangoUx extends TangoUx {
         mTextView.setTextColor(Color.BLACK);
         mTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 34);
         mTextView.setVisibility(View.GONE);
-        ViewGroup parent = (ViewGroup)tangoUxLayout.getParent();
+        ViewGroup parent = tangoUxLayout;//.getParent();
         parent.addView(mTextView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 

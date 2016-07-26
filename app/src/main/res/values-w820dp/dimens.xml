@@ -5,4 +5,5 @@
     <dimen name="activity_horizontal_margin">64dp</dimen>
     <dimen name="new_content_dialog_width">430dp</dimen>
     <dimen name="new_content_dialog_max_height">500dp</dimen>
+    <dimen name="people_chooser_width">450dp</dimen>
 </resources>

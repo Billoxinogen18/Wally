@@ -93,6 +93,7 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:support-v4:24.1.1'
     compile 'com.google.maps.android:android-maps-utils:0.4.3'
+    compile 'com.android.support:percent:24.1.1'
 
     // Google API libs
     compile 'com.google.android.gms:play-services-plus:9.2.1'
