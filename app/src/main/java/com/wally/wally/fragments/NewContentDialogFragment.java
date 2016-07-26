@@ -46,7 +46,7 @@ import java.util.List;
 public class NewContentDialogFragment extends TiltDialogFragment implements
         View.OnClickListener,
         PhotoChooserPopup.PhotoChooserListener,
-        PeopleChooserDialogFragment.PeopleChooserListener,
+        PeopleChooserPopup.PeopleChooserListener,
         TextChangeListenerAdapter.TextChangeListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
@@ -194,7 +194,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     }
 
     @Override
-    public void onClick(View v) {
+    public void onClick(final View v) {
 //        Utils.hideSoftKeyboard(mNoteEt, getContext());
 //        Utils.hideSoftKeyboard(mTitleEt, getContext());
         updateContent();
@@ -214,8 +214,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
                         }
                         if (socialVisibilityMode == Visibility.SocialVisibility.PEOPLE) {
                             List<SocialUser> sharedWith = toSocialUserList(mContent.getVisibility().getSocialVisibility().getSharedWith());
-                            PeopleChooserDialogFragment.newInstance(sharedWith).show(getChildFragmentManager(), PeopleChooserDialogFragment.TAG);
-                            showDialog(false);
+                            new PeopleChooserPopup().show(v, sharedWith, NewContentDialogFragment.this);
                         }
                     }
                 });

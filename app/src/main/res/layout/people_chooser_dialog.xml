@@ -1,79 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:background="#a6949191"
     android:clipToPadding="false"
     android:orientation="vertical">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/dialog_title"
+        style="@style/TextAppearance.AppCompat.Subhead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/people_chips_view"
+        android:layout_marginTop="30dp"
+        android:paddingBottom="16dp"
+        android:text="@string/people_chooser_dialog_title"
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btn_done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/dialog_title"
+        android:layout_alignRight="@+id/people_chips_view"
+        android:background="?attr/selectableItemBackground"
+        android:drawableLeft="@drawable/ic_done_white_24dp"
+        android:paddingLeft="8dp"
+        android:text="@string/done"
+        android:textColor="@android:color/white" />
+
+    <com.doodle.android.chips.ChipsView
+        android:id="@+id/people_chips_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#fff"
-        android:elevation="4dp"
-        android:orientation="horizontal"
-        android:padding="4dp"
-        tools:targetApi="lollipop">
+        android:layout_alignLeft="@+id/recyclerview_people"
+        android:layout_alignRight="@+id/recyclerview_people"
+        android:layout_below="@+id/dialog_title"
+        android:overScrollMode="never"
+        app:cv_color="@color/colorAccent"
+        app:cv_max_height="120dp"
+        app:cv_vertical_spacing="10dp" />
 
-        <ImageButton
-            android:id="@+id/btn_dismiss"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="8dp"
-            android:src="@drawable/ic_arrow_back_black_24dp" />
-
-        <TextView
-            android:id="@+id/dialog_title"
-            style="@style/TextAppearance.AppCompat.Title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_weight="1"
-            android:padding="8dp"
-            android:text="@string/people_chooser_dialog_title" />
-
-        <ImageButton
-            android:id="@+id/btn_done"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="8dp"
-            android:src="@drawable/ic_done_black_24dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/paper"
-        android:elevation="6dp"
-        android:orientation="horizontal"
-        android:paddingLeft="16dp"
-        tools:targetApi="lollipop">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="8dp"
-            android:text="@string/share_to" />
-
-        <com.doodle.android.chips.ChipsView
-            android:id="@+id/people_chips_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:overScrollMode="never"
-            app:cv_max_height="120dp"
-            app:cv_vertical_spacing="2dp" />
-
-    </LinearLayout>
-
+    <!-- TODO make with percentage -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerview_people"
-        android:layout_width="match_parent"
+        android:layout_width="400dp"
         android:layout_height="match_parent"
-        android:paddingLeft="@dimen/gallery_image_padding"
-        android:paddingRight="@dimen/gallery_image_padding"
+        android:layout_below="@id/people_chips_view"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/dialog_background"
         android:scrollbars="vertical" />
-</LinearLayout>
+</RelativeLayout>
