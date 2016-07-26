@@ -2,6 +2,7 @@ package com.wally.wally.fragments;
 
 
 import android.Manifest;
+import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -70,6 +71,8 @@ public class MapsFragment extends Fragment implements
     private static final String KEY_USER = "USER";
     private static final int MY_LOCATION_REQUEST_CODE = 222;
     private static final int PAGE_LENGTH = 5;
+
+    private MapCloseListener mListener;
 
     private SocialUser mUserProfile;
 
@@ -188,6 +191,22 @@ public class MapsFragment extends Fragment implements
             mMapView.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mListener = (MapCloseListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement MapCloseListener");
+        }
+    }
+
+    @Override
+    public void onDetach (){
+        super.onDetach();
+        mListener.onMapClose();
+    }
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
@@ -313,6 +332,17 @@ public class MapsFragment extends Fragment implements
         mGoogleApiClient.disconnect();
     }
 
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.back)
+            getActivity().getSupportFragmentManager().popBackStack();
+        else if (view.getId() == R.id.my_location)
+            onMyLocationClick();
+        else if (view.getId() == R.id.update_area)
+            onAreaUpdateClick();
+
+    }
+
     @SuppressWarnings("ConstantConditions")
     private void initFeedTitle(View v) {
         ImageView ownerImage = (ImageView) v.findViewById(R.id.iv_owner_image);
@@ -431,14 +461,8 @@ public class MapsFragment extends Fragment implements
         }
     }
 
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.back)
-            getActivity().getSupportFragmentManager().popBackStack();
-        else if (view.getId() == R.id.my_location)
-            onMyLocationClick();
-        else if (view.getId() == R.id.update_area)
-            onAreaUpdateClick();
 
+    public interface MapCloseListener{
+        void onMapClose();
     }
 }

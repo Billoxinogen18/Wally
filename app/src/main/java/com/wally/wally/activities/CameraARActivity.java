@@ -35,7 +35,7 @@ import java.util.Date;
 /**
  * Created by shota on 5/21/16.
  */
-public abstract class CameraARActivity extends GoogleApiClientActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, SelectedMenuView.OnSelectedMenuActionListener {
+public abstract class CameraARActivity extends GoogleApiClientActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, SelectedMenuView.OnSelectedMenuActionListener, MapsFragment.MapCloseListener {
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int REQUEST_CODE_MY_LOCATION = 22;
     protected DataController mDataController;
@@ -46,6 +46,11 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     private Content mSelectedContent; //TODO may be needed to remove
     private Content mContentToSave;
     private long mNewContentButtonLastClickTime;
+
+    private View mNewContentButton;
+    private View mMapButton;
+    private View mProfileBar;
+    private View mWaterMark;
 
     public abstract void onDeleteContent(Content selectedContent);
 
@@ -65,6 +70,12 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         // Initialize managers
         mUserManager = ((App) getApplicationContext()).getUserManager(); //TODO get LoginManager from the Factory!
         mDataController = ((App) getApplicationContext()).getDataController();
+
+
+        mNewContentButton = findViewById(R.id.btn_new_post);
+        mMapButton = findViewById(R.id.btn_map);
+        mProfileBar = findViewById(R.id.profile_bar);
+        mWaterMark = findViewById(R.id.watermark);
 
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -254,7 +265,28 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         transaction.replace(R.id.fragment_container, mf);
         transaction.addToBackStack(null);
 
+
+        hideGUI(true);
+
         // Commit the transaction
         transaction.commit();
+    }
+
+    private void hideGUI(boolean hide){
+        if(hide){
+            mNewContentButton.setVisibility(View.GONE);
+            mMapButton.setVisibility(View.GONE);
+            mProfileBar.setVisibility(View.GONE);
+            mWaterMark.setVisibility(View.GONE);
+        }else{
+            mNewContentButton.setVisibility(View.VISIBLE);
+            mMapButton.setVisibility(View.VISIBLE);
+            mProfileBar.setVisibility(View.VISIBLE);
+            mWaterMark.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void onMapClose(){
+        hideGUI(false);
     }
 }
