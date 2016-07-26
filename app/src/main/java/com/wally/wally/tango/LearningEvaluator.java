@@ -1,11 +1,14 @@
 package com.wally.wally.tango;
 
 
+import android.util.Log;
+
 import com.google.atap.tangoservice.TangoPoseData;
 
 import org.rajawali3d.math.Quaternion;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
@@ -22,15 +25,17 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
     private long startTime;
     private long latestUpdateTime;
     private LearningEvaluatorListener listener;
+    private boolean isFinished;
 
     public void addLearningEvaluatorListener(final LearningEvaluatorListener listener){
         this.listener = listener;
+        isFinished = false;
         start();
     }
 
     @Override
     public synchronized void onValidPose(TangoPoseData pose) {
-        if (System.currentTimeMillis() - latestUpdateTime < 100){
+        if (System.currentTimeMillis() - latestUpdateTime < 100 ||  isFinished){
             return;
         }
         latestUpdateTime = System.currentTimeMillis();
@@ -51,9 +56,10 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
         } else {
             cells.get(index).angleVisited[angleIndex] = true;
         }
-//        Log.d(TAG, "pose = " + Arrays.toString(pose.translation) + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
 
-        if (canFinish()) {
+        if (canFinish() && !isFinished) {
+            isFinished = true;
+            Log.d(TAG, "pose = " + Arrays.toString(pose.translation) + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
