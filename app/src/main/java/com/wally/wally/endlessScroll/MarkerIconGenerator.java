@@ -24,7 +24,6 @@ public class MarkerIconGenerator {
     private Map<String, Icon> cache;
     private Map<Integer, Icon> defaultCache;
     private final int[] DRAWABLES;
-    private final int[] COLORS;
     private final static int ANONYMOUS_DRAWABLE = 3;
     private final static int NO_PREVIEW_DRAWABLE = 4;
 
@@ -39,23 +38,17 @@ public class MarkerIconGenerator {
                 R.drawable.no_preview_content_marker
         };
 
-        COLORS = new int[]{
-                ContextCompat.getColor(context, R.color.public_content_marker_color),
-                ContextCompat.getColor(context, R.color.private_content_marker_color),
-                ContextCompat.getColor(context, R.color.people_content_marker_color)
-        };
-
                 cache = new HashMap<>();
         defaultCache = new HashMap<>();
     }
 
-    public synchronized void getEnumeratedMarkerIcon(final String name, final int visibility, final MarkerIconGenerateListener markerIconGenerateListener) {
+    public synchronized void getEnumeratedMarkerIcon(final String name, final int color, final MarkerIconGenerateListener markerIconGenerateListener) {
         if (cache.containsKey(name)) {
             markerIconGenerateListener.onMarkerIconGenerate(cache.get(name));
         } else {
-            if (mMarkerGeneratorTask != null) {
-                mMarkerGeneratorTask.cancel(true);
-            }
+//            if (mMarkerGeneratorTask != null) {
+//                mMarkerGeneratorTask.cancel(true);
+//            }
 
             mMarkerGeneratorTask = new AsyncTask<Void, Void, Icon>() {
 
@@ -67,7 +60,6 @@ public class MarkerIconGenerator {
                     if (isCancelled()) {
                         return null;
                     }
-                    int color = COLORS[visibility];
                     iconGenerator.setColor(color);
 
                     Bitmap bitmap = iconGenerator.makeIcon(name);

@@ -1,5 +1,6 @@
 package com.wally.wally;
 
+import android.graphics.Color;
 import android.util.Log;
 
 import com.wally.wally.datacontroller.DebugUtils;
@@ -92,7 +93,7 @@ public class StubContentFetcher implements ContentFetcher {
                 .withUuid(DebugUtils.randomStr(1))
                 .withNote(DebugUtils.randomStr(15))
 //                .withTitle(DebugUtils.randomStr(7))
-                .withColor(random.nextInt())
+                .withColor(Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256)))
 //                .withImageUri("http://" + DebugUtils.randomStr(10))
                 .withAuthorId("8g7t26liJZgP6Z7jHgTkTdZLk632")
                 .withLocation(DebugUtils.randomLatLngNearPoint(DebugUtils.OFFICE_LAT_LNG)).withVisibility(

@@ -7,6 +7,9 @@ import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.wally.wally.Utils;
+import com.wally.wally.components.MapWindowAdapter;
+import com.wally.wally.datacontroller.content.Content;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +30,14 @@ public class MarkerManager {
         mMarkerIconGenerator = new MarkerIconGenerator(context);
         mMap = map;
         mMarkerList = new ArrayList<>();
+
+        mMap.setInfoWindowAdapter(new MapWindowAdapter(context));
     }
 
     public void reset() {
         mSelectedMarker = 0;
         for (MarkerNameVisibility markerNameVisibility : mMarkerList) {
-            mMap.removeMarker(markerNameVisibility.marker);
+            markerNameVisibility.remove();
         }
         mMarkerList.clear();
     }
@@ -41,128 +46,135 @@ public class MarkerManager {
     public void selectMarkerAt(final int position) {
         if (position < 0 || position >= mMarkerList.size()) return;
 
-        final MarkerNameVisibility oldSelect = mMarkerList.get(mSelectedMarker);
-        final MarkerNameVisibility newSelect = mMarkerList.get(position);
-
-
-        mMarkerIconGenerator.getDefaultMarkerIcon(oldSelect.visibility,
-                oldSelect.isAnonymous,
-                oldSelect.isNoPreviewVisible,
-                new MarkerIconGenerator.MarkerIconGenerateListener() {
-            @Override
-            public void onMarkerIconGenerate(Icon icon) {
-                oldSelect.marker.setIcon(icon);
-                oldSelect.markerOptions.icon(icon);
-
-//                MarkerOptions markerOptions = new MarkerOptions()
-//                        .position(oldSelect.marker.getPosition())
-//                        .icon(iconFactory.fromBitmap(icon));
-////                        .anchor(0.5f, 1f);
+//        final MarkerNameVisibility oldSelect = mMarkerList.get(mSelectedMarker);
+//        final MarkerNameVisibility newSelect = mMarkerList.get(position);
 //
-//                Marker marker = mMap.addMarker(markerOptions);
 //
-//                mMap.removeMarker(oldSelect.marker);
-//                oldSelect.markerOptions = markerOptions;
-//                oldSelect.marker = marker;
-            }
-        });
+//        mMarkerIconGenerator.getDefaultMarkerIcon(oldSelect.visibility,
+//                oldSelect.isAnonymous,
+//                oldSelect.isNoPreviewVisible,
+//                new MarkerIconGenerator.MarkerIconGenerateListener() {
+//            @Override
+//            public void onMarkerIconGenerate(Icon icon) {
+//                oldSelect.markerBase.setIcon(icon);
+//            }
+//        });
 
-        mMarkerIconGenerator.getEnumeratedMarkerIcon(newSelect.name, newSelect.visibility, new MarkerIconGenerator.MarkerIconGenerateListener() {
-            @Override
-            public void onMarkerIconGenerate(Icon icon) {
-
-                newSelect.marker.setIcon(icon);
-                newSelect.markerOptions.icon(icon);
-
-//                MarkerOptions markerOptions = new MarkerOptions()
-//                        .position(newSelect.marker.getPosition())
-//                        .icon(iconFactory.fromBitmap(icon));
-////                        .anchor(0.5f, 1f);
+//        mMarkerIconGenerator.getEnumeratedMarkerIcon(newSelect.name, newSelect.visibility, new MarkerIconGenerator.MarkerIconGenerateListener() {
+//            @Override
+//            public void onMarkerIconGenerate(Icon icon) {
 //
-//                Marker marker = mMap.addMarker(markerOptions);
-//                mMap.removeMarker(newSelect.marker);
-//                newSelect.markerOptions = markerOptions;
-//                newSelect.marker = marker;
-                mSelectedMarker = position;
+//                newSelect.markerBase.setIcon(icon);
 
-                mMap.getMarkerViewManager().select(newSelect.marker);
+        mSelectedMarker = position;
 
-                hideObsoleteMarkers(position);
-            }
-        });
+//                mMap.getMarkerViewManager().select(newSelect.markerBase);
+
+        hideObsoleteMarkers(position);
+//            }
+//        });
     }
 
     private void hideObsoleteMarkers(int position) {
         for (int i = position - LIMIT; i >= 0; i--) {
-            mMap.removeMarker(mMarkerList.get(i).marker);
-            mMarkerList.get(i).isAdded = false;
+            mMarkerList.get(i).hide();
         }
 
         for (int i = position + LIMIT; i < mMarkerList.size(); i++) {
-            mMap.removeMarker(mMarkerList.get(i).marker);
-            mMarkerList.get(i).isAdded = false;
+            mMarkerList.get(i).hide();
         }
 
         for (int i = position - LIMIT; i < position + LIMIT; i++) {
             if (i >= 0 && i < mMarkerList.size()) {
-                if(!mMarkerList.get(i).isAdded) {
-                    mMarkerList.get(i).marker = mMap.addMarker(mMarkerList.get(i).markerOptions);
-                    mMarkerList.get(i).isAdded = true;
-                }
+                mMarkerList.get(i).show();
             }
         }
     }
 
 
-    public void addMarker(final String name, final int visibility, final boolean isAnonymous, final boolean isNoPreviewVisible, final LatLng location) {
-        mMarkerIconGenerator.getDefaultMarkerIcon(visibility,
-                isAnonymous,
-                isNoPreviewVisible,
-                new MarkerIconGenerator.MarkerIconGenerateListener() {
-            @Override
-            public void onMarkerIconGenerate(Icon icon) {
-                MarkerViewOptions markerOptions = new MarkerViewOptions()
-                        .position(location)
-                        .icon(icon);
-                // TODO .anchor(1, 0.5f);
+    public void addMarker(String name, Content content) {
+        MarkerNameVisibility markerNameVisibility = new MarkerNameVisibility(name, content);
 
-                MarkerView marker = mMap.addMarker(markerOptions);
-
-                MarkerNameVisibility markerNameVisibility = new MarkerNameVisibility();
-                markerNameVisibility.markerOptions = markerOptions;
-                markerNameVisibility.marker = marker;
-                markerNameVisibility.name = name;
-                markerNameVisibility.visibility = visibility;
-                markerNameVisibility.isAnonymous = isAnonymous;
-                markerNameVisibility.isNoPreviewVisible = isNoPreviewVisible;
-
-                markerNameVisibility.isAdded = true;
-                mMarkerList.add(markerNameVisibility);
-
-                if (mMarkerList.size() == 1) {
-                    selectMarkerAt(0);
-                }
-            }
-        });
+        markerNameVisibility.createMarker();
     }
 
     public List<MarkerView> getVisibleMarkers() {
         List<MarkerView> res = new ArrayList<>();
         for (MarkerNameVisibility markerNameVisibility : mMarkerList) {
-            res.add(markerNameVisibility.marker);
+            res.add(markerNameVisibility.markerBase);
         }
         return res;
 
     }
 
     private class MarkerNameVisibility {
-        public boolean isAdded;
-        public MarkerView marker;
-        public MarkerViewOptions markerOptions;
-        public int visibility;
+
+        public MarkerView markerBase;
+        public MarkerView markerNumber;
+
         public String name;
-        public boolean isAnonymous;
-        public boolean isNoPreviewVisible;
+        public Content content;
+
+
+        public MarkerNameVisibility(String name, Content content) {
+            this.name = name;
+            this.content = content;
+        }
+
+
+        public void createMarker() {
+            mMarkerIconGenerator.getDefaultMarkerIcon(
+                    content.getVisibility().getSocialVisibility().getMode(),
+                    content.getVisibility().isAuthorAnonymous(),
+                    !content.getVisibility().isPreviewVisible(),
+                    new MarkerIconGenerator.MarkerIconGenerateListener() {
+                        @Override
+                        public void onMarkerIconGenerate(final Icon icon) {
+                            MarkerViewOptions baseMarkerOptions = new MarkerViewOptions()
+                                    .position(Utils.serializableLatLngToLatLng(content.getLocation()))
+                                    .icon(icon)
+                                    .anchor(0.5f, 0.5f);
+
+                            mMap.getMarkerViewManager().update();
+
+                            markerBase = mMap.addMarker(baseMarkerOptions);
+
+                            mMarkerIconGenerator.getEnumeratedMarkerIcon(name, content.getColor(),
+                                    new MarkerIconGenerator.MarkerIconGenerateListener() {
+                                        @Override
+                                        public void onMarkerIconGenerate(Icon icon) {
+                                            MarkerViewOptions markerOptions = new MarkerViewOptions()
+                                                    .position(Utils.serializableLatLngToLatLng(content.getLocation()))
+                                                    .icon(icon)
+                                                    .anchor(0.5f, 1f);
+
+                                            markerNumber = mMap.addMarker(markerOptions);
+                                            mMarkerList.add(MarkerNameVisibility.this);
+                                        }
+                                    });
+                        }
+                    });
+        }
+
+
+        public void hide() {
+            if (markerBase != null)
+                markerBase.setVisible(false);
+            if (markerNumber != null)
+                markerNumber.setVisible(false);
+        }
+
+        public void show() {
+            if (markerBase != null)
+                markerBase.setVisible(true);
+            if (markerNumber != null)
+                markerNumber.setVisible(true);
+        }
+
+        public void remove() {
+            mMap.removeMarker(markerBase);
+            mMap.removeMarker(markerNumber);
+        }
     }
 
 }

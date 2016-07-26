@@ -36,6 +36,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.wally.wally.App;
 import com.wally.wally.R;
+import com.wally.wally.StubContentFetcher;
 import com.wally.wally.Utils;
 import com.wally.wally.activities.CameraARActivity;
 import com.wally.wally.activities.ContentDetailsActivity;
@@ -354,14 +355,7 @@ public class MapsFragment extends Fragment implements
 
                 for (int i = 0; i < contentList.size(); i++) {
                     Content c = contentList.get(i);
-                    Content content = mContentRetriever.get(i);
-                    int visibility = content.getVisibility().getSocialVisibility().getMode();
-                    mMarkerManager.addMarker(
-                            "" + (size - pageLength + i + 1),
-                            visibility,
-                            content.getVisibility().isAuthorAnonymous(),
-                            !content.getVisibility().isPreviewVisible(),
-                            Utils.serializableLatLngToLatLng(c.getLocation()));
+                    mMarkerManager.addMarker("" + (size - pageLength + i + 1), c);
                 }
             }
         });
@@ -382,23 +376,24 @@ public class MapsFragment extends Fragment implements
     }
 
     private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
-        VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
-        double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
-        ContentFetcher contentFetcher;
-
-        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
-            contentFetcher = App.getInstance().getDataController()
-                    .createFetcherForMyContent();
-        } else if (mUserProfile != null) {
-            contentFetcher = App.getInstance().getDataController()
-                    .createFetcherForUserContent(mUserProfile.getBaseUser());
-        } else {
-            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
-                    Utils.latLngToSerializableLatLng(cameraPosition.target),
-                    radius
-            );
-        }
-        return contentFetcher;
+//        VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
+//        double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
+//        ContentFetcher contentFetcher;
+//
+//        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
+//            contentFetcher = App.getInstance().getDataController()
+//                    .createFetcherForMyContent();
+//        } else if (mUserProfile != null) {
+//            contentFetcher = App.getInstance().getDataController()
+//                    .createFetcherForUserContent(mUserProfile.getBaseUser());
+//        } else {
+//            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
+//                    Utils.latLngToSerializableLatLng(cameraPosition.target),
+//                    radius
+//            );
+//        }
+//        return contentFetcher;
+        return new StubContentFetcher();
     }
 
     private void centerMapOnMyLocation(MapboxMap.CancelableCallback callback) {
@@ -422,7 +417,7 @@ public class MapsFragment extends Fragment implements
 
     private void centerMapOnVisibleMarkers() {
         List<MarkerView> markers = mMarkerManager.getVisibleMarkers();
-        if(markers.size() > 0) {
+        if (markers.size() > 1) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (Marker marker : markers) {
                 builder.include(marker.getPosition());
@@ -438,11 +433,11 @@ public class MapsFragment extends Fragment implements
 
     @Override
     public void onClick(View view) {
-        if(view.getId() == R.id.back)
+        if (view.getId() == R.id.back)
             getActivity().getSupportFragmentManager().popBackStack();
-        else if(view.getId() == R.id.my_location)
+        else if (view.getId() == R.id.my_location)
             onMyLocationClick();
-        else if(view.getId() == R.id.update_area)
+        else if (view.getId() == R.id.update_area)
             onAreaUpdateClick();
 
     }
