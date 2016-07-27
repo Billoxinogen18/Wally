@@ -1,9 +1,11 @@
 package com.wally.wally.activities;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -14,6 +16,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -24,6 +28,9 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.adfCreator.AdfManager;
+import com.wally.wally.datacontroller.adf.ADFService;
+import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
@@ -35,6 +42,7 @@ public class LoginActivity extends GoogleApiClientActivity implements
     @SuppressWarnings("unused")
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 100;
+    private static final int REQ_CODE_LOCATION = 129;
     /**
      * Tango
      */
@@ -88,6 +96,18 @@ public class LoginActivity extends GoogleApiClientActivity implements
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_CODE_LOCATION) {
+            if (Utils.checkLocationPermission(this)) {
+                createAdfManager();
+            } else {
+                // TODO show user that program needs Location and exit
+            }
+        }
+    }
+
     /**
      * At first it tries to silently sign in, if not it calls google sign in window
      */
@@ -122,7 +142,7 @@ public class LoginActivity extends GoogleApiClientActivity implements
 
     @Override
     public void onUserLoad(SocialUser user) {
-        continueToNextActivity();
+        createAdfManager();
     }
 
     @Override
@@ -134,6 +154,40 @@ public class LoginActivity extends GoogleApiClientActivity implements
     private void saveUserInContext(User user) {
         mLoadingView.setVisibility(View.VISIBLE);
         App.getInstance().getUserManager().loadLoggedInUser(user, getGoogleApiClient(), this);
+    }
+
+    private void createAdfManager() {
+        mLoadingView.setVisibility(View.VISIBLE);
+
+        if (!Utils.checkLocationPermission(this)) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQ_CODE_LOCATION);
+            return;
+        }
+        Utils.getNewLocation(mGoogleApiClient, new Callback<LatLng>() {
+            @Override
+            public void onResult(LatLng result) {
+                ADFService as = App.getInstance().getDataController().getADFService();
+                AdfManager.createWithLocation(result, as, new Callback<AdfManager>() {
+                    @Override
+                    public void onResult(AdfManager result) {
+                        App.getInstance().setAdfManager(result);
+                        continueToNextActivity();
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e(TAG, "onError: couldn't create adf Manager" + e);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG, "onError: couldn't get location " + e);
+            }
+        });
     }
 
 
@@ -166,6 +220,7 @@ public class LoginActivity extends GoogleApiClientActivity implements
                 .addConnectionCallbacks(this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .addApi(Plus.API)
+                .addApi(LocationServices.API)
                 .build();
         return mGoogleApiClient;
     }

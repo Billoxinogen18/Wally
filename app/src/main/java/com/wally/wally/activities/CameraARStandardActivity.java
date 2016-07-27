@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.R;
 import com.wally.wally.datacontroller.content.Content;
 
@@ -39,4 +40,5 @@ public class CameraARStandardActivity extends CameraARActivity {
         View mSurfaceView = findViewById(R.id.rajawali_surface);
         ((ViewGroup) mSurfaceView.getParent()).removeView(mSurfaceView); //TODO should not delete rajawali
     }
+
 }

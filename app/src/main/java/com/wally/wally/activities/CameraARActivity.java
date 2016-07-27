@@ -31,11 +31,11 @@ import com.wally.wally.userManager.UserManager;
 
 import java.util.Date;
 
-
-/**
- * Created by shota on 5/21/16.
- */
-public abstract class CameraARActivity extends GoogleApiClientActivity implements OnVisualContentSelectedListener, NewContentDialogFragment.NewContentDialogListener, SelectedMenuView.OnSelectedMenuActionListener, MapsFragment.MapCloseListener {
+public abstract class CameraARActivity extends GoogleApiClientActivity implements
+        OnVisualContentSelectedListener,
+        NewContentDialogFragment.NewContentDialogListener,
+        SelectedMenuView.OnSelectedMenuActionListener,
+        MapsFragment.MapCloseListener {
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int REQUEST_CODE_MY_LOCATION = 22;
     protected DataController mDataController;
@@ -289,4 +289,5 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     public void onMapClose(){
         hideGUI(false);
     }
+
 }

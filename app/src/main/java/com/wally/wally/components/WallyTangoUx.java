@@ -15,7 +15,7 @@ import com.google.atap.tango.ux.TangoUxLayout;
 import com.wally.wally.R;
 
 /**
- * Created by Meravici on 5/26/2016.
+ * Created by Meravici on 5/26/2016. yea
  */
 public class WallyTangoUx extends TangoUx {
     private Handler mMainThreadHandler;

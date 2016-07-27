@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.adfCreator.AdfInfo;
 
 /**
  * This is dialog that manages ADF import export permission grant and returns callback statuses via
@@ -30,7 +31,7 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     public static final String TAG = ImportExportPermissionDialogFragment.class.getSimpleName();
     public static final int IMPORT = 0;
     public static final int EXPORT = 1;
-    public static final String ARG_UUID = "ARG_UUID";
+    private static final String ARG_ADF_INFO = "ARG_ADF_INFO";
     private static final String INTENT_CLASSPACKAGE = "com.projecttango.tango";
     private static final String INTENT_IMPORTEXPORT_CLASSNAME = "com.google.atap.tango.RequestImportExportActivity";
     private static final String EXTRA_KEY_SOURCEFILE = "SOURCE_FILE";
@@ -46,20 +47,18 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     private int mReqCode;
     private ImportExportPermissionListener mListener;
 
-    private String mUUID;
+    private AdfInfo mAdfInfo;
 
 
     /**
-     * @param uuid           file uuid
+     * @param adfInfo           adfInfo
      * @param importOrExport public integer that represents IMPORT/EXPORT enumeration.
-     * @param requestCode    request code is for user, to get result
      * @return Fragment that should be shown
      */
-    public static ImportExportPermissionDialogFragment newInstance(String uuid, int importOrExport, int requestCode) {
+    public static ImportExportPermissionDialogFragment newInstance(AdfInfo adfInfo, int importOrExport) {
         Bundle args = new Bundle();
-        args.putString(ARG_UUID, uuid);
+        args.putSerializable(ARG_ADF_INFO, adfInfo);
         args.putInt(ARG_MODE, importOrExport);
-        args.putInt(ARG_REQ_CODE, requestCode);
 
         ImportExportPermissionDialogFragment fragment = new ImportExportPermissionDialogFragment();
         fragment.setArguments(args);
@@ -102,14 +101,14 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     private void requestImportPermission() {
         Intent importIntent = new Intent();
         importIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
-        importIntent.putExtra(EXTRA_KEY_SOURCEFILE, Utils.getAdfFilePath(mUUID));
+        importIntent.putExtra(EXTRA_KEY_SOURCEFILE, Utils.getAdfFilePath(mAdfInfo.getUuid()));
         startActivityForResult(importIntent, mReqCode);
     }
 
     private void requestExportPermission() {
         Intent exportIntent = new Intent();
         exportIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
-        exportIntent.putExtra(EXTRA_KEY_SOURCEUUID, mUUID);
+        exportIntent.putExtra(EXTRA_KEY_SOURCEUUID, mAdfInfo.getUuid());
         exportIntent.putExtra(EXTRA_KEY_DESTINATIONFILE, Utils.getAdfFilesFolder());
         startActivityForResult(exportIntent, mReqCode);
     }
@@ -118,7 +117,7 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
         Bundle b = getArguments();
         mMode = b.getInt(ARG_MODE);
         mReqCode = b.getInt(ARG_REQ_CODE);
-        mUUID = b.getString(ARG_UUID);
+        mAdfInfo = (AdfInfo) b.getSerializable(ARG_ADF_INFO);
     }
 
     private void initViews(View v) {
@@ -157,9 +156,9 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
             e.apply();
 
             if (resultCode == Activity.RESULT_OK) {
-                mListener.onPermissionGranted(mReqCode);
+                mListener.onPermissionGranted(mAdfInfo);
             } else {
-                mListener.onPermissionDenied(mReqCode);
+                mListener.onPermissionDenied(mAdfInfo);
             }
             dismiss();
         }
@@ -184,8 +183,8 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     }
 
     public interface ImportExportPermissionListener {
-        void onPermissionGranted(int reqCode);
+        void onPermissionGranted(AdfInfo adfInfo);
 
-        void onPermissionDenied(int reqCode);
+        void onPermissionDenied(AdfInfo adfInfo);
     }
 }

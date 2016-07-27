@@ -1,15 +1,22 @@
 package com.wally.wally.activities;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.widget.Toast;
 
+import com.google.android.gms.location.LocationServices;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
@@ -17,15 +24,19 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.adfCreator.AdfInfo;
+import com.wally.wally.adfCreator.AdfManager;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.datacontroller.adf.ADFService;
-import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.fragments.ImportExportPermissionDialogFragment;
+import com.wally.wally.fragments.PersistentDialogFragment;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
+import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.LocalizationListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoManager;
@@ -39,17 +50,21 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Created by shota on 5/21/16.
- */
-public class CameraARTangoActivity extends CameraARActivity implements ContentFitter.OnContentFitListener, LocalizationListener {
+public class CameraARTangoActivity extends CameraARActivity implements
+        ContentFitter.OnContentFitListener,
+        LocalizationListener,
+        ImportExportPermissionDialogFragment.ImportExportPermissionListener,
+        PersistentDialogFragment.PersistentDialogListener {
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
-    private static final String ARG_ADF_SYNC_INFO = "ARG_ADF_SYNC_INFO";
-
-    private AdfSyncInfo mAdfSyncInfo;
-    private String mAdfUuid;
+    // Permission Denied explain codes
+    private static final int RC_EXPLAIN_ADF = 14;
+    // Permission Request codes
+    private static final int RC_REQ_AREA_LEARNING = 17;
+    private int REQUEST_CODE_MY_LOCATION = 1;
+    private boolean mExplainAdfPermission;
 
     private TangoManager mTangoManager;
+    private FloatingActionButton mCreateNewContent;
     private FloatingActionButton mFinishFitting;
     private View mLayoutFitting;
     private FloatingActionButton mFinishFittingFab;
@@ -58,20 +73,11 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
     private ContentFitter mContentFitter;
     private VisualContentManager mVisualContentManager;
+    private WallyRenderer mRenderer;
+    private SerializableLatLng mLocalizationLocation;
 
-
-    /**
-     * Redirects to ADF chooser, because activity is being started without ADF.
-     * ADF chooser will start {@link CameraARTangoActivity} with chosen ADF file.
-     */
     public static Intent newIntent(Context context) {
-        return ADFChooser.newIntent(context);
-    }
-
-    public static Intent newIntent(Context context, AdfSyncInfo adfSyncInfo) {
-        Intent i = new Intent(context, CameraARTangoActivity.class);
-        i.putExtra(ARG_ADF_SYNC_INFO, adfSyncInfo);
-        return i;
+        return new Intent(context, CameraARTangoActivity.class);
     }
 
     @Override
@@ -80,6 +86,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
         mLayoutFitting = findViewById(R.id.layout_fitting);
         mFinishFittingFab = (FloatingActionButton) mLayoutFitting.findViewById(R.id.btn_finish_fitting);
+        mCreateNewContent = (FloatingActionButton) findViewById(R.id.btn_new_post);
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
@@ -87,24 +94,27 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         Context context = getBaseContext();
 
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
-        mAdfSyncInfo = (AdfSyncInfo) getIntent().getSerializableExtra(ARG_ADF_SYNC_INFO);
-        mAdfUuid = mAdfSyncInfo.getAdfMetaData().getUuid();
 
         mVisualContentManager = new VisualContentManager();
-        fetchContentForAdf(context, mAdfUuid);
+//        fetchContentForAdf(context, mAdfUuid);
 
-        final WallyRenderer renderer = new WallyRenderer(context, mVisualContentManager, this);
+        mRenderer = new WallyRenderer(context, mVisualContentManager, this);
 
-        mSurfaceView.setSurfaceRenderer(renderer);
+        mSurfaceView.setSurfaceRenderer(mRenderer);
         WallyTangoUx tangoUx = new WallyTangoUx(context);
+        LearningEvaluator evaluator = new LearningEvaluator();
 
         TangoPointCloudManager pointCloudManager = new TangoPointCloudManager();
 
         tangoUx.setLayout(mTangoUxLayout);
+        TangoUpdater tangoUpdater = new TangoUpdater(tangoUx, mSurfaceView, pointCloudManager);
+        tangoUpdater.addLocalizationListener(this);
 
-        TangoUpdater tangoUpdater = new TangoUpdater(tangoUx, mSurfaceView, pointCloudManager, this);
         TangoFactory tangoFactory = new TangoFactory(context);
-        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, renderer, tangoUx, tangoFactory, mAdfUuid);
+
+        AdfManager adfManager = App.getInstance().getAdfManager();
+        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, mRenderer, tangoUx,
+                tangoFactory, adfManager, evaluator);
         restoreState(savedInstanceState);
 
 
@@ -116,7 +126,7 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
             public boolean onTouch(View v, MotionEvent event) {
                 //TODO check!
                 scaleDetector.onTouchEvent(event);
-                renderer.onTouchEvent(event);
+                mRenderer.onTouchEvent(event);
                 return true;
             }
         });
@@ -125,6 +135,38 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
             requestADFPermission();
         }
+    }
+
+
+    private void requestADFPermission() {
+        startActivityForResult(
+                Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE), RC_REQ_AREA_LEARNING);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_REQ_AREA_LEARNING) {
+            if (resultCode != RESULT_OK) {
+                mExplainAdfPermission = true;
+            }
+        }
+    }
+
+
+    @Override
+    public void onDialogPositiveClicked(int requestCode) {
+        switch (requestCode) {
+            case RC_EXPLAIN_ADF:
+                requestADFPermission();
+                break;
+        }
+    }
+
+    @Override
+    public void onDialogNegativeClicked(int requestCode) {
+        finish();
+        System.exit(0);
     }
 
     private void fetchContentForAdf(Context context, String adfUuid) {
@@ -159,7 +201,30 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
 
     @Override
     public void onSaveContent(Content content) {
-        content.withUuid(mAdfUuid);
+        AdfInfo adfInfo = mTangoManager.getCurrentAdf();
+
+        adfInfo.getMetaData().setLatLng(mLocalizationLocation);
+
+        content.withUuid(adfInfo.getUuid());
+        if (!adfInfo.isUploaded()) requestExportPermission(adfInfo);
+    }
+
+    private void requestExportPermission(AdfInfo adfInfo) {
+        DialogFragment df = ImportExportPermissionDialogFragment
+                .newInstance(adfInfo, ImportExportPermissionDialogFragment.EXPORT);
+        df.show(getSupportFragmentManager(), ImportExportPermissionDialogFragment.TAG);
+    }
+
+
+    @Override
+    public void onPermissionGranted(AdfInfo adfInfo) {
+        startUploadingAdf(adfInfo);
+        adfInfo.withUploaded(true);
+    }
+
+    @Override
+    public void onPermissionDenied(AdfInfo adfInfo) {
+//TODO !!!
     }
 
     @Override
@@ -192,16 +257,30 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
     @Override
     protected void onResume() {
         super.onResume();
-        mTangoManager.onResume();
+        if (mExplainAdfPermission) {
+            mExplainAdfPermission = false;
+            PersistentDialogFragment.newInstance(
+                    this,
+                    RC_EXPLAIN_ADF,
+                    R.string.explain_adf_permission,
+                    R.string.give_permission,
+                    R.string.close_application)
+                    .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
+        }
 
-        if (mContentFitter != null) {
-            if (mContentFitter.isCancelled()) {
-                mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager, mVisualContentManager, this);
+        if (Utils.hasADFPermissions(this)) {
+            mTangoManager.onResume();
+
+            if (mContentFitter != null) {
+                if (mContentFitter.isCancelled()) {
+                    mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager, mVisualContentManager, this);
+                }
+                mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                onFitStatusChange(true);
             }
-            mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            onFitStatusChange(true);
         }
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -248,69 +327,76 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
         onFitStatusChange(false);
     }
 
-    private void requestADFPermission() {
-        startActivityForResult(
-                Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE),
-                Tango.TANGO_INTENT_ACTIVITYCODE);
-    }
-
     /**
      * Just syncs adf on cloud.
      * Note that we only sync when localized.
      */
-    private void startUploadingAdf() {
-        mAdfSyncInfo.setIsSynchronized(true);
-        ADFService s = App.getInstance().getDataController().getADFService();
-        s.upload(Utils.getAdfFilePath(mAdfUuid), mAdfSyncInfo.getAdfMetaData(), new Callback<Void>() {
-            @Override
-            public void onResult(Void result) {
+    private void startUploadingAdf(final AdfInfo adfInfo) {
+        final ADFService s = App.getInstance().getDataController().getADFService();
 
-            }
+        if (Utils.checkLocationPermission(this) && mGoogleApiClient.isConnected()) {
+            Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
+                @Override
+                public void onResult(SerializableLatLng result) {
+                    adfInfo.getMetaData().setLatLng(result);
+                    Utils.getAddressForLocation(CameraARTangoActivity.this, result, new Callback<String>() {
+                        @Override
+                        public void onResult(String address) {
+                            adfInfo.getMetaData().setName(address);
+                            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
+                        }
 
-            @Override
-            public void onError(Exception e) {
-                mAdfSyncInfo.setIsSynchronized(false);
-            }
-        });
-    }
+                        @Override
+                        public void onError(Exception e) {
+                            adfInfo.getMetaData().setName(null);
+                            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
+                        }
+                    });
+                }
 
-    /**
-     * same {@link #localized()} method called in main thread.
-     */
-    public void localizedMainThread() {
-        // Sync adf when localized
-        if (!mAdfSyncInfo.isSynchronized()) {
-            // Get new position if possible, or otherwise upload with old location.
-            if (Utils.checkLocationPermission(this) && mGoogleApiClient.isConnected()) {
-                Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
-                    @Override
-                    public void onResult(SerializableLatLng result) {
-                        mAdfSyncInfo.getAdfMetaData().setLatLng(result);
-                        startUploadingAdf();
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        startUploadingAdf();
-                    }
-                });
-            } else {
-                startUploadingAdf();
-            }
+                @Override
+                public void onError(Exception e) {
+                    s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
+                }
+            });
+        } else {
+            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
         }
-        mVisualContentManager.localized();
-        mFinishFittingFab.setEnabled(true);
     }
+
 
     @Override
     public void localized() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                localizedMainThread();
+                mVisualContentManager.localized();
+                mFinishFittingFab.setEnabled(true);
+                mCreateNewContent.setVisibility(View.VISIBLE);
             }
         });
+        if (!mTangoManager.isLearningMode())
+            fetchContentForAdf(getBaseContext(), mTangoManager.getCurrentAdf().getUuid());
+        setLocalizationLocation();
     }
+
+    private void setLocalizationLocation() {
+        if (Utils.checkLocationPermission(getBaseContext())) {
+            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+            if (myLocation == null) {
+                Toast.makeText(getBaseContext(), "Couldn't get user location", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "saveActiveContent: Cannot get user location");
+            } else {
+                mLocalizationLocation = new SerializableLatLng(myLocation.getLatitude(), myLocation.getLongitude());
+            }
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_CODE_MY_LOCATION);
+        }
+    }
+
 
     @Override
     public void notLocalized() {
@@ -319,7 +405,21 @@ public class CameraARTangoActivity extends CameraARActivity implements ContentFi
             public void run() {
                 mVisualContentManager.notLocalized();
                 mFinishFittingFab.setEnabled(false);
+                mCreateNewContent.setVisibility(View.GONE);
             }
         });
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_MY_LOCATION) {
+            if (Utils.checkLocationPermission(this)) {
+                setLocalizationLocation();
+            }
+            // TODO show error that user can't add content without location permission
+        }
+    }
+
 }

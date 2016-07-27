@@ -13,7 +13,10 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
@@ -49,6 +52,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Utility functions which are not specific to one part of the code goes here.
@@ -404,5 +409,46 @@ public final class Utils {
             });
             anim.start();
         }
+    }
+
+    public static void sleep(long ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void getAddressForLocation(final Context ctx, final SerializableLatLng latLng,
+                                             final Callback<String> callback) {
+        new AsyncTask<Void, Void, String>() {
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                Geocoder geocoder = new Geocoder(ctx, Locale.getDefault());
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(
+                            latLng.getLatitude(), latLng.getLongitude(), 1);
+                    String city = addresses.get(0).getLocality();
+                    String street = addresses.get(0).getFeatureName();
+                    //String zip = addresses.get(0).getPostalCode();
+                    String country = addresses.get(0).getCountryName();
+                    return String.format("%s,%s (%s)", street, city, country);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                if (!TextUtils.isEmpty(s)) {
+                    callback.onResult(s);
+                } else {
+                    callback.onError(null);
+                }
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 }

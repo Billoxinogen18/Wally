@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
+import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoEvent;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
@@ -11,11 +12,10 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.components.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
-import org.rajawali3d.surface.RajawaliTextureView;
 
-/**
- * Created by shota on 5/27/16.
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private static final String TAG = TangoUpdater.class.getSimpleName();
 
@@ -24,18 +24,36 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private boolean mIsFrameAvailableTangoThread;
     private RajawaliSurfaceView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
-    private LocalizationListener mLocalizator;
+    private List<LocalizationListener> mLocalizationListeners;
+    private List<ValidPoseListener> mValidPoseListeners;
+    private ArrayList<TangoCoordinateFramePair> framePairs;
 
 
-    public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager, LocalizationListener localizator) {
+    public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager) {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
-        mLocalizator = localizator;
+        mLocalizationListeners = new ArrayList<>();
+        mValidPoseListeners = new ArrayList<>();
+        framePairs = new ArrayList<>();
+        framePairs.add(
+                new TangoCoordinateFramePair(
+                        TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
+                        TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE));
+        framePairs.add(
+                new TangoCoordinateFramePair(
+                        TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE,
+                        TangoPoseData.COORDINATE_FRAME_DEVICE
+                ));
+    }
+
+    public ArrayList<TangoCoordinateFramePair> getFramePairs() {
+        return framePairs;
     }
 
     @Override
     public void onPoseAvailable(TangoPoseData pose) {
+        //Log.d(TAG,  "pose = [" + pose + "]");
         if (mTangoUx != null) {
             mTangoUx.updatePoseStatus(pose.statusCode);
         }
@@ -48,12 +66,16 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         } else if (pose.baseFrame == TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION && pose.targetFrame == TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE) {
             setTangoLocalization(true);
             if (mTangoUx != null) {
-                mTangoUx.hideCustomMessage();
+                // mTangoUx.hideCustomMessage();
             }
         } else if (!isTangoLocalized()) {
             if (mTangoUx != null) {
                 mTangoUx.showCustomMessage("Walk around!");
             }
+        }
+
+        if (pose.statusCode == TangoPoseData.POSE_VALID) {
+            fireOnValidPose(pose);
         }
     }
 
@@ -101,10 +123,38 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         if (isLocalized != localization) {
             isLocalized = localization;
             if (isLocalized) {
-                mLocalizator.localized();
+                for (LocalizationListener listener : mLocalizationListeners) {
+                    listener.localized();
+                }
             } else {
-                mLocalizator.notLocalized();
+                for (LocalizationListener listener : mLocalizationListeners) {
+                    listener.notLocalized();
+                }
             }
         }
+    }
+
+    public synchronized void addLocalizationListener(LocalizationListener listener) {
+        mLocalizationListeners.add(listener);
+    }
+
+    public void addValidPoseListener(ValidPoseListener listener) {
+        mValidPoseListeners.add(listener);
+    }
+
+    public void removeValidPoserListener(ValidPoseListener listener) {
+        mValidPoseListeners.remove(listener);
+    }
+
+    private void fireOnValidPose(final TangoPoseData poseData) {
+
+        for (ValidPoseListener listener : mValidPoseListeners) {
+            listener.onValidPose(poseData);
+        }
+
+    }
+
+    public interface ValidPoseListener {
+        void onValidPose(TangoPoseData data);
     }
 }
