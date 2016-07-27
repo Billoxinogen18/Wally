@@ -31,7 +31,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.geometry.VisibleRegion;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -40,7 +39,6 @@ import com.wally.wally.R;
 import com.wally.wally.StubContentFetcher;
 import com.wally.wally.Utils;
 import com.wally.wally.activities.CameraARActivity;
-import com.wally.wally.activities.ContentDetailsActivity;
 import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.ContentListView;
 import com.wally.wally.components.ContentListViewItem;
@@ -252,11 +250,11 @@ public class MapsFragment extends Fragment implements
 
     @Override
     public void onContentClicked(Content content) {
-        if (content.getVisibility().isPreviewVisible()) {
-            startActivity(ContentDetailsActivity.newIntent(getContext(), content));
-        } else {
-            Toast.makeText(getContext(), R.string.content_not_visible_note, Toast.LENGTH_SHORT).show();
-        }
+//        if (content.getVisibility().isPreviewVisible()) {
+//            startActivity(ContentDetailsActivity.newIntent(getContext(), content));
+//        } else {
+//            Toast.makeText(getContext(), R.string.content_not_visible_note, Toast.LENGTH_SHORT).show();
+//        }
     }
 
     @Override

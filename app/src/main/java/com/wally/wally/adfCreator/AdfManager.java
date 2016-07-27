@@ -1,10 +1,10 @@
 package com.wally.wally.adfCreator;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.adf.ADFService;
 import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class AdfManager {
         });
     }
 
-    public static void createWithLocation(LatLng location, final ADFService adfService,
+    public static void createWithLocation(SerializableLatLng location, final ADFService adfService,
                                           final Callback<AdfManager> callback){
         adfService.searchADfMetaDataNearLocation(location, new Callback<List<AdfMetaData>>() {
             @Override

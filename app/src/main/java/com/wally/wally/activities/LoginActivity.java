@@ -17,7 +17,6 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,6 +31,7 @@ import com.wally.wally.adfCreator.AdfManager;
 import com.wally.wally.datacontroller.adf.ADFService;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
 
@@ -165,9 +165,9 @@ public class LoginActivity extends GoogleApiClientActivity implements
                     REQ_CODE_LOCATION);
             return;
         }
-        Utils.getNewLocation(mGoogleApiClient, new Callback<LatLng>() {
+        Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
             @Override
-            public void onResult(LatLng result) {
+            public void onResult(SerializableLatLng result) {
                 ADFService as = App.getInstance().getDataController().getADFService();
                 AdfManager.createWithLocation(result, as, new Callback<AdfManager>() {
                     @Override
