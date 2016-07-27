@@ -64,6 +64,8 @@ public class TangoManager implements LocalizationListener {
     private boolean mIsLearningMode;
     private boolean mIsReadyToSaveAdf;
 
+    private Thread localizationWatchdog;
+
     public TangoManager(
             TangoUpdater tangoUpdater,
             TangoPointCloudManager pointCloudManager,
@@ -178,6 +180,21 @@ public class TangoManager implements LocalizationListener {
         mTangoUx.showCustomMessage("New room was learned.", 500);
         onPause();
         localizeWithLearnedAdf(currentAdf);
+        localizationWatchdog = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(20000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (!localizationWatchdog.isInterrupted()) {
+                    savedAdf = null;
+                    onPause();
+                    onResume();
+                }
+            }
+        });
     }
 
     private synchronized void saveAdf() {
@@ -391,6 +408,11 @@ public class TangoManager implements LocalizationListener {
     @Override
     public void localized() {
         Log.d(TAG, "localized() called with: " + "");
+
+        if (localizationWatchdog != null) {
+            localizationWatchdog.interrupt();
+        }
+
         mIsLocalized = true;
         mAdfScheduler.finish();
         if (currentAdf != null) savedAdf = currentAdf;
