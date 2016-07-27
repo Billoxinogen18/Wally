@@ -403,7 +403,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "run() called with: " + "");
                 mVisualContentManager.notLocalized();
                 mFinishFittingFab.setEnabled(false);
                 mCreateNewContent.setVisibility(View.GONE);

@@ -60,6 +60,7 @@ public class AdfScheduler extends Thread {
     @Override
     public void run() {
         while (!done && !isInterrupted()) {
+            Log.d(TAG, "AdfScheduler: ");
             mAdfManager.getAdf(new Callback<AdfInfo>() {
                 @Override
                 public void onResult(AdfInfo result) {

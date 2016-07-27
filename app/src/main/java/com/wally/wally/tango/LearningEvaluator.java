@@ -19,7 +19,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
     private static final int MIN_ANGLE_COUNT = 10;
     private static final int MIN_CELL_COUNT = 4;
     private static final int MIN_TIME_S = 20;
-    private static final int MAX_TIME_S = 60;
+    private static final int MAX_TIME_S = 25;
 
     private List<Cell> cells;
     private long startTime;
@@ -56,10 +56,11 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
         } else {
             cells.get(index).angleVisited[angleIndex] = true;
         }
+        //Log.d(TAG, "pose = " + pose + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
 
         if (canFinish() && !isFinished) {
             isFinished = true;
-            Log.d(TAG, "pose = " + Arrays.toString(pose.translation) + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
+            Log.d(TAG, "pose = " + pose + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
             new Thread(new Runnable() {
                 @Override
                 public void run() {

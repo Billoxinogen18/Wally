@@ -5,10 +5,8 @@ import android.util.Log;
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
-import com.google.atap.tangoservice.TangoConfig;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoException;
-import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
@@ -84,6 +82,9 @@ public class TangoManager implements LocalizationListener {
         mTangoUpdater = tangoUpdater;
         mRenderer = wallyRenderer;
         mTangoUx = tangoUx;
+        TangoUx.StartParams params = new TangoUx.StartParams();
+        params.showConnectionScreen = false;
+        mTangoUx.start(params);
         mPointCloudManager = pointCloudManager;
         mTangoFactory = tangoFactory;
         mAdfManager = adfManager;
@@ -143,7 +144,7 @@ public class TangoManager implements LocalizationListener {
 
     public synchronized void onResume() {
         Log.d(TAG, "Enter onResume()");
-        if (savedAdf != null){
+        if (savedAdf != null) {
             startLocalizing(savedAdf);
             // TODO: what happens if can't localize on saved ADF?
         } else {
@@ -156,12 +157,14 @@ public class TangoManager implements LocalizationListener {
     }
 
     private Callback<AdfInfo> adfSchedulerCallback() {
-       return new Callback<AdfInfo>() {
+        return new Callback<AdfInfo>() {
             @Override
             public void onResult(AdfInfo result) {
-                if (mIsLocalized) { return; }
+                if (mIsLocalized) {
+                    return;
+                }
                 Log.d(TAG, "adfSchedulerCallback onResult: " + result);
-                if (result == null){
+                if (result == null) {
                     startLearning();
                 } else {
                     startLocalizing(result);
@@ -170,12 +173,13 @@ public class TangoManager implements LocalizationListener {
 
             @Override
             public void onError(Exception e) {
-                Log.d(TAG, "adfSchedulerCallback onError: " + e );
+                Log.d(TAG, "adfSchedulerCallback onError: " + e);
             }
         };
     }
 
-    private synchronized void prepareForLearning(){
+
+    private synchronized void prepareForLearning() {
         mAdfScheduler.finish();
         mIsLearningMode = true;
         mLearningEvaluator.addLearningEvaluatorListener(new LearningEvaluator.LearningEvaluatorListener() {
@@ -197,13 +201,16 @@ public class TangoManager implements LocalizationListener {
         mTangoUx.showCustomMessage("Learning new room...");
     }
 
-    private void finishLearning(){
+    private void finishLearning() {
+        Log.d(TAG, "finishLearning() called with: " + "");
         saveAdf();
         mTangoUx.showCustomMessage("New room was learned.");
-        startLocalizing(currentAdf);
+        onPause();
+        localizeWithLearnedAdf(currentAdf);
     }
 
-    private synchronized void saveAdf(){
+    private synchronized void saveAdf() {
+        Log.d(TAG, "saveAdf() called with: " + "");
         String uuid = mTango.saveAreaDescription();
         mIsLearningMode = false;
         AdfInfo adfInfo = new AdfInfo().withUuid(uuid).withMetaData(new AdfMetaData(uuid, uuid, null));
@@ -212,35 +219,67 @@ public class TangoManager implements LocalizationListener {
         mIsReadyToSaveAdf = false;
     }
 
-    private synchronized void startLearning(){
+    private synchronized void startLearning() {
+        Log.d(TAG, "startLearning() called with: " + "");
         prepareForLearning();
-        startLocalizing(null);
+        currentAdf = null;
+        savedAdf = null;
+        if (mIsConnected) {
+            onPause();
+        }
+        mTango = mTangoFactory.getTangoForLearning(getRunnable());
+    }
+
+    private synchronized void localizeWithLearnedAdf(final AdfInfo adf){
+        Log.d(TAG, "localizeWithLearnedAdf() called with: " + "adf = [" + adf + "]");
+        currentAdf = adf;
+        mTango = mTangoFactory.getTangoWithUuid(getRunnable(), adf.getUuid());
     }
 
     private synchronized void startLocalizing(final AdfInfo adf) {
-        // Synchronize against disconnecting while the service is being used
-        // in OpenGL thread or in UI thread.
-        currentAdf = adf;
-        if (mIsConnected) { onPause(); }
-        TangoUx.StartParams params = new TangoUx.StartParams();
-        params.showConnectionScreen = false;
-        mTangoUx.start(params);
-        mTango = mTangoFactory.getTango(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    TangoSupport.initialize();
-                    connectTango(adf);
-                    connectRenderer();
-                    mIsConnected = true;
-                } catch (TangoOutOfDateException e) {
-                    if (mTangoUx != null) {
-                        mTangoUx.showTangoOutOfDate();
+        Log.d(TAG, "startLocalizing() called with: " + "adf = [" + adf + "]");
+        currentAdf = adf; //TODO mchirdeba tu ara?
+        if (!mIsConnected) {
+            mTango = mTangoFactory.getTango(new TangoFactory.RunnableWithError() {
+                @Override
+                public void run() {
+                    getRunnable().run();
+                    if (isAdfImported(adf)) {
+                        mTango.experimentalLoadAreaDescription(adf.getUuid());
+                    } else {
+                        mTango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
                     }
                 }
-            }
-        });
 
+                @Override
+                public void onError(Exception e) {
+                    getRunnable().onError(e);
+                }
+            });
+        } else {
+            if (isAdfImported(adf)) {
+                mTango.experimentalLoadAreaDescription(adf.getUuid());
+            } else {
+                mTango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
+            }
+        }
+
+    }
+
+    private TangoFactory.RunnableWithError getRunnable() {
+        return new TangoFactory.RunnableWithError() {
+            @Override
+            public void run() {
+                finishTangoConnection();
+                connectRenderer();
+                mIsConnected = true;
+            }
+
+            @Override
+            public void onError(Exception e) {
+                mTangoUx.showTangoOutOfDate();
+            }
+        };
     }
 
     public boolean isConnected() {
@@ -266,55 +305,20 @@ public class TangoManager implements LocalizationListener {
 
     }
 
-    /**
-     * Configures the Tango service and connects it to callbacks.
-     */
-    private void connectTango(AdfInfo adf) {
-        TangoConfig config = mTango.getConfig(TangoConfig.CONFIG_TYPE_DEFAULT);
-        config.putBoolean(TangoConfig.KEY_BOOLEAN_DEPTH, true);
-        config.putBoolean(TangoConfig.KEY_BOOLEAN_COLORCAMERA, true);
-        config.putBoolean(TangoConfig.KEY_BOOLEAN_AUTORECOVERY, true);
-        config.putBoolean(TangoConfig.KEY_BOOLEAN_LOWLATENCYIMUINTEGRATION, true);
-
-
-        if (adf != null) {
-            if (isAdfImported(adf)) {
-                config.putString(TangoConfig.KEY_STRING_AREADESCRIPTION, adf.getUuid());
-            }
-        } else {
-            config.putBoolean(TangoConfig.KEY_BOOLEAN_LEARNINGMODE, true);
-        }
-
-        mTango.connect(config);
-
-        if (adf != null && !adf.isImported()) {
-            mTango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
-        }
-
-        ArrayList<TangoCoordinateFramePair> framePairs = new ArrayList<>();
-        framePairs.add(
-                new TangoCoordinateFramePair(
-                        TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
-                        TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE));
-        framePairs.add(
-                new TangoCoordinateFramePair(
-                        TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE,
-                        TangoPoseData.COORDINATE_FRAME_DEVICE
-                ));
-        mTango.connectListener(framePairs, mTangoUpdater);
+    private void finishTangoConnection() {
+        mTango.connectListener(mTangoUpdater.getFramePairs(), mTangoUpdater);
 
         // Get extrinsics from device for use in transforms. This needs
         // to be done after connecting Tango and listeners.
         mExtrinsics = setupExtrinsics(mTango);
         mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-        Log.d(TAG, "connectTango() called with: " + "adf = [" + adf + "]");
     }
 
-    private boolean isAdfImported(AdfInfo adf){
+    private boolean isAdfImported(AdfInfo adf) {
         String uuid = adf.getUuid();
         if (uuid == null) return false;
-        ArrayList<String> l  = mTango.listAreaDescriptions();
-        for (String id : l){
+        ArrayList<String> l = mTango.listAreaDescriptions();
+        for (String id : l) {
             if (id.equals(uuid)) return true;
         }
         return false;
@@ -443,10 +447,10 @@ public class TangoManager implements LocalizationListener {
         mAdfScheduler.finish();
         Log.d(TAG, "localized() mAdfScheduler.finish() was called");
         if (currentAdf != null) savedAdf = currentAdf;
-        if(mIsReadyToSaveAdf && mIsLearningMode){
+        if (mIsReadyToSaveAdf && mIsLearningMode) {
             finishLearning();
         }
-        if (!mIsLearningMode){
+        if (!mIsLearningMode) {
             mTangoUx.hideCustomMessage();
         }
     }
@@ -455,14 +459,14 @@ public class TangoManager implements LocalizationListener {
     public void notLocalized() {
         Log.d(TAG, "notLocalized() called with: " + "");
         mIsLocalized = false;
-        if (mIsLearningMode){
+        if (mIsLearningMode) {
             mTangoUx.showCustomMessage("Learning New Room. Walk Around");
         } else {
             mTangoUx.showCustomMessage("Walk Around");
         }
     }
 
-    public synchronized boolean isLocalized(){
+    public synchronized boolean isLocalized() {
         return mIsLocalized;
     }
 
