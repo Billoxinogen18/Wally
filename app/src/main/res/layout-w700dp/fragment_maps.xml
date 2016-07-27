@@ -106,6 +106,13 @@
                 android:onClick="onBtnCameraClick"
                 android:padding="8dp"
                 android:src="@drawable/ic_arrow_back_white_24dp" />
+
+            <TextView
+                android:id="@+id/fragment_title"
+                style="@style/TextAppearance.AppCompat.Title.Inverse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Public feed" />
         </android.support.v7.widget.Toolbar>
 
         <com.wally.wally.components.ContentListView

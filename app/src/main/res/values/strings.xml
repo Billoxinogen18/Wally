@@ -47,7 +47,7 @@
     <string name="synchronizing_adfs">Synchronizing</string>
     <string name="loading_adfs">Loading ADF\'s</string>
     <string name="updating_area">Updating area</string>
-    <string name="map_feed_title">Notes</string>
+    <string name="map_feed_title">Public feed</string>
     <string name="map_feed_self_title">My Notes</string>
     <string name="map_feed_profile_title">s Notes</string>
     <string name="no_content">No content</string>
@@ -125,4 +125,5 @@
     <string name="select_share_visibility">Share Visibility</string>
     <string name="done">Done</string>
     <string name="map_style_url">mapbox://styles/wallynotes/ciqrsooto000dc7nic64jfgfn</string>
+    <string name="profile">Profile</string>
 </resources>

@@ -344,6 +344,7 @@ public class MapsFragment extends Fragment implements
     private void initFeedTitle(View v) {
         ImageView ownerImage = (ImageView) v.findViewById(R.id.iv_owner_image);
         TextView ownerName = (TextView) v.findViewById(R.id.tv_owner_name);
+        TextView fragmentTitle = (TextView) v.findViewById(R.id.fragment_title);
 
         if (mUserProfile != null) {
             Glide.with(getContext())
@@ -358,17 +359,11 @@ public class MapsFragment extends Fragment implements
 
             ownerImage.setVisibility(View.VISIBLE);
             String firstName = mUserProfile.getFirstName() == null ? mUserProfile.getDisplayName() : mUserProfile.getFirstName();
-            String title;
-            if (mUserProfile.equals(App.getInstance().getUserManager().getUser())) {
-                title = getString(R.string.map_feed_self_title);
-            } else {
-                title = firstName + getString(R.string.map_feed_profile_title);
-            }
-
-            ownerName.setText(title);
+            ownerName.setText(firstName);
+            fragmentTitle.setText(R.string.profile);
         } else {
-            ownerName.setText(R.string.map_feed_title);
-            ownerImage.setVisibility(View.GONE);
+            v.findViewById(R.id.owner_profile_info).setVisibility(View.GONE);
+            fragmentTitle.setText(R.string.map_feed_title);
         }
     }
 
