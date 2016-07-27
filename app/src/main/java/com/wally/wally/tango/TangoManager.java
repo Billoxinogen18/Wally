@@ -24,8 +24,6 @@ import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
 
-import java.util.ArrayList;
-
 public class TangoManager implements LocalizationListener {
     private static final String TAG = TangoManager.class.getSimpleName();
 
@@ -87,29 +85,6 @@ public class TangoManager implements LocalizationListener {
         mLearningEvaluator = evaluator;
         mTangoUpdater.addLocalizationListener(this);
     }
-
-    /**
-     * Calculates and stores the fixed transformations between the device and
-     * the various sensors to be used later for transformations between frames.
-     */
-    private static DeviceExtrinsics setupExtrinsics(Tango tango) {
-        // Create camera to IMU transform.
-        TangoCoordinateFramePair framePair = new TangoCoordinateFramePair();
-        framePair.baseFrame = TangoPoseData.COORDINATE_FRAME_IMU;
-        framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR;
-        TangoPoseData imuTrgbPose = tango.getPoseAtTime(0.0, framePair);
-
-        // Create device to IMU transform.
-        framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_DEVICE;
-        TangoPoseData imuTdevicePose = tango.getPoseAtTime(0.0, framePair);
-
-        // Create depth camera to IMU transform.
-        framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH;
-        TangoPoseData imuTdepthPose = tango.getPoseAtTime(0.0, framePair);
-
-        return new DeviceExtrinsics(imuTdevicePose, imuTrgbPose, imuTdepthPose);
-    }
-
 
     public synchronized void onPause() {
         Log.d(TAG, "Enter onPause()");
@@ -221,9 +196,7 @@ public class TangoManager implements LocalizationListener {
         prepareForLearning();
         currentAdf = null;
         savedAdf = null;
-        if (mIsConnected) {
-            onPause();
-        }
+        if (mIsConnected) { onPause(); }
         mTango = mTangoFactory.getTangoForLearning(getRunnable());
     }
 
@@ -239,30 +212,27 @@ public class TangoManager implements LocalizationListener {
         mTangoUx.showCustomMessage("localizing... Walk around");
         currentAdf = adf; //TODO mchirdeba tu ara?
         if (!mIsConnected) {
+            final TangoFactory.RunnableWithError r = getRunnable();
             mTango = mTangoFactory.getTango(new TangoFactory.RunnableWithError() {
                 @Override
                 public void run() {
-                    getRunnable().run();
-                    if (isAdfImported(adf)) {
-                        mTango.experimentalLoadAreaDescription(adf.getUuid());
-                    } else {
-                        mTango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
-                    }
+                    r.run();
+                    loadAdf(mTango, adf);
                 }
-
                 @Override
                 public void onError(Exception e) {
-                    getRunnable().onError(e);
+                    r.onError(e);
                 }
             });
-        } else {
-            if (isAdfImported(adf)) {
-                mTango.experimentalLoadAreaDescription(adf.getUuid());
-            } else {
-                mTango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
-            }
-        }
+        } else { loadAdf(mTango, adf); }
+    }
 
+    private void loadAdf(Tango tango, AdfInfo adf) {
+        if (TangoUtils.isAdfImported(tango, adf.getUuid())) {
+            tango.experimentalLoadAreaDescription(adf.getUuid());
+        } else {
+            tango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
+        }
     }
 
     private TangoFactory.RunnableWithError getRunnable() {
@@ -272,7 +242,7 @@ public class TangoManager implements LocalizationListener {
                 // Connect TangoUpdater and tango
                 mTango.connectListener(mTangoUpdater.getFramePairs(), mTangoUpdater);
                 // Get extrinsics (needs to be done after connecting Tango and listeners)
-                mExtrinsics = setupExtrinsics(mTango);
+                mExtrinsics = TangoUtils.getDeviceExtrinsics(mTango);
                 mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
                 connectRenderer();
                 mIsConnected = true;
@@ -283,10 +253,6 @@ public class TangoManager implements LocalizationListener {
                 mTangoUx.showTangoOutOfDate();
             }
         };
-    }
-
-    public boolean isConnected() {
-        return mIsConnected;
     }
 
     /**
@@ -306,16 +272,6 @@ public class TangoManager implements LocalizationListener {
 
         return new Pose(p.getPosition().add(addto), p.getOrientation().multiply(rot));
 
-    }
-
-    private boolean isAdfImported(AdfInfo adf) {
-        String uuid = adf.getUuid();
-        if (uuid == null) return false;
-        ArrayList<String> l = mTango.listAreaDescriptions();
-        for (String id : l) {
-            if (id.equals(uuid)) return true;
-        }
-        return false;
     }
 
     /**
@@ -469,6 +425,10 @@ public class TangoManager implements LocalizationListener {
 
     public boolean isLearningMode() {
         return mIsLearningMode;
+    }
+
+    public boolean isConnected() {
+        return mIsConnected;
     }
 
 }
