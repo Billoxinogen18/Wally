@@ -60,6 +60,7 @@ public class WallyTangoUx extends TangoUx {
 
     public void showCustomMessage(final String message){
         if(!mTextView.getText().equals(message) || mTextView.getVisibility() != View.VISIBLE){
+            mMainThreadHandler.removeCallbacks(hideMessageRunnable);
             mMainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
