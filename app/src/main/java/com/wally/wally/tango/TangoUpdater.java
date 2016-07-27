@@ -60,7 +60,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         if (pose.statusCode != TangoPoseData.POSE_VALID) {
             setTangoLocalization(false);
             if (mTangoUx != null) {
-                mTangoUx.showCustomMessage("Hold Still");
+                //mTangoUx.showCustomMessage("Hold Still");
                 //setTangoLocalization(false);
             }
         } else if (pose.baseFrame == TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION && pose.targetFrame == TangoPoseData.COORDINATE_FRAME_START_OF_SERVICE) {
@@ -70,12 +70,13 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
             }
         } else if (!isTangoLocalized()) {
             if (mTangoUx != null) {
-                mTangoUx.showCustomMessage("Walk around!");
+                //mTangoUx.showCustomMessage("Walk around!");
             }
         }
 
         if (pose.statusCode == TangoPoseData.POSE_VALID) {
             fireOnValidPose(pose);
+            //mTangoUx.showCustomMessage("Valid Pose!");
         }
     }
 

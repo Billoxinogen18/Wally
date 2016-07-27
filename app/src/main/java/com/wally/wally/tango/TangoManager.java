@@ -204,13 +204,12 @@ public class TangoManager implements LocalizationListener {
             }
         });
         mTangoUpdater.addValidPoseListener(mLearningEvaluator);
-        mTangoUx.showCustomMessage("Learning new room...");
     }
 
     private void finishLearning() {
         Log.d(TAG, "finishLearning() called with: " + "");
         saveAdf();
-        mTangoUx.showCustomMessage("New room was learned.");
+        mTangoUx.showCustomMessage("New room was learned.", 500);
         onPause();
         localizeWithLearnedAdf(currentAdf);
     }
@@ -227,6 +226,7 @@ public class TangoManager implements LocalizationListener {
 
     private synchronized void startLearning() {
         Log.d(TAG, "startLearning()");
+        mTangoUx.showCustomMessage("Learning the area. Walk around");
         prepareForLearning();
         currentAdf = null;
         savedAdf = null;
@@ -239,11 +239,13 @@ public class TangoManager implements LocalizationListener {
     private synchronized void localizeWithLearnedAdf(final AdfInfo adf){
         Log.d(TAG, "localizeWithLearnedAdf() called with: " + "adf = [" + adf + "]");
         currentAdf = adf;
+        mTangoUx.showCustomMessage("localizing on new area. Walk around");
         mTango = mTangoFactory.getTangoWithUuid(getRunnable(), adf.getUuid());
     }
 
     private synchronized void startLocalizing(final AdfInfo adf) {
         Log.d(TAG, "startLocalizing() called with: " + "adf = [" + adf + "]");
+        mTangoUx.showCustomMessage("localizing... Walk around");
         currentAdf = adf; //TODO mchirdeba tu ara?
         if (!mIsConnected) {
             mTango = mTangoFactory.getTango(new TangoFactory.RunnableWithError() {
@@ -457,7 +459,8 @@ public class TangoManager implements LocalizationListener {
             finishLearning();
         }
         if (!mIsLearningMode) {
-            mTangoUx.hideCustomMessage();
+            //mTangoUx.hideCustomMessage();
+            mTangoUx.showCustomMessage("Yay!", 1000);
         }
     }
 
@@ -466,10 +469,10 @@ public class TangoManager implements LocalizationListener {
         Log.d(TAG, "notLocalized() called with: " + "");
         mIsLocalized = false;
         if (mIsLearningMode) {
-            mTangoUx.showCustomMessage("Learning New Room. Walk Around");
+            mTangoUx.showCustomMessage("I'm lost. Starting to learn the room again...", 1000);
             mLearningEvaluator.stop();
         } else {
-            mTangoUx.showCustomMessage("Walk Around");
+            mTangoUx.showCustomMessage("I'm lost. Walk Around");
         }
     }
 
