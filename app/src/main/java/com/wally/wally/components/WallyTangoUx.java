@@ -8,6 +8,8 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.atap.tango.ux.TangoUx;
@@ -83,13 +85,19 @@ public class WallyTangoUx extends TangoUx {
 
     private void addTextView(TangoUxLayout tangoUxLayout) {
         mTextView = new TextView(mContext);
+        mTextView.setPadding(50,50,50,50);
         mTextView.setGravity(Gravity.CENTER);
         mTextView.setBackgroundResource(R.color.uxOverlayBackgroundColor);
         mTextView.setTextColor(Color.BLACK);
         mTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 34);
         mTextView.setVisibility(View.GONE);
-        ViewGroup parent = tangoUxLayout;//.getParent();
-        parent.addView(mTextView, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        ViewGroup parent = (ViewGroup)tangoUxLayout.getParent();
+
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.CENTER;
+
+        parent.addView(mTextView, params);
     }
 
 

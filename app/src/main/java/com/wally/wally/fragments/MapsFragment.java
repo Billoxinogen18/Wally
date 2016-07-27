@@ -454,7 +454,6 @@ public class MapsFragment extends Fragment implements
 
             int padding = 100; // offset from edges of the map in pixels
             CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
             mMap.animateCamera(cu);
         }
     }
