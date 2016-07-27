@@ -187,7 +187,7 @@ public class TangoManager implements LocalizationListener {
             public void onLearningFinish() {
                 mIsReadyToSaveAdf = true;
                 mTangoUpdater.removeValidPoserListener(mLearningEvaluator);
-                if (isLocalized()) {
+                if (mIsLocalized) {
                     finishLearning();
                 }
             }
@@ -475,11 +475,6 @@ public class TangoManager implements LocalizationListener {
             mTangoUx.showCustomMessage("I'm lost. Walk Around");
         }
     }
-
-    public synchronized boolean isLocalized() {
-        return mIsLocalized;
-    }
-
 
     public AdfInfo getCurrentAdf() {
         return currentAdf;
