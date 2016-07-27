@@ -179,7 +179,7 @@ public class TangoManager implements LocalizationListener {
     }
 
 
-    private synchronized void prepareForLearning() {
+    private void prepareForLearning() {
         mAdfScheduler.finish();
         mIsLearningMode = true;
         mLearningEvaluator.addLearningEvaluatorListener(new LearningEvaluator.LearningEvaluatorListener() {
@@ -206,7 +206,7 @@ public class TangoManager implements LocalizationListener {
         mTangoUpdater.addValidPoseListener(mLearningEvaluator);
     }
 
-    private void finishLearning() {
+    private synchronized void finishLearning() {
         Log.d(TAG, "finishLearning() called with: " + "");
         saveAdf();
         mTangoUx.showCustomMessage("New room was learned.", 500);
@@ -214,7 +214,7 @@ public class TangoManager implements LocalizationListener {
         localizeWithLearnedAdf(currentAdf);
     }
 
-    private synchronized void saveAdf() {
+    private void saveAdf() {
         Log.d(TAG, "saveAdf() called with: " + "");
         String uuid = mTango.saveAreaDescription();
         mIsLearningMode = false;
@@ -236,7 +236,7 @@ public class TangoManager implements LocalizationListener {
         mTango = mTangoFactory.getTangoForLearning(getRunnable());
     }
 
-    private synchronized void localizeWithLearnedAdf(final AdfInfo adf){
+    private void localizeWithLearnedAdf(final AdfInfo adf){
         Log.d(TAG, "localizeWithLearnedAdf() called with: " + "adf = [" + adf + "]");
         currentAdf = adf;
         mTangoUx.showCustomMessage("localizing on new area. Walk around");
@@ -252,11 +252,7 @@ public class TangoManager implements LocalizationListener {
                 @Override
                 public void run() {
                     getRunnable().run();
-                    if (isAdfImported(adf)) {
-                        mTango.experimentalLoadAreaDescription(adf.getUuid());
-                    } else {
-                        mTango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
-                    }
+                    loadAdfInTango(adf);
                 }
 
                 @Override
@@ -265,13 +261,17 @@ public class TangoManager implements LocalizationListener {
                 }
             });
         } else {
-            if (isAdfImported(adf)) {
-                mTango.experimentalLoadAreaDescription(adf.getUuid());
-            } else {
-                mTango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
-            }
+            loadAdfInTango(adf);
         }
 
+    }
+
+    private void loadAdfInTango(AdfInfo adf){
+        if (isAdfImported(adf)) {
+            mTango.experimentalLoadAreaDescription(adf.getUuid());
+        } else {
+            mTango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
+        }
     }
 
     private TangoFactory.RunnableWithError getRunnable() {
