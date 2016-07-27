@@ -10,6 +10,7 @@ import com.google.maps.android.ui.IconGenerator;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.wally.wally.R;
+import com.wally.wally.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,14 +19,13 @@ import java.util.Map;
  * Created by Meravici on 6/20/2016. yea
  */
 public class MarkerIconGenerator {
+    private final static int ANONYMOUS_DRAWABLE = 3;
+    private final static int NO_PREVIEW_DRAWABLE = 4;
+    private final int[] DRAWABLES;
     private Context context;
-
     private AsyncTask mMarkerGeneratorTask;
     private Map<String, Icon> cache;
     private Map<Integer, Icon> defaultCache;
-    private final int[] DRAWABLES;
-    private final static int ANONYMOUS_DRAWABLE = 3;
-    private final static int NO_PREVIEW_DRAWABLE = 4;
 
     public MarkerIconGenerator(Context context) {
         this.context = context;
@@ -38,7 +38,7 @@ public class MarkerIconGenerator {
                 R.drawable.no_preview_content_marker
         };
 
-                cache = new HashMap<>();
+        cache = new HashMap<>();
         defaultCache = new HashMap<>();
     }
 
@@ -55,12 +55,13 @@ public class MarkerIconGenerator {
                 @Override
                 protected Icon doInBackground(Void... voids) {
                     IconGenerator iconGenerator = new IconGenerator(context);
-                    iconGenerator.setTextAppearance(R.style.Bubble_TextAppearance_Light);
+                    iconGenerator.setTextAppearance(Utils.isColorDark(color) ? R.style.Bubble_TextAppearance_Light : R.style.Bubble_TextAppearance_Dark);
 
                     if (isCancelled()) {
                         return null;
                     }
                     iconGenerator.setColor(color);
+
 
                     Bitmap bitmap = iconGenerator.makeIcon(name);
                     Icon icon = IconFactory.getInstance(context).fromBitmap(bitmap);

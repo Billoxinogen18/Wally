@@ -8,9 +8,41 @@
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:style_url="mapbox://styles/mapbox/dark-v9"
         android:layout_toRightOf="@+id/list"
+        android:alpha="@dimen/map_alpha"
+        app:style_url="@string/map_style_url"
         tools:context=".fragments.MapsFragment" />
+
+    <LinearLayout
+        android:id="@+id/owner_profile_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/map"
+        android:layout_alignRight="@id/map"
+        android:layout_alignTop="@+id/map"
+        android:background="@drawable/map_user_info_background"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <ImageView
+            android:id="@+id/iv_owner_image"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_margin="8dp"
+            android:layout_marginRight="16dp"
+            tools:src="@drawable/sample_user_image" />
+
+        <TextView
+            android:id="@+id/tv_owner_name"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            tools:text="Gio Gogiashvili" />
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -53,14 +85,13 @@
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignRight="@id/fakeView"
-        android:background="@color/backgroundColor"
         android:minWidth="300dp"
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorPrimaryDark"
             android:contentInsetLeft="0dp"
             android:contentInsetStart="0dp"
             app:contentInsetLeft="0dp"
@@ -74,40 +105,14 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:onClick="onBtnCameraClick"
                 android:padding="8dp"
-                android:src="@drawable/ic_arrow_back_black_24dp" />
-            <LinearLayout
-                android:id="@+id/owner_profile_info"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/map"
-                android:layout_alignParentTop="true"
-                android:layout_alignRight="@+id/map"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/iv_owner_image"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_marginRight="16dp"
-                    tools:src="@drawable/sample_user_image" />
-
-                <TextView
-                    android:id="@+id/tv_owner_name"
-                    style="@style/TextAppearance.AppCompat.Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    tools:text="Gio Gogiashvili" />
-            </LinearLayout>
+                android:src="@drawable/ic_arrow_back_white_24dp" />
         </android.support.v7.widget.Toolbar>
 
         <com.wally.wally.components.ContentListView
             android:id="@+id/content_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:animateLayoutChanges="true" />
+            android:animateLayoutChanges="true"
+            android:background="@color/colorPrimary_alpha_0_9" />
     </LinearLayout>
 </RelativeLayout>

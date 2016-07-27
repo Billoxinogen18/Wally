@@ -29,6 +29,8 @@ import com.wally.wally.tango.VisualContent;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
 
+import org.rajawali3d.surface.RajawaliSurfaceView;
+
 import java.util.Date;
 
 public abstract class CameraARActivity extends GoogleApiClientActivity implements
@@ -40,6 +42,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     private static final int REQUEST_CODE_MY_LOCATION = 22;
     protected DataController mDataController;
     protected GoogleApiClient mGoogleApiClient;
+    private RajawaliSurfaceView mRajawaliView;
     private UserManager mUserManager;
     private SelectedMenuView mSelectedMenuView;
     private long mLastSelectTime;
@@ -65,18 +68,17 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mRajawaliView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         mSelectedMenuView = (SelectedMenuView) findViewById(R.id.selected_menu_view);
         mSelectedMenuView.setOnSelectedMenuActionListener(this);
         // Initialize managers
         mUserManager = ((App) getApplicationContext()).getUserManager(); //TODO get LoginManager from the Factory!
         mDataController = ((App) getApplicationContext()).getDataController();
 
-
         mNewContentButton = findViewById(R.id.btn_new_post);
         mMapButton = findViewById(R.id.btn_map);
         mProfileBar = findViewById(R.id.profile_bar);
         mWaterMark = findViewById(R.id.watermark);
-
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
 //                .enableAutoManage(this, this)
@@ -255,7 +257,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         infoView.setUser(user);
     }
 
-    public void showMapFragment(SocialUser user){
+    public void showMapFragment(SocialUser user) {
         MapsFragment mf = MapsFragment.newInstance(user);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -272,13 +274,15 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         transaction.commit();
     }
 
-    private void hideGUI(boolean hide){
-        if(hide){
+    private void hideGUI(boolean hide) {
+        if (hide) {
+            mRajawaliView.setFrameRate(10);
             mNewContentButton.setVisibility(View.GONE);
             mMapButton.setVisibility(View.GONE);
             mProfileBar.setVisibility(View.GONE);
             mWaterMark.setVisibility(View.GONE);
-        }else{
+        } else {
+            mRajawaliView.setFrameRate(30);
             mNewContentButton.setVisibility(View.VISIBLE);
             mMapButton.setVisibility(View.VISIBLE);
             mProfileBar.setVisibility(View.VISIBLE);
@@ -286,7 +290,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         }
     }
 
-    public void onMapClose(){
+    public void onMapClose() {
         hideGUI(false);
     }
 

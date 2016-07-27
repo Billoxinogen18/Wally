@@ -124,4 +124,5 @@
     <string name="select_color">Select Color</string>
     <string name="select_share_visibility">Share Visibility</string>
     <string name="done">Done</string>
+    <string name="map_style_url">mapbox://styles/wallynotes/ciqrsooto000dc7nic64jfgfn</string>
 </resources>

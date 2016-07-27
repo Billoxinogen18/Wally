@@ -31,4 +31,5 @@
     <dimen name="adf_name_dialog_height">220dp</dimen>
     <dimen name="new_content_dialog_width">350dp</dimen>
     <dimen name="people_chooser_width">400dp</dimen>
+    <item name="map_alpha" format="float" type="dimen">0.9</item>
 </resources>

@@ -1,11 +1,11 @@
 package com.wally.wally.endlessScroll;
 
 import android.content.Context;
+import android.graphics.Color;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.wally.wally.Utils;
 import com.wally.wally.components.MapWindowAdapter;
@@ -139,7 +139,8 @@ public class MarkerManager {
 
                             markerBase = mMap.addMarker(baseMarkerOptions);
 
-                            mMarkerIconGenerator.getEnumeratedMarkerIcon(name, content.getColor(),
+                            int contentColor = content.getColor() == null ? Color.WHITE : content.getColor();
+                            mMarkerIconGenerator.getEnumeratedMarkerIcon(name, contentColor,
                                     new MarkerIconGenerator.MarkerIconGenerateListener() {
                                         @Override
                                         public void onMarkerIconGenerate(Icon icon) {

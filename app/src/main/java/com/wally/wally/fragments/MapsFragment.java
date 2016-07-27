@@ -36,7 +36,6 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.wally.wally.App;
 import com.wally.wally.R;
-import com.wally.wally.StubContentFetcher;
 import com.wally.wally.Utils;
 import com.wally.wally.activities.CameraARActivity;
 import com.wally.wally.components.CircleTransform;
@@ -201,7 +200,7 @@ public class MapsFragment extends Fragment implements
     }
 
     @Override
-    public void onDetach (){
+    public void onDetach() {
         super.onDetach();
         mListener.onMapClose();
     }
@@ -404,24 +403,23 @@ public class MapsFragment extends Fragment implements
     }
 
     private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
-//        VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
-//        double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
-//        ContentFetcher contentFetcher;
-//
-//        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
-//            contentFetcher = App.getInstance().getDataController()
-//                    .createFetcherForMyContent();
-//        } else if (mUserProfile != null) {
-//            contentFetcher = App.getInstance().getDataController()
-//                    .createFetcherForUserContent(mUserProfile.getBaseUser());
-//        } else {
-//            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
-//                    Utils.latLngToSerializableLatLng(cameraPosition.target),
-//                    radius
-//            );
-//        }
-//        return contentFetcher;
-        return new StubContentFetcher();
+        VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
+        double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
+        ContentFetcher contentFetcher;
+
+        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
+            contentFetcher = App.getInstance().getDataController()
+                    .createFetcherForMyContent();
+        } else if (mUserProfile != null) {
+            contentFetcher = App.getInstance().getDataController()
+                    .createFetcherForUserContent(mUserProfile.getBaseUser());
+        } else {
+            contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
+                    Utils.latLngToSerializableLatLng(cameraPosition.target),
+                    radius
+            );
+        }
+        return contentFetcher;
     }
 
     private void centerMapOnMyLocation(MapboxMap.CancelableCallback callback) {
@@ -459,7 +457,7 @@ public class MapsFragment extends Fragment implements
     }
 
 
-    public interface MapCloseListener{
+    public interface MapCloseListener {
         void onMapClose();
     }
 }

@@ -78,6 +78,7 @@ public class ContentListViewItem extends LinearLayout {
         mPreviewNotVisible = findViewById(R.id.preview_not_visible);
 
         mContentPositionVIew = new TextView(getContext());
+        mContentPositionVIew.setTextColor(Color.WHITE);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
