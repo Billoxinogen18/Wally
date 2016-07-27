@@ -48,12 +48,9 @@ public class TangoManager implements LocalizationListener {
 
     private double mCameraPoseTimestamp = 0;
 
-    private boolean mIsConnected;
-
-    // Texture rendering related fields
-    // NOTE: Naming indicates which thread is in charge of updating this variable
-    private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
+    // NOTE: suffix indicates which thread is in charge of updating
     private double mRgbTimestampGlThread;
+    private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
 
     private TangoUpdater mTangoUpdater;
     private TangoFactory mTangoFactory;
@@ -61,14 +58,13 @@ public class TangoManager implements LocalizationListener {
     private AdfInfo savedAdf;
     private AdfInfo currentAdf;
     private AdfManager mAdfManager;
-
-    private boolean mIsLocalized;
-    private boolean mIsReadyToSaveAdf;
-
-    private boolean mIsLearningMode;
     private AdfScheduler mAdfScheduler;
     private LearningEvaluator mLearningEvaluator;
 
+    private boolean mIsLocalized;
+    private boolean mIsConnected;
+    private boolean mIsLearningMode;
+    private boolean mIsReadyToSaveAdf;
 
     public TangoManager(
             TangoUpdater tangoUpdater,
@@ -91,11 +87,6 @@ public class TangoManager implements LocalizationListener {
         mLearningEvaluator = evaluator;
         mTangoUpdater.addLocalizationListener(this);
     }
-
-//    public TangoManager(TangoUpdater tangoUpdater, TangoPointCloudManager pointCloudManager, WallyRenderer wallyRenderer,
-//                        WallyTangoUx tangoUx, TangoFactory tangoFactory, AdfManager adfManager, LearningEvaluator evaluator) {
-//        this(tangoUpdater, pointCloudManager, wallyRenderer, tangoUx, tangoFactory, adfManager, evaluator);
-//    }
 
     /**
      * Calculates and stores the fixed transformations between the device and
@@ -278,7 +269,11 @@ public class TangoManager implements LocalizationListener {
         return new TangoFactory.RunnableWithError() {
             @Override
             public void run() {
-                finishTangoConnection();
+                // Connect TangoUpdater and tango
+                mTango.connectListener(mTangoUpdater.getFramePairs(), mTangoUpdater);
+                // Get extrinsics (needs to be done after connecting Tango and listeners)
+                mExtrinsics = setupExtrinsics(mTango);
+                mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
                 connectRenderer();
                 mIsConnected = true;
             }
@@ -295,7 +290,7 @@ public class TangoManager implements LocalizationListener {
     }
 
     /**
-     * Finds plane pose in the middle of the screen.
+    / * Finds plane pose in the middle of the screen.
      */
     public TangoPoseData findPlaneInMiddle() {
         return doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread);
@@ -311,15 +306,6 @@ public class TangoManager implements LocalizationListener {
 
         return new Pose(p.getPosition().add(addto), p.getOrientation().multiply(rot));
 
-    }
-
-    private void finishTangoConnection() {
-        mTango.connectListener(mTangoUpdater.getFramePairs(), mTangoUpdater);
-
-        // Get extrinsics from device for use in transforms. This needs
-        // to be done after connecting Tango and listeners.
-        mExtrinsics = setupExtrinsics(mTango);
-        mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
     }
 
     private boolean isAdfImported(AdfInfo adf) {
@@ -385,8 +371,6 @@ public class TangoManager implements LocalizationListener {
                                 // Update the camera pose from the renderer
                                 mRenderer.updateRenderCameraPose(lastFramePose, mExtrinsics);
                                 mCameraPoseTimestamp = lastFramePose.timestamp;
-                            } else {
-                                //Log.v(TAG, "Can't get device pose at time: " + mRgbTimestampGlThread);
                             }
                         } catch (TangoException e) {
                             e.printStackTrace();
@@ -453,7 +437,6 @@ public class TangoManager implements LocalizationListener {
         Log.d(TAG, "localized() called with: " + "");
         mIsLocalized = true;
         mAdfScheduler.finish();
-        Log.d(TAG, "localized() mAdfScheduler.finish() was called");
         if (currentAdf != null) savedAdf = currentAdf;
         if (mIsReadyToSaveAdf && mIsLearningMode) {
             finishLearning();
@@ -479,7 +462,6 @@ public class TangoManager implements LocalizationListener {
     public synchronized boolean isLocalized() {
         return mIsLocalized;
     }
-
 
     public AdfInfo getCurrentAdf() {
         return currentAdf;
