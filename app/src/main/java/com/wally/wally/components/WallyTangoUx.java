@@ -22,11 +22,18 @@ public class WallyTangoUx extends TangoUx {
     private TextView mTextView;
     private Context mContext;
 
+    private Runnable hideMessageRunnable;
+
     public WallyTangoUx(Context context) {
         super(context);
         mContext = context;
         mMainThreadHandler = new Handler(Looper.getMainLooper());
-
+        hideMessageRunnable = new Runnable() {
+            @Override
+            public void run() {
+                hideCustomMessage();
+            }
+        };
     }
 
 
@@ -35,6 +42,20 @@ public class WallyTangoUx extends TangoUx {
         super.setLayout(tangoUxLayout);
         addTextView(tangoUxLayout);
 
+    }
+
+    public void showCustomMessage(final String message, long time){
+        if(!mTextView.getText().equals(message) || mTextView.getVisibility() != View.VISIBLE){
+            mMainThreadHandler.removeCallbacks(hideMessageRunnable);
+            mMainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    mTextView.setText(message);
+                    mTextView.setVisibility(View.VISIBLE);
+                }
+            });
+            mMainThreadHandler.postDelayed(hideMessageRunnable, time);
+        }
     }
 
     public void showCustomMessage(final String message){
