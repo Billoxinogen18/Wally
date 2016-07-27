@@ -93,11 +93,20 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
         return res;
     }
 
-    public void start(){
+    public LearningEvaluator start(){
         cells = new ArrayList<>();
         startTime = System.currentTimeMillis();
         latestUpdateTime = startTime;
+        return this;
     }
+
+    public LearningEvaluator stop() {
+        Log.d(TAG, "stop() called");
+        listener.onLearningFailed();
+        return this;
+    }
+
+
 
     interface LearningEvaluatorListener{
         void onLearningFinish();

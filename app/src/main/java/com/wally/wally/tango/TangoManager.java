@@ -194,7 +194,13 @@ public class TangoManager implements LocalizationListener {
 
             @Override
             public void onLearningFailed() {
-                //TODO
+                mTangoUpdater.removeValidPoserListener(mLearningEvaluator);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startLearning();
+                    }
+                }).start();
             }
         });
         mTangoUpdater.addValidPoseListener(mLearningEvaluator);
@@ -220,7 +226,7 @@ public class TangoManager implements LocalizationListener {
     }
 
     private synchronized void startLearning() {
-        Log.d(TAG, "startLearning() called with: " + "");
+        Log.d(TAG, "startLearning()");
         prepareForLearning();
         currentAdf = null;
         savedAdf = null;
@@ -461,6 +467,7 @@ public class TangoManager implements LocalizationListener {
         mIsLocalized = false;
         if (mIsLearningMode) {
             mTangoUx.showCustomMessage("Learning New Room. Walk Around");
+            mLearningEvaluator.stop();
         } else {
             mTangoUx.showCustomMessage("Walk Around");
         }
