@@ -13,7 +13,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Config implements LEConstants {
+public class Config implements LEConstants, TMConstants {
     public static final String TAG = "WallyConfig";
     private FirebaseRemoteConfig config;
 
@@ -47,6 +47,18 @@ public class Config implements LEConstants {
         params.put(MIN_CELL_COUNT, 4);
         params.put(MIN_ANGLE_COUNT, 10);
         params.put(ANGLE_RESOLUTION, 8);
+
+        // timeouts
+        params.put(LOCALIZATION_TIMEOUT, 15000);
+
+        // UX constants
+        params.put(LOCALIZED, "Yay!");
+        params.put(NEW_ROOM_LEARNED, "New room learned");
+        params.put(LEARNING_AREA, "Learning new area, Walk around");
+        params.put(LOCALIZING_IN_NEW_AREA, "Verifying new area, Walk around");
+        params.put(LOCALIZING_IN_KNOWN_AREA, "Identifying area, Walk around");
+        params.put(LOCALIZATION_LOST_IN_LEARNING, "I'm lost. Restarting learning...");
+        params.put(LOCALIZATION_LOST, "I'm lost. Walk Around");
         config.setDefaults(params);
     }
 
@@ -59,8 +71,8 @@ public class Config implements LEConstants {
                         if (task.isSuccessful()){
                             Log.d(TAG, "fetch success");
                             Log.d(TAG, "activate " + config.activateFetched());
-                            Log.d(TAG, MIN_TIME_S + getString(MIN_TIME_S));
-                            Log.d(TAG, MAX_TIME_S + getString(MAX_TIME_S));
+                            Log.d(TAG, MIN_TIME_S + ": " + getString(MIN_TIME_S));
+                            Log.d(TAG, LOCALIZED + ": " + getString(LOCALIZED));
                         } else {
                             Log.d(TAG, "fetch failed");
                         }

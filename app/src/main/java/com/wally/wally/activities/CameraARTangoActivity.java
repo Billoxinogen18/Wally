@@ -114,7 +114,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         TangoFactory tangoFactory = new TangoFactory(context);
 
         AdfManager adfManager = App.getInstance().getAdfManager();
-        mTangoManager = new TangoManager(tangoUpdater, pointCloudManager, mRenderer, tangoUx,
+        mTangoManager = new TangoManager(config, tangoUpdater, pointCloudManager, mRenderer, tangoUx,
                 tangoFactory, adfManager, evaluator);
         restoreState(savedInstanceState);
 
