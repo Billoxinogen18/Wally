@@ -154,10 +154,12 @@ public class Content implements Serializable {
                 ", imageUri='" + imageUri + '\'' +
                 ", uuid='" + uuid + '\'' +
                 ", color=" + color +
+                ", textColor=" + textColor +
                 ", tangoData=" + tangoData +
                 ", location=" + location +
                 ", visibility=" + visibility +
                 ", authorId='" + authorId + '\'' +
+                ", creationDate=" + creationDate +
                 '}';
     }
 
