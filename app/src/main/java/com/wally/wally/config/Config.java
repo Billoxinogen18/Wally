@@ -23,12 +23,12 @@ public class Config implements LEConstants {
         registerDefaultParams();
         // http://stackoverflow.com/a/37376342
         // Shitty walk around for the "silent completion" problem
-        new Handler().post(new Runnable() {
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 fetchServerParams();
             }
-        });
+        }, 1000);
     }
 
     private void setSettings() {
@@ -50,17 +50,17 @@ public class Config implements LEConstants {
         config.setDefaults(params);
     }
 
-    private void fetchServerParams() {
+    public void fetchServerParams() {
         Log.d(TAG, "Attach listener");
-        config.fetch().addOnCompleteListener(
+        config.fetch(0).addOnCompleteListener(
                 new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
                             Log.d(TAG, "fetch success");
-                            config.activateFetched();
-                            Log.d(TAG, getString(MIN_TIME_S));
-                            Log.d(TAG, getString(MAX_TIME_S));
+                            Log.d(TAG, "activate " + config.activateFetched());
+                            Log.d(TAG, MIN_TIME_S + getString(MIN_TIME_S));
+                            Log.d(TAG, MAX_TIME_S + getString(MAX_TIME_S));
                         } else {
                             Log.d(TAG, "fetch failed");
                         }
