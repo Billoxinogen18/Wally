@@ -58,29 +58,35 @@ public class SocialUserFactory {
                     public void onResult(@NonNull People.LoadPeopleResult peopleData) {
                         if (peopleData.getStatus().getStatusCode() == CommonStatusCodes.SUCCESS) {
                             PersonBuffer personBuffer = peopleData.getPersonBuffer();
-                            try {
-                                Person person = personBuffer.get(0);
-                                final SocialUser googleUser = toSocialUser(baseUser, person);
+                            if(personBuffer != null) {
+                                try {
+                                    Person person = personBuffer.get(0);
+                                    final SocialUser googleUser = toSocialUser(baseUser, person);
 
-                                Plus.PeopleApi.loadVisible(googleApiClient, null).setResultCallback(
-                                        new ResultCallback<People.LoadPeopleResult>() {
-                                            @Override
-                                            public void onResult(@NonNull People.LoadPeopleResult peopleData) {
-                                                PersonBuffer personBuffer = peopleData.getPersonBuffer();
-                                                try {
-                                                    List<SocialUser> friends = new ArrayList<>();
-                                                    for (Person person : personBuffer) {
-                                                        friends.add(toSocialUser(new User(null).withGgId(person.getId()), person));
+                                    Plus.PeopleApi.loadVisible(googleApiClient, null).setResultCallback(
+                                            new ResultCallback<People.LoadPeopleResult>() {
+                                                @Override
+                                                public void onResult(@NonNull People.LoadPeopleResult peopleData) {
+                                                    PersonBuffer personBuffer = peopleData.getPersonBuffer();
+                                                    if (personBuffer != null) {
+                                                        try {
+                                                            List<SocialUser> friends = new ArrayList<>();
+                                                            for (Person person : personBuffer) {
+                                                                friends.add(toSocialUser(new User(null).withGgId(person.getId()), person));
+                                                            }
+                                                            googleUser.withFriends(friends);
+                                                        } finally {
+                                                            personBuffer.release();
+                                                        }
                                                     }
-                                                    googleUser.withFriends(friends);
                                                     userLoadListener.onUserLoad(googleUser);
-                                                } finally {
-                                                    personBuffer.release();
                                                 }
-                                            }
-                                        });
-                            } finally {
-                                personBuffer.release();
+                                            });
+                                } finally {
+                                    personBuffer.release();
+                                }
+                            }else{
+                                userLoadListener.onUserLoadFailed();
                             }
                         } else {
                             Log.e(TAG, "onResult: Error requesting people data" + peopleData.getStatus());
@@ -90,19 +96,19 @@ public class SocialUserFactory {
                 });
     }
 
-    private SocialUser toSocialUser(User baseUser, Person person){
+    private SocialUser toSocialUser(User baseUser, Person person) {
         SocialUser socialUser = new GoogleUser(baseUser);
 
-        if(person.hasDisplayName())
-                socialUser.withDisplayName(person.getDisplayName());
-        if(person.hasImage())
-                socialUser.withAvatar(person.getImage().getUrl());
+        if (person.hasDisplayName())
+            socialUser.withDisplayName(person.getDisplayName());
+        if (person.hasImage())
+            socialUser.withAvatar(person.getImage().getUrl());
 
-        if(person.hasCover() && person.getCover().hasCoverPhoto()){
+        if (person.hasCover() && person.getCover().hasCoverPhoto()) {
             socialUser.withCover(person.getCover().getCoverPhoto().getUrl());
         }
 
-        if(person.hasName() && person.getName().hasGivenName()){
+        if (person.hasName() && person.getName().hasGivenName()) {
             socialUser.withFirstName(person.getName().getGivenName());
         }
 

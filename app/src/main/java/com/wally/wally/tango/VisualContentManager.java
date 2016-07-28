@@ -316,7 +316,7 @@ public class VisualContentManager implements LocalizationListener {
                 if (isLocalized()) {
                     Log.d(TAG, "createStaticContent() isLocalized");
                     for (Content c : collection) {
-                        addPendingStaticContent(new VisualContent(c));
+                        addPendingStaticContent(c);
                     }
 
                 } else {
@@ -327,6 +327,10 @@ public class VisualContentManager implements LocalizationListener {
                 }
             }
         }
+    }
+
+    public void addPendingStaticContent(Content content){
+        addPendingStaticContent(new VisualContent(content));
     }
 
     public void removePendingStaticContent(Content content) {

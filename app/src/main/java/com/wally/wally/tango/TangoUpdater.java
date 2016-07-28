@@ -135,7 +135,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         }
     }
 
-    public synchronized void addLocalizationListener(LocalizationListener listener) {
+    public void addLocalizationListener(LocalizationListener listener) {
         mLocalizationListeners.add(listener);
     }
 

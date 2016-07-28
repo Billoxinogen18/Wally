@@ -16,7 +16,7 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_NOTE           = "note";
     public static final String K_TITLE          = "title";
     public static final String K_COLOR          = "color";
-    public static final String K_TEXT_COLOR          = "color";
+    public static final String K_TEXT_COLOR          = "text_color";
     public static final String K_IMGURI         = "image";
     public static final String K_ROOM           = "roomId";
     public static final String K_AUTHOR         = "authorId";

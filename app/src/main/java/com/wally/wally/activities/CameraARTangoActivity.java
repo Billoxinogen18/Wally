@@ -229,9 +229,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public void onContentCreated(Content contentCreated, boolean isEditMode) {
+        editableContent = null;
         if (isEditMode) {
             // remove content and start new fitting.
             mVisualContentManager.removePendingStaticContent(contentCreated);
+            editableContent = contentCreated;
         }
         if (mContentFitter != null) {
             Log.e(TAG, "onContentCreated: called when content was already fitting");
@@ -243,6 +245,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
         onFitStatusChange(true);
 
     }
+
+    private Content editableContent;
 
     @Override
     protected void onPause() {
@@ -317,6 +321,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
     public void onCancelFittingClick(View view) {
         mContentFitter.cancel(true);
         mContentFitter = null;
+
+        if (editableContent != null) {
+            mVisualContentManager.addPendingStaticContent(editableContent);
+            editableContent = null;
+        }
 
         onFitStatusChange(false);
     }
