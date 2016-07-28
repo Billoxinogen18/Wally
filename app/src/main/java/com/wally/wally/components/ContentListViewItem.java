@@ -36,13 +36,11 @@ public class ContentListViewItem extends LinearLayout {
     private static final String TAG = ContentListViewItem.class.getSimpleName();
 
     private CardView mCardView;
-    private View mNoteContent;
     private UserInfoView mUserInfoView;
     private ImageView mNoteImageView;
     private TextView mTitleView;
     private TextView mNoteView;
     private TextView mContentPositionVIew;
-    private View mNoteTextsContainer;
     private View mPreviewNotVisible;
     private OnClickListener onClickListener;
     private Content mContent;
@@ -69,12 +67,10 @@ public class ContentListViewItem extends LinearLayout {
         setBackgroundColor(Color.TRANSPARENT);
 
         mCardView = (CardView) findViewById(R.id.note_card);
-        mNoteContent = findViewById(R.id.note_content);
         mUserInfoView = (UserInfoView) findViewById(R.id.user_info_view);
         mNoteImageView = (ImageView) findViewById(R.id.iv_note_image);
         mTitleView = (TextView) findViewById(R.id.tv_title);
         mNoteView = (TextView) findViewById(R.id.tv_note);
-        mNoteTextsContainer = findViewById(R.id.note_texts_container);
         mPreviewNotVisible = findViewById(R.id.preview_not_visible);
 
         mContentPositionVIew = new TextView(getContext());
@@ -133,15 +129,6 @@ public class ContentListViewItem extends LinearLayout {
             return;
         } else {
             mPreviewNotVisible.setVisibility(GONE);
-        }
-
-        LinearLayout.LayoutParams noteImageLps = (LayoutParams) mNoteImageView.getLayoutParams();
-        if (TextUtils.isEmpty(content.getNote()) && TextUtils.isEmpty(content.getTitle())) {
-            mNoteTextsContainer.setVisibility(GONE);
-            noteImageLps.weight = 2;
-        } else {
-            mNoteTextsContainer.setVisibility(VISIBLE);
-            noteImageLps.weight = 1;
         }
         if (!TextUtils.isEmpty(content.getImageUri())) {
             Glide.with(getContext())
@@ -232,8 +219,6 @@ public class ContentListViewItem extends LinearLayout {
      */
     public void clear() {
         mCardView.setCardBackgroundColor(Color.WHITE);
-        mNoteContent.setBackground(null);
-
         mNoteImageView.setImageDrawable(null);
         mNoteImageView.setBackground(null);
         mNoteImageView.setVisibility(View.VISIBLE);

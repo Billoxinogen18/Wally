@@ -15,7 +15,7 @@
 
         <com.wally.wally.components.UserInfoView
             android:id="@+id/user_info_view"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="-8dp"
             android:background="?attr/selectableItemBackground"
@@ -31,65 +31,40 @@
             android:src="@drawable/preview_not_visible"
             android:visibility="gone" />
 
-        <LinearLayout
-            android:id="@+id/note_content"
+        <TextView
+            android:id="@+id/tv_title"
+            style="@style/TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/user_info_view"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="Note title here"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tv_note"
+            style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/user_info_view"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:weightSum="2">
+            android:layout_below="@id/tv_title"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:fontFamily="serif"
+            android:textSize="14sp"
+            tools:text="Note maybe big text here "
+            tools:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/iv_note_image"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="18dp"
-                android:layout_weight="1"
-                android:adjustViewBounds="true"
-                android:src="@drawable/ic_btn_map_75dp"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-            <LinearLayout
-                android:id="@+id/note_texts_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_title"
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/user_info_view"
-                    android:layout_marginBottom="8dp"
-                    android:layout_toRightOf="@+id/iv_note_image"
-                    android:ellipsize="end"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:visibility="gone"
-                    tools:text="Note title here"
-                    tools:visibility="visible" />
-
-                <TextView
-                    android:id="@+id/tv_note"
-                    style="@style/TextAppearance.AppCompat.Subhead"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/tv_title"
-                    android:layout_marginBottom="8dp"
-                    android:layout_toRightOf="@+id/iv_note_image"
-                    android:ellipsize="end"
-                    android:fontFamily="serif"
-                    android:scrollbars="none"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    tools:text="Note maybe big text here "
-                    tools:visibility="visible" />
-
-            </LinearLayout>
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/iv_note_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/tv_note"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_btn_map_75dp"
+            tools:visibility="visible" />
     </RelativeLayout>
 </android.support.v7.widget.CardView>

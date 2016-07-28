@@ -3,6 +3,7 @@ package com.wally.wally.fragments;
 
 import android.Manifest;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -369,6 +370,18 @@ public class MapsFragment extends Fragment implements
     }
 
     private void loadNewPageMarkers(final int pageLength) {
+        // TODO delete this test
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (mContentRetriever.getList() != null) {
+                    for (Content content : mContentRetriever.getList()) {
+                        Bitmap b = Utils.createBitmapFromContent(content);
+                        int i = 1 + 1;
+                    }
+                }
+            }
+        }).start();
         mainThreadHandler.post(new Runnable() {
             @Override
             public void run() {

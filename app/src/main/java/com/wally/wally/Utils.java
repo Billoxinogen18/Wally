@@ -181,7 +181,7 @@ public final class Utils {
     }
 
     public static Bitmap createBitmapFromView(View v) {
-        int w = v.getMeasuredHeight();
+        int w = v.getMeasuredWidth();
         int h = v.getMeasuredHeight();
 
         Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_4444);
