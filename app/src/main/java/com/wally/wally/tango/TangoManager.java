@@ -97,12 +97,13 @@ public class TangoManager implements LocalizationListener {
         // Tango.disconnect will block here until all Tango callback calls are finished.
         // If you lock against this object in a Tango callback thread it will cause a deadlock.
         if (mIsConnected) {
-            mIsConnected = false;
             mRenderer.getCurrentScene().clearFrameCallbacks();
             mTango.disconnectCamera(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
             // We need to invalidate the connected texture ID,
             // this will cause re-connection in the OpenGL thread after resume
             mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
+
+            mIsConnected = false;
         }
         if (mTango != null) {
             mTango.disconnect();
@@ -213,7 +214,9 @@ public class TangoManager implements LocalizationListener {
         prepareForLearning();
         currentAdf = null;
         savedAdf = null;
-        if (mIsConnected) { onPause(); }
+        if (mIsConnected) {
+            onPause();
+        }
         mTango = mTangoFactory.getTangoForLearning(getRunnable());
     }
 
@@ -298,6 +301,7 @@ public class TangoManager implements LocalizationListener {
         // Register a Rajawali Scene Frame Callback to update the scene camera pose whenever a new
         // RGB frame is rendered.
         // (@see https://github.com/Rajawali/Rajawali/wiki/Scene-Frame-Callbacks)
+        mRenderer.getCurrentScene().clearFrameCallbacks();
         mRenderer.getCurrentScene().registerFrameCallback(new ASceneFrameCallback() {
             @Override
             public void onPreFrame(long sceneTime, double deltaTime) {
