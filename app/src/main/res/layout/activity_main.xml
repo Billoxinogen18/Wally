@@ -64,12 +64,11 @@
 
     <ImageView
         android:id="@+id/watermark"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="96dp"
+        android:layout_height="48dp"
         android:layout_gravity="top|start"
         android:layout_margin="@dimen/watermark_margin"
-        android:src="@drawable/watermark"
-        android:tint="@color/colorPrimaryDark" />
+        android:src="@drawable/watermark" />
 
     <com.wally.wally.components.UserInfoView
         android:id="@+id/profile_bar"
