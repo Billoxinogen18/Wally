@@ -13,14 +13,14 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Config {
+public class Config implements LEConstants {
     public static final String TAG = "WallyConfig";
     private FirebaseRemoteConfig config;
 
     public Config() {
         config = FirebaseRemoteConfig.getInstance();
         setSettings();
-        setDefaultParams();
+        registerDefaultParams();
         // http://stackoverflow.com/a/37376342
         // Shitty walk around for the "silent completion" problem
         new Handler().post(new Runnable() {
@@ -38,8 +38,15 @@ public class Config {
         config.setConfigSettings(configSettings);
     }
 
-    private void setDefaultParams() {
+    private void registerDefaultParams() {
         Map<String, Object> params = new HashMap<>();
+
+        // LearningEvaluator constants
+        params.put(MAX_TIME_S, 25);
+        params.put(MIN_TIME_S, 20);
+        params.put(MIN_CELL_COUNT, 4);
+        params.put(MIN_ANGLE_COUNT, 10);
+        params.put(ANGLE_RESOLUTION, 8);
         config.setDefaults(params);
     }
 
@@ -52,6 +59,8 @@ public class Config {
                         if (task.isSuccessful()){
                             Log.d(TAG, "fetch success");
                             config.activateFetched();
+                            Log.d(TAG, getString(MIN_TIME_S));
+                            Log.d(TAG, getString(MAX_TIME_S));
                         } else {
                             Log.d(TAG, "fetch failed");
                         }
@@ -62,6 +71,10 @@ public class Config {
 
     public String getString(String key) {
         return config.getString(key);
+    }
+
+    public int getInt(String key) {
+        return (int) config.getLong(key);
     }
 
     private static Config instance;

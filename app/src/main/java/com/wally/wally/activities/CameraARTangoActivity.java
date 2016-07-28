@@ -27,6 +27,7 @@ import com.wally.wally.Utils;
 import com.wally.wally.adfCreator.AdfInfo;
 import com.wally.wally.adfCreator.AdfManager;
 import com.wally.wally.components.WallyTangoUx;
+import com.wally.wally.config.Config;
 import com.wally.wally.datacontroller.adf.ADFService;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
@@ -90,7 +91,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-
+        Config config = Config.getInstance();
         Context context = getBaseContext();
 
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
@@ -102,7 +103,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
         mSurfaceView.setSurfaceRenderer(mRenderer);
         WallyTangoUx tangoUx = new WallyTangoUx(context);
-        LearningEvaluator evaluator = new LearningEvaluator();
+        LearningEvaluator evaluator = new LearningEvaluator(config);
 
         TangoPointCloudManager pointCloudManager = new TangoPointCloudManager();
 

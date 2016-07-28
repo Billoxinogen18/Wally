@@ -4,28 +4,36 @@ package com.wally.wally.tango;
 import android.util.Log;
 
 import com.google.atap.tangoservice.TangoPoseData;
+import com.wally.wally.config.Config;
+import com.wally.wally.config.LEConstants;
 
 import org.rajawali3d.math.Quaternion;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
     public static final String TAG = LearningEvaluator.class.getSimpleName();
-    public static final int TIMEOUT_S = 20;
-    private static final int ANGLE_RESOLUTION = 8;
 
-    private static final int MIN_ANGLE_COUNT = 10;
-    private static final int MIN_CELL_COUNT = 4;
-    private static final int MIN_TIME_S = 20;
-    private static final int MAX_TIME_S = 25;
+    private int minTimeMs;
+    private int maxTimeMs;
+    private int minCellCount;
+    private int minAngleCount;
+    private int angleResolution;
 
     private List<Cell> cells;
     private long startTime;
     private long latestUpdateTime;
     private LearningEvaluatorListener listener;
     private boolean isFinished;
+
+    public LearningEvaluator(Config config) {
+        minTimeMs = config.getInt(LEConstants.MIN_TIME_S) * 1000;
+        maxTimeMs = config.getInt(LEConstants.MAX_TIME_S) * 1000;
+        minCellCount = config.getInt(LEConstants.MIN_CELL_COUNT);
+        minAngleCount = config.getInt(LEConstants.MIN_ANGLE_COUNT);
+        angleResolution = config.getInt(LEConstants.ANGLE_RESOLUTION);
+    }
 
     public void addLearningEvaluatorListener(final LearningEvaluatorListener listener){
         this.listener = listener;
@@ -48,7 +56,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
         Quaternion q = new Quaternion(pose.rotation[0],pose.rotation[1],pose.rotation[2],pose.rotation[3]);
         double yaw = Math.toDegrees(q.getYaw());
         if (yaw < 0) yaw += 360;
-        int angleIndex = ((int)(yaw / 360 * ANGLE_RESOLUTION)) % ANGLE_RESOLUTION;
+        int angleIndex = ((int)(yaw / 360 * angleResolution)) % angleResolution;
         c.angleVisited[angleIndex] = true;
         int index = cells.indexOf(c);
         if (index == -1){
@@ -74,10 +82,11 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
         int angleCount = getAngleCount();
         int size = cells.size();
         long time = System.currentTimeMillis() - startTime;
-        if (angleCount >= MIN_ANGLE_COUNT && size >= MIN_CELL_COUNT && time > MIN_TIME_S*1000){
+        if (angleCount >= minAngleCount && size >= minCellCount && time > minTimeMs){
             return true;
         }
-        if (time > MAX_TIME_S*1000){
+
+        if (time > maxTimeMs){
             return true;
         }
         return false;
@@ -86,7 +95,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
     private int getAngleCount(){
         int res = 0;
         for (Cell c : cells){
-            for (int i = 0; i<ANGLE_RESOLUTION; i++){
+            for (int i = 0; i<angleResolution; i++){
                 if (c.angleVisited[i]) res++;
             }
         }
@@ -117,7 +126,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
         public static final double CELL_SIZE_M = 1; //Cell size in meters.
         public int x;
         public int y;
-        public boolean[] angleVisited = new boolean[ANGLE_RESOLUTION];
+        public boolean[] angleVisited = new boolean[angleResolution];
 
         @Override
         public boolean equals(Object o){
