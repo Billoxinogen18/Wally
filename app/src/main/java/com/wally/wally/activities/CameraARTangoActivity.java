@@ -200,6 +200,14 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     @Override
+    public void onEditSelectedContentClick(Content content){
+        super.onEditSelectedContentClick(content);
+
+        mEditableContent = content;
+
+    }
+
+    @Override
     public void onSaveContent(Content content) {
         AdfInfo adfInfo = mTangoManager.getCurrentAdf();
 
@@ -229,11 +237,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public void onContentCreated(Content contentCreated, boolean isEditMode) {
-        editableContent = null;
+        mIsEditing = false;
         if (isEditMode) {
             // remove content and start new fitting.
             mVisualContentManager.removePendingStaticContent(contentCreated);
-            editableContent = contentCreated;
+            mIsEditing = true;
         }
         if (mContentFitter != null) {
             Log.e(TAG, "onContentCreated: called when content was already fitting");
@@ -246,7 +254,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     }
 
-    private Content editableContent;
+    private Content mEditableContent;
+    private boolean mIsEditing;
 
     @Override
     protected void onPause() {
@@ -322,9 +331,10 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mContentFitter.cancel(true);
         mContentFitter = null;
 
-        if (editableContent != null) {
-            mVisualContentManager.addPendingStaticContent(editableContent);
-            editableContent = null;
+        if (mIsEditing) {
+            mVisualContentManager.addPendingStaticContent(mEditableContent);
+            mEditableContent = null;
+            mIsEditing = false;
         }
 
         onFitStatusChange(false);
@@ -334,6 +344,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mContentFitter.finishFitting();
         mContentFitter = null;
         onFitStatusChange(false);
+
+        mEditableContent = null;
+        mIsEditing = false;
     }
 
     /**
@@ -389,24 +402,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         setLocalizationLocation();
     }
 
-    private void setLocalizationLocation() {
-        if (Utils.checkLocationPermission(getBaseContext())) {
-            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-            if (myLocation == null) {
-                Toast.makeText(getBaseContext(), "Couldn't get user location", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "saveActiveContent: Cannot get user location");
-            } else {
-                mLocalizationLocation = new SerializableLatLng(myLocation.getLatitude(), myLocation.getLongitude());
-            }
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_CODE_MY_LOCATION);
-        }
-    }
-
-
     @Override
     public void notLocalized() {
         runOnUiThread(new Runnable() {
@@ -428,6 +423,24 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 setLocalizationLocation();
             }
             // TODO show error that user can't add content without location permission
+        }
+    }
+
+
+    private void setLocalizationLocation() {
+        if (Utils.checkLocationPermission(getBaseContext())) {
+            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+            if (myLocation == null) {
+                Toast.makeText(getBaseContext(), "Couldn't get user location", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "saveActiveContent: Cannot get user location");
+            } else {
+                mLocalizationLocation = new SerializableLatLng(myLocation.getLatitude(), myLocation.getLongitude());
+            }
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_CODE_MY_LOCATION);
         }
     }
 
