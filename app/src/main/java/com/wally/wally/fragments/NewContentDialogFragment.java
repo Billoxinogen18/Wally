@@ -116,6 +116,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         v.findViewById(R.id.btn_discard_post).setOnClickListener(this);
         v.findViewById(R.id.btn_create_post).setOnClickListener(this);
         v.findViewById(R.id.btn_more_settings).setOnClickListener(this);
+        v.findViewById(R.id.root).setOnClickListener(this);
 
         mNoteView = v.findViewById(R.id.note_view);
         mRootView = v.findViewById(R.id.root);
@@ -255,6 +256,10 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
             case R.id.btn_more_settings:
                 new ContentMetaInfoPopup().show(v, mContent);
                 break;
+            case R.id.root:
+                Utils.hideSoftKeyboard(mTitleEt, getContext());
+                Utils.hideSoftKeyboard(mNoteEt, getContext());
+                return;
             default:
                 Log.e(TAG, "onClick: " + v.getId());
         }
