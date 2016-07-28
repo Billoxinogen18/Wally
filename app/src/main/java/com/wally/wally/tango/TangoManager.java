@@ -115,6 +115,7 @@ public class TangoManager implements LocalizationListener {
         Log.d(TAG, "Enter onResume()");
         if (savedAdf != null) {
             startLocalizing(savedAdf);
+            startLocalizationWatchDog();
             // TODO: what happens if can't localize on saved ADF?
         } else {
             mAdfScheduler = new AdfScheduler(mAdfManager)
@@ -181,20 +182,6 @@ public class TangoManager implements LocalizationListener {
         mTangoUx.showCustomMessage("New room was learned.", 500);
         onPause();
         localizeWithLearnedAdf(currentAdf);
-        mlocalizationWatchdog = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(20000);
-                } catch (InterruptedException e) {
-                    return;
-                }
-                savedAdf = null;
-                onPause();
-                onResume();
-            }
-        });
-        mlocalizationWatchdog.start();
     }
 
     private void saveAdf() {
@@ -219,11 +206,29 @@ public class TangoManager implements LocalizationListener {
         mTango = mTangoFactory.getTangoForLearning(getRunnable());
     }
 
+    private void startLocalizationWatchDog() {
+        mlocalizationWatchdog = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(20000);
+                } catch (InterruptedException e) {
+                    return;
+                }
+                savedAdf = null;
+                onPause();
+                onResume();
+            }
+        });
+        mlocalizationWatchdog.start();
+    }
+
     private void localizeWithLearnedAdf(final AdfInfo adf){
         Log.d(TAG, "localizeWithLearnedAdf() called with: " + "adf = [" + adf + "]");
         currentAdf = adf;
         mTangoUx.showCustomMessage("localizing on new area. Walk around");
         mTango = mTangoFactory.getTangoWithUuid(getRunnable(), adf.getUuid());
+        startLocalizationWatchDog();
     }
 
     private synchronized void startLocalizing(final AdfInfo adf) {
