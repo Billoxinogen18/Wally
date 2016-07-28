@@ -6,28 +6,33 @@ import com.wally.wally.datacontroller.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class AdfManager {
     private ADFService adfService;
     private List<AdfMetaData> metadatas;
+    private Iterator<AdfMetaData> queue;
 
     public AdfManager(ADFService adfService) {
         this.adfService = adfService;
-        this.metadatas = new LinkedList<>();
+        this.metadatas = new ArrayList<>();
+        this.queue = metadatas.iterator();
     }
 
     private void addMetadata(AdfMetaData d) {
         metadatas.add(d);
+        queue = metadatas.iterator();
     }
 
     public void getAdf(final Callback<AdfInfo> callback){
-        if (metadatas.size() < 1) {
+        if (!queue.hasNext()) {
             callback.onResult(null);
+            queue = metadatas.iterator();
             return;
         }
-        final AdfMetaData metadata = metadatas.remove(0);
+        final AdfMetaData metadata = queue.next();
         final String uuid = metadata.getUuid();
         final String path = Utils.getAdfFilePath(uuid);
         adfService.download(path, uuid, new Callback<Void>() {
