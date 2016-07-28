@@ -1,5 +1,7 @@
 package com.wally.wally.datacontroller.content;
 
+import android.graphics.Color;
+
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.io.Serializable;
@@ -23,6 +25,8 @@ public class Content implements Serializable {
     private Date creationDate;
 
     public Content() {
+        withTextColor(Color.BLACK);
+        withColor(Color.WHITE);
     }
 
     public Content(String id) {

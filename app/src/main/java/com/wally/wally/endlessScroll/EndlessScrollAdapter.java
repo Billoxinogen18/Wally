@@ -77,7 +77,7 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
             mHolder.contentListViewItem.clear();
             mHolder.contentListViewItem.setContent(content, googleApiClient);
             mHolder.contentListViewItem.showUserInfo(userProfile == null);
-            mHolder.contentListViewItem.setPosition(position+1);
+            mHolder.contentListViewItem.setPosition(position + 1);
             mHolder.contentListViewItem.setOnClickListener(onClickListener);
         }
     }
@@ -120,6 +120,7 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public class ProgressViewHolder extends RecyclerView.ViewHolder {
         View toHide;
+
         public ProgressViewHolder(View itemView) {
             super(itemView);
             toHide = itemView.findViewById(R.id.progressbar);

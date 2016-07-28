@@ -169,6 +169,10 @@ public final class Utils {
         if (content.getColor() != null) {
             root.setBackgroundColor(content.getColor());
         }
+        if (content.getTextColor() != null) {
+            titleTV.setTextColor(content.getTextColor());
+            noteTV.setTextColor(content.getTextColor());
+        }
 
         Resources res = context.getResources();
         cv.measure(

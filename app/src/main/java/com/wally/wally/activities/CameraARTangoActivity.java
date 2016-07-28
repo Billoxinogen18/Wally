@@ -76,6 +76,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private VisualContentManager mVisualContentManager;
     private WallyRenderer mRenderer;
     private SerializableLatLng mLocalizationLocation;
+    private Content editableContent;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, CameraARTangoActivity.class);
@@ -138,7 +139,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         }
     }
 
-
     private void requestADFPermission() {
         startActivityForResult(
                 Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE), RC_REQ_AREA_LEARNING);
@@ -153,7 +153,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
             }
         }
     }
-
 
     @Override
     public void onDialogPositiveClicked(int requestCode) {
@@ -201,14 +200,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     @Override
-    public void onEditSelectedContentClick(Content content){
-        super.onEditSelectedContentClick(content);
-
-        mEditableContent = content;
-
-    }
-
-    @Override
     public void onSaveContent(Content content) {
         AdfInfo adfInfo = mTangoManager.getCurrentAdf();
 
@@ -224,7 +215,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         df.show(getSupportFragmentManager(), ImportExportPermissionDialogFragment.TAG);
     }
 
-
     @Override
     public void onPermissionGranted(AdfInfo adfInfo) {
         startUploadingAdf(adfInfo);
@@ -238,11 +228,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public void onContentCreated(Content contentCreated, boolean isEditMode) {
-        mIsEditing = false;
+        editableContent = null;
         if (isEditMode) {
             // remove content and start new fitting.
             mVisualContentManager.removePendingStaticContent(contentCreated);
-            mIsEditing = true;
+            editableContent = contentCreated;
         }
         if (mContentFitter != null) {
             Log.e(TAG, "onContentCreated: called when content was already fitting");
@@ -332,10 +322,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mContentFitter.cancel(true);
         mContentFitter = null;
 
-        if (mIsEditing) {
-            mVisualContentManager.addPendingStaticContent(mEditableContent);
-            mEditableContent = null;
-            mIsEditing = false;
+        if (editableContent != null) {
+            mVisualContentManager.addPendingStaticContent(editableContent);
+            editableContent = null;
         }
 
         onFitStatusChange(false);
@@ -345,9 +334,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mContentFitter.finishFitting();
         mContentFitter = null;
         onFitStatusChange(false);
-
-        mEditableContent = null;
-        mIsEditing = false;
     }
 
     /**
@@ -395,12 +381,13 @@ public class CameraARTangoActivity extends CameraARActivity implements
             public void run() {
                 mVisualContentManager.localized();
                 mFinishFittingFab.setEnabled(true);
-                mCreateNewContent.setVisibility(View.VISIBLE);
+                if (!mTangoManager.isLearningMode()) {
+                    mCreateNewContent.setVisibility(View.VISIBLE);
+                    fetchContentForAdf(getBaseContext(), mTangoManager.getCurrentAdf().getUuid());
+                }
+                setLocalizationLocation();
             }
         });
-        if (!mTangoManager.isLearningMode())
-            fetchContentForAdf(getBaseContext(), mTangoManager.getCurrentAdf().getUuid());
-        setLocalizationLocation();
     }
 
     @Override
