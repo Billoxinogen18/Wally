@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
@@ -32,12 +33,13 @@ import com.wally.wally.userManager.UserManager;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import java.util.Date;
+import java.util.List;
 
 public abstract class CameraARActivity extends GoogleApiClientActivity implements
         OnVisualContentSelectedListener,
         NewContentDialogFragment.NewContentDialogListener,
         SelectedMenuView.OnSelectedMenuActionListener,
-        MapsFragment.MapCloseListener {
+        MapsFragment.MapOpenCloseListener {
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int REQUEST_CODE_MY_LOCATION = 22;
     protected DataController mDataController;
@@ -62,6 +64,11 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     // Called When content object is created by user
     @Override
     public abstract void onContentCreated(Content content, boolean isEditMode);
+
+    /**
+     * @return true if new content can be added
+     */
+    public abstract boolean isNewContentFabVisible();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,9 +274,6 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         transaction.replace(R.id.fragment_container, mf);
         transaction.addToBackStack(null);
 
-
-        hideGUI(true);
-
         // Commit the transaction
         transaction.commit();
     }
@@ -283,15 +287,36 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
             mWaterMark.setVisibility(View.GONE);
         } else {
             mRajawaliView.setFrameRate(30);
-            mNewContentButton.setVisibility(View.VISIBLE);
+            mNewContentButton.setVisibility(isNewContentFabVisible() ? View.VISIBLE : View.GONE);
             mMapButton.setVisibility(View.VISIBLE);
             mProfileBar.setVisibility(View.VISIBLE);
             mWaterMark.setVisibility(View.VISIBLE);
         }
     }
 
+    @Override
     public void onMapClose() {
-        hideGUI(false);
+        if (!isMapsFragmentAttached()) {
+            hideGUI(false);
+        }
     }
 
+    @Override
+    public void onMapOpen() {
+        hideGUI(true);
+    }
+
+    public boolean isMapsFragmentAttached() {
+        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+        if (fragmentList == null) {
+            return false;
+        } else {
+            for (Fragment fragment : fragmentList) {
+                if (fragment instanceof MapsFragment && fragment.isInLayout()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

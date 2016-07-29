@@ -72,7 +72,7 @@ public class MapsFragment extends Fragment implements
     private static final int MY_LOCATION_REQUEST_CODE = 222;
     private static final int PAGE_LENGTH = 5;
 
-    private MapCloseListener mListener;
+    private MapOpenCloseListener mListener;
 
     private SocialUser mUserProfile;
 
@@ -161,6 +161,7 @@ public class MapsFragment extends Fragment implements
         super.onResume();
         if (mMapView != null)
             mMapView.onResume();
+        mListener.onMapOpen();
     }
 
     @Override
@@ -195,10 +196,10 @@ public class MapsFragment extends Fragment implements
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            mListener = (MapCloseListener) context;
+            mListener = (MapOpenCloseListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement MapCloseListener");
+                    + " must implement MapOpenCloseListener");
         }
     }
 
@@ -479,8 +480,9 @@ public class MapsFragment extends Fragment implements
         }
     }
 
-
-    public interface MapCloseListener {
+    public interface MapOpenCloseListener {
         void onMapClose();
+
+        void onMapOpen();
     }
 }

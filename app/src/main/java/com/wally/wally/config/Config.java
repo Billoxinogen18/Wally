@@ -13,8 +13,9 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Config implements LEConstants, TMConstants {
+public class Config implements LEConstants, TMConstants, CTAConstants {
     public static final String TAG = "WallyConfig";
+    private static Config instance;
     private FirebaseRemoteConfig config;
 
     public Config() {
@@ -29,6 +30,13 @@ public class Config implements LEConstants, TMConstants {
                 fetchServerParams();
             }
         }, 1000);
+    }
+
+    public static Config getInstance() {
+        if (instance == null) {
+            instance = new Config();
+        }
+        return instance;
     }
 
     private void setSettings() {
@@ -59,6 +67,10 @@ public class Config implements LEConstants, TMConstants {
         params.put(LOCALIZING_IN_KNOWN_AREA, "Identifying area, Walk around");
         params.put(LOCALIZATION_LOST_IN_LEARNING, "I'm lost. Restarting learning...");
         params.put(LOCALIZATION_LOST, "I'm lost. Walk Around");
+
+        params.put(ADF_EXPORT_EXPLAIN_MSG, "If you don't give permission, you won't be able to see created content again, Would you like to give permission?");
+        params.put(ADF_EXPORT_EXPLAIN_PST_BTN, "Give Permission");
+        params.put(ADF_EXPORT_EXPLAIN_NGT_BTN, "Deny");
         config.setDefaults(params);
     }
 
@@ -68,7 +80,7 @@ public class Config implements LEConstants, TMConstants {
                 new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             Log.d(TAG, "fetch success");
                             Log.d(TAG, "activate " + config.activateFetched());
                             Log.d(TAG, MIN_TIME_S + ": " + getString(MIN_TIME_S));
@@ -87,13 +99,5 @@ public class Config implements LEConstants, TMConstants {
 
     public int getInt(String key) {
         return (int) config.getLong(key);
-    }
-
-    private static Config instance;
-    public static Config getInstance() {
-        if (instance == null) {
-            instance = new Config();
-        }
-        return instance;
     }
 }

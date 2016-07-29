@@ -27,15 +27,14 @@ import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
 
 public class TangoManager implements LocalizationListener {
-    private static final String TAG = TangoManager.class.getSimpleName();
-
     public static final TangoCoordinateFramePair FRAME_PAIR =
             new TangoCoordinateFramePair(
                     TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
                     TangoPoseData.COORDINATE_FRAME_DEVICE
             );
+    private static final String TAG = TangoManager.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
-//    private static final int ADF_LOCALIZAION_TIMEOUT_MS = 15000;
+    //    private static final int ADF_LOCALIZAION_TIMEOUT_MS = 15000;
     private Config mConfig;
 
 
@@ -231,7 +230,7 @@ public class TangoManager implements LocalizationListener {
         mlocalizationWatchdog.start();
     }
 
-    private void localizeWithLearnedAdf(final AdfInfo adf){
+    private void localizeWithLearnedAdf(final AdfInfo adf) {
         Log.d(TAG, "localizeWithLearnedAdf() called with: " + "adf = [" + adf + "]");
         currentAdf = adf;
 
@@ -254,12 +253,15 @@ public class TangoManager implements LocalizationListener {
                     r.run();
                     loadAdf(mTango, adf);
                 }
+
                 @Override
                 public void onError(Exception e) {
                     r.onError(e);
                 }
             });
-        } else { loadAdf(mTango, adf); }
+        } else {
+            loadAdf(mTango, adf);
+        }
     }
 
     private void loadAdf(Tango tango, AdfInfo adf) {
@@ -291,7 +293,7 @@ public class TangoManager implements LocalizationListener {
     }
 
     /**
-    / * Finds plane pose in the middle of the screen.
+     * / * Finds plane pose in the middle of the screen.
      */
     public TangoPoseData findPlaneInMiddle() {
         return doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread);
@@ -421,6 +423,10 @@ public class TangoManager implements LocalizationListener {
         return ScenePoseCalculator.planeFitToTangoWorldPose(
                 intersectionPointPlaneModelPair.intersectionPoint,
                 intersectionPointPlaneModelPair.planeModel, devicePose, mExtrinsics);
+    }
+
+    public boolean isLocalized() {
+        return mIsLocalized;
     }
 
 
