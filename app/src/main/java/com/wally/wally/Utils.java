@@ -437,12 +437,18 @@ public final class Utils {
                 Geocoder geocoder = new Geocoder(ctx, Locale.getDefault());
                 try {
                     List<Address> addresses = geocoder.getFromLocation(
-                            latLng.getLatitude(), latLng.getLongitude(), 1);
-                    String city = addresses.get(0).getLocality();
-                    String street = addresses.get(0).getFeatureName();
-                    //String zip = addresses.get(0).getPostalCode();
-                    String country = addresses.get(0).getCountryName();
-                    return String.format("%s,%s (%s)", street, city, country);
+                            latLng.getLatitude(), latLng.getLongitude(), 10);
+                    Address address = addresses.get(0);
+
+                    String city = address.getLocality();
+                    String street = address.getFeatureName();
+                    String country = address.getCountryName();
+
+                    String addr = String.format("%s,%s (%s)", street, city, country);
+                    if (address.getThoroughfare() != null) {
+                        return address.getThoroughfare();
+                    }
+                    return addr;
                 } catch (Exception e) {
                     e.printStackTrace();
                     return null;
