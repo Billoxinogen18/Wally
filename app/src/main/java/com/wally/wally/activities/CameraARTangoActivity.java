@@ -26,6 +26,7 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adfCreator.AdfInfo;
 import com.wally.wally.adfCreator.AdfManager;
+import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.config.CTAConstants;
 import com.wally.wally.config.Config;
@@ -98,6 +99,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         Config config = Config.getInstance();
+        WallyAnalytics analytics = WallyAnalytics.getInstance(this);
         Context context = getBaseContext();
 
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
