@@ -10,19 +10,28 @@
         android:layout_height="280dp"
         android:layout_centerInParent="true"
         android:paddingBottom="60dp"
-        android:src="@mipmap/ic_launcher" />
+        android:src="@drawable/high_res_logo" />
+
+    <TextView
+        android:id="@+id/tv_app_motto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="serif"
+        android:padding="8dp"
+        android:text="Virtual Notes"/>
 
     <TextView
         android:id="@+id/tv_app_name"
         style="@style/TextAppearance.AppCompat.Display2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@id/tv_app_motto"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="28dp"
         android:fontFamily="serif"
-        android:padding="8dp"
-        android:text="@string/app_name" />
+        android:text="Wally" />
 
     <LinearLayout
         android:id="@+id/loading_view"
