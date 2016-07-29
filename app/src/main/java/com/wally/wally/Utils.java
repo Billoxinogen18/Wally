@@ -78,6 +78,18 @@ public final class Utils {
     }
 
     /**
+     * Show Keyboard when View is focused.
+     * Note that keyboard won't show if view isn't focused first!
+     *
+     * @param input   View that want's to show keyboard.
+     * @param context context to get the keyboard manager.
+     */
+    public static void showKeyboard(View input, Context context) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(input, InputMethodManager.SHOW_FORCED);
+    }
+
+    /**
      * Permission checking methods should start with 'check' and end with 'permission'
      * if not there will be lint error. (Lint won't understand that this is permission checking.)
      *
