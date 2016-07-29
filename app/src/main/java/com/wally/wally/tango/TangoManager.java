@@ -16,6 +16,7 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.adfCreator.AdfInfo;
 import com.wally.wally.adfCreator.AdfManager;
+import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TMConstants;
@@ -34,7 +35,7 @@ public class TangoManager implements LocalizationListener {
             );
     private static final String TAG = TangoManager.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
-    //    private static final int ADF_LOCALIZAION_TIMEOUT_MS = 15000;
+    private final WallyAnalytics mAnalytics;
     private Config mConfig;
 
 
@@ -70,6 +71,7 @@ public class TangoManager implements LocalizationListener {
 
     public TangoManager(
             Config config,
+            WallyAnalytics analytics,
             TangoUpdater tangoUpdater,
             TangoPointCloudManager pointCloudManager,
             WallyRenderer wallyRenderer,
@@ -79,6 +81,7 @@ public class TangoManager implements LocalizationListener {
             LearningEvaluator evaluator
     ) {
         mConfig = config;
+        mAnalytics = analytics;
         mTangoUpdater = tangoUpdater;
         mRenderer = wallyRenderer;
         mTangoUx = tangoUx;
@@ -198,6 +201,7 @@ public class TangoManager implements LocalizationListener {
         savedAdf = adfInfo;
         currentAdf = adfInfo;
         mIsReadyToSaveAdf = false;
+        mAnalytics.onAdfCreate();
     }
 
     private synchronized void startLearning() {
@@ -477,5 +481,4 @@ public class TangoManager implements LocalizationListener {
     public boolean isConnected() {
         return mIsConnected;
     }
-
 }

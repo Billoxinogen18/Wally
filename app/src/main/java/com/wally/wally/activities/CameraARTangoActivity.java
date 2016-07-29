@@ -82,7 +82,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private Content editableContent;
     private Content mEditableContent;
     private boolean mIsEditing;
-
+    private WallyAnalytics mAnalytics;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, CameraARTangoActivity.class);
@@ -99,7 +99,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         Config config = Config.getInstance();
-        WallyAnalytics analytics = WallyAnalytics.getInstance(this);
+        mAnalytics = WallyAnalytics.getInstance(this);
         Context context = getBaseContext();
 
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
@@ -122,8 +122,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
         TangoFactory tangoFactory = new TangoFactory(context);
 
         AdfManager adfManager = App.getInstance().getAdfManager();
-        mTangoManager = new TangoManager(config, tangoUpdater, pointCloudManager, mRenderer, tangoUx,
-                tangoFactory, adfManager, evaluator);
+        mTangoManager = new TangoManager(config, mAnalytics, tangoUpdater,
+                pointCloudManager, mRenderer, tangoUx, tangoFactory, adfManager, evaluator);
         restoreState(savedInstanceState);
 
 
@@ -218,6 +218,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     @Override
     public void onDeleteContent(Content selectedContent) {
         mVisualContentManager.removePendingStaticContent(selectedContent);
+        mAnalytics.onContentDelete();
     }
 
     @Override
