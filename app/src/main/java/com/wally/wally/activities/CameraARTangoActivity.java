@@ -35,7 +35,6 @@ import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.fragments.ImportExportPermissionDialogFragment;
-import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.fragments.PersistentDialogFragment;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
@@ -82,6 +81,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private Content editableContent;
     private Content mEditableContent;
     private boolean mIsEditing;
+
 
     public static Intent newIntent(Context context) {
         return new Intent(context, CameraARTangoActivity.class);
@@ -273,8 +273,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         onFitStatusChange(true);
 
     }
-
-    private boolean mIsEditing;
 
     @Override
     protected void onPause() {
