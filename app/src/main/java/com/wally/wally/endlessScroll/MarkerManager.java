@@ -92,10 +92,10 @@ public class MarkerManager {
     }
 
 
-    public void addMarker(String name, Content content) {
+    public void addMarker(String name, Content content, OnMarkerAddListener callback) {
         MarkerNameVisibility markerNameVisibility = new MarkerNameVisibility(name, content);
 
-        markerNameVisibility.createMarker();
+        markerNameVisibility.createMarker(callback);
     }
 
     public List<MarkerView> getVisibleMarkers() {
@@ -122,7 +122,7 @@ public class MarkerManager {
         }
 
 
-        public void createMarker() {
+        public void createMarker(final OnMarkerAddListener callback) {
             mMarkerIconGenerator.getDefaultMarkerIcon(
                     content.getVisibility().getSocialVisibility().getMode(),
                     content.getVisibility().isAuthorAnonymous(),
@@ -151,6 +151,7 @@ public class MarkerManager {
 
                                             markerNumber = mMap.addMarker(markerOptions);
                                             mMarkerList.add(MarkerNameVisibility.this);
+                                            callback.onMarkerAdd();
                                         }
                                     });
                         }
@@ -178,4 +179,8 @@ public class MarkerManager {
         }
     }
 
+
+    public interface OnMarkerAddListener{
+        void onMarkerAdd();
+    }
 }
