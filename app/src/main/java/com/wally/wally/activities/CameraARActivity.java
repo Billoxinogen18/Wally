@@ -18,6 +18,7 @@ import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.components.SelectedMenuView;
 import com.wally.wally.components.UserInfoView;
 import com.wally.wally.datacontroller.DataController;
@@ -57,6 +58,9 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     private View mProfileBar;
     private View mWaterMark;
 
+    protected WallyAnalytics mAnalytics;
+
+
     public abstract void onDeleteContent(Content selectedContent);
 
     public abstract void onSaveContent(Content selectedContent);
@@ -95,6 +99,9 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
                 .addApi(Plus.API)
                 .addApi(LocationServices.API)
                 .build();
+
+        mAnalytics = WallyAnalytics.getInstance(this);
+
     }
 
     protected void onStart() {
@@ -176,6 +183,12 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
 
     @Override
     public void onVisualContentSelected(VisualContent visualContent) {
+        if (visualContent != null) {
+            mAnalytics.onButtonClick("Content_Selected");
+        } else {
+            mAnalytics.onButtonClick("Click_On_Camera");
+        }
+
         Content content = null;
         if (visualContent != null) {
             content = visualContent.getContent();
@@ -185,7 +198,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
 
 
     public void onNewContentClick(View v) {
-
+        mAnalytics.onButtonClick("New_Content");
         if (SystemClock.elapsedRealtime() - mNewContentButtonLastClickTime < 1000) {
             return;
         }
@@ -196,15 +209,17 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     }
 
     public void onBtnMapClick(View v) {
+        mAnalytics.onButtonClick("Map");
         showMapFragment(null);
     }
 
     public void onShowProfileClick(View v) {
-        onProfileClick(mUserManager.getUser());
+        onProfileClick(mUserManager.getUser(), true);
     }
 
 
     public void onEditSelectedContentClick(Content content) {
+        mAnalytics.onButtonClick("Edit_Content");
         if (content == null) {
             Log.e(TAG, "editSelectedContent: when mSelectedContent is NULL");
             return;
@@ -215,6 +230,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     }
 
     public void onDeleteSelectedContentClick(Content content) {
+        mAnalytics.onButtonClick("Delete_Content");
         if (content == null) {
             Log.e(TAG, "deleteSelectedContent: when mSelectedContent is NULL");
             return;
@@ -224,7 +240,12 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         onDeleteContent(content);
     }
 
-    public void onProfileClick(SocialUser user) {
+    public void onProfileClick(SocialUser user, boolean type) {
+        if (type){
+            mAnalytics.onButtonClick("My_Profile");
+        } else {
+            mAnalytics.onButtonClick("Some_Profile");
+        }
         showMapFragment(user);
     }
 

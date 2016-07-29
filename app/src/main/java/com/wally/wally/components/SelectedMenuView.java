@@ -109,7 +109,7 @@ public class SelectedMenuView extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 if (mOnSelectedMenuActionListener != null) {
-                    mOnSelectedMenuActionListener.onProfileClick(mContentAuthor);
+                    mOnSelectedMenuActionListener.onProfileClick(mContentAuthor, false);
                 }
             }
         });
@@ -125,6 +125,6 @@ public class SelectedMenuView extends RelativeLayout {
 
         void onEditSelectedContentClick(Content selectedContent);
 
-        void onProfileClick(SocialUser user);
+        void onProfileClick(SocialUser user, boolean type);
     }
 }

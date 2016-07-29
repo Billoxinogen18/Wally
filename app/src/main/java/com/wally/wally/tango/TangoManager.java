@@ -9,7 +9,6 @@ import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
@@ -123,10 +122,12 @@ public class TangoManager implements LocalizationListener {
         Log.d(TAG, "Enter onResume()");
         if (savedAdf != null) {
             startLocalizing(savedAdf);
+            localizationState = LocalizationState.AFTER_ON_RESUME;
             startLocalizationWatchDog();
             // TODO: what happens if can't localize on saved ADF?
         } else {
             int timeout = mConfig.getInt(TMConstants.LOCALIZATION_TIMEOUT);
+            adfCounter = 0;
             mAdfScheduler = new AdfScheduler(mAdfManager)
                     .withTimeout(timeout)
                     .addCallback(adfSchedulerCallback());
@@ -139,13 +140,17 @@ public class TangoManager implements LocalizationListener {
         return new Callback<AdfInfo>() {
             @Override
             public void onResult(AdfInfo result) {
+                adfCounter++;
+                logLocalization(false);
                 if (mIsLocalized) {
                     return;
                 }
                 Log.d(TAG, "adfSchedulerCallback onResult: " + result);
                 if (result == null) {
+                    mAnalytics.logAdfNumberBeforeLearning(adfCounter);
                     startLearning();
                 } else {
+                    localizationState = LocalizationState.AFTER_DOWNLOAD;
                     startLocalizing(result);
                 }
             }
@@ -227,6 +232,7 @@ public class TangoManager implements LocalizationListener {
                 } catch (InterruptedException e) {
                     return;
                 }
+                logLocalization(false);
                 savedAdf = null;
                 onPause();
                 onResume();
@@ -237,16 +243,20 @@ public class TangoManager implements LocalizationListener {
 
     private void localizeWithLearnedAdf(final AdfInfo adf) {
         Log.d(TAG, "localizeWithLearnedAdf() called with: " + "adf = [" + adf + "]");
+        timeForAdfLocalization = System.currentTimeMillis();
+
         currentAdf = adf;
 
         String msg = mConfig.getString(TMConstants.LOCALIZING_IN_NEW_AREA);
         mTangoUx.showCustomMessage(msg);
         mTango = mTangoFactory.getTangoWithUuid(getRunnable(), adf.getUuid());
+        localizationState = LocalizationState.AFTER_LEARNING;
         startLocalizationWatchDog();
     }
 
     private synchronized void startLocalizing(final AdfInfo adf) {
         Log.d(TAG, "startLocalizing() called with: " + "adf = [" + adf + "]");
+        timeForAdfLocalization = System.currentTimeMillis();
         String msg = mConfig.getString(TMConstants.LOCALIZING_IN_KNOWN_AREA);
         mTangoUx.showCustomMessage(msg);
         currentAdf = adf; //TODO mchirdeba tu ara?
@@ -454,6 +464,7 @@ public class TangoManager implements LocalizationListener {
             String msg = mConfig.getString(TMConstants.LOCALIZED);
             mTangoUx.showCustomMessage(msg, 1000);
         }
+        logLocalization(true);
     }
 
     @Override
@@ -481,5 +492,32 @@ public class TangoManager implements LocalizationListener {
 
     public boolean isConnected() {
         return mIsConnected;
+    }
+
+    private LocalizationState localizationState = LocalizationState.NONE;
+    private int adfCounter = 0;
+    private long timeForAdfLocalization;
+
+    enum LocalizationState{
+        NONE, AFTER_LEARNING, AFTER_ON_RESUME, AFTER_DOWNLOAD;
+    }
+
+    private void logLocalization(boolean success){
+        if (localizationState == LocalizationState.AFTER_LEARNING){
+            mAnalytics.onLocalizeOnNewAdf(success);
+            localizationState = LocalizationState.NONE;
+        } else if (localizationState == LocalizationState.AFTER_ON_RESUME){
+            mAnalytics.onLocalizeAfterResume(success);
+            localizationState = LocalizationState.NONE;
+        } else if (localizationState == LocalizationState.AFTER_DOWNLOAD){
+            mAnalytics.onLocalizeOnDownloadedAdf(success);
+            localizationState = LocalizationState.NONE;
+            if (success){
+                mAnalytics.logAdfNumberBeforeLocalization(adfCounter);
+            }
+        }
+        if (success){
+            mAnalytics.logLocalizationTimeForAdf(currentAdf.getUuid(), System.currentTimeMillis() - timeForAdfLocalization);
+        }
     }
 }

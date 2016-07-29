@@ -41,13 +41,13 @@ public class WallyAnalytics {
         }
     }
 
-    public void onLocalizeAfterExport(boolean status) {
+    public void onLocalizeAfterResume(boolean status) {
         Bundle bundle = new Bundle();
         bundle.putInt("Count", 1);
         if (status) {
-            analytics.logEvent("ADF_exp_localize_success", bundle);
+            analytics.logEvent("ADF_resume_localize_success", bundle);
         } else {
-            analytics.logEvent("ADF_exp_localize_fail", bundle);
+            analytics.logEvent("ADF_resume_localize_fail", bundle);
         }
     }
 

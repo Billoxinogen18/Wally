@@ -82,7 +82,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private Content editableContent;
     private Content mEditableContent;
     private boolean mIsEditing;
-    private WallyAnalytics mAnalytics;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, CameraARTangoActivity.class);
@@ -99,7 +98,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         Config config = Config.getInstance();
-        mAnalytics = WallyAnalytics.getInstance(this);
         Context context = getBaseContext();
 
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
