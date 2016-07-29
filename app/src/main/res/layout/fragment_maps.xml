@@ -20,6 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="@dimen/map_alpha"
+            app:tilt_enabled="false"
             app:style_url="@string/map_style_url" />
 
         <!-- Just invisible for now, redesign later-->
