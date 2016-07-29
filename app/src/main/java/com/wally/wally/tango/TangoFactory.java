@@ -81,6 +81,7 @@ public class TangoFactory {
 
     private void connectTango(Tango mTango) {
         TangoConfig config = getBasicConfig(mTango);
+        config.putBoolean(TangoConfig.KEY_BOOLEAN_DRIFT_CORRECTION, true);
         mTango.connect(config);
     }
 
