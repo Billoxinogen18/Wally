@@ -34,6 +34,7 @@ import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.fragments.ImportExportPermissionDialogFragment;
+import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.fragments.PersistentDialogFragment;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
@@ -228,11 +229,16 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public void onContentCreated(Content contentCreated, boolean isEditMode) {
-        editableContent = null;
         if (isEditMode) {
             // remove content and start new fitting.
+
             mVisualContentManager.removePendingStaticContent(contentCreated);
-            editableContent = contentCreated;
+            Log.d(TAG, "onContentCreated() deleted " + contentCreated);
+            mIsEditing = true;
+            editableContent = new Content(contentCreated);
+        } else {
+            mIsEditing = false;
+            editableContent = null;
         }
         if (mContentFitter != null) {
             Log.e(TAG, "onContentCreated: called when content was already fitting");
@@ -245,7 +251,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     }
 
-    private Content mEditableContent;
     private boolean mIsEditing;
 
     @Override
@@ -325,6 +330,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         if (editableContent != null) {
             mVisualContentManager.addPendingStaticContent(editableContent);
             editableContent = null;
+            mIsEditing = false;
         }
 
         onFitStatusChange(false);

@@ -24,6 +24,21 @@ public class Content implements Serializable {
     private String authorId;
     private Date creationDate;
 
+    public Content(Content content){
+        this.id = content.id;
+        this.title = content.title;
+        this.note = content.note;
+        this.imageUri = content.imageUri;
+        this.uuid = content.uuid;
+        this.color = content.color;
+        this.textColor = content.textColor;
+        this.tangoData = content.tangoData;
+        this.location = content.location;
+        this.visibility = content.visibility;
+        this.authorId = content.authorId;
+        this.creationDate = content.creationDate;
+    }
+
     public Content() {
         withTextColor(Color.BLACK);
         withColor(Color.WHITE);
