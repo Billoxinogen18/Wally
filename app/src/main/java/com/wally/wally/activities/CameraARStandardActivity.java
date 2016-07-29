@@ -35,6 +35,11 @@ public class CameraARStandardActivity extends CameraARActivity {
     }
 
     @Override
+    public boolean isNewContentFabVisible() {
+        return false;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View mSurfaceView = findViewById(R.id.rajawali_surface);

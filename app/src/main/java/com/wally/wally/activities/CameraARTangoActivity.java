@@ -26,7 +26,9 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adfCreator.AdfInfo;
 import com.wally.wally.adfCreator.AdfManager;
+import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.components.WallyTangoUx;
+import com.wally.wally.config.CTAConstants;
 import com.wally.wally.config.Config;
 import com.wally.wally.datacontroller.adf.ADFService;
 import com.wally.wally.datacontroller.callbacks.Callback;
@@ -34,7 +36,6 @@ import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.fragments.ImportExportPermissionDialogFragment;
-import com.wally.wally.fragments.NewContentDialogFragment;
 import com.wally.wally.fragments.PersistentDialogFragment;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
@@ -60,6 +61,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
     // Permission Denied explain codes
     private static final int RC_EXPLAIN_ADF = 14;
+    private static final int RC_EXPLAIN_ADF_EXPORT = 19;
     // Permission Request codes
     private static final int RC_REQ_AREA_LEARNING = 17;
     private int REQUEST_CODE_MY_LOCATION = 1;
@@ -78,6 +80,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private WallyRenderer mRenderer;
     private SerializableLatLng mLocalizationLocation;
     private Content editableContent;
+    private Content mEditableContent;
+    private boolean mIsEditing;
+    private WallyAnalytics mAnalytics;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, CameraARTangoActivity.class);
@@ -94,6 +99,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
         Config config = Config.getInstance();
+        mAnalytics = WallyAnalytics.getInstance(this);
         Context context = getBaseContext();
 
         TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
@@ -116,8 +122,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
         TangoFactory tangoFactory = new TangoFactory(context);
 
         AdfManager adfManager = App.getInstance().getAdfManager();
-        mTangoManager = new TangoManager(config, tangoUpdater, pointCloudManager, mRenderer, tangoUx,
-                tangoFactory, adfManager, evaluator);
+        mTangoManager = new TangoManager(config, mAnalytics, tangoUpdater,
+                pointCloudManager, mRenderer, tangoUx, tangoFactory, adfManager, evaluator);
         restoreState(savedInstanceState);
 
 
@@ -138,6 +144,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
             Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
             requestADFPermission();
         }
+    }
+
+    @Override
+    public boolean isNewContentFabVisible() {
+        return mTangoManager.isLocalized() && !mTangoManager.isLearningMode();
     }
 
     private void requestADFPermission() {
@@ -161,13 +172,22 @@ public class CameraARTangoActivity extends CameraARActivity implements
             case RC_EXPLAIN_ADF:
                 requestADFPermission();
                 break;
+            case RC_EXPLAIN_ADF_EXPORT:
+                requestExportPermission(mTangoManager.getCurrentAdf());
+                break;
         }
     }
 
     @Override
     public void onDialogNegativeClicked(int requestCode) {
-        finish();
-        System.exit(0);
+        switch (requestCode) {
+            case RC_EXPLAIN_ADF:
+                finish();
+                System.exit(0);
+                break;
+            case RC_EXPLAIN_ADF_EXPORT:
+                break;
+        }
     }
 
     private void fetchContentForAdf(Context context, String adfUuid) {
@@ -198,6 +218,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     @Override
     public void onDeleteContent(Content selectedContent) {
         mVisualContentManager.removePendingStaticContent(selectedContent);
+        mAnalytics.onContentDelete();
     }
 
     @Override
@@ -224,7 +245,12 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public void onPermissionDenied(AdfInfo adfInfo) {
-//TODO !!!
+        Config config = Config.getInstance();
+        String message = config.getString(CTAConstants.ADF_EXPORT_EXPLAIN_MSG);
+        String positiveText = config.getString(CTAConstants.ADF_EXPORT_EXPLAIN_PST_BTN);
+        String negativeText = config.getString(CTAConstants.ADF_EXPORT_EXPLAIN_NGT_BTN);
+        DialogFragment df = PersistentDialogFragment.newInstance(RC_EXPLAIN_ADF_EXPORT, null, message, positiveText, negativeText, false);
+        df.show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
     }
 
     @Override
@@ -250,8 +276,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         onFitStatusChange(true);
 
     }
-
-    private boolean mIsEditing;
 
     @Override
     protected void onPause() {

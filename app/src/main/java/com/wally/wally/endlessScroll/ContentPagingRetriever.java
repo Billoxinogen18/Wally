@@ -113,34 +113,6 @@ public class ContentPagingRetriever {
         });
     }
 
-//    private void fetch() {
-//        contentFetcher.fetchNext(pageLength * 3, new FetchResultCallback() {
-//            @Override
-//            public void onResult(Collection<Content> result) {
-//                if (result.size() != 0) {
-//                    current.clear();
-//
-//                    current.addAll(result);
-//
-//                    for (ContentPageRetrieveListener observer : observers) {
-//                        observer.onNextPageLoad(result.size());
-//                    }
-//                } else {
-//                    for (ContentPageRetrieveListener observer : observers) {
-//                        observer.onNextPageFail();
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onError(Exception e) {
-//                for (ContentPageRetrieveListener observer : observers) {
-//                    observer.onNextPageFail();
-//                }
-//            }
-//        });
-//    }
-
     public interface ContentPageRetrieveListener {
         void onNextPageLoad(int pageLength);
 

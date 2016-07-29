@@ -43,6 +43,7 @@ import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.ContentListView;
 import com.wally.wally.components.ContentListViewItem;
 import com.wally.wally.components.MapWindowAdapter;
+import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.endlessScroll.ContentPagingRetriever;
@@ -52,6 +53,7 @@ import com.wally.wally.endlessScroll.MarkerManager;
 import com.wally.wally.userManager.SocialUser;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,7 +72,7 @@ public class MapsFragment extends Fragment implements
     private static final int MY_LOCATION_REQUEST_CODE = 222;
     private static final int PAGE_LENGTH = 5;
 
-    private MapCloseListener mListener;
+    private MapOpenCloseListener mListener;
 
     private SocialUser mUserProfile;
 
@@ -159,6 +161,7 @@ public class MapsFragment extends Fragment implements
         super.onResume();
         if (mMapView != null)
             mMapView.onResume();
+        mListener.onMapOpen();
     }
 
     @Override
@@ -193,10 +196,10 @@ public class MapsFragment extends Fragment implements
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            mListener = (MapCloseListener) context;
+            mListener = (MapOpenCloseListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
-                    + " must implement MapCloseListener");
+                    + " must implement MapOpenCloseListener");
         }
     }
 
@@ -229,7 +232,7 @@ public class MapsFragment extends Fragment implements
             @Override
             public void onVisibleItemChanged(final int previous, final int current) {
                 mMarkerManager.selectMarkerAt(current);
-                if ((markerCounter % 10 == 0 && mUserProfile != null) || (mContentRetriever.size() <= PAGE_LENGTH * 3 && current == 0)) {
+                if (markerCounter % 10 == 0 || (mContentRetriever.size() <= PAGE_LENGTH * 3 && current == 0)) {
                     markerCounter = 0;
                     centerMapOnVisibleMarkers();
                 }
@@ -369,19 +372,44 @@ public class MapsFragment extends Fragment implements
     }
 
     private void loadNewPageMarkers(final int pageLength) {
-        mainThreadHandler.post(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                int size = mContentRetriever.size();
+                final int size = mContentRetriever.size();
                 List<Content> contentList = mContentRetriever.getList();
                 contentList = contentList.subList(Math.max(size - pageLength, 0), size);
+                final CountDownLatch latch = new CountDownLatch(contentList.size());
 
                 for (int i = 0; i < contentList.size(); i++) {
-                    Content c = contentList.get(i);
-                    mMarkerManager.addMarker("" + (size - pageLength + i + 1), c);
+                    final Content c = contentList.get(i);
+                    final String name = "" + (size - pageLength + i + 1);
+                    mainThreadHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mMarkerManager.addMarker(name, c, new MarkerManager.OnMarkerAddListener() {
+                                @Override
+                                public void onMarkerAdd() {
+                                    latch.countDown();
+                                }
+                            });
+                        }
+                    });
                 }
+
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+
+                }
+
+                mainThreadHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        centerMapOnVisibleMarkers();
+                    }
+                });
             }
-        });
+        }).start();
     }
 
     private void loadContentNearLocation(CameraPosition cameraPosition) {
@@ -452,8 +480,9 @@ public class MapsFragment extends Fragment implements
         }
     }
 
-
-    public interface MapCloseListener {
+    public interface MapOpenCloseListener {
         void onMapClose();
+
+        void onMapOpen();
     }
 }
