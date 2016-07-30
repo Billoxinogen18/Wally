@@ -517,7 +517,7 @@ public class TangoManager implements LocalizationListener {
             }
         }
         if (success){
-            mAnalytics.logLocalizationTimeForAdf(currentAdf.getUuid(), System.currentTimeMillis() - timeForAdfLocalization);
+            mAnalytics.logLocalizationTimeForAdf("NAN", System.currentTimeMillis() - timeForAdfLocalization);
         }
     }
 }
