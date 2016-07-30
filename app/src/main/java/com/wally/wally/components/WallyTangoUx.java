@@ -9,7 +9,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.atap.tango.ux.TangoUx;
@@ -47,30 +46,26 @@ public class WallyTangoUx extends TangoUx {
     }
 
     public void showCustomMessage(final String message, long time){
-        if(!mTextView.getText().equals(message) || mTextView.getVisibility() != View.VISIBLE){
-            mMainThreadHandler.removeCallbacks(hideMessageRunnable);
-            mMainThreadHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mTextView.setText(message);
-                    mTextView.setVisibility(View.VISIBLE);
-                }
-            });
-            mMainThreadHandler.postDelayed(hideMessageRunnable, time);
-        }
+        mMainThreadHandler.removeCallbacks(hideMessageRunnable);
+        mMainThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mTextView.setText(message);
+                mTextView.setVisibility(View.VISIBLE);
+            }
+        });
+        mMainThreadHandler.postDelayed(hideMessageRunnable, time);
     }
 
     public void showCustomMessage(final String message){
-        if(!mTextView.getText().equals(message) || mTextView.getVisibility() != View.VISIBLE){
-            mMainThreadHandler.removeCallbacks(hideMessageRunnable);
-            mMainThreadHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    mTextView.setText(message);
-                    mTextView.setVisibility(View.VISIBLE);
-                }
-            });
-        }
+        mMainThreadHandler.removeCallbacks(hideMessageRunnable);
+        mMainThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mTextView.setText(message);
+                mTextView.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     public void hideCustomMessage(){

@@ -166,6 +166,7 @@ public class TangoManager implements LocalizationListener {
     private void prepareForLearning() {
         mAdfScheduler.finish();
         mIsLearningMode = true;
+        mIsReadyToSaveAdf = false;
         mLearningEvaluator.addLearningEvaluatorListener(new LearningEvaluator.LearningEvaluatorListener() {
             @Override
             public void onLearningFinish() {
@@ -474,12 +475,11 @@ public class TangoManager implements LocalizationListener {
         String msg;
         if (mIsLearningMode) {
             msg = mConfig.getString(TMConstants.LOCALIZATION_LOST_IN_LEARNING);
-            mTangoUx.showCustomMessage(msg, 1000);
             mLearningEvaluator.stop();
         } else {
             msg = mConfig.getString(TMConstants.LOCALIZATION_LOST);
-            mTangoUx.showCustomMessage(msg);
         }
+        mTangoUx.showCustomMessage(msg);
     }
 
     public AdfInfo getCurrentAdf() {
