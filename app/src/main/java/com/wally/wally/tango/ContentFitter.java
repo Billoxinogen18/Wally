@@ -117,7 +117,9 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         //mVisualContentManager.setActiveContentAdded();
         // TODO here we might lost localization (Theoretically possible)
         mVisualContentManager.setActiveContentFinishFitting();
-        //mVisualContentManager.removePendingActiveContent();
+        if(mVisualContentManager.isActiveContent()) {
+            mVisualContentManager.removePendingActiveContent();
+        }
         cancel(true);
     }
 
