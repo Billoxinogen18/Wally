@@ -10,14 +10,14 @@ idea {
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24"
+    buildToolsVersion "24.0.1"
 
     defaultConfig {
         applicationId "com.wally.wally"
         minSdkVersion 19
         targetSdkVersion 24
-        versionCode 2
-        versionName "0.0.1 alpha"
+        versionCode 3
+        versionName "0.1.0 Beta"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -30,8 +30,8 @@ android {
 
     buildTypes {
         release {
-            shrinkResources true
-            minifyEnabled true
+            shrinkResources false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

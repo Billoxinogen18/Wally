@@ -58,7 +58,6 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:onClick="onAreaUpdateClick"
             android:src="@drawable/ic_sync_black_24dp"
             app:backgroundTint="@android:color/background_light"
             app:fabSize="mini" />
@@ -69,7 +68,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:onClick="onMyLocationClick"
             android:src="@drawable/ic_my_location_black_24dp" />
     </RelativeLayout>
 
@@ -103,7 +101,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:onClick="onBtnCameraClick"
                 android:padding="8dp"
                 android:src="@drawable/ic_arrow_back_white_24dp" />
 
