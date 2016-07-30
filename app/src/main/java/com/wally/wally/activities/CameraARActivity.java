@@ -45,6 +45,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     private static final int REQUEST_CODE_MY_LOCATION = 22;
     protected DataController mDataController;
     protected GoogleApiClient mGoogleApiClient;
+    protected WallyAnalytics mAnalytics;
     private RajawaliSurfaceView mRajawaliView;
     private UserManager mUserManager;
     private SelectedMenuView mSelectedMenuView;
@@ -52,14 +53,10 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     private Content mSelectedContent; //TODO may be needed to remove
     private Content mContentToSave;
     private long mNewContentButtonLastClickTime;
-
     private View mNewContentButton;
     private View mMapButton;
     private View mProfileBar;
     private View mWaterMark;
-
-    protected WallyAnalytics mAnalytics;
-
 
     public abstract void onDeleteContent(Content selectedContent);
 
@@ -241,7 +238,7 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
     }
 
     public void onProfileClick(SocialUser user, boolean type) {
-        if (type){
+        if (type) {
             mAnalytics.onButtonClick("My_Profile");
         } else {
             mAnalytics.onButtonClick("Some_Profile");
@@ -289,7 +286,11 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
         MapsFragment mf = MapsFragment.newInstance(user);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
+        transaction.setCustomAnimations(
+                android.R.anim.fade_in,
+                android.R.anim.fade_out,
+                android.R.anim.fade_in,
+                android.R.anim.fade_out);
         // Replace whatever is in the fragment_container view with this fragment,
         // and add the transaction to the back stack so the user can navigate back
         transaction.replace(R.id.fragment_container, mf);
