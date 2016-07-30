@@ -88,16 +88,15 @@ public class WallyTangoUx extends TangoUx {
         mTextView.setPadding(50,50,50,50);
         mTextView.setGravity(Gravity.CENTER);
         mTextView.setBackgroundResource(R.color.uxOverlayBackgroundColor);
-        mTextView.setTextColor(Color.BLACK);
+        mTextView.setTextColor(Color.WHITE);
         mTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 34);
         mTextView.setVisibility(View.GONE);
-        ViewGroup parent = (ViewGroup)tangoUxLayout.getParent();
 
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
 
-        parent.addView(mTextView, params);
+        tangoUxLayout.addView(mTextView, params);
     }
 
 
