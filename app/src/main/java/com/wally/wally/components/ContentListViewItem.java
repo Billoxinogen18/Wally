@@ -13,6 +13,7 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -76,13 +77,11 @@ public class ContentListViewItem extends LinearLayout {
         mContentPositionVIew = new TextView(getContext());
         mContentPositionVIew.setTextColor(Color.WHITE);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Utils.dpToPx(getContext(), 30),
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(
-                Utils.dpToPx(getContext(), 8),
-                Utils.dpToPx(getContext(), 28),
-                Utils.dpToPx(getContext(), 12), 0);
+        lp.setMargins(0, Utils.dpToPx(getContext(), 28), Utils.dpToPx(getContext(), 8), 0);
         mContentPositionVIew.setLayoutParams(lp);
+        mContentPositionVIew.setGravity(Gravity.CENTER);
         addView(mContentPositionVIew, 0);
 
         mUserInfoView.setOnClickListener(new View.OnClickListener() {
