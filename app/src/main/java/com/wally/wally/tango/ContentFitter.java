@@ -1,6 +1,7 @@
 package com.wally.wally.tango;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.Pose;
@@ -20,6 +21,7 @@ import org.rajawali3d.math.vector.Vector3;
  * Created by ioane5 on 4/26/16.
  */
 public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
+    private static final String TAG = ContentFitter.class.getSimpleName();
 
     private TangoManager mTangoManager;
     private Content mContent;
@@ -28,6 +30,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     private VisualContentManager mVisualContentManager;
 
     public ContentFitter(Content content, TangoManager tangoManager, VisualContentManager visualContentManager, OnContentFitListener fittingStatusListener) {
+        Log.d(TAG, "ContentFitter() called with: " + "content = [" + content + "], tangoManager = [" + tangoManager + "], visualContentManager = [" + visualContentManager + "], fittingStatusListener = [" + fittingStatusListener + "]");
         mContent = content;
         mTangoManager = tangoManager;
         mVisualContentManager = visualContentManager;
@@ -99,6 +102,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     @Override
     protected void onCancelled() {
         super.onCancelled();
+        Log.d(TAG, "onCancelled()");
         if(mVisualContentManager.isActiveContent()) {
             mVisualContentManager.removePendingActiveContent();
         }
@@ -112,14 +116,15 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     }
 
     public void finishFitting() {
+        Log.d(TAG, "finishFitting()");
         // Order of this calls matter!!!
         mFittingStatusListener.onContentFittingFinished(getContent());
         //mVisualContentManager.setActiveContentAdded();
         // TODO here we might lost localization (Theoretically possible)
         mVisualContentManager.setActiveContentFinishFitting();
-        if(mVisualContentManager.isActiveContent()) {
-            mVisualContentManager.removePendingActiveContent();
-        }
+//        if(mVisualContentManager.isActiveContent()) {
+//            mVisualContentManager.removePendingActiveContent();
+//        }
         cancel(true);
     }
 

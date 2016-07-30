@@ -411,7 +411,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 mFinishFittingFab.setEnabled(true);
                 if (!mTangoManager.isLearningMode()) {
                     mCreateNewContent.setVisibility(View.VISIBLE);
-                    fetchContentForAdf(getBaseContext(), mTangoManager.getCurrentAdf().getUuid());
+                    if (!mVisualContentManager.getStaticVisualContentToAdd().hasNext()) {
+                        fetchContentForAdf(getBaseContext(), mTangoManager.getCurrentAdf().getUuid());
+                    }
                 }
                 setLocalizationLocation();
             }

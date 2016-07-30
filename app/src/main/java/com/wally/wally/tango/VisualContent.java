@@ -96,4 +96,11 @@ public class VisualContent {
 
     public enum RenderStatus {None, PendingRender, PendingRemove, Rendered}
 
+    @Override
+    public boolean equals(Object o){
+        VisualContent v = (VisualContent) o;
+
+        return v.getContent().getId().equals(mContent.getId());
+    }
+
 }
