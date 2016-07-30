@@ -27,7 +27,6 @@ public class SelectedMenuView extends RelativeLayout {
     private View mContentControlPanel;
 
     private Content mSelectedContent;
-    private SocialUser mContentAuthor;
     private OnSelectedMenuActionListener mOnSelectedMenuActionListener;
 
 
@@ -57,7 +56,6 @@ public class SelectedMenuView extends RelativeLayout {
     }
 
     public void setContent(Content content, GoogleApiClient googleApiClient) {
-        mContentAuthor = null;
         if (content != null) {
             mSelectedContent = content;
             mUserInfoView.loadAndSetUser(
@@ -109,7 +107,7 @@ public class SelectedMenuView extends RelativeLayout {
             @Override
             public void onClick(View v) {
                 if (mOnSelectedMenuActionListener != null) {
-                    mOnSelectedMenuActionListener.onProfileClick(mContentAuthor, false);
+                    mOnSelectedMenuActionListener.onProfileClick(mUserInfoView.getUser(), false);
                 }
             }
         });
