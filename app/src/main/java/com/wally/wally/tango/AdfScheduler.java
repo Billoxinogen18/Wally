@@ -8,6 +8,7 @@ import com.wally.wally.datacontroller.callbacks.Callback;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class AdfScheduler extends Thread {
     public static final String TAG = AdfScheduler.class.getSimpleName();
@@ -60,12 +61,14 @@ public class AdfScheduler extends Thread {
     @Override
     public void run() {
         while (!done && !isInterrupted()) {
+            final CountDownLatch latch = new CountDownLatch(1);
             Log.d(TAG, "AdfScheduler: ");
             mAdfManager.getAdf(new Callback<AdfInfo>() {
                 @Override
                 public void onResult(AdfInfo result) {
                     if (done || isInterrupted()) return;
                     fireSuccess(result);
+                    latch.countDown();
                 }
                 @Override
                 public void onError(Exception e) {
@@ -73,6 +76,7 @@ public class AdfScheduler extends Thread {
                 }
             });
             try {
+                latch.await();
                 Thread.sleep(timeout);
             } catch (InterruptedException e) {
                 break;
