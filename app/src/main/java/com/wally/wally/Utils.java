@@ -42,16 +42,12 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.atap.tangoservice.Tango;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.wally.wally.datacontroller.adf.AdfSyncInfo;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -326,30 +322,6 @@ public final class Utils {
 
     public static String getAdfFilePath(String uuid) {
         return getAdfFilesFolder() + "/" + uuid;
-    }
-
-    /**
-     * Sorts Adf list with respect to location.
-     */
-    public static void sortWithLocation(ArrayList<AdfSyncInfo> list, final SerializableLatLng location) {
-        Collections.sort(list, new Comparator<AdfSyncInfo>() {
-            @Override
-            public int compare(AdfSyncInfo one, AdfSyncInfo two) {
-                SerializableLatLng loc1 = one.getAdfMetaData().getLatLng();
-                SerializableLatLng loc2 = two.getAdfMetaData().getLatLng();
-
-                float[] result1 = new float[3];
-                float[] result2 = new float[3];
-
-                Location.distanceBetween(loc1.getLatitude(), loc1.getLongitude(), location.getLatitude(), location.getLongitude(), result1);
-                Location.distanceBetween(loc2.getLatitude(), loc2.getLongitude(), location.getLatitude(), location.getLongitude(), result2);
-
-                Float distance1 = result1[0];
-                Float distance2 = result2[0];
-
-                return distance1.compareTo(distance2);
-            }
-        });
     }
 
 
