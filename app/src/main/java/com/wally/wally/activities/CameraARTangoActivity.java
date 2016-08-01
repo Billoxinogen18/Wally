@@ -221,7 +221,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     @Override
     public void onSaveContent(Content content) {
         AdfInfo adfInfo = mTangoManager.getCurrentAdf();
-        content.withUuid(adfInfo.withLocation(mLocalizationLocation).getUuid());
+        content.withUuid(adfInfo.withCreationLocation(mLocalizationLocation).getUuid());
         if (!adfInfo.isUploaded()) requestExportPermission(adfInfo);
     }
 
@@ -234,7 +234,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     @Override
     public void onPermissionGranted(AdfInfo adfInfo) {
         startUploadingAdf(adfInfo);
-        adfInfo.withUploaded(true);
+        adfInfo.withUploadedStatus(true);
     }
 
     @Override
@@ -371,7 +371,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
             Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
                 @Override
                 public void onResult(SerializableLatLng result) {
-                    adfInfo.withLocation(result);
+                    adfInfo.withCreationLocation(result);
                     Utils.getAddressForLocation(CameraARTangoActivity.this, result, new Callback<String>() {
                         @Override
                         public void onResult(String address) {

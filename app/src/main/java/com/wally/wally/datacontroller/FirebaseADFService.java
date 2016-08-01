@@ -148,7 +148,7 @@ public class FirebaseAdfService implements AdfService {
         return new AdfInfo()
                 .withName(snapshot.child("name").getValue(String.class))
                 .withUuid(snapshot.child("uuid").getValue(String.class))
-                .withLocation(
+                .withCreationLocation(
                         new SerializableLatLng(
                             snapshot.child("location/latitude").getValue(Double.class),
                             snapshot.child("location/longitude").getValue(Double.class))

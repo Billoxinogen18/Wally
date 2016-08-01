@@ -5,14 +5,12 @@ import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import java.io.Serializable;
 
 public class AdfInfo implements Serializable {
+    private String name;
     private String path;
     private String uuid;
-    private String name;
     private boolean isImported;
     private boolean isUploaded;
     private SerializableLatLng creationLocation;
-
-    public AdfInfo() {}
 
     public AdfInfo withName(String name) {
         this.name = name;
@@ -29,19 +27,19 @@ public class AdfInfo implements Serializable {
         return this;
     }
 
-    public AdfInfo withLocation(SerializableLatLng location) {
-        this.creationLocation = location;
-        return this;
-    }
-
-    public AdfInfo withUploaded(boolean uploaded) {
-        this.isUploaded = uploaded;
+    public AdfInfo withUploadedStatus(boolean status) {
+        this.isUploaded = status;
         return this;
     }
 
     @SuppressWarnings("unused")
     public AdfInfo withImportedStatus(boolean status) {
         this.isImported = status;
+        return this;
+    }
+
+    public AdfInfo withCreationLocation(SerializableLatLng location) {
+        this.creationLocation = location;
         return this;
     }
 

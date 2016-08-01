@@ -208,8 +208,8 @@ public class TangoManager implements LocalizationListener {
                 .withName(uuid)
                 .withUuid(uuid)
                 .withPath(null)
-                .withLocation(null)
-                .withUploaded(true);
+                .withCreationLocation(null)
+                .withUploadedStatus(true);
         savedAdf = info;
         currentAdf = info;
         mIsReadyToSaveAdf = false;

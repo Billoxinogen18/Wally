@@ -33,7 +33,7 @@ public class AdfManager {
         final AdfInfo info = queue.next();
         final String uuid = info.getUuid();
         final String path = Utils.getAdfFilePath(uuid);
-        info.withPath(path).withUploaded(true);
+        info.withPath(path).withUploadedStatus(true);
         adfService.download(path, uuid, new Callback<Void>() {
             @Override
             public void onResult(Void result) {
