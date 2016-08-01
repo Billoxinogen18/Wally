@@ -67,7 +67,7 @@ public class TangoManager implements LocalizationListener {
     private boolean mIsLearningMode;
     private boolean mIsReadyToSaveAdf;
 
-    private Thread mlocalizationWatchdog;
+    private Thread mLocalizationWatchdog;
 
     public TangoManager(
             Config config,
@@ -204,12 +204,7 @@ public class TangoManager implements LocalizationListener {
         Log.d(TAG, "saveAdf() called with: " + "");
         String uuid = mTango.saveAreaDescription();
         mIsLearningMode = false;
-        AdfInfo info = new AdfInfo()
-                .withName(uuid)
-                .withUuid(uuid)
-                .withPath(null)
-                .withCreationLocation(null)
-                .withUploadedStatus(true);
+        AdfInfo info = new AdfInfo().withUuid(uuid);
         savedAdf = info;
         currentAdf = info;
         mIsReadyToSaveAdf = false;
@@ -230,7 +225,7 @@ public class TangoManager implements LocalizationListener {
     }
 
     private void startLocalizationWatchDog() {
-        mlocalizationWatchdog = new Thread(new Runnable() {
+        mLocalizationWatchdog = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -244,7 +239,7 @@ public class TangoManager implements LocalizationListener {
                 onResume();
             }
         });
-        mlocalizationWatchdog.start();
+        mLocalizationWatchdog.start();
     }
 
     private void localizeWithLearnedAdf(final AdfInfo adf) {
@@ -455,8 +450,8 @@ public class TangoManager implements LocalizationListener {
     public void localized() {
         Log.d(TAG, "localized() called with: " + "");
 
-        if (mlocalizationWatchdog != null) {
-            mlocalizationWatchdog.interrupt();
+        if (mLocalizationWatchdog != null) {
+            mLocalizationWatchdog.interrupt();
         }
 
         mIsLocalized = true;
@@ -504,7 +499,7 @@ public class TangoManager implements LocalizationListener {
     private long timeForAdfLocalization;
 
     enum LocalizationState{
-        NONE, AFTER_LEARNING, AFTER_ON_RESUME, AFTER_DOWNLOAD;
+        NONE, AFTER_LEARNING, AFTER_ON_RESUME, AFTER_DOWNLOAD
     }
 
     private void logLocalization(boolean success){
