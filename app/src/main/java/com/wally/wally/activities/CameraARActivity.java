@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -36,7 +37,7 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 import java.util.Date;
 import java.util.List;
 
-public abstract class CameraARActivity extends GoogleApiClientActivity implements
+public abstract class CameraARActivity extends AppCompatActivity implements
         OnVisualContentSelectedListener,
         NewContentDialogFragment.NewContentDialogListener,
         SelectedMenuView.OnSelectedMenuActionListener,
@@ -90,7 +91,6 @@ public abstract class CameraARActivity extends GoogleApiClientActivity implement
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
 //                .enableAutoManage(this, this)
-                .addOnConnectionFailedListener(this)
                 .addScope(Plus.SCOPE_PLUS_LOGIN)
                 .addScope(Plus.SCOPE_PLUS_PROFILE)
                 .addApi(Plus.API)

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
@@ -35,7 +36,7 @@ import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.UserManager;
 
-public class LoginActivity extends GoogleApiClientActivity implements
+public class LoginActivity extends AppCompatActivity implements
         UserManager.UserLoadListener,
         GoogleApiClient.ConnectionCallbacks {
 
@@ -216,7 +217,7 @@ public class LoginActivity extends GoogleApiClientActivity implements
                 .build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this, this)
+                .enableAutoManage(this, null)
                 .addConnectionCallbacks(this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .addApi(Plus.API)
