@@ -1,7 +1,6 @@
-package com.wally.wally.datacontroller.adf;
+package com.wally.wally.datacontroller;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -12,6 +11,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.adf.ADFService;
+import com.wally.wally.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;

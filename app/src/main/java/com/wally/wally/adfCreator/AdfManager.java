@@ -1,8 +1,8 @@
 package com.wally.wally.adfCreator;
 
 import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.adf.ADFService;
-import com.wally.wally.datacontroller.adf.AdfMetaData;
+import com.wally.wally.adf.ADFService;
+import com.wally.wally.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 

@@ -28,7 +28,7 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adfCreator.AdfManager;
-import com.wally.wally.datacontroller.adf.ADFService;
+import com.wally.wally.adf.ADFService;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;

@@ -3,7 +3,7 @@ package com.wally.wally.datacontroller;
 import android.util.Log;
 
 import com.google.firebase.database.DatabaseReference;
-import com.wally.wally.datacontroller.adf.AdfMetaData;
+import com.wally.wally.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;

@@ -1,4 +1,4 @@
-package com.wally.wally.datacontroller.adf;
+package com.wally.wally.adf;
 
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;

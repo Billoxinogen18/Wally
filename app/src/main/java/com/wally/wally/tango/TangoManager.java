@@ -20,7 +20,7 @@ import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TMConstants;
-import com.wally.wally.datacontroller.adf.AdfMetaData;
+import com.wally.wally.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
 
 import org.rajawali3d.math.Quaternion;
