@@ -9,7 +9,7 @@ import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.wally.wally.adf.ADFService;
+import com.wally.wally.adf.AdfService;
 import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
@@ -30,7 +30,7 @@ public class DataController {
     private static DataController instance;
 
     private StorageReference storage;
-    private FirebaseADFService adfService;
+    private FirebaseAdfService adfService;
     private DatabaseReference contents, rooms;
     private UserManager userManager;
     private ContentManager contentManager;
@@ -175,9 +175,9 @@ public class DataController {
         });
     }
 
-    public ADFService getADFService() {
+    public AdfService getADFService() {
         if (adfService == null) {
-            adfService = new FirebaseADFService(rooms, storage);
+            adfService = new FirebaseAdfService(rooms, storage);
         }
         return adfService;
     }

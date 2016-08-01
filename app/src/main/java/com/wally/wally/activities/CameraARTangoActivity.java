@@ -29,7 +29,7 @@ import com.wally.wally.adf.AdfManager;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.config.CTAConstants;
 import com.wally.wally.config.Config;
-import com.wally.wally.adf.ADFService;
+import com.wally.wally.adf.AdfService;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
@@ -368,7 +368,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
      * Note that we only sync when localized.
      */
     private void startUploadingAdf(final AdfInfo adfInfo) {
-        final ADFService s = App.getInstance().getDataController().getADFService();
+        final AdfService s = App.getInstance().getDataController().getADFService();
 
         if (Utils.checkLocationPermission(this) && mGoogleApiClient.isConnected()) {
             Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {

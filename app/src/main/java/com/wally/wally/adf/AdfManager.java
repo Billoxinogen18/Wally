@@ -9,11 +9,11 @@ import java.util.Iterator;
 import java.util.List;
 
 public class AdfManager {
-    private ADFService adfService;
+    private AdfService adfService;
     private List<AdfMetaData> metadatas;
     private Iterator<AdfMetaData> queue;
 
-    public AdfManager(ADFService adfService) {
+    public AdfManager(AdfService adfService) {
         this.adfService = adfService;
         this.metadatas = new ArrayList<>();
         this.queue = metadatas.iterator();
@@ -51,7 +51,7 @@ public class AdfManager {
         });
     }
 
-    public static void createWithLocation(SerializableLatLng location, final ADFService adfService,
+    public static void createWithLocation(SerializableLatLng location, final AdfService adfService,
                                           final Callback<AdfManager> callback){
         adfService.searchADfMetaDataNearLocation(location, new Callback<List<AdfMetaData>>() {
             @Override

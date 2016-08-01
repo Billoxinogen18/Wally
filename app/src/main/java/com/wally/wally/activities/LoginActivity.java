@@ -28,7 +28,7 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfManager;
-import com.wally.wally.adf.ADFService;
+import com.wally.wally.adf.AdfService;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
@@ -168,7 +168,7 @@ public class LoginActivity extends GoogleApiClientActivity implements
         Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
             @Override
             public void onResult(SerializableLatLng result) {
-                ADFService as = App.getInstance().getDataController().getADFService();
+                AdfService as = App.getInstance().getDataController().getADFService();
                 AdfManager.createWithLocation(result, as, new Callback<AdfManager>() {
                     @Override
                     public void onResult(AdfManager result) {

@@ -11,7 +11,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
-import com.wally.wally.adf.ADFService;
+import com.wally.wally.adf.AdfService;
 import com.wally.wally.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
@@ -27,12 +27,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FirebaseADFService implements ADFService {
+public class FirebaseAdfService implements AdfService {
     public static final double SEARCH_RADIUS_M = 50;
     private final DatabaseReference db;
     private final StorageReference storage;
 
-    public FirebaseADFService(DatabaseReference db, StorageReference storage) {
+    public FirebaseAdfService(DatabaseReference db, StorageReference storage) {
         this.db = db;
         this.storage = storage.child("ADFs");
     }

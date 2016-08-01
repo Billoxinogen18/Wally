@@ -5,7 +5,7 @@ import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.util.List;
 
-public interface ADFService {
+public interface AdfService {
 
     /**
      * Download Adf file using provided UUID
