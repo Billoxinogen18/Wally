@@ -37,10 +37,11 @@ public class AdfManager {
             @Override
             public void onResult(Void result) {
                 AdfInfo info = new AdfInfo()
+                        .withName(metadata.getName())
+                        .withLocation(metadata.getLatLng())
                         .withUuid(uuid)
                         .withPath(path)
-                        .withUploaded(true)
-                        .withMetaData(metadata);
+                        .withUploaded(true);
                 callback.onResult(info);
             }
 

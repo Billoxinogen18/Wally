@@ -27,16 +27,16 @@ public interface AdfService {
 
     /**
      *
-     * @deprecated use {@link #upload(String, AdfMetaData)} instead.
+     * @deprecated use {@link #upload(String, AdfInfo)} instead.
      */
     @Deprecated
-    void upload(String path, AdfMetaData adfMetaData, Callback<Void> callback);
+    void upload(String path, AdfInfo info, Callback<Void> callback);
 
     /**
      * Uploads adf with it's meta data to server
      *
      * @param path        path of adf on local disk
-     * @param adfMetaData Adf data that contains uuid, name and location
+     * @param info Adf data that contains uuid, name and location
      */
-    void upload(String path, AdfMetaData adfMetaData);
+    void upload(String path, AdfInfo info);
 }

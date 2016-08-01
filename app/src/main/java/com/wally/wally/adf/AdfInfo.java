@@ -1,21 +1,22 @@
 package com.wally.wally.adf;
 
+import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.io.Serializable;
 
 public class AdfInfo implements Serializable {
     private String path;
     private String uuid;
-    private AdfMetaData adfMetaData;
+    private String name;
+    private boolean isImported;
     private boolean isUploaded;
+    private SerializableLatLng creationLocation;
 
-    public AdfInfo() {
+    public AdfInfo() {}
 
-    }
-
-    public AdfInfo(AdfInfo other) {
-        this.path = other.path;
-        this.uuid = other.uuid;
+    public AdfInfo withName(String name) {
+        this.name = name;
+        return this;
     }
 
     public AdfInfo withUuid(String uuid) {
@@ -28,14 +29,24 @@ public class AdfInfo implements Serializable {
         return this;
     }
 
-    public AdfInfo withMetaData(AdfMetaData adfMetaData) {
-        this.adfMetaData = adfMetaData;
+    public AdfInfo withLocation(SerializableLatLng location) {
+        this.creationLocation = location;
         return this;
     }
 
     public AdfInfo withUploaded(boolean uploaded) {
         this.isUploaded = uploaded;
         return this;
+    }
+
+    @SuppressWarnings("unused")
+    public AdfInfo withImportedStatus(boolean status) {
+        this.isImported = status;
+        return this;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getPath() {
@@ -46,22 +57,22 @@ public class AdfInfo implements Serializable {
         return uuid;
     }
 
+    @SuppressWarnings("unused")
     public boolean isImported() {
-        return true;
-    }
-
-    public AdfMetaData getMetaData() {
-        return adfMetaData;
+        return isImported;
     }
 
     public boolean isUploaded() {
         return isUploaded;
     }
 
+    public SerializableLatLng getCreationLocation() {
+        return creationLocation;
+    }
+
     @Override
     public String toString() {
         return "path: " + path + "; " +
-                "uuid: " + uuid + "; " +
-                "AdfMetaData: " + adfMetaData + ".";
+                "uuid: " + uuid + "; ";
     }
 }

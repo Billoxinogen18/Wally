@@ -11,6 +11,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfService;
 import com.wally.wally.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
@@ -109,17 +110,17 @@ public class FirebaseAdfService implements AdfService {
      */
     @Override
     @Deprecated
-    public void upload(String path, final AdfMetaData adfMetaData, final Callback<Void> callback) {
-        upload(path, adfMetaData);
+    public void upload(String path, final AdfInfo info, final Callback<Void> callback) {
+        upload(path, info);
         callback.onResult(null);
     }
 
     @Override
-    public void upload(String path, final AdfMetaData adfMetaData) {
-        FirebaseDAL.uploadFile(storage, path, adfMetaData.getUuid(), new Callback<String>() {
+    public void upload(String path, final AdfInfo info) {
+        FirebaseDAL.uploadFile(storage, path, info.getUuid(), new Callback<String>() {
             @Override
             public void onResult(String result) {
-                saveMetaData(adfMetaData);
+                saveMetaData(info);
             }
 
             @Override
@@ -129,14 +130,14 @@ public class FirebaseAdfService implements AdfService {
         });
     }
 
-    private void saveMetaData(AdfMetaData obj) {
-        SerializableLatLng l = obj.getLatLng();
+    private void saveMetaData(AdfInfo obj) {
+        SerializableLatLng l = obj.getCreationLocation();
         String hash = new GeoHash(l.getLatitude(), l.getLongitude()).getGeoHashString();
         db.child(obj.getUuid()).updateChildren(toFirebaseObject(obj).put("hash", hash));
     }
 
-    private FirebaseObject toFirebaseObject(AdfMetaData obj) {
-        SerializableLatLng l = obj.getLatLng();
+    private FirebaseObject toFirebaseObject(AdfInfo obj) {
+        SerializableLatLng l = obj.getCreationLocation();
         return new FirebaseObject()
                 .put("name", obj.getName())
                 .put("uuid", obj.getUuid())

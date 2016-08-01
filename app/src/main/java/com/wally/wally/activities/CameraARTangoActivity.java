@@ -221,10 +221,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     @Override
     public void onSaveContent(Content content) {
         AdfInfo adfInfo = mTangoManager.getCurrentAdf();
-
-        adfInfo.getMetaData().setLatLng(mLocalizationLocation);
-
-        content.withUuid(adfInfo.getUuid());
+        content.withUuid(adfInfo.withLocation(mLocalizationLocation).getUuid());
         if (!adfInfo.isUploaded()) requestExportPermission(adfInfo);
     }
 
@@ -374,29 +371,29 @@ public class CameraARTangoActivity extends CameraARActivity implements
             Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
                 @Override
                 public void onResult(SerializableLatLng result) {
-                    adfInfo.getMetaData().setLatLng(result);
+                    adfInfo.withLocation(result);
                     Utils.getAddressForLocation(CameraARTangoActivity.this, result, new Callback<String>() {
                         @Override
                         public void onResult(String address) {
-                            adfInfo.getMetaData().setName(address);
-                            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
+                            adfInfo.withName(address);
+                            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo);
                         }
 
                         @Override
                         public void onError(Exception e) {
-                            adfInfo.getMetaData().setName(null);
-                            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
+                            adfInfo.withName(null);
+                            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo);
                         }
                     });
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
+                    s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo);
                 }
             });
         } else {
-            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo.getMetaData());
+            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo);
         }
     }
 
