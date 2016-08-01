@@ -275,9 +275,6 @@ public final class Utils {
 
 
     public static double getRadius(LatLng center, LatLng northEast) {
-        SerializableLatLng c = SerializableLatLng.fromLatLng(center);
-        SerializableLatLng ne = SerializableLatLng.fromLatLng(northEast);
-
         // r = radius of the earth in statute miles
         double r = 3963.0;
 

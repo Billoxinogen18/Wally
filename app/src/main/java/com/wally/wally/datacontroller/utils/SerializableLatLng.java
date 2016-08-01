@@ -1,10 +1,5 @@
 package com.wally.wally.datacontroller.utils;
 
-import android.support.annotation.Nullable;
-
-
-import com.mapbox.mapboxsdk.geometry.LatLng;
-
 import java.io.Serializable;
 
 /**
@@ -26,24 +21,6 @@ public class SerializableLatLng implements Serializable {
 
     public double getLongitude(){
         return lng;
-    }
-
-    public static
-    @Nullable
-    LatLng toLatLng(@Nullable SerializableLatLng ll) {
-        if (ll == null) {
-            return null;
-        }
-        return new LatLng(ll.lat, ll.lng);
-    }
-
-    public static
-    @Nullable
-    SerializableLatLng fromLatLng(@Nullable LatLng ll) {
-        if (ll == null) {
-            return null;
-        }
-        return new SerializableLatLng(ll.getLatitude(), ll.getLongitude());
     }
 
     @Override
