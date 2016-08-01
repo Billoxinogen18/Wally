@@ -52,15 +52,10 @@ public class DataController {
         return this;
     }
 
-    public DataController(DatabaseReference database,
-                          StorageReference storage) {
+    public DataController(DatabaseReference database, StorageReference storage) {
         this.storage = storage;
         contents = database.child(Config.CONTENTS_NODE);
         rooms = database.child(Config.ROOMS_NODE);
-
-        // Debug calls will be deleted in the end
-//        DebugUtils.refreshContents(contents.getParent(), this);
-        DebugUtils.sanityCheck(this);
     }
 
     public static DataController create() {
