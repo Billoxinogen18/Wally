@@ -1,4 +1,4 @@
-package com.wally.wally.adfCreator;
+package com.wally.wally.deprecatedAdfCreator;
 
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
@@ -17,6 +17,7 @@ import javax.microedition.khronos.opengles.GL10;
  * Created by Meravici on 7/8/2016. yea
  */
 @SuppressWarnings("FieldCanBeLocal")
+@Deprecated
 public class AdfCreatorRenderer implements GLSurfaceView.Renderer {
     private static final String TAG = AdfCreatorActivity.class.getSimpleName();
 

@@ -1,4 +1,4 @@
-package com.wally.wally.adfCreator;
+package com.wally.wally.deprecatedAdfCreator;
 
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +27,7 @@ import com.wally.wally.components.WallyTangoUx;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Deprecated
 public class AdfCreatorActivity extends AppCompatActivity implements SetAdfNameDialog.CallbackListener,
         SaveAdfTask.SaveAdfListener {
 

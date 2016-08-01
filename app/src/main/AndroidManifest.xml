@@ -53,7 +53,6 @@
 
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
 
-        <activity android:name=".adfCreator.AdfCreatorActivity"></activity>
     </application>
 
 </manifest>

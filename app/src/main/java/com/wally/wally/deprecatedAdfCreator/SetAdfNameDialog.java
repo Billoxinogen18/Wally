@@ -1,4 +1,4 @@
-package com.wally.wally.adfCreator;
+package com.wally.wally.deprecatedAdfCreator;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -17,6 +17,7 @@ import com.wally.wally.R;
 /**
  * Created by Meravici on 7/8/2016. yea
  */
+@Deprecated
 public class SetAdfNameDialog extends DialogFragment {
 
     public static final String TAG = SetAdfNameDialog.class.getSimpleName();

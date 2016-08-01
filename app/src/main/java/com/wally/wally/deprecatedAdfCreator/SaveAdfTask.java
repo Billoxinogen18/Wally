@@ -1,4 +1,4 @@
-package com.wally.wally.adfCreator;
+package com.wally.wally.deprecatedAdfCreator;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -11,6 +11,7 @@ import com.google.atap.tangoservice.TangoInvalidException;
 /**
  * Created by Meravici on 7/8/2016. yea
  */
+@Deprecated
 public class SaveAdfTask extends AsyncTask<Void, Integer, String> {
 
     /**
