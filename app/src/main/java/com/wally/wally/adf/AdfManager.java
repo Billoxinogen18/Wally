@@ -10,8 +10,8 @@ import java.util.List;
 
 public class AdfManager {
     private AdfService adfService;
-    private List<AdfMetaData> metadatas;
-    private Iterator<AdfMetaData> queue;
+    private List<AdfInfo> metadatas;
+    private Iterator<AdfInfo> queue;
 
     public AdfManager(AdfService adfService) {
         this.adfService = adfService;
@@ -19,8 +19,8 @@ public class AdfManager {
         this.queue = metadatas.iterator();
     }
 
-    private void addMetadata(AdfMetaData d) {
-        metadatas.add(d);
+    private void addAdfInfo(AdfInfo info) {
+        metadatas.add(info);
         queue = metadatas.iterator();
     }
 
@@ -30,18 +30,13 @@ public class AdfManager {
             queue = metadatas.iterator();
             return;
         }
-        final AdfMetaData metadata = queue.next();
-        final String uuid = metadata.getUuid();
+        final AdfInfo info = queue.next();
+        final String uuid = info.getUuid();
         final String path = Utils.getAdfFilePath(uuid);
+        info.withPath(path).withUploaded(true);
         adfService.download(path, uuid, new Callback<Void>() {
             @Override
             public void onResult(Void result) {
-                AdfInfo info = new AdfInfo()
-                        .withName(metadata.getName())
-                        .withLocation(metadata.getLatLng())
-                        .withUuid(uuid)
-                        .withPath(path)
-                        .withUploaded(true);
                 callback.onResult(info);
             }
 
@@ -54,12 +49,12 @@ public class AdfManager {
 
     public static void createWithLocation(SerializableLatLng location, final AdfService adfService,
                                           final Callback<AdfManager> callback){
-        adfService.searchADfMetaDataNearLocation(location, new Callback<List<AdfMetaData>>() {
+        adfService.searchNearLocation(location, new Callback<List<AdfInfo>>() {
             @Override
-            public void onResult(List<AdfMetaData> result) {
+            public void onResult(List<AdfInfo> result) {
                 AdfManager adfManager = new AdfManager(adfService);
-                for (AdfMetaData d : result) {
-                    adfManager.addMetadata(d);
+                for (AdfInfo i : result) {
+                    adfManager.addAdfInfo(i);
                 }
                 callback.onResult(adfManager);
             }

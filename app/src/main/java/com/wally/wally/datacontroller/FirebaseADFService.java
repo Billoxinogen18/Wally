@@ -13,7 +13,6 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfService;
-import com.wally.wally.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;
@@ -66,7 +65,7 @@ public class FirebaseAdfService implements AdfService {
      * {@inheritDoc}
      */
     @Override
-    public void searchADfMetaDataNearLocation(SerializableLatLng location, final Callback<List<AdfMetaData>> callback) {
+    public void searchNearLocation(SerializableLatLng location, final Callback<List<AdfInfo>> callback) {
         Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(location, SEARCH_RADIUS_M);
         ValueEventListener aggregator = getMetaDataAggregatorCallback(queries.size(), callback);
         for (GeoHashQuery q : queries) {
@@ -78,22 +77,22 @@ public class FirebaseAdfService implements AdfService {
     }
 
     public ValueEventListener getMetaDataAggregatorCallback(
-            final int n, final Callback<List<AdfMetaData>> callback) {
+            final int n, final Callback<List<AdfInfo>> callback) {
         return new ValueEventListener() {
             private int nUpdates = n;
-            private List<AdfMetaData> aggregated = new ArrayList<>();
+            private List<AdfInfo> aggregated = new ArrayList<>();
 
 
-            private synchronized boolean update(Collection<AdfMetaData> result) {
+            private synchronized boolean update(Collection<AdfInfo> result) {
                 aggregated.addAll(result);
                 return --nUpdates == 0;
             }
 
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Collection<AdfMetaData> result = new HashSet<>();
+                Collection<AdfInfo> result = new HashSet<>();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    result.add(toAdfMetaData(snapshot));
+                    result.add(toAdfInfo(snapshot));
                 }
                 if (update(result)) {
                     callback.onResult(aggregated);
@@ -145,14 +144,14 @@ public class FirebaseAdfService implements AdfService {
                 .put("location/longitude", l.getLongitude());
     }
 
-    private AdfMetaData toAdfMetaData(DataSnapshot snapshot) {
-        return new AdfMetaData(
-                snapshot.child("name").getValue(String.class),
-                snapshot.child("uuid").getValue(String.class),
-                new SerializableLatLng(
-                        snapshot.child("location/latitude").getValue(Double.class),
-                        snapshot.child("location/longitude").getValue(Double.class)
-                )
-        );
+    private AdfInfo toAdfInfo(DataSnapshot snapshot) {
+        return new AdfInfo()
+                .withName(snapshot.child("name").getValue(String.class))
+                .withUuid(snapshot.child("uuid").getValue(String.class))
+                .withLocation(
+                        new SerializableLatLng(
+                            snapshot.child("location/latitude").getValue(Double.class),
+                            snapshot.child("location/longitude").getValue(Double.class))
+                );
     }
 }

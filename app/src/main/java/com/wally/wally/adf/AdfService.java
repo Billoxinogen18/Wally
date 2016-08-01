@@ -22,7 +22,7 @@ public interface AdfService {
      * @param location filter parameter
      * @param callback callback with result
      */
-    void searchADfMetaDataNearLocation(SerializableLatLng location, Callback<List<AdfMetaData>> callback);
+    void searchNearLocation(SerializableLatLng location, Callback<List<AdfInfo>> callback);
 
 
     /**

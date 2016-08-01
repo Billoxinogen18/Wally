@@ -3,7 +3,6 @@ package com.wally.wally.datacontroller;
 import android.util.Log;
 
 import com.google.firebase.database.DatabaseReference;
-import com.wally.wally.adf.AdfMetaData;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
@@ -158,17 +157,6 @@ public class DebugUtils {
             public void onError(Exception e) {
             }
         };
-    }
-
-    public static List<AdfMetaData> generateRandomAdfMetaData(int quantity) {
-        List<AdfMetaData> list = new ArrayList<>(quantity);
-        for (int i = 0; i < quantity; i++) {
-            list.add(new AdfMetaData(
-                    randomStr(10),
-                    randomStr(20),
-                    randomLatLngNearPoint(OFFICE_LAT_LNG)));
-        }
-        return list;
     }
 
     public static void refreshContents(DatabaseReference contents, DataController datacontroller) {
