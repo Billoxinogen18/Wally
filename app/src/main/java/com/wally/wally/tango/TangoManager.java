@@ -16,6 +16,7 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfManager;
+import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.config.Config;
