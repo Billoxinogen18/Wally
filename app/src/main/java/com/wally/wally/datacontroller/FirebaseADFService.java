@@ -41,10 +41,10 @@ public class FirebaseAdfService implements AdfService {
      * {@inheritDoc}
      */
     @Override
-    public void download(String path, String uuid, final Callback<Void> callback) {
-        File localFile = new File(path);
+    public void download(AdfInfo info, final Callback<Void> callback) {
+        File localFile = new File(info.getPath());
 
-        storage.child(uuid).getFile(localFile)
+        storage.child(info.getUuid()).getFile(localFile)
                 .addOnSuccessListener(
                         new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                             @Override
@@ -104,19 +104,9 @@ public class FirebaseAdfService implements AdfService {
         };
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    @Deprecated
-    public void upload(String path, final AdfInfo info, final Callback<Void> callback) {
-        upload(path, info);
-        callback.onResult(null);
-    }
-
-    @Override
-    public void upload(String path, final AdfInfo info) {
-        FirebaseDAL.uploadFile(storage, path, info.getUuid(), new Callback<String>() {
+    public void upload(final AdfInfo info) {
+        FirebaseDAL.uploadFile(storage, info.getPath(), info.getUuid(), new Callback<String>() {
             @Override
             public void onResult(String result) {
                 saveMetaData(info);

@@ -31,10 +31,9 @@ public class AdfManager {
             return;
         }
         final AdfInfo info = queue.next();
-        final String uuid = info.getUuid();
-        final String path = Utils.getAdfFilePath(uuid);
+        final String path = Utils.getAdfFilePath(info.getUuid());
         info.withPath(path).withUploadedStatus(true);
-        adfService.download(path, uuid, new Callback<Void>() {
+        adfService.download(info, new Callback<Void>() {
             @Override
             public void onResult(Void result) {
                 callback.onResult(info);

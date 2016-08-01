@@ -365,36 +365,38 @@ public class CameraARTangoActivity extends CameraARActivity implements
      * Note that we only sync when localized.
      */
     private void startUploadingAdf(final AdfInfo adfInfo) {
-        final AdfService s = App.getInstance().getDataController().getADFService();
-
-        if (Utils.checkLocationPermission(this) && mGoogleApiClient.isConnected()) {
-            Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
-                @Override
-                public void onResult(SerializableLatLng result) {
-                    adfInfo.withCreationLocation(result);
-                    Utils.getAddressForLocation(CameraARTangoActivity.this, result, new Callback<String>() {
-                        @Override
-                        public void onResult(String address) {
-                            adfInfo.withName(address);
-                            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo);
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-                            adfInfo.withName(null);
-                            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo);
-                        }
-                    });
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo);
-                }
-            });
-        } else {
-            s.upload(Utils.getAdfFilePath(adfInfo.getUuid()), adfInfo);
+        if (!Utils.checkLocationPermission(this) || !mGoogleApiClient.isConnected()) {
+            uploadAdf(adfInfo);
+            return;
         }
+        Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
+            @Override
+            public void onResult(SerializableLatLng result) {
+                adfInfo.withCreationLocation(result);
+                Utils.getAddressForLocation(CameraARTangoActivity.this, result, new Callback<String>() {
+                    @Override
+                    public void onResult(String address) {
+                        uploadAdf(adfInfo.withName(address));
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        uploadAdf(adfInfo.withName(null));
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                uploadAdf(adfInfo);
+            }
+        });
+    }
+
+    private void uploadAdf(AdfInfo info) {
+        AdfService adfService = App.getInstance().getDataController().getADFService();
+        String path = Utils.getAdfFilePath(info.getUuid());
+        adfService.upload(info.withPath(path));
     }
 
 
