@@ -1,7 +1,5 @@
-package com.wally.wally.adfCreator;
+package com.wally.wally.adf;
 
-
-import com.wally.wally.adf.AdfMetaData;
 
 import java.io.Serializable;
 

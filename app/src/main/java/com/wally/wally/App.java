@@ -4,8 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
 
-import com.google.atap.tangoservice.TangoAreaDescriptionMetaData;
-import com.wally.wally.adfCreator.AdfManager;
+import com.wally.wally.adf.AdfManager;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.userManager.UserManager;
 import com.wally.wally.userManager.SocialUserFactory;

@@ -2,8 +2,8 @@ package com.wally.wally.tango;
 
 import android.util.Log;
 
-import com.wally.wally.adfCreator.AdfInfo;
-import com.wally.wally.adfCreator.AdfManager;
+import com.wally.wally.adf.AdfInfo;
+import com.wally.wally.adf.AdfManager;
 import com.wally.wally.datacontroller.callbacks.Callback;
 
 import java.util.ArrayList;

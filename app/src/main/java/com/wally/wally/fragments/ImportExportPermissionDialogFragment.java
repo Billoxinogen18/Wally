@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.adfCreator.AdfInfo;
+import com.wally.wally.adf.AdfInfo;
 
 /**
  * This is dialog that manages ADF import export permission grant and returns callback statuses via

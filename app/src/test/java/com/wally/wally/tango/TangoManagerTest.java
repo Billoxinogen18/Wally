@@ -2,21 +2,13 @@ package com.wally.wally.tango;
 
 
 
-import android.content.Context;
-import android.test.suitebuilder.annotation.SmallTest;
-
-import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
-import com.google.atap.tangoservice.TangoConfig;
 import com.projecttango.tangosupport.TangoPointCloudManager;
-import com.wally.wally.Utils;
-import com.wally.wally.adfCreator.AdfInfo;
-import com.wally.wally.adfCreator.AdfManager;
+import com.wally.wally.adf.AdfInfo;
+import com.wally.wally.adf.AdfManager;
 import com.wally.wally.components.WallyTangoUx;
 
 import org.junit.Before;
-import org.junit.Test;
-import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;

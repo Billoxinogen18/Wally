@@ -4,7 +4,6 @@ import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.DeviceExtrinsics;
-import com.wally.wally.adfCreator.AdfInfo;
 
 
 public class TangoUtils {

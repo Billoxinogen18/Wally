@@ -27,7 +27,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.adfCreator.AdfManager;
+import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.ADFService;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
