@@ -17,7 +17,6 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.ContentManager;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
-import com.wally.wally.datacontroller.queries.FirebaseQuery;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.user.UserManager;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
@@ -31,7 +30,7 @@ public class DataController {
 
     private StorageReference storage;
     private FirebaseAdfService adfService;
-    private DatabaseReference contents, rooms;
+    private DatabaseReference rooms;
     private UserManager userManager;
     private ContentManager contentManager;
 
@@ -54,7 +53,6 @@ public class DataController {
 
     public DataController(DatabaseReference database, StorageReference storage) {
         this.storage = storage;
-        contents = database.child(Config.CONTENTS_NODE);
         rooms = database.child(Config.ROOMS_NODE);
     }
 
@@ -64,11 +62,6 @@ public class DataController {
                     .getReference().child(Config.DATABASE_ROOT);
             StorageReference storage = FirebaseStorage.getInstance()
                     .getReference().child(Config.STORAGE_ROOT);
-
-            UserManager uManager = new UserManager(
-                    FirebaseAuth.getInstance(),
-                    root.child(Config.USERS_NODE)
-            );
 
             ContentManager cManager = new ContentManager(
                     root.child(Config.ROOMS_NODE),
@@ -82,8 +75,9 @@ public class DataController {
 
             instance = new DataController(
                     FirebaseDatabase.getInstance().getReference().child(Config.DATABASE_ROOT),
-                    FirebaseStorage.getInstance().getReference().child(Config.STORAGE_ROOT)
-            ).withUserManager(uManager).withContentManager(cManager).withFetcherFactory(fFactory);
+                    FirebaseStorage.getInstance().getReference().child(Config.STORAGE_ROOT))
+                    .withUserManager(createUserManager())
+                    .withContentManager(cManager).withFetcherFactory(fFactory);
         }
         return instance;
     }
@@ -111,7 +105,7 @@ public class DataController {
                 AggregatorCallback aggregator = new AggregatorCallback(callback)
                         .withExpectedCallbacks(extendedIds.size());
                 for (String key : extendedIds.keySet()) {
-                    fetchContentAt(key.replace(':', '/'), contents, aggregator);
+                    contentManager.fetchAt(key.replace(':', '/'), aggregator);
                 }
             }
 
@@ -153,27 +147,18 @@ public class DataController {
         userManager.fetchUser(id, callback);
     }
 
-    private void fetchContentAt(String path, DatabaseReference ref,
-                                final FetchResultCallback callback) {
-        ref.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Content content = FirebaseQuery.firebaseContentFromSnapshot(dataSnapshot).toContent();
-                callback.onResult(Collections.singleton(content));
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                callback.onError(databaseError.toException());
-            }
-        });
-    }
-
     public AdfService getADFService() {
         if (adfService == null) {
             adfService = new FirebaseAdfService(rooms, storage);
         }
         return adfService;
+    }
+
+    public static UserManager createUserManager() {
+        return new UserManager(
+                FirebaseAuth.getInstance(),
+                FirebaseDatabase.getInstance()
+                        .getReference().child(Config.USERS_NODE)
+        );
     }
 }
