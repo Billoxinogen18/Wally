@@ -21,6 +21,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.userManager.SocialUser;
@@ -205,7 +206,7 @@ public class UserInfoView extends LinearLayout {
 
         mUserImage.setImageResource(R.drawable.ic_account_circle_black_24dp);
         mUserName.setText(R.string.loading);
-        App.getInstance().getDataController().fetchUser(userId, new Callback<User>() {
+        DataController.getUserManagerInstance().fetchUser(userId, new Callback<User>() {
             @Override
             public void onResult(User result) {
                 // Check if new request came while we were loading user data.

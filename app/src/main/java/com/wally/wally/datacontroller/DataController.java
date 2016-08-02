@@ -6,7 +6,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.wally.wally.adf.AdfService;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.ContentManager;
@@ -17,22 +16,15 @@ import com.wally.wally.datacontroller.user.UserManager;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 public class DataController {
-    public static final String TAG = DataController.class.getSimpleName();
     private static DataController instance;
     private static AdfService adfServiceInstance;
     private static UserManager userManagerInstance;
 
-    private UserManager userManager;
     private ContentManager contentManager;
     private ContentFetcherFactory fetcherFactory;
 
     public DataController withContentManager(ContentManager manager) {
         this.contentManager = manager;
-        return this;
-    }
-
-    public DataController withUserManager(UserManager manager) {
-        this.userManager = manager;
         return this;
     }
 
@@ -59,7 +51,6 @@ public class DataController {
             );
 
             instance = new DataController()
-                    .withUserManager(getUserManagerInstance())
                     .withContentManager(cManager)
                     .withFetcherFactory(fFactory);
         }
@@ -79,7 +70,7 @@ public class DataController {
     }
 
     public ContentFetcher createFetcherForMyContent() {
-        User current = userManager.getCurrentUser();
+        User current = getUserManagerInstance().getCurrentUser();
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForPrivate(current));
         chain.addPager(fetcherFactory.createForSharedByMe(current));
@@ -89,20 +80,18 @@ public class DataController {
 
     public ContentFetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForSharedWithMe(userManager.getCurrentUser(), center, radiusKm));
+        chain.addPager(fetcherFactory.createForSharedWithMe(
+                getUserManagerInstance().getCurrentUser(), center, radiusKm));
         chain.addPager(fetcherFactory.createForPublic(center, radiusKm));
         return chain;
     }
 
     public ContentFetcher createFetcherForUserContent(User user) {
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForSharedWithMe(userManager.getCurrentUser(), user));
+        chain.addPager(fetcherFactory.createForSharedWithMe(
+                getUserManagerInstance().getCurrentUser(), user));
         chain.addPager(fetcherFactory.createForPublic(user));
         return chain;
-    }
-
-    public void fetchUser(String id, Callback<User> callback) {
-        userManager.fetchUser(id, callback);
     }
 
     public static AdfService getAdfServiceInstance() {
