@@ -52,42 +52,42 @@ public class ContentManagerTest {
 
     @Test
     public void savePublicTest() {
-        Content c = DebugUtils.generateRandomContent();
+        Content c = new Content();
         c.getVisibility().withSocialVisibility(Visibility.PUBLIC);
         saveTest(c, "Public");
     }
 
     @Test
     public void savePrivateTest() {
-        Content c = DebugUtils.generateRandomContent();
+        Content c = new Content();
         c.getVisibility().withSocialVisibility(Visibility.PRIVATE);
         saveTest(c, c.getAuthorId());
     }
 
     @Test
     public void saveSharedTest() {
-        Content c = DebugUtils.generateRandomContent();
+        Content c = new Content();
         c.getVisibility().withSocialVisibility(Visibility.SHARED);
         saveTest(c, "Shared");
     }
 
     @Test
     public void updatePublicTest() {
-        Content c = DebugUtils.generateRandomContent().withId(TEST_ID);
+        Content c = new Content().withId(TEST_ID);
         c.getVisibility().withSocialVisibility(Visibility.PUBLIC);
         updateTest(c, "Public");
     }
 
     @Test
     public void updatePrivateTest() {
-        Content c = DebugUtils.generateRandomContent().withId(TEST_ID);
+        Content c = new Content().withId(TEST_ID);
         c.getVisibility().withSocialVisibility(Visibility.PRIVATE);
         updateTest(c, c.getAuthorId());
     }
 
     @Test
     public void updateSharedTest() {
-        Content c = DebugUtils.generateRandomContent().withId(TEST_ID);
+        Content c = new Content().withId(TEST_ID);
         c.getVisibility().withSocialVisibility(Visibility.SHARED);
         updateTest(c, "Shared");
     }
