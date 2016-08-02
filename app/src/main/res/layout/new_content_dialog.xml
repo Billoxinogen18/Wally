@@ -21,7 +21,6 @@
         android:layout_alignParentBottom="true" />
 
     <android.support.v4.widget.NestedScrollView
-        android:id="@+id/scroll_view"
         android:layout_width="@dimen/new_content_dialog_width"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -46,7 +45,6 @@
                 tools:targetApi="lollipop">
 
                 <LinearLayout
-                    android:id="@+id/top_panel"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:orientation="horizontal">

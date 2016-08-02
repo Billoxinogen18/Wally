@@ -40,11 +40,11 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return new StringBuilder().append("{")
-                .append("id: ").append(id.getId())
-                .append(", ggId: ").append(getGgId().getId())
-                .append(", fbId: ").append(getFbId())
-                .append("}").toString();
+        return "{" +
+                "id: " + id.getId() +
+                ", ggId: " + getGgId().getId() +
+                ", fbId: " + getFbId() +
+                "}";
     }
 
 }

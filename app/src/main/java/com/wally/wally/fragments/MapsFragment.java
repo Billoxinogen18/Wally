@@ -42,8 +42,6 @@ import com.wally.wally.activities.CameraARActivity;
 import com.wally.wally.components.CircleTransform;
 import com.wally.wally.components.ContentListView;
 import com.wally.wally.components.ContentListViewItem;
-import com.wally.wally.components.MapWindowAdapter;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.endlessScroll.ContentPagingRetriever;
@@ -212,7 +210,6 @@ public class MapsFragment extends Fragment implements
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
         mMap = mapboxMap;
-        mMap.setInfoWindowAdapter(new MapWindowAdapter(getContext()));
 
         if (Utils.checkLocationPermission(getContext())) {
             mMap.setMyLocationEnabled(true);
@@ -398,7 +395,7 @@ public class MapsFragment extends Fragment implements
 
                 try {
                     latch.await();
-                } catch (InterruptedException e) {
+                } catch (InterruptedException ignored) {
 
                 }
 

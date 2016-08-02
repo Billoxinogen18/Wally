@@ -23,7 +23,7 @@ public abstract class Predicate<T> {
         };
     }
 
-    public Predicate<T> or(final Predicate other) {
+    public Predicate<T> or(final Predicate<T> other) {
         return new Predicate<T>() {
             @Override
             public boolean test(T target) {

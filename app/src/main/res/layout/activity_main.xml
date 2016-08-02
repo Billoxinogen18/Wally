@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -37,7 +37,6 @@
         android:visibility="gone">
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/btn_cancel_fitting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onCancelFittingClick"
@@ -90,12 +89,9 @@
         android:layout_margin="16dp"
         android:foreground="?attr/selectableItemBackground"
         android:onClick="onBtnMapClick"
-        android:stateListAnimator="@animator/raise"
-        app:layout_behavior="com.wally.wally.components.MoveUpwardBehavior"
         tools:targetApi="lollipop">
 
         <ImageView
-            android:id="@+id/map_background_image"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:clickable="false"
@@ -112,4 +108,4 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="30dp" />
-</FrameLayout>
+</merge>

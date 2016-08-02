@@ -4,8 +4,6 @@
     <color name="colorPrimary_alpha_0_9">#e3374d5e</color>
     <color name="colorPrimaryDark">#24323d</color>
     <color name="colorAccent">#2196F3</color>
-    <color name="colorAccentLight">#FFD54F</color>
-    <color name="colorAccentLight_100">#FFECB3</color>
 
     <!-- Note colors -->
     <color name="note_color_white">#fff</color>
@@ -28,13 +26,8 @@
     <color name="accept_button_color">#4CAF50</color>
     <color name="disabled_button_color">#bdbdbd</color>
     <color name="backgroundColor">#fff</color>
-    <color name="dividerColor">#1f000000</color>
 
     <color name="uxOverlayBackgroundColor">#5a000000</color>
 
-    <color name="public_content_marker_color">#388E3C</color>
-    <color name="private_content_marker_color">#7B1FA2</color>
-    <color name="people_content_marker_color">#D32F2F</color>
-    <color name="content_not_visible_color">#eae9e9</color>
     <color name="color_shadow">#64080808</color>
 </resources>

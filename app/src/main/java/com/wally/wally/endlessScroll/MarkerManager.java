@@ -8,7 +8,6 @@ import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.wally.wally.Utils;
-import com.wally.wally.components.MapWindowAdapter;
 import com.wally.wally.datacontroller.content.Content;
 
 import java.util.ArrayList;
@@ -30,8 +29,6 @@ public class MarkerManager {
         mMarkerIconGenerator = new MarkerIconGenerator(context);
         mMap = map;
         mMarkerList = new ArrayList<>();
-
-        mMap.setInfoWindowAdapter(new MapWindowAdapter(context));
     }
 
     public void reset() {
