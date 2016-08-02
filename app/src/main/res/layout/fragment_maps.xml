@@ -19,8 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="@dimen/map_alpha"
-            app:tilt_enabled="false"
-            app:style_url="@string/map_style_url" />
+            app:style_url="@string/map_style_url"
+            app:tilt_enabled="false" />
 
         <!-- Just invisible for now, redesign later-->
         <TextView
@@ -101,7 +101,7 @@
 
     </RelativeLayout>
 
-    <com.wally.wally.components.ContentListView
+    <com.wally.wally.controllers.map.ContentListView
         android:id="@+id/content_list_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"

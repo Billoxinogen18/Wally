@@ -24,15 +24,15 @@
             android:required="false" />
 
         <activity
-            android:name=".activities.CameraARTangoActivity"
+            android:name=".controllers.main.CameraARTangoActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".activities.CameraARStandardActivity"
+            android:name=".controllers.main.CameraARStandardActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".activities.LoginActivity"
+            android:name=".controllers.LoginActivity"
             android:screenOrientation="landscape">
             <!--android:theme="@style/AppTheme.SplashScreen">-->
             <intent-filter android:label="@string/app_name">

@@ -1,20 +1,14 @@
 package com.wally.wally.tango;
 
 
-
 import com.google.atap.tangoservice.Tango;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfManager;
-import com.wally.wally.components.WallyTangoUx;
 
 import org.junit.Before;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNull;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 
 /**
@@ -22,9 +16,8 @@ import static org.mockito.Mockito.*;
  */
 
 public class TangoManagerTest {
+    AdfInfo adf;
     private TangoManager mTangoManager;
-
-
     private WallyRenderer renderer;
     private TangoPointCloudManager pointCloudManager;
     private TangoUpdater tangoUpdater;
@@ -33,9 +26,6 @@ public class TangoManagerTest {
     private AdfManager adfManager;
     private Tango tango;
     private String uid;
-    AdfInfo adf;
-
-
 
     @Before
     public void init(){

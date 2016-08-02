@@ -18,7 +18,6 @@ import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.analytics.WallyAnalytics;
-import com.wally.wally.components.WallyTangoUx;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TMConstants;
 import com.wally.wally.datacontroller.callbacks.Callback;
@@ -68,6 +67,9 @@ public class TangoManager implements LocalizationListener {
     private boolean mIsReadyToSaveAdf;
 
     private Thread mLocalizationWatchdog;
+    private LocalizationState localizationState = LocalizationState.NONE;
+    private int adfCounter = 0;
+    private long timeForAdfLocalization;
 
     public TangoManager(
             Config config,
@@ -161,7 +163,6 @@ public class TangoManager implements LocalizationListener {
             }
         };
     }
-
 
     private void prepareForLearning() {
         mAdfScheduler.finish();
@@ -445,7 +446,6 @@ public class TangoManager implements LocalizationListener {
         return mIsLocalized;
     }
 
-
     @Override
     public void localized() {
         Log.d(TAG, "localized() called with: " + "");
@@ -494,14 +494,6 @@ public class TangoManager implements LocalizationListener {
         return mIsConnected;
     }
 
-    private LocalizationState localizationState = LocalizationState.NONE;
-    private int adfCounter = 0;
-    private long timeForAdfLocalization;
-
-    enum LocalizationState{
-        NONE, AFTER_LEARNING, AFTER_ON_RESUME, AFTER_DOWNLOAD
-    }
-
     private void logLocalization(boolean success){
         if (localizationState == LocalizationState.AFTER_LEARNING){
             mAnalytics.onLocalizeOnNewAdf(success);
@@ -519,5 +511,9 @@ public class TangoManager implements LocalizationListener {
         if (success && localizationState != LocalizationState.AFTER_LEARNING){
             mAnalytics.logLocalizationTimeForAdf("NAN", System.currentTimeMillis() - timeForAdfLocalization);
         }
+    }
+
+    enum LocalizationState {
+        NONE, AFTER_LEARNING, AFTER_ON_RESUME, AFTER_DOWNLOAD
     }
 }

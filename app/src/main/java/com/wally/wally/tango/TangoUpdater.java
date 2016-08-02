@@ -9,7 +9,6 @@ import com.google.atap.tangoservice.TangoEvent;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
-import com.wally.wally.components.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 

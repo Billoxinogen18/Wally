@@ -6,7 +6,7 @@
     android:animateLayoutChanges="true"
     android:background="@drawable/pickers_background"
     android:padding="8dp"
-    tools:context=".activities.CameraARActivity">
+    tools:context=".controllers.main.CameraARActivity">
 
     <TextView
         android:id="@+id/dialog_title"
