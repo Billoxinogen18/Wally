@@ -168,7 +168,7 @@ public class LoginActivity extends GoogleApiClientActivity implements
         Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
             @Override
             public void onResult(SerializableLatLng result) {
-                AdfService as = App.getInstance().getDataController().getADFService();
+                AdfService as = App.getInstance().getAdfService();
                 AdfManager.createWithLocation(result, as, new Callback<AdfManager>() {
                     @Override
                     public void onResult(AdfManager result) {

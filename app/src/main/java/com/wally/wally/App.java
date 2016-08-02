@@ -5,19 +5,17 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 
 import com.wally.wally.adf.AdfManager;
+import com.wally.wally.adf.AdfService;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.userManager.UserManager;
 import com.wally.wally.userManager.SocialUserFactory;
 
 /**
  * Application class for Application wide feature initializations.
- * <p/>
- * Created by ioane5 on 3/31/16.
  */
 public class App extends Application {
     private static App sInstance = null;
 
-    private DataController dataController;
     private UserManager userManager;
     private AdfManager adfManager;
 
@@ -33,11 +31,7 @@ public class App extends Application {
     public void onCreate() {
         MultiDex.install(getApplicationContext());
         super.onCreate();
-        // TODO: DataController.create()
-        // Is implemented with singleton
-        // Why save the instance here as well?
-        dataController = DataController.create();
-        userManager = new UserManager(new SocialUserFactory(), dataController);
+        userManager = new UserManager(new SocialUserFactory(), DataController.getInstance());
         sInstance = this;
     }
 
@@ -47,7 +41,7 @@ public class App extends Application {
     }
 
     public DataController getDataController() {
-        return dataController;
+        return DataController.getInstance();
     }
 
     public UserManager getUserManager() {
@@ -60,5 +54,9 @@ public class App extends Application {
 
     public AdfManager getAdfManager() {
         return adfManager;
+    }
+
+    public AdfService getAdfService() {
+        return DataController.getAdfServiceInstance();
     }
 }

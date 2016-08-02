@@ -394,7 +394,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     private void uploadAdf(AdfInfo info) {
-        AdfService adfService = App.getInstance().getDataController().getADFService();
+        AdfService adfService = App.getInstance().getAdfService();
         String path = Utils.getAdfFilePath(info.getUuid());
         adfService.upload(info.withPath(path));
     }

@@ -1,16 +1,11 @@
 package com.wally.wally.datacontroller;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.GenericTypeIndicator;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.wally.wally.adf.AdfService;
-import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
@@ -21,19 +16,14 @@ import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.user.UserManager;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
-import java.util.Collections;
-import java.util.Map;
-
 public class DataController {
     public static final String TAG = DataController.class.getSimpleName();
     private static DataController instance;
+    private static AdfService adfServiceInstance;
+    private static UserManager userManagerInstance;
 
-    private StorageReference storage;
-    private FirebaseAdfService adfService;
-    private DatabaseReference rooms;
     private UserManager userManager;
     private ContentManager contentManager;
-
     private ContentFetcherFactory fetcherFactory;
 
     public DataController withContentManager(ContentManager manager) {
@@ -51,12 +41,7 @@ public class DataController {
         return this;
     }
 
-    public DataController(DatabaseReference database, StorageReference storage) {
-        this.storage = storage;
-        rooms = database.child(Config.ROOMS_NODE);
-    }
-
-    public static DataController create() {
+    public static DataController getInstance() {
         if (instance == null) {
             DatabaseReference root = FirebaseDatabase.getInstance()
                     .getReference().child(Config.DATABASE_ROOT);
@@ -73,11 +58,10 @@ public class DataController {
                     root.child(Config.CONTENTS_NODE)
             );
 
-            instance = new DataController(
-                    FirebaseDatabase.getInstance().getReference().child(Config.DATABASE_ROOT),
-                    FirebaseStorage.getInstance().getReference().child(Config.STORAGE_ROOT))
-                    .withUserManager(createUserManager())
-                    .withContentManager(cManager).withFetcherFactory(fFactory);
+            instance = new DataController()
+                    .withUserManager(getUserManagerInstance())
+                    .withContentManager(cManager)
+                    .withFetcherFactory(fFactory);
         }
         return instance;
     }
@@ -91,29 +75,7 @@ public class DataController {
     }
 
     public void fetchByUUID(String uuid, final FetchResultCallback callback) {
-        rooms.child(uuid).child("Contents")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                GenericTypeIndicator<Map<String, Boolean>> indicator =
-                        new GenericTypeIndicator<Map<String, Boolean>>(){};
-                Map<String, Boolean> extendedIds = dataSnapshot.getValue(indicator);
-                if (extendedIds == null) {
-                    callback.onResult(Collections.<Content>emptySet());
-                    return;
-                }
-                AggregatorCallback aggregator = new AggregatorCallback(callback)
-                        .withExpectedCallbacks(extendedIds.size());
-                for (String key : extendedIds.keySet()) {
-                    contentManager.fetchAt(key.replace(':', '/'), aggregator);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                callback.onError(databaseError.toException());
-            }
-        });
+        contentManager.fetchForUuid(uuid, callback);
     }
 
     public ContentFetcher createFetcherForMyContent() {
@@ -147,18 +109,24 @@ public class DataController {
         userManager.fetchUser(id, callback);
     }
 
-    public AdfService getADFService() {
-        if (adfService == null) {
-            adfService = new FirebaseAdfService(rooms, storage);
+    public static AdfService getAdfServiceInstance() {
+        if (adfServiceInstance == null) {
+            adfServiceInstance = new FirebaseAdfService(
+                    FirebaseDatabase.getInstance().getReference()
+                            .child(Config.DATABASE_ROOT).child(Config.ROOMS_NODE),
+                    FirebaseStorage.getInstance().getReference().child(Config.STORAGE_ROOT));
         }
-        return adfService;
+        return adfServiceInstance;
     }
 
-    public static UserManager createUserManager() {
-        return new UserManager(
-                FirebaseAuth.getInstance(),
-                FirebaseDatabase.getInstance()
-                        .getReference().child(Config.USERS_NODE)
-        );
+    public static UserManager getUserManagerInstance() {
+        if (userManagerInstance == null) {
+            userManagerInstance = new UserManager(
+                    FirebaseAuth.getInstance(),
+                    FirebaseDatabase.getInstance()
+                            .getReference().child(Config.USERS_NODE)
+            );
+        }
+        return userManagerInstance;
     }
 }
