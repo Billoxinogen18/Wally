@@ -66,7 +66,7 @@ public class DataController {
         return instance;
     }
 
-    public void save(final Content c) {
+    public void save(Content c) {
         contentManager.save(c);
     }
 
@@ -74,7 +74,7 @@ public class DataController {
         contentManager.delete(c);
     }
 
-    public void fetchByUUID(String uuid, final FetchResultCallback callback) {
+    public void fetchForUuid(String uuid, FetchResultCallback callback) {
         contentManager.fetchForUuid(uuid, callback);
     }
 
