@@ -15,13 +15,11 @@ import com.wally.wally.datacontroller.user.User;
 public class UserManager {
     private static final String TAG = "UserManager";
     SocialUserFactory mSocialUserFactory;
-    DataController mDataController;
     SocialUser mUser;
 
 
-    public UserManager(SocialUserFactory socialUserFactory, DataController dataController){
+    public UserManager(SocialUserFactory socialUserFactory){
         mSocialUserFactory = socialUserFactory;
-        mDataController = dataController;
     }
 
     public void setUser(SocialUser user){
@@ -35,21 +33,6 @@ public class UserManager {
     public boolean isLoggedIn(){
         return mUser != null;
     }
-
-    /*
-     * GoogleApiClient googleApiClient = new GoogleApiClient.Builder(this)
-     *      .enableAutoManage(this, this)
-     *       .addApi(Plus.API)
-     *      .addScope(Plus.SCOPE_PLUS_LOGIN)
-     *      .addScope(Plus.SCOPE_PLUS_PROFILE)
-     *      .build();
-     */
-    public void loadLoggedInUser(GoogleApiClient googleApiClient, final UserLoadListener userLoadListener) {
-        User user = mDataController.getCurrentUser();
-
-        loadLoggedInUser(user, googleApiClient, userLoadListener);
-    }
-
 
     public void loadLoggedInUser(User user, GoogleApiClient googleApiClient, final UserLoadListener userLoadListener) {
         loadUser(user, googleApiClient, new UserLoadListener() {

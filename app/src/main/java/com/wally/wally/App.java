@@ -31,7 +31,7 @@ public class App extends Application {
     public void onCreate() {
         MultiDex.install(getApplicationContext());
         super.onCreate();
-        userManager = new UserManager(new SocialUserFactory(), DataController.getInstance());
+        userManager = new UserManager(new SocialUserFactory());
         sInstance = this;
     }
 

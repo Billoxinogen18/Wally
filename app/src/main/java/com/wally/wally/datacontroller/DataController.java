@@ -79,7 +79,7 @@ public class DataController {
     }
 
     public ContentFetcher createFetcherForMyContent() {
-        User current = getCurrentUser();
+        User current = userManager.getCurrentUser();
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForPrivate(current));
         chain.addPager(fetcherFactory.createForSharedByMe(current));
@@ -89,20 +89,16 @@ public class DataController {
 
     public ContentFetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForSharedWithMe(getCurrentUser(), center, radiusKm));
+        chain.addPager(fetcherFactory.createForSharedWithMe(userManager.getCurrentUser(), center, radiusKm));
         chain.addPager(fetcherFactory.createForPublic(center, radiusKm));
         return chain;
     }
 
     public ContentFetcher createFetcherForUserContent(User user) {
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForSharedWithMe(getCurrentUser(), user));
+        chain.addPager(fetcherFactory.createForSharedWithMe(userManager.getCurrentUser(), user));
         chain.addPager(fetcherFactory.createForPublic(user));
         return chain;
-    }
-
-    public User getCurrentUser() {
-        return userManager.getCurrentUser();
     }
 
     public void fetchUser(String id, Callback<User> callback) {
