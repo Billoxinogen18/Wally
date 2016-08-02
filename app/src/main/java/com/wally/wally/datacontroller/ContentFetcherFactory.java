@@ -22,7 +22,7 @@ import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import java.util.Collections;
 import java.util.Set;
 
-public class ContentFetcherFactory {
+class ContentFetcherFactory {
     private DatabaseReference contents;
     private DatabaseReference publicContents;
     private DatabaseReference sharedContents;
