@@ -42,18 +42,23 @@ public abstract class CameraARActivity extends AppCompatActivity implements
         NewContentDialogFragment.NewContentDialogListener,
         SelectedMenuView.OnSelectedMenuActionListener,
         MapsFragment.MapOpenCloseListener {
+
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int REQUEST_CODE_MY_LOCATION = 22;
+
     protected DataController mDataController;
     protected GoogleApiClient mGoogleApiClient;
     protected WallyAnalytics mAnalytics;
-    private RajawaliSurfaceView mRajawaliView;
     private UserManager mUserManager;
-    private SelectedMenuView mSelectedMenuView;
+
     private long mLastSelectTime;
     private Content mSelectedContent; //TODO may be needed to remove
     private Content mContentToSave;
     private long mNewContentButtonLastClickTime;
+
+    // Views
+    private SelectedMenuView mSelectedMenuView;
+    private RajawaliSurfaceView mRajawaliView;
     private View mNewContentButton;
     private View mMapButton;
     private View mProfileBar;
@@ -98,7 +103,6 @@ public abstract class CameraARActivity extends AppCompatActivity implements
                 .build();
 
         mAnalytics = WallyAnalytics.getInstance(this);
-
     }
 
     protected void onStart() {
@@ -110,7 +114,6 @@ public abstract class CameraARActivity extends AppCompatActivity implements
         mGoogleApiClient.disconnect();
         super.onStop();
     }
-
 
     @Override
     protected void onPause() {
