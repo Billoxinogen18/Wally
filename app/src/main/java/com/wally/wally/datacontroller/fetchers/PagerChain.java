@@ -10,13 +10,11 @@ import java.util.List;
 public class PagerChain implements ContentFetcher {
     private int currentPagerIndex;
     private List<ContentFetcher> pagerList;
-    private Collection<Content> head;
     private Collection<Content> tail;
 
     public PagerChain(List<ContentFetcher> pagerList) {
         this.pagerList = pagerList;
         this.currentPagerIndex = 0;
-        head = new ArrayList<>();
         tail = new ArrayList<>();
     }
 
@@ -27,40 +25,6 @@ public class PagerChain implements ContentFetcher {
     public PagerChain addPager(ContentFetcher fetcher) {
         pagerList.add(fetcher);
         return this;
-    }
-
-    @Override
-    public void fetchPrev(final int count, final FetchResultCallback callback) {
-        if (currentPagerIndex == -1) {
-            ArrayList<Content> finalResult = new ArrayList<>(head);
-            head.clear();
-            callback.onResult(finalResult);
-            return;
-        }
-
-        if (currentPagerIndex == pagerList.size()) {
-            currentPagerIndex--;
-        }
-
-        pagerList.get(currentPagerIndex).fetchPrev(count - head.size(), new FetchResultCallback() {
-            @Override
-            public void onResult(Collection<Content> result) {
-                head.addAll(result);
-                if (head.size() == count) {
-                    List<Content> finalResult = new ArrayList<>(head);
-                    head.clear();
-                    callback.onResult(finalResult);
-                } else {
-                    currentPagerIndex--;
-                    fetchPrev(count, callback);
-                }
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
-            }
-        });
     }
 
     @Override

@@ -96,11 +96,6 @@ public class ContentFetcherFactory {
     public ContentFetcher createTrivial() {
         return new ContentFetcher() {
             @Override
-            public void fetchPrev(int i, FetchResultCallback callback) {
-                callback.onResult(Collections.<Content>emptySet());
-            }
-
-            @Override
             public void fetchNext(int i, FetchResultCallback callback) {
                 callback.onResult(Collections.<Content>emptySet());
             }

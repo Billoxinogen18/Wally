@@ -15,26 +15,6 @@ public class QueryContentFetcher implements ContentFetcher {
     }
 
     @Override
-    public void fetchPrev(final int i, final FetchResultCallback callback) {
-        if (fetcher == null) {
-            query.fetch(new FetchResultCallback() {
-                @Override
-                public void onResult(Collection<Content> result) {
-                    fetcher = new ListPager(result);
-                    fetcher.fetchPrev(i, callback);
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    callback.onError(e);
-                }
-            });
-        } else {
-            fetcher.fetchPrev(i, callback);
-        }
-    }
-
-    @Override
     public void fetchNext(final int i, final FetchResultCallback callback) {
         if (fetcher == null) {
             query.fetch(new FetchResultCallback() {
