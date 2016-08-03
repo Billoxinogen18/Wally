@@ -3,6 +3,9 @@ package com.wally.wally.controllers.contentCreator.peopleChooser;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AnimationUtils;
+import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -13,7 +16,7 @@ import com.wally.wally.components.CircleTransform;
 import com.wally.wally.userManager.SocialUser;
 
 /**
- * Created by Xato on 5/31/2016.
+ * Created by Meravici on 5/31/2016. yea
  */
 public class CircleUserView extends RelativeLayout {
 
@@ -46,15 +49,15 @@ public class CircleUserView extends RelativeLayout {
     public void setChecked(boolean checked){
         mCheckedStatus = checked;
 //        mTickView.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.bounce_scale));
-        mTickView.setVisibility(checked ? VISIBLE : GONE);
-//        if(checked){
-//            mTickView.setScaleX(0);
-//            mTickView.setScaleY(0);
-//            mTickView.setVisibility(VISIBLE);
-//            mTickView.animate().scaleX(1).scaleY(1).setInterpolator(new BounceInterpolator());
-//        }else {
-//            mTickView.animate().scaleX(0).scaleY(0).setInterpolator(new AccelerateDecelerateInterpolator());
-//        }
+//        mTickView.setVisibility(checked ? VISIBLE : GONE);
+        if(checked){
+            mTickView.setScaleX(0);
+            mTickView.setScaleY(0);
+            mTickView.setVisibility(VISIBLE);
+            mTickView.animate().scaleX(1).scaleY(1).setInterpolator(new BounceInterpolator());
+        }else {
+            mTickView.animate().scaleX(0).scaleY(0).setInterpolator(new AccelerateDecelerateInterpolator());
+        }
     }
 
     public SocialUser getUser() {
@@ -85,8 +88,8 @@ public class CircleUserView extends RelativeLayout {
     }
 
     private void reset(){
-//        mTickView.setScaleX(0);
-//        mTickView.setScaleY(0);
+        mTickView.setScaleX(0);
+        mTickView.setScaleY(0);
         mAvatarImageView.setImageBitmap(null); //TODO set default image
         mNameTextView.setText("");
         mCheckedStatus = false;

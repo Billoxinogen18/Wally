@@ -107,6 +107,7 @@ dependencies {
     compile(name: 'android-material-chips-1.1.0-release', ext: 'aar')
     compile 'org.rajawali3d:rajawali:1.0.325@aar'
     compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'de.hdodenhof:circleimageview:2.0.0'
 
     // Firebase
 
