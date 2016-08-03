@@ -1,7 +1,8 @@
 package com.wally.wally.adf;
 
+import android.util.Log;
+
 import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class AdfManager {
+    public static final String TAG = AdfManager.class.getSimpleName();
     private AdfService adfService;
     private List<AdfInfo> metadatas;
     private Iterator<AdfInfo> queue;
@@ -24,9 +26,9 @@ public class AdfManager {
         queue = metadatas.iterator();
     }
 
-    public void getAdf(final Callback<AdfInfo> callback){
+    public void getAdf(final AdfManagerStateListener listener){
         if (!queue.hasNext()) {
-            callback.onResult(null);
+            listener.onNoMoreAdfs();
             queue = metadatas.iterator();
             return;
         }
@@ -36,12 +38,12 @@ public class AdfManager {
         adfService.download(info, new AdfService.AdfDownloadListener() {
             @Override
             public void onSuccess() {
-                callback.onResult(info);
+                listener.onAdfReady(info);
             }
-
-            @Override
+            @Override // try download next adf
             public void onFail(Exception e) {
-                callback.onError(e);
+                Log.d(TAG, "Download of adf with uuid " + info.getUuid() + " failed");
+                getAdf(listener);
             }
         });
     }
@@ -58,5 +60,10 @@ public class AdfManager {
                 callback.onResult(adfManager);
             }
         });
+    }
+
+    interface AdfManagerStateListener {
+        void onAdfReady(AdfInfo info);
+        void onNoMoreAdfs();
     }
 }

@@ -2,8 +2,6 @@ package com.wally.wally.adf;
 
 import android.util.Log;
 
-import com.wally.wally.datacontroller.callbacks.Callback;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -15,7 +13,7 @@ public class AdfScheduler extends Thread {
     private boolean done;
     private int timeout;
     private AdfManager mAdfManager;
-    private List<Callback<AdfInfo>> callbackList;
+    private List<AdfSchedulerListener> callbackList;
 
     public AdfScheduler(AdfManager adfManager) {
         done = false;
@@ -29,8 +27,8 @@ public class AdfScheduler extends Thread {
         return this;
     }
 
-    public AdfScheduler addCallback(Callback<AdfInfo> callback) {
-        callbackList.add(callback);
+    public AdfScheduler addListener(AdfSchedulerListener listener) {
+        callbackList.add(listener);
         return this;
     }
 
@@ -40,19 +38,14 @@ public class AdfScheduler extends Thread {
     }
 
     private void fireSuccess(AdfInfo info) {
-        if (info != null) {
-            Log.d(TAG, info.getUuid());
-        } else {
-            Log.d(TAG, "end");
-        }
-        for (Callback<AdfInfo> c : callbackList) {
-            c.onResult(info);
-        }
-    }
-
-    private void fireError(Exception e){
-        for (Callback<AdfInfo> c : callbackList) {
-            c.onError(e);
+        for (AdfSchedulerListener c : callbackList) {
+            if (info != null) {
+                Log.d(TAG, info.getUuid());
+                c.onNewAdfSchedule(info);
+            } else {
+                Log.d(TAG, "end");
+                c.onScheduleFinish();
+            }
         }
     }
 
@@ -60,25 +53,29 @@ public class AdfScheduler extends Thread {
     public void run() {
         while (!done && !isInterrupted()) {
             final CountDownLatch latch = new CountDownLatch(1);
-            Log.d(TAG, "AdfScheduler: ");
-            mAdfManager.getAdf(new Callback<AdfInfo>() {
+            mAdfManager.getAdf(new AdfManager.AdfManagerStateListener() {
                 @Override
-                public void onResult(AdfInfo result) {
+                public void onAdfReady(AdfInfo info) {
                     if (done || isInterrupted()) return;
-                    fireSuccess(result);
+                    fireSuccess(info);
                     latch.countDown();
                 }
+
                 @Override
-                public void onError(Exception e) {
-                    fireError(e);
+                public void onNoMoreAdfs() {
+                    fireSuccess(null);
                 }
             });
+
             try {
                 latch.await();
                 Thread.sleep(timeout);
-            } catch (InterruptedException e) {
-                break;
-            }
+            } catch (InterruptedException e) { break; }
         }
+    }
+
+    public interface AdfSchedulerListener {
+        void onNewAdfSchedule(AdfInfo info);
+        void onScheduleFinish();
     }
 }

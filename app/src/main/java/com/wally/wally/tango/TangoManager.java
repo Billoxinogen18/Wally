@@ -20,7 +20,6 @@ import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
-import com.wally.wally.datacontroller.callbacks.Callback;
 
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
@@ -132,34 +131,34 @@ public class TangoManager implements LocalizationListener {
             adfCounter = 0;
             mAdfScheduler = new AdfScheduler(mAdfManager)
                     .withTimeout(timeout)
-                    .addCallback(adfSchedulerCallback());
+                    .addListener(createAdfSchedulerListener());
             // TODO: probably should be injected in constructor
             mAdfScheduler.start();
         }
     }
 
-    private Callback<AdfInfo> adfSchedulerCallback() {
-        return new Callback<AdfInfo>() {
+    private AdfScheduler.AdfSchedulerListener createAdfSchedulerListener() {
+        return new AdfScheduler.AdfSchedulerListener() {
             @Override
-            public void onResult(AdfInfo result) {
+            public void onNewAdfSchedule(AdfInfo info) {
                 adfCounter++;
                 logLocalization(false);
                 if (mIsLocalized) {
                     return;
                 }
-                Log.d(TAG, "adfSchedulerCallback onResult: " + result);
-                if (result == null) {
+                if (info == null) {
                     mAnalytics.logAdfNumberBeforeLearning(adfCounter);
                     startLearning();
                 } else {
                     localizationState = LocalizationState.AFTER_DOWNLOAD;
-                    startLocalizing(result);
+                    startLocalizing(info);
                 }
             }
 
             @Override
-            public void onError(Exception e) {
-                Log.d(TAG, "adfSchedulerCallback onError: " + e);
+            public void onScheduleFinish() {
+                // TODO rethink this shit!
+                this.onNewAdfSchedule(null);
             }
         };
     }
