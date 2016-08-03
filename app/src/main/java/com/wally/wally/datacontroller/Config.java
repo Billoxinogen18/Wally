@@ -6,5 +6,5 @@ class Config {
     public static final String ROOMS_NODE = "Rooms";
     public static final String USERS_NODE = DATABASE_ROOT + "/Users";
     public static final String CONTENTS_NODE = "Contents";
-    public static final double RADIUS_MAX_KM = 2500.0;
+    public static final double RADIUS_MAX_KM = 1000.0;
 }
