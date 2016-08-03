@@ -6,11 +6,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
 import com.wally.wally.datacontroller.content.FirebaseContent;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,7 @@ public abstract class FirebaseQuery {
 
     public abstract Query getTarget(DatabaseReference ref);
 
-    public final void fetch(DatabaseReference ref, final Callback<Collection<FirebaseContent>> callback) {
+    public final void fetch(DatabaseReference ref, final FirebaseFetchResultCallback callback) {
         getTarget(ref).addListenerForSingleValueEvent(new ValueEventListener() {
 
             @Override

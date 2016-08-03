@@ -4,7 +4,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.queries.FirebaseQuery;
@@ -55,7 +54,7 @@ public class KeyPager implements Fetcher {
                 return endKey == null ? target : target.endAt(endKey);
             }
         }.fetch(contents, new FirebaseFetchResultCallback(
-                new Callback<Collection<Content>>() {
+                new FetchResultCallback() {
                     @Override
                     public void onResult(Collection<Content> result) {
                         List<Content> contents = new ArrayList<>();
