@@ -19,7 +19,7 @@ import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.config.Config;
-import com.wally.wally.config.TMConstants;
+import com.wally.wally.config.TangoManagerConstants;
 import com.wally.wally.datacontroller.callbacks.Callback;
 
 import org.rajawali3d.math.Quaternion;
@@ -128,7 +128,7 @@ public class TangoManager implements LocalizationListener {
             startLocalizationWatchDog();
             // TODO: what happens if can't localize on saved ADF?
         } else {
-            int timeout = mConfig.getInt(TMConstants.LOCALIZATION_TIMEOUT);
+            int timeout = mConfig.getInt(TangoManagerConstants.LOCALIZATION_TIMEOUT);
             adfCounter = 0;
             mAdfScheduler = new AdfScheduler(mAdfManager)
                     .withTimeout(timeout)
@@ -195,7 +195,7 @@ public class TangoManager implements LocalizationListener {
     private synchronized void finishLearning() {
         Log.d(TAG, "finishLearning() called with: " + "");
         saveAdf();
-        String msg = mConfig.getString(TMConstants.NEW_ROOM_LEARNED);
+        String msg = mConfig.getString(TangoManagerConstants.NEW_ROOM_LEARNED);
         mTangoUx.showCustomMessage(msg, 500);
         onPause();
         localizeWithLearnedAdf(currentAdf);
@@ -214,7 +214,7 @@ public class TangoManager implements LocalizationListener {
 
     private synchronized void startLearning() {
         Log.d(TAG, "startLearning()");
-        String msg = mConfig.getString(TMConstants.LEARNING_AREA);
+        String msg = mConfig.getString(TangoManagerConstants.LEARNING_AREA);
         mTangoUx.showCustomMessage(msg);
         prepareForLearning();
         currentAdf = null;
@@ -249,7 +249,7 @@ public class TangoManager implements LocalizationListener {
 
         currentAdf = adf;
 
-        String msg = mConfig.getString(TMConstants.LOCALIZING_IN_NEW_AREA);
+        String msg = mConfig.getString(TangoManagerConstants.LOCALIZING_IN_NEW_AREA);
         mTangoUx.showCustomMessage(msg);
         mTango = mTangoFactory.getTangoWithUuid(getRunnable(), adf.getUuid());
         localizationState = LocalizationState.AFTER_LEARNING;
@@ -259,7 +259,7 @@ public class TangoManager implements LocalizationListener {
     private synchronized void startLocalizing(final AdfInfo adf) {
         Log.d(TAG, "startLocalizing() called with: " + "adf = [" + adf + "]");
         timeForAdfLocalization = System.currentTimeMillis();
-        String msg = mConfig.getString(TMConstants.LOCALIZING_IN_KNOWN_AREA);
+        String msg = mConfig.getString(TangoManagerConstants.LOCALIZING_IN_KNOWN_AREA);
         mTangoUx.showCustomMessage(msg);
         currentAdf = adf; //TODO mchirdeba tu ara?
         if (!mIsConnected) {
@@ -462,7 +462,7 @@ public class TangoManager implements LocalizationListener {
         }
         if (!mIsLearningMode) {
             //mTangoUx.hideCustomMessage();
-            String msg = mConfig.getString(TMConstants.LOCALIZED);
+            String msg = mConfig.getString(TangoManagerConstants.LOCALIZED);
             mTangoUx.showCustomMessage(msg, 1000);
         }
         logLocalization(true);
@@ -474,10 +474,10 @@ public class TangoManager implements LocalizationListener {
         mIsLocalized = false;
         String msg;
         if (mIsLearningMode) {
-            msg = mConfig.getString(TMConstants.LOCALIZATION_LOST_IN_LEARNING);
+            msg = mConfig.getString(TangoManagerConstants.LOCALIZATION_LOST_IN_LEARNING);
             mLearningEvaluator.stop();
         } else {
-            msg = mConfig.getString(TMConstants.LOCALIZATION_LOST);
+            msg = mConfig.getString(TangoManagerConstants.LOCALIZATION_LOST);
         }
         mTangoUx.showCustomMessage(msg);
     }

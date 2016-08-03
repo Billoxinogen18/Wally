@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.google.atap.tangoservice.TangoPoseData;
 import com.wally.wally.config.Config;
-import com.wally.wally.config.LEConstants;
+import com.wally.wally.config.LearningEvaluatorConstants;
 
 import org.rajawali3d.math.Quaternion;
 
@@ -28,11 +28,11 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
     private boolean isFinished;
 
     public LearningEvaluator(Config config) {
-        minTimeMs = config.getInt(LEConstants.MIN_TIME_S) * 1000;
-        maxTimeMs = config.getInt(LEConstants.MAX_TIME_S) * 1000;
-        minCellCount = config.getInt(LEConstants.MIN_CELL_COUNT);
-        minAngleCount = config.getInt(LEConstants.MIN_ANGLE_COUNT);
-        angleResolution = config.getInt(LEConstants.ANGLE_RESOLUTION);
+        minTimeMs = config.getInt(LearningEvaluatorConstants.MIN_TIME_S) * 1000;
+        maxTimeMs = config.getInt(LearningEvaluatorConstants.MAX_TIME_S) * 1000;
+        minCellCount = config.getInt(LearningEvaluatorConstants.MIN_CELL_COUNT);
+        minAngleCount = config.getInt(LearningEvaluatorConstants.MIN_ANGLE_COUNT);
+        angleResolution = config.getInt(LearningEvaluatorConstants.ANGLE_RESOLUTION);
     }
 
     public void addLearningEvaluatorListener(final LearningEvaluatorListener listener){

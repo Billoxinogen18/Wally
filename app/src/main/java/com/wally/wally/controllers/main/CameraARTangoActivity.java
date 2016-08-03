@@ -28,7 +28,7 @@ import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.AdfService;
 import com.wally.wally.components.PersistentDialogFragment;
-import com.wally.wally.config.CTAConstants;
+import com.wally.wally.config.CameraTangoActivityConstants;
 import com.wally.wally.config.Config;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
@@ -239,9 +239,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
     @Override
     public void onPermissionDenied(AdfInfo adfInfo) {
         Config config = Config.getInstance();
-        String message = config.getString(CTAConstants.ADF_EXPORT_EXPLAIN_MSG);
-        String positiveText = config.getString(CTAConstants.ADF_EXPORT_EXPLAIN_PST_BTN);
-        String negativeText = config.getString(CTAConstants.ADF_EXPORT_EXPLAIN_NGT_BTN);
+        String message = config.getString(CameraTangoActivityConstants.ADF_EXPORT_EXPLAIN_MSG);
+        String positiveText = config.getString(CameraTangoActivityConstants.ADF_EXPORT_EXPLAIN_PST_BTN);
+        String negativeText = config.getString(CameraTangoActivityConstants.ADF_EXPORT_EXPLAIN_NGT_BTN);
         DialogFragment df = PersistentDialogFragment.newInstance(RC_EXPLAIN_ADF_EXPORT, null, message, positiveText, negativeText, false);
         df.show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
     }

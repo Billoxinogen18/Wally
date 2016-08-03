@@ -13,7 +13,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Config implements LEConstants, TMConstants, CTAConstants {
+public class Config implements LearningEvaluatorConstants, TangoManagerConstants, CameraTangoActivityConstants {
     public static final String TAG = "WallyConfig";
     private static Config instance;
     private FirebaseRemoteConfig config;
