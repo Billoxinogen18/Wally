@@ -37,11 +37,8 @@ class FirebaseAdfService implements AdfService {
         this.storage = storage.child("ADFs");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public void download(AdfInfo info, final Callback<Void> callback) {
+    public void download(AdfInfo info, final AdfDownloadListener listener) {
         File localFile = new File(info.getPath());
 
         storage.child(info.getUuid()).getFile(localFile)
@@ -49,14 +46,14 @@ class FirebaseAdfService implements AdfService {
                         new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                callback.onResult(null);
+                                listener.onSuccess();
                             }
                         })
                 .addOnFailureListener(
                         new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                callback.onError(e);
+                                listener.onFail(e);
                             }
                         });
     }
@@ -65,9 +62,9 @@ class FirebaseAdfService implements AdfService {
      * {@inheritDoc}
      */
     @Override
-    public void searchNearLocation(SerializableLatLng location, final Callback<List<AdfInfo>> callback) {
+    public void searchNearLocation(SerializableLatLng location, SearchResultListener listener) {
         Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(location, SEARCH_RADIUS_M);
-        ValueEventListener aggregator = getMetaDataAggregatorCallback(queries.size(), callback);
+        ValueEventListener aggregator = getMetaDataAggregatorCallback(queries.size(), listener);
         for (GeoHashQuery q : queries) {
             Query query = db.orderByChild("hash")
                     .startAt(q.getStartValue())
@@ -77,7 +74,7 @@ class FirebaseAdfService implements AdfService {
     }
 
     public ValueEventListener getMetaDataAggregatorCallback(
-            final int n, final Callback<List<AdfInfo>> callback) {
+            final int n, final SearchResultListener listener) {
         return new ValueEventListener() {
             private int nUpdates = n;
             private List<AdfInfo> aggregated = new ArrayList<>();
@@ -95,7 +92,7 @@ class FirebaseAdfService implements AdfService {
                     result.add(toAdfInfo(snapshot));
                 }
                 if (update(result)) {
-                    callback.onResult(aggregated);
+                    listener.onSearchResult(aggregated);
                 }
             }
 

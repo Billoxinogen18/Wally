@@ -33,14 +33,14 @@ public class AdfManager {
         final AdfInfo info = queue.next();
         final String path = Utils.getAdfFilePath(info.getUuid());
         info.withPath(path).withUploadedStatus(true);
-        adfService.download(info, new Callback<Void>() {
+        adfService.download(info, new AdfService.AdfDownloadListener() {
             @Override
-            public void onResult(Void result) {
+            public void onSuccess() {
                 callback.onResult(info);
             }
 
             @Override
-            public void onError(Exception e) {
+            public void onFail(Exception e) {
                 callback.onError(e);
             }
         });
@@ -48,19 +48,14 @@ public class AdfManager {
 
     public static void createWithLocation(SerializableLatLng location, final AdfService adfService,
                                           final Utils.Callback<AdfManager> callback){
-        adfService.searchNearLocation(location, new Callback<List<AdfInfo>>() {
+        adfService.searchNearLocation(location, new AdfService.SearchResultListener() {
             @Override
-            public void onResult(List<AdfInfo> result) {
+            public void onSearchResult(List<AdfInfo> infoList) {
                 AdfManager adfManager = new AdfManager(adfService);
-                for (AdfInfo i : result) {
+                for (AdfInfo i : infoList) {
                     adfManager.addAdfInfo(i);
                 }
                 callback.onResult(adfManager);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
             }
         });
     }
