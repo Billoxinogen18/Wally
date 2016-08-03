@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.wally.wally.R;
-import com.wally.wally.components.CircleTransform;
 import com.wally.wally.userManager.SocialUser;
 
 /**

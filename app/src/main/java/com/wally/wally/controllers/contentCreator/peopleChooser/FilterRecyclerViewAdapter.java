@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Meravici on 6/1/2016.
+ * Created by Meravici on 6/1/2016. yea
  */
 public abstract class FilterRecyclerViewAdapter<ViewHolderT extends RecyclerView.ViewHolder, DataT> extends RecyclerView.Adapter<ViewHolderT> {
     private List<DataT> mFilteredData;
