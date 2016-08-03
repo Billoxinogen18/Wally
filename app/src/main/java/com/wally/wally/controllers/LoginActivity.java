@@ -33,7 +33,6 @@ import com.wally.wally.adf.AdfService;
 import com.wally.wally.controllers.main.CameraARStandardActivity;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.datacontroller.DataControllerFactory;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
@@ -169,11 +168,11 @@ public class LoginActivity extends AppCompatActivity implements
                     REQ_CODE_LOCATION);
             return;
         }
-        Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
+        Utils.getNewLocation(mGoogleApiClient, new Utils.Callback<SerializableLatLng>() {
             @Override
             public void onResult(SerializableLatLng result) {
                 AdfService as = App.getInstance().getAdfService();
-                AdfManager.createWithLocation(result, as, new Callback<AdfManager>() {
+                AdfManager.createWithLocation(result, as, new Utils.Callback<AdfManager>() {
                     @Override
                     public void onResult(AdfManager result) {
                         App.getInstance().setAdfManager(result);

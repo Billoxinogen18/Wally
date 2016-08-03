@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.PopupWindow;
 
 import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.callbacks.Callback;
 
 /**
  * Abstract Popup Dialog class that manages reveal animations.
@@ -62,7 +61,7 @@ public abstract class RevealPopup {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.LOLLIPOP) {
             mPopup.dismiss();
         } else {
-            Utils.addCircularReveal(mAnchor, mPopup.getContentView(), false, new Callback<Void>() {
+            Utils.addCircularReveal(mAnchor, mPopup.getContentView(), false, new Utils.Callback<Void>() {
                 @Override
                 public void onResult(Void result) {
                     mPopup.dismiss();

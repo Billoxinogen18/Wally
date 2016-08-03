@@ -32,7 +32,6 @@ import com.wally.wally.config.CameraTangoActivityConstants;
 import com.wally.wally.config.Config;
 import com.wally.wally.datacontroller.DataController.*;
 import com.wally.wally.datacontroller.DataControllerFactory;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
@@ -365,11 +364,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
             uploadAdf(adfInfo);
             return;
         }
-        Utils.getNewLocation(mGoogleApiClient, new Callback<SerializableLatLng>() {
+        Utils.getNewLocation(mGoogleApiClient, new Utils.Callback<SerializableLatLng>() {
             @Override
             public void onResult(SerializableLatLng result) {
                 adfInfo.withCreationLocation(result);
-                Utils.getAddressForLocation(CameraARTangoActivity.this, result, new Callback<String>() {
+                Utils.getAddressForLocation(CameraARTangoActivity.this, result, new Utils.Callback<String>() {
                     @Override
                     public void onResult(String address) {
                         uploadAdf(adfInfo.withName(address));

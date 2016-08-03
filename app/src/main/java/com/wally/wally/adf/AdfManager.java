@@ -47,7 +47,7 @@ public class AdfManager {
     }
 
     public static void createWithLocation(SerializableLatLng location, final AdfService adfService,
-                                          final Callback<AdfManager> callback){
+                                          final Utils.Callback<AdfManager> callback){
         adfService.searchNearLocation(location, new Callback<List<AdfInfo>>() {
             @Override
             public void onResult(List<AdfInfo> result) {

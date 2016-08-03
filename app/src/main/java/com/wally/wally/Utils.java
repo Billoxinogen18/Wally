@@ -42,7 +42,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.atap.tangoservice.Tango;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
@@ -446,5 +445,10 @@ public final class Utils {
                 }
             }
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public interface Callback<T> {
+        void onResult(T result);
+        void onError(Exception e);
     }
 }
