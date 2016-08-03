@@ -33,7 +33,7 @@ public class DataControllerFactory {
                     storage
             );
 
-            ContentFetcherFactory fFactory = new ContentFetcherFactory(
+            FetcherFactory fFactory = new FetcherFactory(
                     root.child(CONTENTS_NODE)
             );
 

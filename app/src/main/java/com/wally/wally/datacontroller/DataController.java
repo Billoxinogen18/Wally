@@ -10,14 +10,14 @@ import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 public class DataController {
     private ContentManager contentManager;
-    private ContentFetcherFactory fetcherFactory;
+    private FetcherFactory fetcherFactory;
 
     public DataController withContentManager(ContentManager manager) {
         this.contentManager = manager;
         return this;
     }
 
-    public DataController withFetcherFactory(ContentFetcherFactory factory) {
+    public DataController withFetcherFactory(FetcherFactory factory) {
         this.fetcherFactory = factory;
         return this;
     }

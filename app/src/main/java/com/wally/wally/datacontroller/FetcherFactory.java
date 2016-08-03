@@ -21,14 +21,14 @@ import com.wally.wally.datacontroller.DataController.Fetcher;
 import java.util.Collections;
 import java.util.Set;
 
-class ContentFetcherFactory {
+class FetcherFactory {
     public static final double RADIUS_MAX_KM = 1000.0;
     private DatabaseReference contents;
     private DatabaseReference publicContents;
     private DatabaseReference sharedContents;
 
 
-    public ContentFetcherFactory(DatabaseReference contents) {
+    public FetcherFactory(DatabaseReference contents) {
         this.contents = contents;
         this.publicContents = contents.child("Public");
         this.sharedContents = contents.child("Shared");
