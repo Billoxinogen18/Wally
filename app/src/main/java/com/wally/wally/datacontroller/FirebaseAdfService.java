@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FirebaseAdfService implements AdfService {
+class FirebaseAdfService implements AdfService {
     public static final double SEARCH_RADIUS_M = 50;
     private final DatabaseReference db;
     private final StorageReference storage;

@@ -21,11 +21,6 @@ public class FilteredFetcher implements ContentFetcher {
     }
 
     @Override
-    public void fetchPrev(final int count, final FetchResultCallback callback) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
     public void fetchNext(final int count, final FetchResultCallback callback) {
         if (nextContents == null) {
             callback.onResult(Collections.<Content>emptySet());

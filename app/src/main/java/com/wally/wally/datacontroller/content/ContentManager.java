@@ -1,9 +1,19 @@
 package com.wally.wally.datacontroller.content;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
+import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
 import com.wally.wally.datacontroller.callbacks.Callback;
+import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
+import com.wally.wally.datacontroller.queries.FirebaseQuery;
+
+import java.util.Collections;
+import java.util.Map;
 
 public class ContentManager {
     private StorageReference storage;
@@ -59,6 +69,47 @@ public class ContentManager {
         contents.child("Public").child(c.getId()).removeValue();
         contents.child("Shared").child(c.getId()).removeValue();
         contents.child(c.getAuthorId()).child(c.getId()).removeValue();
+    }
+
+    public void fetchAt(String path, final FetchResultCallback callback) {
+        contents.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Content content = FirebaseQuery.firebaseContentFromSnapshot(dataSnapshot).toContent();
+                callback.onResult(Collections.singleton(content));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onError(databaseError.toException());
+            }
+        });
+    }
+
+    public void fetchForUuid(String uuid, final FetchResultCallback callback) {
+        rooms.child(uuid).child("Contents")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        GenericTypeIndicator<Map<String, Boolean>> indicator =
+                                new GenericTypeIndicator<Map<String, Boolean>>(){};
+                        Map<String, Boolean> extendedIds = dataSnapshot.getValue(indicator);
+                        if (extendedIds == null) {
+                            callback.onResult(Collections.<Content>emptySet());
+                            return;
+                        }
+                        AggregatorCallback aggregator = new AggregatorCallback(callback)
+                                .withExpectedCallbacks(extendedIds.size());
+                        for (String key : extendedIds.keySet()) {
+                            fetchAt(key.replace(':', '/'), aggregator);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        callback.onError(databaseError.toException());
+                    }
+                });
     }
 
     private void uploadImage(String imagePath, String folder, final Callback<String> callback) {

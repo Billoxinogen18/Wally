@@ -187,7 +187,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     private void fetchContentForAdf(Context context, String adfUuid) {
-        ((App) context.getApplicationContext()).getDataController().fetchByUUID(adfUuid, new FetchResultCallback() {
+        ((App) context.getApplicationContext()).getDataController().fetchForUuid(adfUuid, new FetchResultCallback() {
 
             @Override
             public void onResult(final Collection<Content> result) {
@@ -393,7 +393,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     private void uploadAdf(AdfInfo info) {
-        AdfService adfService = App.getInstance().getDataController().getADFService();
+        AdfService adfService = App.getInstance().getAdfService();
         String path = Utils.getAdfFilePath(info.getUuid());
         adfService.upload(info.withPath(path));
     }

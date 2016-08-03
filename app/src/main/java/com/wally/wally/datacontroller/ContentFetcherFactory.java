@@ -22,7 +22,7 @@ import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import java.util.Collections;
 import java.util.Set;
 
-public class ContentFetcherFactory {
+class ContentFetcherFactory {
     private DatabaseReference contents;
     private DatabaseReference publicContents;
     private DatabaseReference sharedContents;
@@ -95,11 +95,6 @@ public class ContentFetcherFactory {
 
     public ContentFetcher createTrivial() {
         return new ContentFetcher() {
-            @Override
-            public void fetchPrev(int i, FetchResultCallback callback) {
-                callback.onResult(Collections.<Content>emptySet());
-            }
-
             @Override
             public void fetchNext(int i, FetchResultCallback callback) {
                 callback.onResult(Collections.<Content>emptySet());
