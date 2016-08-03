@@ -91,7 +91,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         initContent(savedInstanceState);
-        mAuthor = App.getInstance().getUserManager().getUser().getBaseUser();
+        mAuthor = App.getInstance().getSocialUserManager().getUser().getBaseUser();
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.CustomDialogTheme);
         View dv = LayoutInflater.from(getActivity()).inflate(R.layout.new_content_dialog, null, false);
@@ -271,7 +271,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
 
     //TODO very bad very bad
     private List<SocialUser> toSocialUserList(List<Id> sharedWith) {
-        List<SocialUser> friendList = App.getInstance().getUserManager().getUser().getFriends();
+        List<SocialUser> friendList = App.getInstance().getSocialUserManager().getUser().getFriends();
         List<SocialUser> result = new ArrayList<>();
         for (Id id : sharedWith) {
             if (id.getProvider().equals(Id.PROVIDER_GOOGLE)) {

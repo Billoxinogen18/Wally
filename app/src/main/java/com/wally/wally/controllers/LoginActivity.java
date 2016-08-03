@@ -36,10 +36,10 @@ import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
-import com.wally.wally.userManager.UserManager;
+import com.wally.wally.userManager.SocialUserManager;
 
 public class LoginActivity extends AppCompatActivity implements
-        UserManager.UserLoadListener,
+        SocialUserManager.UserLoadListener,
         GoogleApiClient.ConnectionCallbacks {
 
     @SuppressWarnings("unused")
@@ -156,7 +156,7 @@ public class LoginActivity extends AppCompatActivity implements
 
     private void saveUserInContext(User user) {
         mLoadingView.setVisibility(View.VISIBLE);
-        App.getInstance().getUserManager().loadLoggedInUser(user, getGoogleApiClient(), this);
+        App.getInstance().getSocialUserManager().loadLoggedInUser(user, getGoogleApiClient(), this);
     }
 
     private void createAdfManager() {

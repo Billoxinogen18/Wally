@@ -296,7 +296,7 @@ public final class Utils {
      * @return true if userId is same signed user.
      */
     public static boolean isCurrentUser(String userId) {
-        SocialUser currentUser = App.getInstance().getUserManager().getUser();
+        SocialUser currentUser = App.getInstance().getSocialUserManager().getUser();
         return currentUser != null &&
                 TextUtils.equals(userId, currentUser.getBaseUser().getId().getId());
     }

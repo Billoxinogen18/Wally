@@ -1,9 +1,6 @@
 package com.wally.wally.userManager;
 
-import android.util.Log;
-
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.user.User;
 
 /**
@@ -12,13 +9,12 @@ import com.wally.wally.datacontroller.user.User;
  * Created by ioane5 on 5/10/16.
  * ReCreated by meravici on 5/21/16.
  */
-public class UserManager {
-    private static final String TAG = "UserManager";
+public class SocialUserManager {
     SocialUserFactory mSocialUserFactory;
     SocialUser mUser;
 
 
-    public UserManager(SocialUserFactory socialUserFactory){
+    public SocialUserManager(SocialUserFactory socialUserFactory){
         mSocialUserFactory = socialUserFactory;
     }
 
@@ -38,7 +34,7 @@ public class UserManager {
         loadUser(user, googleApiClient, new UserLoadListener() {
             @Override
             public void onUserLoad(SocialUser user) {
-                UserManager.this.setUser(user);
+                SocialUserManager.this.setUser(user);
                 userLoadListener.onUserLoad(user);
             }
 

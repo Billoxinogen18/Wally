@@ -6,7 +6,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
-import com.wally.wally.datacontroller.callbacks.Callback;
 
 public class UserManager {
     private User currentUser;
@@ -30,18 +29,23 @@ public class UserManager {
         return currentUser;
     }
 
-    public void fetchUser(String id, final Callback<User> callback) {
+    public void fetchUser(String id, final UserFetchListener listener) {
         users.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                callback.onResult(dataSnapshot.getValue(User.class));
+                listener.onUserFetchSuccess(dataSnapshot.getValue(User.class));
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.onError(databaseError.toException());
+                listener.onUserFetchFail(databaseError.toException());
             }
         });
+    }
+
+    public interface UserFetchListener {
+        void onUserFetchSuccess(User user);
+        void onUserFetchFail(Exception e);
     }
 
 }

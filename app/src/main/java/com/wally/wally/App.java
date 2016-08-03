@@ -8,7 +8,7 @@ import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.AdfService;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.DataControllerFactory;
-import com.wally.wally.userManager.UserManager;
+import com.wally.wally.userManager.SocialUserManager;
 import com.wally.wally.userManager.SocialUserFactory;
 
 /**
@@ -17,7 +17,7 @@ import com.wally.wally.userManager.SocialUserFactory;
 public class App extends Application {
     private static App sInstance = null;
 
-    private UserManager userManager;
+    private SocialUserManager socialUserManager;
     private AdfManager adfManager;
 
     public static App getInstance() {
@@ -32,7 +32,7 @@ public class App extends Application {
     public void onCreate() {
         MultiDex.install(getApplicationContext());
         super.onCreate();
-        userManager = new UserManager(new SocialUserFactory());
+        socialUserManager = new SocialUserManager(new SocialUserFactory());
         sInstance = this;
     }
 
@@ -45,8 +45,8 @@ public class App extends Application {
         return DataControllerFactory.getDataControllerInstance();
     }
 
-    public UserManager getUserManager() {
-        return userManager;
+    public SocialUserManager getSocialUserManager() {
+        return socialUserManager;
     }
 
     public void setAdfManager(AdfManager adfManager) {

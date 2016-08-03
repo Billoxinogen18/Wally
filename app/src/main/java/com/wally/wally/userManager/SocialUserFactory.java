@@ -26,12 +26,12 @@ public class SocialUserFactory {
         userCache = new HashMap<>();
     }
 
-    public void getSocialUser(final User baseUser, final GoogleApiClient googleApiClient, final UserManager.UserLoadListener userLoadListener) {
+    public void getSocialUser(final User baseUser, final GoogleApiClient googleApiClient, final SocialUserManager.UserLoadListener userLoadListener) {
         final CompoundUser compoundUser = new CompoundUser();
         if (userCache.containsKey(baseUser.getId())) {
             userLoadListener.onUserLoad(userCache.get(baseUser.getId()));
         } else if (baseUser.getGgId() != null) {
-            getGoogleUser(baseUser, googleApiClient, new UserManager.UserLoadListener() {
+            getGoogleUser(baseUser, googleApiClient, new SocialUserManager.UserLoadListener() {
                 @Override
                 public void onUserLoad(SocialUser user) {
                     compoundUser.addSocialUser(user);
@@ -51,7 +51,7 @@ public class SocialUserFactory {
         }
     }
 
-    private void getGoogleUser(final User baseUser, final GoogleApiClient googleApiClient, final UserManager.UserLoadListener userLoadListener) {
+    private void getGoogleUser(final User baseUser, final GoogleApiClient googleApiClient, final SocialUserManager.UserLoadListener userLoadListener) {
         Plus.PeopleApi.load(googleApiClient, baseUser.getGgId().getId()).setResultCallback(
                 new ResultCallback<People.LoadPeopleResult>() {
                     @Override

@@ -414,7 +414,7 @@ public class MapsFragment extends Fragment implements
         double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
         DataController.Fetcher contentFetcher;
 
-        if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
+        if (mUserProfile != null && App.getInstance().getSocialUserManager().getUser().equals(mUserProfile)) {
             contentFetcher = App.getInstance().getDataController()
                     .createFetcherForMyContent();
         } else if (mUserProfile != null) {

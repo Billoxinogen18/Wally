@@ -47,7 +47,7 @@ public class PeopleChooserPopup extends RevealPopup implements
 
         mAdapter = new PeopleListAdapter(mContext);
         mAdapter.setUserSelectListener(this);
-        mAdapter.setData(App.getInstance().getUserManager().getUser().getFriends());
+        mAdapter.setData(App.getInstance().getSocialUserManager().getUser().getFriends());
 
         RecyclerView mRecycler = (RecyclerView) v.findViewById(R.id.recyclerview_people);
         mRecycler.setLayoutManager(new LinearLayoutManager(mContext));

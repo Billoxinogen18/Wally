@@ -22,10 +22,10 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.DataControllerFactory;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
+import com.wally.wally.datacontroller.user.UserManager;
 import com.wally.wally.userManager.SocialUser;
-import com.wally.wally.userManager.UserManager;
+import com.wally.wally.userManager.SocialUserManager;
 
 /**
  * User info view that is simple profile picture with user name on it.
@@ -185,7 +185,7 @@ public class UserInfoView extends LinearLayout {
             setAnonymousUser();
         } else {
             if (isOwn) {
-                setUser(App.getInstance().getUserManager().getUser());
+                setUser(App.getInstance().getSocialUserManager().getUser());
             } else {
                 loadAndSetUser(userId, googleApiClient);
             }
@@ -205,14 +205,14 @@ public class UserInfoView extends LinearLayout {
 
         mUserImage.setImageResource(R.drawable.ic_account_circle_black_24dp);
         mUserName.setText(R.string.loading);
-        DataControllerFactory.getUserManagerInstance().fetchUser(userId, new Callback<User>() {
+        DataControllerFactory.getUserManagerInstance().fetchUser(userId, new UserManager.UserFetchListener() {
             @Override
-            public void onResult(User result) {
+            public void onUserFetchSuccess(User result) {
                 // Check if new request came while we were loading user data.
                 if (!TextUtils.equals(mLastUserId, userId) || result == null || ((Activity) getContext()).isDestroyed()) {
                     return;
                 }
-                App.getInstance().getUserManager().loadUser(result, googleApiClient, new UserManager.UserLoadListener() {
+                App.getInstance().getSocialUserManager().loadUser(result, googleApiClient, new SocialUserManager.UserLoadListener() {
                     @Override
                     public void onUserLoad(SocialUser user) {
                         // Second check here
@@ -230,7 +230,7 @@ public class UserInfoView extends LinearLayout {
             }
 
             @Override
-            public void onError(Exception e) {
+            public void onUserFetchFail(Exception e) {
                 Log.e(TAG, "onError: ", e);
             }
         });

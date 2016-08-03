@@ -29,7 +29,7 @@ import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.tango.OnVisualContentSelectedListener;
 import com.wally.wally.tango.VisualContent;
 import com.wally.wally.userManager.SocialUser;
-import com.wally.wally.userManager.UserManager;
+import com.wally.wally.userManager.SocialUserManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
@@ -48,7 +48,7 @@ public abstract class CameraARActivity extends AppCompatActivity implements
     protected DataController mDataController;
     protected GoogleApiClient mGoogleApiClient;
     protected WallyAnalytics mAnalytics;
-    private UserManager mUserManager;
+    private SocialUserManager mSocialUserManager;
 
     private long mLastSelectTime;
     private Content mSelectedContent; //TODO may be needed to remove
@@ -85,7 +85,7 @@ public abstract class CameraARActivity extends AppCompatActivity implements
         mSelectedMenuView = (SelectedMenuView) findViewById(R.id.selected_menu_view);
         mSelectedMenuView.setOnSelectedMenuActionListener(this);
         // Initialize managers
-        mUserManager = ((App) getApplicationContext()).getUserManager(); //TODO get LoginManager from the Factory!
+        mSocialUserManager = ((App) getApplicationContext()).getSocialUserManager(); //TODO get LoginManager from the Factory!
         mDataController = ((App) getApplicationContext()).getDataController();
 
         mNewContentButton = findViewById(R.id.btn_new_post);
@@ -122,8 +122,8 @@ public abstract class CameraARActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        if (mUserManager.isLoggedIn()) {
-            displayProfileBar(mUserManager.getUser());
+        if (mSocialUserManager.isLoggedIn()) {
+            displayProfileBar(mSocialUserManager.getUser());
         }
     }
 
@@ -156,7 +156,7 @@ public abstract class CameraARActivity extends AppCompatActivity implements
 
     public void onContentSelected(final Content content) {
         mSelectedContent = content;
-        if (App.getInstance().getUserManager().isLoggedIn()) {
+        if (App.getInstance().getSocialUserManager().isLoggedIn()) {
             runOnUiThread(new Runnable() {
                 @SuppressWarnings("ConstantConditions")
                 @Override
@@ -213,7 +213,7 @@ public abstract class CameraARActivity extends AppCompatActivity implements
     }
 
     public void onShowProfileClick(View v) {
-        onProfileClick(mUserManager.getUser(), true);
+        onProfileClick(mSocialUserManager.getUser(), true);
     }
 
 

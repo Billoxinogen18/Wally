@@ -13,42 +13,42 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Created by shota on 5/24/16.
  */
 
-public class UserManagerTest {
-    private UserManager mUserManager;
+public class SocialUserManagerTest {
+    private SocialUserManager mSocialUserManager;
 
     @Before
     public void init(){
-        mUserManager = new UserManager(null);
+        mSocialUserManager = new SocialUserManager(null);
     }
 
 
     @After
     public void finish(){
-        mUserManager = null;
+        mSocialUserManager = null;
     }
 
     @Test
     public void isLoggedInTest1(){
-        assertThat(mUserManager.isLoggedIn(), is(false));
+        assertThat(mSocialUserManager.isLoggedIn(), is(false));
     }
 
     @Test
     public void isLoggedInTest2(){
-        mUserManager.setUser(new GoogleUser(new User()));
-        assertThat(mUserManager.isLoggedIn(), is(true));
+        mSocialUserManager.setUser(new GoogleUser(new User()));
+        assertThat(mSocialUserManager.isLoggedIn(), is(true));
     }
 
     @Test
     public void isLoggedInTest3(){
-        mUserManager.setUser(null);
-        assertThat(mUserManager.isLoggedIn(), is(false));
+        mSocialUserManager.setUser(null);
+        assertThat(mSocialUserManager.isLoggedIn(), is(false));
     }
 
     @Test
     public void setUserTest(){
         SocialUser gu = new GoogleUser(new User());
-        mUserManager.setUser(gu);
-        assertThat(mUserManager.getUser(), is(gu));
+        mSocialUserManager.setUser(gu);
+        assertThat(mSocialUserManager.getUser(), is(gu));
     }
 
 
