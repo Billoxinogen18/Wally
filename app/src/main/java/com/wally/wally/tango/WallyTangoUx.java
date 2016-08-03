@@ -9,6 +9,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.atap.tango.ux.TangoUx;
@@ -21,6 +22,7 @@ import com.wally.wally.R;
 public class WallyTangoUx extends TangoUx {
     private Handler mMainThreadHandler;
     private TextView mTextView;
+    private RelativeLayout mContainer;
     private Context mContext;
 
     private Runnable hideMessageRunnable;
@@ -78,7 +80,14 @@ public class WallyTangoUx extends TangoUx {
             });
     }
 
+    public void setVisible(boolean isVisible){
+        mContainer.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+    }
+
     private void addTextView(TangoUxLayout tangoUxLayout) {
+        mContainer = new RelativeLayout(mContext);
+        mContainer.setGravity(Gravity.CENTER);
+
         mTextView = new TextView(mContext);
         mTextView.setPadding(50,50,50,50);
         mTextView.setGravity(Gravity.CENTER);
@@ -87,11 +96,16 @@ public class WallyTangoUx extends TangoUx {
         mTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 34);
         mTextView.setVisibility(View.GONE);
 
+        RelativeLayout.LayoutParams containerParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        containerParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+
+        mContainer.addView(mTextView, containerParams);
+
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
 
-        tangoUxLayout.addView(mTextView, params);
+        tangoUxLayout.addView(mContainer, params);
     }
 
 

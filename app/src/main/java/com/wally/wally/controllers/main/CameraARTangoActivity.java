@@ -66,6 +66,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private boolean mExplainAdfPermission;
 
     private TangoManager mTangoManager;
+    private WallyTangoUx mTangoUx;
     private FloatingActionButton mCreateNewContent;
     private FloatingActionButton mFinishFitting;
     private View mLayoutFitting;
@@ -104,20 +105,20 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mRenderer = new WallyRenderer(context, mVisualContentManager, this);
 
         mSurfaceView.setSurfaceRenderer(mRenderer);
-        WallyTangoUx tangoUx = new WallyTangoUx(context);
+        mTangoUx = new WallyTangoUx(context);
         LearningEvaluator evaluator = new LearningEvaluator(config);
 
         TangoPointCloudManager pointCloudManager = new TangoPointCloudManager();
 
-        tangoUx.setLayout(mTangoUxLayout);
-        TangoUpdater tangoUpdater = new TangoUpdater(tangoUx, mSurfaceView, pointCloudManager);
+        mTangoUx.setLayout(mTangoUxLayout);
+        TangoUpdater tangoUpdater = new TangoUpdater(mTangoUx, mSurfaceView, pointCloudManager);
         tangoUpdater.addLocalizationListener(this);
 
         TangoFactory tangoFactory = new TangoFactory(context);
 
         AdfManager adfManager = App.getInstance().getAdfManager();
         mTangoManager = new TangoManager(config, mAnalytics, tangoUpdater,
-                pointCloudManager, mRenderer, tangoUx, tangoFactory, adfManager, evaluator);
+                pointCloudManager, mRenderer, mTangoUx, tangoFactory, adfManager, evaluator);
         restoreState(savedInstanceState);
 
 
@@ -455,4 +456,16 @@ public class CameraARTangoActivity extends CameraARActivity implements
         }
     }
 
+
+    @Override
+    public void onMapClose() {
+        super.onMapClose();
+        mTangoUx.setVisible(true);
+    }
+
+    @Override
+    public void onMapOpen() {
+        super.onMapOpen();
+        mTangoUx.setVisible(false);
+    }
 }
