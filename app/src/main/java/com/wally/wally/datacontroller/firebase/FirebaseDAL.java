@@ -2,22 +2,25 @@ package com.wally.wally.datacontroller.firebase;
 
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.wally.wally.datacontroller.callbacks.Callback;
 
 import java.io.File;
 import java.util.UUID;
 
 public class FirebaseDAL {
 
+    public interface FileUploadListener {
+        void onUploadSuccess(String downloadUri);
+    }
+
     public static void uploadFile(StorageReference storage, String localPath, String name,
-                                   final Callback<String > callback) {
+                                  final FileUploadListener listener) {
         storage.child(name)
                 .putFile(Uri.fromFile(new File(localPath)))
                 .addOnSuccessListener(
@@ -26,9 +29,10 @@ public class FirebaseDAL {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 Uri downloadUri = taskSnapshot.getDownloadUrl();
                                 if (downloadUri == null) {
-                                    callback.onError(new Exception("could not upload!"));
+                                    Log.d("FirebaseDAL", "File upload error");
+                                    // not clear what should we do yet! TODO
                                 } else {
-                                    callback.onResult(downloadUri.toString());
+                                    listener.onUploadSuccess(downloadUri.toString());
                                 }
                             }
                         })
@@ -36,14 +40,16 @@ public class FirebaseDAL {
                         new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                callback.onError(e);
+                                Log.d("FirebaseDAL", "File upload error");
+                                // not clear what should we do yet! TODO
                             }
                         }
                 );
     }
 
-    public static void uploadFile(StorageReference storage, String localPath,
-                                  final Callback<String> callback) {
+    public static void uploadFile(StorageReference storage,
+                                  String localPath,
+                                  FileUploadListener callback) {
         uploadFile(storage, localPath, UUID.randomUUID().toString(), callback);
     }
 
@@ -52,33 +58,8 @@ public class FirebaseDAL {
         return ref.getKey();
     }
 
-    public static void save(DatabaseReference ref, FirebaseObject target,
-                            final Callback<String > callback) {
-        ref.push().setValue(target, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError error, DatabaseReference destination) {
-                if (error == null) {
-                    callback.onResult(destination.getKey());
-                } else {
-                    callback.onError(error.toException());
-                }
-            }
-        });
-    }
-
     public static String delete(DatabaseReference ref, FirebaseObject target) {
         ref.child(target.id).removeValue();
         return null;
     }
-
-    public static void delete(DatabaseReference ref, FirebaseObject target,
-                              final Callback<Boolean> statusCallback) {
-        ref.child(target.id).removeValue(new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
-                statusCallback.onResult(firebaseError == null);
-            }
-        });
-    }
-
 }

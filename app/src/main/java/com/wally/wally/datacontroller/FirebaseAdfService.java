@@ -13,7 +13,6 @@ import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfService;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
@@ -103,15 +102,11 @@ class FirebaseAdfService implements AdfService {
 
     @Override
     public void upload(final AdfInfo info) {
-        FirebaseDAL.uploadFile(storage, info.getPath(), info.getUuid(), new Callback<String>() {
+        FirebaseDAL.uploadFile(storage, info.getPath(), info.getUuid(),
+                new FirebaseDAL.FileUploadListener() {
             @Override
-            public void onResult(String result) {
+            public void onUploadSuccess(String result) {
                 saveMetaData(info);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                // should retry?!
             }
         });
     }

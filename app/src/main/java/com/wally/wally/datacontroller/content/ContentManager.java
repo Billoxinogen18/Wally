@@ -8,7 +8,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
-import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.queries.FirebaseQuery;
 
@@ -23,7 +22,7 @@ public class ContentManager {
                           DatabaseReference contents,
                           StorageReference storage) {
 
-        this.rooms =rooms;
+        this.rooms = rooms;
         this.storage = storage;
         this.contents = contents;
     }
@@ -35,22 +34,15 @@ public class ContentManager {
         uploadImage(
                 c.getImageUri(),
                 ref.getKey(),
-                new Callback<String>() {
+                new FirebaseDAL.FileUploadListener() {
                     @Override
-                    public void onResult(String result) {
+                    public void onUploadSuccess(String result) {
                         c.withImageUri(result);
                         new FirebaseContent(c).save(ref);
                         if (c.getUuid() != null) {
                             String extendedId = ref.getParent().getKey() + ":" + ref.getKey();
                             addInRoom(c.getUuid(), extendedId);
                         }
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        // Omitted Implementation:
-                        // If we are here image upload failed somehow
-                        // We decided to leave this case for now!
                     }
                 }
         );
@@ -112,12 +104,10 @@ public class ContentManager {
                 });
     }
 
-    private void uploadImage(String imagePath, String folder, final Callback<String> callback) {
+    private void uploadImage(String imagePath, String folder, FirebaseDAL.FileUploadListener listener) {
         if (imagePath != null && imagePath.startsWith(Content.UPLOAD_URI_PREFIX)) {
             String imgUriString = imagePath.substring(Content.UPLOAD_URI_PREFIX.length());
-            FirebaseDAL.uploadFile(storage.child(folder), imgUriString, callback);
-        } else {
-            callback.onResult(imagePath);
+            FirebaseDAL.uploadFile(storage.child(folder), imgUriString, listener);
         }
     }
 

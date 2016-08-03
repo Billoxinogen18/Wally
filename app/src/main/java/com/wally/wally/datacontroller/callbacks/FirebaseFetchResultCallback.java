@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class FirebaseFetchResultCallback implements Callback<Collection<FirebaseContent>> {
+public class FirebaseFetchResultCallback {
     private FetchResultCallback callback;
     private Predicate<Content> predicate;
 
@@ -27,7 +27,6 @@ public class FirebaseFetchResultCallback implements Callback<Collection<Firebase
         this.predicate = predicate;
     }
 
-    @Override
     public void onResult(Collection<FirebaseContent> fetched) {
         List<Content> result = new ArrayList<>();
         for (FirebaseContent c : fetched) {
@@ -40,7 +39,6 @@ public class FirebaseFetchResultCallback implements Callback<Collection<Firebase
     }
 
 
-    @Override
     public void onError(Exception e) {
         callback.onError(e);
     }
