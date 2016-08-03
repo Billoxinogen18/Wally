@@ -38,8 +38,6 @@ import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.controllers.map.contentList.View;
-import com.wally.wally.components.CircleTransform;
-import com.wally.wally.controllers.main.CameraARActivity;
 import com.wally.wally.controllers.map.contentList.ViewItem;
 import com.wally.wally.controllers.map.contentList.PagingRetriever;
 import com.wally.wally.controllers.map.contentList.OnScrollListener;
@@ -248,7 +246,7 @@ public class MapsFragment extends Fragment implements
 
     @Override
     public void onProfileClicked(SocialUser user) {
-        ((CameraARActivity) getActivity()).showMapFragment(user);
+        mListener.openMapFragment(user);
     }
 
     public void onMyLocationClick() {
@@ -469,5 +467,7 @@ public class MapsFragment extends Fragment implements
         void onMapClose();
 
         void onMapOpen();
+
+        void openMapFragment(SocialUser socialUser);
     }
 }

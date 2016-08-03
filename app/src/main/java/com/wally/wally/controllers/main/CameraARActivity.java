@@ -209,7 +209,7 @@ public abstract class CameraARActivity extends AppCompatActivity implements
 
     public void onBtnMapClick(View v) {
         mAnalytics.onButtonClick("Map");
-        showMapFragment(null);
+        openMapFragment(null);
     }
 
     public void onShowProfileClick(View v) {
@@ -245,7 +245,7 @@ public abstract class CameraARActivity extends AppCompatActivity implements
         } else {
             mAnalytics.onButtonClick("Some_Profile");
         }
-        showMapFragment(user);
+        openMapFragment(user);
     }
 
     protected void saveActiveContent(Content content) {
@@ -284,7 +284,7 @@ public abstract class CameraARActivity extends AppCompatActivity implements
         infoView.setUser(user);
     }
 
-    public void showMapFragment(SocialUser user) {
+    public void openMapFragment(SocialUser user) {
         MapsFragment mf = MapsFragment.newInstance(user);
 
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
