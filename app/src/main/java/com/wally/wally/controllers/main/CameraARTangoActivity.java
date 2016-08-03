@@ -30,8 +30,9 @@ import com.wally.wally.adf.AdfService;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.config.CameraTangoActivityConstants;
 import com.wally.wally.config.Config;
+import com.wally.wally.datacontroller.DataController.*;
+import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.callbacks.Callback;
-import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.tango.ActiveContentScaleGestureDetector;
@@ -78,8 +79,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private WallyRenderer mRenderer;
     private SerializableLatLng mLocalizationLocation;
     private Content editableContent;
-    private Content mEditableContent;
-    private boolean mIsEditing;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, CameraARTangoActivity.class);
@@ -186,8 +185,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
         }
     }
 
-    private void fetchContentForAdf(Context context, String adfUuid) {
-        ((App) context.getApplicationContext()).getDataController().fetchForUuid(adfUuid, new FetchResultCallback() {
+    private void fetchContentForAdf(String adfUuid) {
+        DataControllerFactory.getDataControllerInstance()
+                .fetchForUuid(adfUuid, new FetchResultCallback() {
 
             @Override
             public void onResult(final Collection<Content> result) {
@@ -253,10 +253,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
             mVisualContentManager.removePendingStaticContent(contentCreated);
             Log.d(TAG, "onContentCreated() deleted " + contentCreated);
-            mIsEditing = true;
             editableContent = new Content(contentCreated);
         } else {
-            mIsEditing = false;
             editableContent = null;
         }
         if (mContentFitter != null) {
@@ -347,7 +345,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         if (editableContent != null) {
             mVisualContentManager.addPendingStaticContent(editableContent);
             editableContent = null;
-            mIsEditing = false;
         }
 
         onFitStatusChange(false);
@@ -409,7 +406,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 if (!mTangoManager.isLearningMode()) {
                     mCreateNewContent.setVisibility(View.VISIBLE);
                     if (!mVisualContentManager.getStaticVisualContentToAdd().hasNext()) {
-                        fetchContentForAdf(getBaseContext(), mTangoManager.getCurrentAdf().getUuid());
+                        fetchContentForAdf(mTangoManager.getCurrentAdf().getUuid());
                     }
                 }
                 setLocalizationLocation();

@@ -1,7 +1,6 @@
 package com.wally.wally.datacontroller.fetchers;
 
-import com.wally.wally.datacontroller.DataController.Fetcher;
-import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
+import com.wally.wally.datacontroller.DataController.*;
 import com.wally.wally.datacontroller.content.Content;
 
 import java.util.ArrayList;

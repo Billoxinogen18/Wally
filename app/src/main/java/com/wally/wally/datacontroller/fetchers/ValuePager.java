@@ -2,9 +2,8 @@ package com.wally.wally.datacontroller.fetchers;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
-import com.wally.wally.datacontroller.DataController.Fetcher;
+import com.wally.wally.datacontroller.DataController.*;
 import com.wally.wally.datacontroller.callbacks.Callback;
-import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.queries.FirebaseQuery;

@@ -3,8 +3,7 @@ package com.wally.wally.endlessScroll;
 import android.os.Handler;
 
 import com.wally.wally.controllers.map.contentList.PagingRetriever;
-import com.wally.wally.datacontroller.DataController.Fetcher;
-import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
+import com.wally.wally.datacontroller.DataController.*;
 import com.wally.wally.datacontroller.content.Content;
 
 import org.junit.After;

@@ -1,12 +1,14 @@
 package com.wally.wally.datacontroller;
 
 import static com.wally.wally.datacontroller.DataControllerFactory.getUserManagerInstance;
-import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
+
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.ContentManager;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
+
+import java.util.Collection;
 
 public class DataController {
     private ContentManager contentManager;
@@ -59,8 +61,13 @@ public class DataController {
         return chain;
     }
 
+    public interface FetchResultCallback {
+        void onResult(Collection<Content> result);
 
-    public interface  Fetcher {
+        void onError(Exception e);
+    }
+
+    public interface Fetcher {
         void fetchNext(int i, FetchResultCallback callback);
     }
 }

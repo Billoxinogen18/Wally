@@ -1,7 +1,6 @@
 package com.wally.wally.datacontroller;
 
 import com.google.firebase.database.DatabaseReference;
-import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.fetchers.FilteredFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
@@ -18,6 +17,7 @@ import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.Predicate;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.datacontroller.DataController.Fetcher;
+import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import java.util.Collections;
 import java.util.Set;
 

@@ -1,7 +1,6 @@
 package com.wally.wally.datacontroller.callbacks;
 
-import android.util.Log;
-
+import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 
 import java.util.Collection;
