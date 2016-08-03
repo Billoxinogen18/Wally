@@ -4,7 +4,6 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AnimationUtils;
 import android.view.animation.BounceInterpolator;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -73,7 +72,6 @@ public class CircleUserView extends RelativeLayout {
     private void setData() {
         Glide.with(getContext())
                 .load(mSocialUser.getAvatarUrl())
-                .transform(new CircleTransform(getContext()))
                 .into(mAvatarImageView);
 
         mNameTextView.setText(mSocialUser.getDisplayName());
