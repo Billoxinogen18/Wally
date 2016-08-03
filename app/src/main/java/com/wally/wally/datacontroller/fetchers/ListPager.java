@@ -1,6 +1,7 @@
 package com.wally.wally.datacontroller.fetchers;
 
 
+import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 
@@ -9,7 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class ListPager implements ContentFetcher {
+public class ListPager implements Fetcher {
     private final List<Content> contents;
     private int nextIndex;
 

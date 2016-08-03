@@ -1,5 +1,6 @@
 package com.wally.wally.datacontroller.fetchers;
 
+import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 
@@ -7,22 +8,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class PagerChain implements ContentFetcher {
+public class PagerChain implements Fetcher {
     private int currentPagerIndex;
-    private List<ContentFetcher> pagerList;
+    private List<Fetcher> pagerList;
     private Collection<Content> tail;
 
-    public PagerChain(List<ContentFetcher> pagerList) {
+    public PagerChain(List<Fetcher> pagerList) {
         this.pagerList = pagerList;
         this.currentPagerIndex = 0;
         tail = new ArrayList<>();
     }
 
     public PagerChain() {
-        this(new ArrayList<ContentFetcher>());
+        this(new ArrayList<Fetcher>());
     }
 
-    public PagerChain addPager(ContentFetcher fetcher) {
+    public PagerChain addPager(Fetcher fetcher) {
         pagerList.add(fetcher);
         return this;
     }

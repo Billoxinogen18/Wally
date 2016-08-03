@@ -4,7 +4,6 @@ import static com.wally.wally.datacontroller.DataControllerFactory.getUserManage
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.ContentManager;
-import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
@@ -35,7 +34,7 @@ public class DataController {
         contentManager.fetchForUuid(uuid, callback);
     }
 
-    public ContentFetcher createFetcherForMyContent() {
+    public Fetcher createFetcherForMyContent() {
         User current = getUserManagerInstance().getCurrentUser();
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForPrivate(current));
@@ -44,7 +43,7 @@ public class DataController {
         return chain;
     }
 
-    public ContentFetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
+    public Fetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForSharedWithMe(
                 getUserManagerInstance().getCurrentUser(), center, radiusKm));
@@ -52,11 +51,16 @@ public class DataController {
         return chain;
     }
 
-    public ContentFetcher createFetcherForUserContent(User user) {
+    public Fetcher createFetcherForUserContent(User user) {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForSharedWithMe(
                 getUserManagerInstance().getCurrentUser(), user));
         chain.addPager(fetcherFactory.createForPublic(user));
         return chain;
+    }
+
+
+    public interface  Fetcher {
+        void fetchNext(int i, FetchResultCallback callback);
     }
 }

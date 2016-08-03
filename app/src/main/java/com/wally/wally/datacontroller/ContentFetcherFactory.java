@@ -3,7 +3,6 @@ package com.wally.wally.datacontroller;
 import com.google.firebase.database.DatabaseReference;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.FilteredFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
@@ -18,7 +17,7 @@ import com.wally.wally.datacontroller.queries.SharedWithQuery;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.Predicate;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
-
+import com.wally.wally.datacontroller.DataController.Fetcher;
 import java.util.Collections;
 import java.util.Set;
 
@@ -35,48 +34,48 @@ class ContentFetcherFactory {
         this.sharedContents = contents.child("Shared");
     }
 
-    public ContentFetcher createForPrivate(User current) {
+    public Fetcher createForPrivate(User current) {
         return new KeyPager(contents.child(current.getId().getId()));
     }
 
-    public ContentFetcher createForPublic(User user) {
+    public Fetcher createForPublic(User user) {
         FirebaseQuery authorQuery = new AuthorQuery(user.getId());
         ContentQuery query = new ContentQuery(authorQuery, publicContents);
         return new QueryContentFetcher(query);
     }
 
-    public ContentFetcher createForPublic(SerializableLatLng center, double radiusKm) {
-        ContentFetcher fetcher = createForLocation(center, radiusKm, publicContents);
+    public Fetcher createForPublic(SerializableLatLng center, double radiusKm) {
+        Fetcher fetcher = createForLocation(center, radiusKm, publicContents);
         if (fetcher == null) { fetcher = new KeyPager(publicContents); }
         return fetcher;
     }
 
-    public ContentFetcher createForSharedByMe(User current) {
+    public Fetcher createForSharedByMe(User current) {
         FirebaseQuery authorQuery = new AuthorQuery(current.getId());
         ContentQuery query = new ContentQuery(authorQuery, sharedContents);
         return new QueryContentFetcher(query);
     }
 
-    public ContentFetcher createForSharedWithMe(User current, SerializableLatLng center, double radiusKm) {
+    public Fetcher createForSharedWithMe(User current, SerializableLatLng center, double radiusKm) {
         FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
         Predicate<Content> predicate = isLocationInRangePredicate(center, radiusKm);
         ContentQuery query = new ContentQuery(sharedWithQuery, sharedContents, predicate);
         return new QueryContentFetcher(query);
     }
 
-    public ContentFetcher createForSharedWithMe(User current, User other) {
-        ContentFetcher sharedContentFetcher = createForSharedWithMe(current);
+    public Fetcher createForSharedWithMe(User current, User other) {
+        Fetcher sharedContentFetcher = createForSharedWithMe(current);
         Predicate<Content> hasAuthorPredicate = hasAuthorPredicate(other.getId().getId());
         return new FilteredFetcher(sharedContentFetcher, hasAuthorPredicate);
     }
 
-    public ContentFetcher createForSharedWithMe(User current) {
+    public Fetcher createForSharedWithMe(User current) {
         FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
         ContentQuery query = new ContentQuery(sharedWithQuery, sharedContents);
         return new QueryContentFetcher(query);
     }
 
-    private ContentFetcher createForLocation(
+    private Fetcher createForLocation(
             SerializableLatLng center, double radiusKm, DatabaseReference target) {
         // We decided that too big radius (>2500 km)
         // means we don't need to filter by location
@@ -94,8 +93,8 @@ class ContentFetcherFactory {
         return new FilteredFetcher(chain, isLocationInRangePredicate(center, radiusKm));
     }
 
-    public ContentFetcher createTrivial() {
-        return new ContentFetcher() {
+    public Fetcher createTrivial() {
+        return new Fetcher() {
             @Override
             public void fetchNext(int i, FetchResultCallback callback) {
                 callback.onResult(Collections.<Content>emptySet());

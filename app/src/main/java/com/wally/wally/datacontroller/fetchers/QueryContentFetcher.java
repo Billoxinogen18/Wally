@@ -1,12 +1,13 @@
 package com.wally.wally.datacontroller.fetchers;
 
+import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.queries.ContentQuery;
 
 import java.util.Collection;
 
-public class QueryContentFetcher implements ContentFetcher {
+public class QueryContentFetcher implements Fetcher {
     private final ContentQuery query;
     private ListPager fetcher;
 

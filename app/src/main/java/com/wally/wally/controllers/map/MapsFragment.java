@@ -42,8 +42,8 @@ import com.wally.wally.controllers.map.contentList.ViewItem;
 import com.wally.wally.controllers.map.contentList.PagingRetriever;
 import com.wally.wally.controllers.map.contentList.OnScrollListener;
 import com.wally.wally.controllers.map.contentList.Adapter;
+import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.userManager.SocialUser;
 
 import java.util.List;
@@ -396,7 +396,7 @@ public class MapsFragment extends Fragment implements
     }
 
     private void loadContentNearLocation(CameraPosition cameraPosition) {
-        ContentFetcher contentFetcher = getContentFetcher(cameraPosition);
+        DataController.Fetcher contentFetcher = getContentFetcher(cameraPosition);
 
         mContentRetriever = new PagingRetriever(contentFetcher, mainThreadHandler, PAGE_LENGTH);
         mContentRetriever.registerLoadListener(this);
@@ -409,10 +409,10 @@ public class MapsFragment extends Fragment implements
         mMarkerManager.reset();
     }
 
-    private ContentFetcher getContentFetcher(CameraPosition cameraPosition) {
+    private DataController.Fetcher getContentFetcher(CameraPosition cameraPosition) {
         VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
         double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
-        ContentFetcher contentFetcher;
+        DataController.Fetcher contentFetcher;
 
         if (mUserProfile != null && App.getInstance().getUserManager().getUser().equals(mUserProfile)) {
             contentFetcher = App.getInstance().getDataController()

@@ -2,6 +2,7 @@ package com.wally.wally.datacontroller.fetchers;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
+import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
@@ -13,7 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class KeyPager implements ContentFetcher {
+public class KeyPager implements Fetcher {
 
     private final DatabaseReference contents;
 

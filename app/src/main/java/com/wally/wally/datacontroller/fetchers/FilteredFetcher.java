@@ -1,5 +1,6 @@
 package com.wally.wally.datacontroller.fetchers;
 
+import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.utils.Predicate;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
@@ -9,12 +10,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public class FilteredFetcher implements ContentFetcher {
+public class FilteredFetcher implements Fetcher {
     private List<Content> nextContents;
-    private final ContentFetcher fetcher;
+    private final Fetcher fetcher;
     private final Predicate<Content> predicate;
 
-    public FilteredFetcher(ContentFetcher fetcher, Predicate<Content> predicate) {
+    public FilteredFetcher(Fetcher fetcher, Predicate<Content> predicate) {
         this.fetcher = fetcher;
         this.predicate = predicate;
         nextContents = new ArrayList<>();

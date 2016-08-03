@@ -3,9 +3,9 @@ package com.wally.wally.controllers.map.contentList;
 import android.os.Handler;
 import android.util.Log;
 
+import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +19,7 @@ public class PagingRetriever {
 
     public int pageLength;
 
-    private ContentFetcher contentFetcher;
+    private Fetcher contentFetcher;
 
     private List<Content> current;
 
@@ -29,7 +29,7 @@ public class PagingRetriever {
 
     private boolean hasNext = true;
 
-    public PagingRetriever(ContentFetcher contentFetcher, Handler handler, int pageLength) {
+    public PagingRetriever(Fetcher contentFetcher, Handler handler, int pageLength) {
         this.contentFetcher = contentFetcher;
         this.pageLength = pageLength;
 
