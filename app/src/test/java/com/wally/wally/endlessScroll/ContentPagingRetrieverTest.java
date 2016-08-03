@@ -2,7 +2,7 @@ package com.wally.wally.endlessScroll;
 
 import android.os.Handler;
 
-import com.wally.wally.controllers.map.ContentPagingRetriever;
+import com.wally.wally.controllers.map.contentList.PagingRetriever;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
@@ -27,14 +27,14 @@ import static org.mockito.Mockito.mock;
  */
 
 public class ContentPagingRetrieverTest {
-    private ContentPagingRetriever mContentRetriever;
+    private PagingRetriever mContentRetriever;
     private ContentFetcher contentFetcher;
 
     @Before
     public void init() {
         contentFetcher = mock(ContentFetcher.class);
         doAnswer(getNextAnswer(0)).when(contentFetcher).fetchNext(anyInt(), any(FetchResultCallback.class));
-        mContentRetriever = new ContentPagingRetriever(contentFetcher, getLinearHandler(), 2);
+        mContentRetriever = new PagingRetriever(contentFetcher, getLinearHandler(), 2);
     }
 
 

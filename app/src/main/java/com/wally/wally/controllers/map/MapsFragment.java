@@ -13,7 +13,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -38,8 +37,13 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.controllers.map.contentList.View;
 import com.wally.wally.components.CircleTransform;
 import com.wally.wally.controllers.main.CameraARActivity;
+import com.wally.wally.controllers.map.contentList.ViewItem;
+import com.wally.wally.controllers.map.contentList.PagingRetriever;
+import com.wally.wally.controllers.map.contentList.OnScrollListener;
+import com.wally.wally.controllers.map.contentList.Adapter;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.userManager.SocialUser;
@@ -54,10 +58,10 @@ import java.util.concurrent.CountDownLatch;
  */
 public class MapsFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
-        ContentPagingRetriever.ContentPageRetrieveListener,
-        ContentListViewItem.OnClickListener,
-        ContentListView.OnScrollSettleListener,
-        View.OnClickListener, OnMapReadyCallback {
+        PagingRetriever.ContentPageRetrieveListener,
+        ViewItem.OnClickListener,
+        View.OnScrollSettleListener,
+        android.view.View.OnClickListener, OnMapReadyCallback {
 
     private static final String TAG = MapsFragment.class.getSimpleName();
     private static final String KEY_USER = "USER";
@@ -72,10 +76,10 @@ public class MapsFragment extends Fragment implements
     private MapboxMap mMap;
     private GoogleApiClient mGoogleApiClient;
 
-    private ContentListView mContentListView;
+    private com.wally.wally.controllers.map.contentList.View mContentListView;
 
-    private ContentPagingRetriever mContentRetriever;
-    private EndlessRecyclerOnScrollListener mContentScrollListener;
+    private PagingRetriever mContentRetriever;
+    private OnScrollListener mContentScrollListener;
 
     private Handler mainThreadHandler;
     private MarkerManager mMarkerManager;
@@ -115,10 +119,10 @@ public class MapsFragment extends Fragment implements
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public android.view.View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         MapboxAccountManager.start(getContext(), getString(R.string.mapbox_api_key));
-        View v = inflater.inflate(R.layout.fragment_maps, container, false);
+        android.view.View v = inflater.inflate(R.layout.fragment_maps, container, false);
 
         initFeedTitle(v);
 
@@ -131,7 +135,7 @@ public class MapsFragment extends Fragment implements
         v.findViewById(R.id.my_location).setOnClickListener(this);
         v.findViewById(R.id.update_area).setOnClickListener(this);
 
-        mContentListView = (ContentListView) v.findViewById(R.id.content_list_view);
+        mContentListView = (com.wally.wally.controllers.map.contentList.View) v.findViewById(R.id.content_list_view);
 
         mGoogleApiClient = new GoogleApiClient.Builder(getContext())
                 .addConnectionCallbacks(this)
@@ -212,7 +216,7 @@ public class MapsFragment extends Fragment implements
         }
 
         mMarkerManager = new MarkerManager(getContext(), mMap);
-        mContentScrollListener = new EndlessRecyclerOnScrollListener(PAGE_LENGTH) {
+        mContentScrollListener = new OnScrollListener(PAGE_LENGTH) {
             int markerCounter = 0;
 
             @Override
@@ -240,15 +244,6 @@ public class MapsFragment extends Fragment implements
             centerMapOnMyLocation(defaultCenterMyLocationCallback);
         else
             loadContentNearLocation(null);
-    }
-
-    @Override
-    public void onContentClicked(Content content) {
-//        if (content.getVisibility().isPreviewVisible()) {
-//            startActivity(ContentDetailsActivity.newIntent(getContext(), content));
-//        } else {
-//            Toast.makeText(getContext(), R.string.content_not_visible_note, Toast.LENGTH_SHORT).show();
-//        }
     }
 
     @Override
@@ -325,7 +320,7 @@ public class MapsFragment extends Fragment implements
     }
 
     @Override
-    public void onClick(View view) {
+    public void onClick(android.view.View view) {
         if (view.getId() == R.id.back)
             getActivity().getSupportFragmentManager().popBackStack();
         else if (view.getId() == R.id.my_location)
@@ -336,7 +331,7 @@ public class MapsFragment extends Fragment implements
     }
 
     @SuppressWarnings("ConstantConditions")
-    private void initFeedTitle(View v) {
+    private void initFeedTitle(android.view.View v) {
         ImageView ownerImage = (ImageView) v.findViewById(R.id.iv_owner_image);
         TextView ownerName = (TextView) v.findViewById(R.id.tv_owner_name);
         TextView fragmentTitle = (TextView) v.findViewById(R.id.fragment_title);
@@ -349,7 +344,6 @@ public class MapsFragment extends Fragment implements
                     .thumbnail(0.1f)
                     .placeholder(R.drawable.ic_account_circle_black_24dp)
                     .dontAnimate()
-                    .transform(new CircleTransform(getContext()))
                     .into(ownerImage);
 
             ownerImage.setVisibility(View.VISIBLE);
@@ -406,10 +400,10 @@ public class MapsFragment extends Fragment implements
     private void loadContentNearLocation(CameraPosition cameraPosition) {
         ContentFetcher contentFetcher = getContentFetcher(cameraPosition);
 
-        mContentRetriever = new ContentPagingRetriever(contentFetcher, mainThreadHandler, PAGE_LENGTH);
+        mContentRetriever = new PagingRetriever(contentFetcher, mainThreadHandler, PAGE_LENGTH);
         mContentRetriever.registerLoadListener(this);
         mContentRetriever.registerLoadListener(mContentListView);
-        EndlessScrollAdapter adapter = new EndlessScrollAdapter(getContext(), mGoogleApiClient, mContentRetriever);
+        Adapter adapter = new Adapter(getContext(), mGoogleApiClient, mContentRetriever);
         adapter.setUserProfile(mUserProfile);
         adapter.setOnClickListener(this);
         mContentListView.setAdapter(adapter);

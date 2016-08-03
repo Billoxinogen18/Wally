@@ -1,4 +1,4 @@
-package com.wally.wally.controllers.map;
+package com.wally.wally.controllers.map.contentList;
 
 import android.content.Context;
 import android.os.Handler;
@@ -16,16 +16,15 @@ import com.wally.wally.userManager.SocialUser;
 /**
  * Created by Meravici on 6/20/2016. yea
  */
-// TODO change name with EndlessNoteAdapter
-public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ContentPagingRetriever.ContentPageRetrieveListener {
-    public static final String TAG = EndlessScrollAdapter.class.getSimpleName();
+public class Adapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements PagingRetriever.ContentPageRetrieveListener {
+    public static final String TAG = Adapter.class.getSimpleName();
     private static final int PROGRESS_VIEW_TYPE = 73;
 
-    private ContentPagingRetriever dataSource;
+    private PagingRetriever dataSource;
     private GoogleApiClient googleApiClient;
     private Context context;
     private SocialUser userProfile;
-    private ContentListViewItem.OnClickListener onClickListener;
+    private ViewItem.OnClickListener onClickListener;
 
 
     private boolean hasNext = true;
@@ -33,7 +32,7 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
     private Handler mainHandler;
 
 
-    public EndlessScrollAdapter(Context context, GoogleApiClient googleApiClient, ContentPagingRetriever dataSource) {
+    public Adapter(Context context, GoogleApiClient googleApiClient, PagingRetriever dataSource) {
         this.context = context;
         this.googleApiClient = googleApiClient;
         this.dataSource = dataSource;
@@ -73,11 +72,11 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
         } else {
             MainListItemViewHolder mHolder = (MainListItemViewHolder) holder;
             Content content = dataSource.get(position);
-            mHolder.contentListViewItem.clear();
-            mHolder.contentListViewItem.setContent(content, googleApiClient);
-            mHolder.contentListViewItem.showUserInfo(userProfile == null);
-            mHolder.contentListViewItem.setPosition(position + 1);
-            mHolder.contentListViewItem.setOnClickListener(onClickListener);
+            mHolder.viewItem.clear();
+            mHolder.viewItem.setContent(content, googleApiClient);
+            mHolder.viewItem.showUserInfo(userProfile == null);
+            mHolder.viewItem.setTitle("" + (position + 1));
+            mHolder.viewItem.setOnClickListener(onClickListener);
         }
     }
 
@@ -86,7 +85,7 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
         return dataSource.size() + 1;
     }
 
-    public void setOnClickListener(ContentListViewItem.OnClickListener onClickListener) {
+    public void setOnClickListener(ViewItem.OnClickListener onClickListener) {
         this.onClickListener = onClickListener;
     }
 
@@ -127,11 +126,11 @@ public class EndlessScrollAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     private class MainListItemViewHolder extends RecyclerView.ViewHolder {
-        public ContentListViewItem contentListViewItem;
+        public ViewItem viewItem;
 
         public MainListItemViewHolder(View itemView) {
             super(itemView);
-            contentListViewItem = (ContentListViewItem) itemView.findViewById(R.id.card);
+            viewItem = (ViewItem) itemView.findViewById(R.id.card);
         }
     }
 

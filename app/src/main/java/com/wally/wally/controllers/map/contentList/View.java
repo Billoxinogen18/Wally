@@ -1,9 +1,8 @@
-package com.wally.wally.controllers.map;
+package com.wally.wally.controllers.map.contentList;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.FrameLayout;
 
 import com.wally.wally.R;
@@ -11,26 +10,26 @@ import com.wally.wally.R;
 /**
  * Created by Meravici on 6/15/2016. yea
  */
-public class ContentListView extends FrameLayout implements ContentPagingRetriever.ContentPageRetrieveListener {
+public class View extends FrameLayout implements PagingRetriever.ContentPageRetrieveListener {
 
     private RecyclerView mRecycler;
-    private View mEmptyContentView;
+    private android.view.View mEmptyContentView;
     private OnScrollSettleListener onScrollSettleListener;
 
     private boolean isFirstLoad = true;
 
-    public ContentListView(Context context) {
+    public View(Context context) {
         super(context);
         init();
     }
 
-    public ContentListView(Context context, AttributeSet attrs) {
+    public View(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
 
     }
 
-    public ContentListView(Context context, AttributeSet attrs, int defStyle) {
+    public View(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }

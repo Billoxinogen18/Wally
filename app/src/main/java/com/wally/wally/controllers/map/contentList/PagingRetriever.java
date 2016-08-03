@@ -1,4 +1,4 @@
-package com.wally.wally.controllers.map;
+package com.wally.wally.controllers.map.contentList;
 
 import android.os.Handler;
 import android.util.Log;
@@ -14,8 +14,8 @@ import java.util.List;
 /**
  * Created by Meravici on 6/15/2016. yea
  */
-public class ContentPagingRetriever {
-    public static final String TAG = ContentPagingRetriever.class.getSimpleName();
+public class PagingRetriever {
+    public static final String TAG = PagingRetriever.class.getSimpleName();
 
     public int pageLength;
 
@@ -29,7 +29,7 @@ public class ContentPagingRetriever {
 
     private boolean hasNext = true;
 
-    public ContentPagingRetriever(ContentFetcher contentFetcher, Handler handler, int pageLength) {
+    public PagingRetriever(ContentFetcher contentFetcher, Handler handler, int pageLength) {
         this.contentFetcher = contentFetcher;
         this.pageLength = pageLength;
 

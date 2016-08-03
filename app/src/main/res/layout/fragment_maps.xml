@@ -44,7 +44,7 @@
             android:orientation="vertical"
             android:padding="8dp">
 
-            <ImageView
+            <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/iv_owner_image"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
@@ -101,7 +101,7 @@
 
     </RelativeLayout>
 
-    <com.wally.wally.controllers.map.ContentListView
+    <com.wally.wally.controllers.map.contentList.View
         android:id="@+id/content_list_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"

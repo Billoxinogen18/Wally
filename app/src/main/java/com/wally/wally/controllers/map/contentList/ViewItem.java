@@ -1,6 +1,5 @@
-package com.wally.wally.controllers.map;
+package com.wally.wally.controllers.map.contentList;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -32,10 +31,7 @@ import com.wally.wally.userManager.SocialUser;
 /**
  * Created by Meravici on 6/20/2016. yea
  */
-public class ContentListViewItem extends LinearLayout {
-
-    @SuppressWarnings("unused")
-    private static final String TAG = ContentListViewItem.class.getSimpleName();
+public class ViewItem extends LinearLayout {
 
     private CardView mCardView;
     private UserInfoView mUserInfoView;
@@ -45,20 +41,19 @@ public class ContentListViewItem extends LinearLayout {
     private TextView mContentPositionVIew;
     private View mPreviewNotVisible;
     private OnClickListener onClickListener;
-    private Content mContent;
 
-    public ContentListViewItem(Context context) {
+    public ViewItem(Context context) {
         super(context);
         init();
     }
 
-    public ContentListViewItem(Context context, AttributeSet attrs) {
+    public ViewItem(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
 
     }
 
-    public ContentListViewItem(Context context, AttributeSet attrs, int defStyle) {
+    public ViewItem(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -75,14 +70,16 @@ public class ContentListViewItem extends LinearLayout {
         mNoteView = (TextView) findViewById(R.id.tv_note);
         mPreviewNotVisible = findViewById(R.id.preview_not_visible);
 
-        mContentPositionVIew = new TextView(getContext());
-        mContentPositionVIew.setTextColor(Color.WHITE);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 Utils.dpToPx(getContext(), 30),
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         lp.setMargins(0, Utils.dpToPx(getContext(), 28), Utils.dpToPx(getContext(), 8), 0);
+
+        mContentPositionVIew = new TextView(getContext());
+        mContentPositionVIew.setTextColor(Color.WHITE);
         mContentPositionVIew.setLayoutParams(lp);
         mContentPositionVIew.setGravity(Gravity.CENTER);
+
         addView(mContentPositionVIew, 0);
 
         mUserInfoView.setOnClickListener(new View.OnClickListener() {
@@ -91,18 +88,10 @@ public class ContentListViewItem extends LinearLayout {
                 onClickListener.onProfileClicked(mUserInfoView.getUser());
             }
         });
-
-        setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onClickListener.onContentClicked(mContent);
-            }
-        });
     }
 
     public void setContent(Content content, GoogleApiClient googleApiClient) {
         clear();
-        this.mContent = content;
 
         if (content.getTextColor() == null) {
             content.withTextColor(Color.BLACK);
@@ -201,9 +190,8 @@ public class ContentListViewItem extends LinearLayout {
         return ss;
     }
 
-    @SuppressLint("SetTextI18n")
-    public void setPosition(int position) {
-        mContentPositionVIew.setText("" + position);
+    public void setTitle(String position) {
+        mContentPositionVIew.setText(position);
     }
 
     public void setOnClickListener(OnClickListener onClickListener) {
@@ -235,7 +223,5 @@ public class ContentListViewItem extends LinearLayout {
 
     public interface OnClickListener {
         void onProfileClicked(SocialUser user);
-
-        void onContentClicked(Content content);
     }
 }

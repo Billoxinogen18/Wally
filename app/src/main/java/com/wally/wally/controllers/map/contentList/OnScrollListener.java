@@ -1,16 +1,16 @@
-package com.wally.wally.controllers.map;
+package com.wally.wally.controllers.map.contentList;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScrollListener {
-    public static String TAG = EndlessRecyclerOnScrollListener.class.getSimpleName();
+public abstract class OnScrollListener extends RecyclerView.OnScrollListener {
+    public static String TAG = OnScrollListener.class.getSimpleName();
     int firstVisibleItem, visibleItemCount, totalItemCount, lastVisibleItem;
     int lastFirstVisibleItem = -1;
     private boolean loading = true;
     private int visibleThreshold = 5; // The minimum amount of items to have below your current scroll position before loading more.
 
-    public EndlessRecyclerOnScrollListener(int numItemsOnPage) {
+    public OnScrollListener(int numItemsOnPage) {
         this.visibleThreshold = numItemsOnPage;
     }
 

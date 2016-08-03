@@ -112,7 +112,7 @@
                 tools:text="Public feed" />
         </android.support.v7.widget.Toolbar>
 
-        <com.wally.wally.controllers.map.ContentListView
+        <com.wally.wally.controllers.map.contentList.View
             android:id="@+id/content_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
