@@ -30,9 +30,9 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.AdfService;
-import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.controllers.main.CameraARStandardActivity;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
+import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.callbacks.Callback;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
@@ -116,7 +116,7 @@ public class LoginActivity extends AppCompatActivity implements
      * At first it tries to silently sign in, if not it calls google sign in window
      */
     private void trySignIn() {
-        User user = DataController.getUserManagerInstance().getCurrentUser();
+        User user = DataControllerFactory.getUserManagerInstance().getCurrentUser();
         if (user != null) {
             // already signed in
             saveUserInContext(user);

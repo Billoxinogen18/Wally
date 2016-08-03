@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Set;
 
 class ContentFetcherFactory {
+    public static final double RADIUS_MAX_KM = 1000.0;
     private DatabaseReference contents;
     private DatabaseReference publicContents;
     private DatabaseReference sharedContents;
@@ -79,7 +80,7 @@ class ContentFetcherFactory {
             SerializableLatLng center, double radiusKm, DatabaseReference target) {
         // We decided that too big radius (>2500 km)
         // means we don't need to filter by location
-        if (radiusKm > Config.RADIUS_MAX_KM) { return null; }
+        if (radiusKm > RADIUS_MAX_KM) { return null; }
         if (radiusKm <= 0) { return createTrivial(); }
 
         final double radius = radiusKm * 1000; // Convert to meters

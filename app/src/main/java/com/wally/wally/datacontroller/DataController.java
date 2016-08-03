@@ -1,25 +1,15 @@
 package com.wally.wally.datacontroller;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.wally.wally.adf.AdfService;
+import static com.wally.wally.datacontroller.DataControllerFactory.getUserManagerInstance;
 import com.wally.wally.datacontroller.callbacks.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.ContentManager;
 import com.wally.wally.datacontroller.fetchers.ContentFetcher;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.user.User;
-import com.wally.wally.datacontroller.user.UserManager;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 public class DataController {
-    private static DataController instance;
-    private static AdfService adfServiceInstance;
-    private static UserManager userManagerInstance;
-
     private ContentManager contentManager;
     private ContentFetcherFactory fetcherFactory;
 
@@ -31,30 +21,6 @@ public class DataController {
     public DataController withFetcherFactory(ContentFetcherFactory factory) {
         this.fetcherFactory = factory;
         return this;
-    }
-
-    public static DataController getInstance() {
-        if (instance == null) {
-            DatabaseReference root = FirebaseDatabase.getInstance()
-                    .getReference().child(Config.DATABASE_ROOT);
-            StorageReference storage = FirebaseStorage.getInstance()
-                    .getReference().child(Config.STORAGE_ROOT);
-
-            ContentManager cManager = new ContentManager(
-                    root.child(Config.ROOMS_NODE),
-                    root.child(Config.CONTENTS_NODE),
-                    storage
-            );
-
-            ContentFetcherFactory fFactory = new ContentFetcherFactory(
-                    root.child(Config.CONTENTS_NODE)
-            );
-
-            instance = new DataController()
-                    .withContentManager(cManager)
-                    .withFetcherFactory(fFactory);
-        }
-        return instance;
     }
 
     public void save(Content c) {
@@ -92,26 +58,5 @@ public class DataController {
                 getUserManagerInstance().getCurrentUser(), user));
         chain.addPager(fetcherFactory.createForPublic(user));
         return chain;
-    }
-
-    public static AdfService getAdfServiceInstance() {
-        if (adfServiceInstance == null) {
-            adfServiceInstance = new FirebaseAdfService(
-                    FirebaseDatabase.getInstance().getReference()
-                            .child(Config.DATABASE_ROOT).child(Config.ROOMS_NODE),
-                    FirebaseStorage.getInstance().getReference().child(Config.STORAGE_ROOT));
-        }
-        return adfServiceInstance;
-    }
-
-    public static UserManager getUserManagerInstance() {
-        if (userManagerInstance == null) {
-            userManagerInstance = new UserManager(
-                    FirebaseAuth.getInstance(),
-                    FirebaseDatabase.getInstance()
-                            .getReference().child(Config.USERS_NODE)
-            );
-        }
-        return userManagerInstance;
     }
 }

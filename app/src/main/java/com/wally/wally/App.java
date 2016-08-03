@@ -7,6 +7,7 @@ import android.support.multidex.MultiDex;
 import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.AdfService;
 import com.wally.wally.datacontroller.DataController;
+import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.userManager.UserManager;
 import com.wally.wally.userManager.SocialUserFactory;
 
@@ -41,7 +42,7 @@ public class App extends Application {
     }
 
     public DataController getDataController() {
-        return DataController.getInstance();
+        return DataControllerFactory.getDataControllerInstance();
     }
 
     public UserManager getUserManager() {
@@ -57,6 +58,6 @@ public class App extends Application {
     }
 
     public AdfService getAdfService() {
-        return DataController.getAdfServiceInstance();
+        return DataControllerFactory.getAdfServiceInstance();
     }
 }
