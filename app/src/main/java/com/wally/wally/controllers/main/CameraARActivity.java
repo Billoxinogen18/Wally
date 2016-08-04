@@ -62,6 +62,7 @@ public abstract class CameraARActivity extends AppCompatActivity implements
     private View mMapButton;
     private View mProfileBar;
     private View mWaterMark;
+    private TipView mTipView;
 
     public abstract void onDeleteContent(Content selectedContent);
 
@@ -102,6 +103,8 @@ public abstract class CameraARActivity extends AppCompatActivity implements
                 .build();
 
         mAnalytics = WallyAnalytics.getInstance(this);
+        mTipView = (TipView)findViewById(R.id.tip_view);
+        mTipView.show("Shut", "Shit", 1000);
     }
 
     protected void onStart() {
