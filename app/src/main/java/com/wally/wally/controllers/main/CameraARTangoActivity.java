@@ -1,14 +1,11 @@
 package com.wally.wally.controllers.main;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -30,7 +27,7 @@ import com.wally.wally.adf.AdfService;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.config.CameraTangoActivityConstants;
 import com.wally.wally.config.Config;
-import com.wally.wally.datacontroller.DataController.*;
+import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
@@ -54,15 +51,15 @@ import java.util.List;
 public class CameraARTangoActivity extends CameraARActivity implements
         ContentFitter.OnContentFitListener,
         LocalizationListener,
-        ImportExportPermissionDialogFragment.ImportExportPermissionListener,
-        PersistentDialogFragment.PersistentDialogListener {
+        ImportExportPermissionDialogFragment.ImportExportPermissionListener {
+
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
     // Permission Denied explain codes
     private static final int RC_EXPLAIN_ADF = 14;
     private static final int RC_EXPLAIN_ADF_EXPORT = 19;
     // Permission Request codes
     private static final int RC_REQ_AREA_LEARNING = 17;
-    private int REQUEST_CODE_MY_LOCATION = 1;
+    private static final int RC_SET_LOCALIZATION_LOCATION = 102;
     private boolean mExplainAdfPermission;
 
     private TangoManager mTangoManager;
@@ -163,6 +160,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public void onDialogPositiveClicked(int requestCode) {
+        super.onDialogPositiveClicked(requestCode);
         switch (requestCode) {
             case RC_EXPLAIN_ADF:
                 requestADFPermission();
@@ -175,6 +173,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public void onDialogNegativeClicked(int requestCode) {
+        super.onDialogNegativeClicked(requestCode);
         switch (requestCode) {
             case RC_EXPLAIN_ADF:
                 finish();
@@ -189,16 +188,16 @@ public class CameraARTangoActivity extends CameraARActivity implements
         DataControllerFactory.getDataControllerInstance()
                 .fetchForUuid(adfUuid, new FetchResultCallback() {
 
-            @Override
-            public void onResult(final Collection<Content> result) {
-                mVisualContentManager.createStaticContent(result);
-            }
+                    @Override
+                    public void onResult(final Collection<Content> result) {
+                        mVisualContentManager.createStaticContent(result);
+                    }
 
-            @Override
-            public void onError(Exception e) {
-                // TODO write error
-            }
-        });
+                    @Override
+                    public void onError(Exception e) {
+                        // TODO write error
+                    }
+                });
     }
 
     private void restoreState(Bundle savedInstanceState) {
@@ -426,33 +425,25 @@ public class CameraARTangoActivity extends CameraARActivity implements
         });
     }
 
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_MY_LOCATION) {
-            if (Utils.checkLocationPermission(this)) {
-                setLocalizationLocation();
-            }
-            // TODO show error that user can't add content without location permission
+    public void onLocationPermissionGranted(int locationRequestCode) {
+        super.onLocationPermissionGranted(locationRequestCode);
+        if (locationRequestCode == RC_SET_LOCALIZATION_LOCATION) {
+            setLocalizationLocation();
         }
     }
 
-
     private void setLocalizationLocation() {
-        if (Utils.checkLocationPermission(getBaseContext())) {
-            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-            if (myLocation == null) {
-                Toast.makeText(getBaseContext(), "Couldn't get user location", Toast.LENGTH_SHORT).show();
-                Log.e(TAG, "saveActiveContent: Cannot get user location");
-            } else {
-                mLocalizationLocation = new SerializableLatLng(myLocation.getLatitude(), myLocation.getLongitude());
-            }
+        if (Utils.checkLocationPermission(this)) {
+            requestLocationPermission(RC_SET_LOCALIZATION_LOCATION);
+            return;
+        }
+        Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (myLocation == null) {
+            Toast.makeText(getBaseContext(), "Couldn't get user location", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "saveActiveContent: Cannot get user location");
         } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_CODE_MY_LOCATION);
+            mLocalizationLocation = new SerializableLatLng(myLocation.getLatitude(), myLocation.getLongitude());
         }
     }
 

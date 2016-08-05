@@ -1,22 +1,18 @@
 package com.wally.wally.controllers.main;
 
-import android.Manifest;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
+import android.support.annotation.CallSuper;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
+import com.wally.wally.BaseActivity;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.analytics.WallyAnalytics;
@@ -36,14 +32,14 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 import java.util.Date;
 import java.util.List;
 
-public abstract class CameraARActivity extends AppCompatActivity implements
+public abstract class CameraARActivity extends BaseActivity implements
         OnVisualContentSelectedListener,
         NewContentDialogFragment.NewContentDialogListener,
         SelectedMenuView.OnSelectedMenuActionListener,
         MapsFragment.MapOpenCloseListener {
 
     private static final String TAG = CameraARActivity.class.getSimpleName();
-    private static final int REQUEST_CODE_MY_LOCATION = 22;
+    private static final int RC_SAVE_CONTENT = 22;
 
     protected DataController mDataController;
     protected GoogleApiClient mGoogleApiClient;
@@ -103,7 +99,7 @@ public abstract class CameraARActivity extends AppCompatActivity implements
                 .build();
 
         mAnalytics = WallyAnalytics.getInstance(this);
-        mTipView = (TipView)findViewById(R.id.tip_view);
+        mTipView = (TipView) findViewById(R.id.tip_view);
         mTipView.show("Did you know:", "Bla bla bla", 5000);
     }
 
@@ -127,18 +123,6 @@ public abstract class CameraARActivity extends AppCompatActivity implements
         super.onResume();
         if (mSocialUserManager.isLoggedIn()) {
             displayProfileBar(mSocialUserManager.getUser());
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CODE_MY_LOCATION) {
-            if (Utils.checkLocationPermission(this)) {
-                saveActiveContent(mContentToSave);
-            } else {
-                // TODO show error that user can't add content without location permission
-            }
         }
     }
 
@@ -251,32 +235,36 @@ public abstract class CameraARActivity extends AppCompatActivity implements
         openMapFragment(user);
     }
 
-    protected void saveActiveContent(Content content) {
-        mContentToSave = content;
-        // Check and set location to content
-        if (Utils.checkLocationPermission(this)) {
-            Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-            if (myLocation == null) {
-                Toast.makeText(this, "Couldn't get user location", Toast.LENGTH_SHORT).show();
-                // TODO show error or something
-                Log.e(TAG, "saveActiveContent: Cannot get user location");
-                return;
-            } else {
-                content.withLocation(new SerializableLatLng(myLocation.getLatitude(), myLocation.getLongitude()));
-            }
-
-            if (content.getCreationDate() == null) {
-                content.withCreationDate(new Date(System.currentTimeMillis()));
-            }
-            onSaveContent(content);
-            Log.wtf(TAG, "saveActiveContent: " + content);
-            mDataController.save(content);
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_CODE_MY_LOCATION);
+    @CallSuper
+    @Override
+    public void onLocationPermissionGranted(int locationRequestCode) {
+        if (locationRequestCode == RC_SAVE_CONTENT) {
+            saveActiveContent(mContentToSave);
         }
+    }
+
+    protected void saveActiveContent(final Content content) {
+        mContentToSave = content;
+        if (Utils.checkLocationPermission(this)) {
+            requestLocationPermission(RC_SAVE_CONTENT);
+            return;
+        }
+        Utils.getNewLocation(mGoogleApiClient, new Utils.Callback<SerializableLatLng>() {
+            @Override
+            public void onResult(SerializableLatLng result) {
+                content.withLocation(result);
+                if (content.getCreationDate() == null) {
+                    content.withCreationDate(new Date(System.currentTimeMillis()));
+                }
+                onSaveContent(content);
+                mDataController.save(content);
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
     }
 
 

@@ -4,13 +4,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.components.PersistentDialogFragment.PersistentDialogListener;
+import com.wally.wally.controllers.map.BaseFragment;
 
 /**
  * Abstract activity that helps to manage things used in activities.
@@ -39,6 +42,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
             return;
         }
         onLocationPermissionGranted(mLocationRequestCode);
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment instanceof BaseFragment) {
+                ((BaseFragment) fragment).onLocationPermissionGranted(mLocationRequestCode);
+            }
+        }
         mLocationRequestCode = -1;
     }
 
@@ -48,7 +56,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
      *
      * @param locationRequestCode called  location permission is finally granted.
      */
-    protected void requestLocationPermission(int locationRequestCode) {
+    public final void requestLocationPermission(int locationRequestCode) {
         mLocationRequestCode = locationRequestCode;
         if (Utils.checkLocationPermission(this)) {
             onLocationPermissionGranted();
@@ -108,11 +116,13 @@ public abstract class BaseActivity extends AppCompatActivity implements
         return ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
+    @CallSuper
     @Override
     public void onDialogNegativeClicked(int requestCode) {
         // We don't have negative button so ignore it.
     }
 
+    @CallSuper
     @Override
     public void onDialogPositiveClicked(int requestCode) {
         if (requestCode == RC_LOCATION_PERMISSION) {
@@ -125,7 +135,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
-    public void startInstalledAppDetailsActivity() {
+    private void startInstalledAppDetailsActivity() {
         mStartedAppSettingsScreen = true;
 
         Intent i = new Intent();
@@ -138,6 +148,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         startActivity(i);
     }
 
+    @CallSuper
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -147,6 +158,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     }
 
+    @CallSuper
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);

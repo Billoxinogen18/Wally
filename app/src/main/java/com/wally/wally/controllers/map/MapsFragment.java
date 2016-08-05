@@ -1,14 +1,11 @@
 package com.wally.wally.controllers.map;
 
 
-import android.Manifest;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -37,11 +34,11 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.controllers.map.contentList.Adapter;
+import com.wally.wally.controllers.map.contentList.OnScrollListener;
+import com.wally.wally.controllers.map.contentList.PagingRetriever;
 import com.wally.wally.controllers.map.contentList.View;
 import com.wally.wally.controllers.map.contentList.ViewItem;
-import com.wally.wally.controllers.map.contentList.PagingRetriever;
-import com.wally.wally.controllers.map.contentList.OnScrollListener;
-import com.wally.wally.controllers.map.contentList.Adapter;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.userManager.SocialUser;
@@ -54,7 +51,7 @@ import java.util.concurrent.CountDownLatch;
  * Use the {@link MapsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapsFragment extends Fragment implements
+public class MapsFragment extends BaseFragment implements
         GoogleApiClient.ConnectionCallbacks,
         PagingRetriever.ContentPageRetrieveListener,
         ViewItem.OnClickListener,
@@ -63,8 +60,8 @@ public class MapsFragment extends Fragment implements
 
     private static final String TAG = MapsFragment.class.getSimpleName();
     private static final String KEY_USER = "USER";
-    private static final int MY_LOCATION_REQUEST_CODE = 222;
     private static final int PAGE_LENGTH = 5;
+    private static final int RC_MY_LOCATION_CLICK = 921;
 
     private MapOpenCloseListener mListener;
 
@@ -118,7 +115,7 @@ public class MapsFragment extends Fragment implements
 
     @Override
     public android.view.View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                                          Bundle savedInstanceState) {
         MapboxAccountManager.start(getContext(), getString(R.string.mapbox_api_key));
         android.view.View v = inflater.inflate(R.layout.fragment_maps, container, false);
 
@@ -210,7 +207,7 @@ public class MapsFragment extends Fragment implements
         if (Utils.checkLocationPermission(getContext())) {
             mMap.setMyLocationEnabled(true);
         } else {
-            requestLocationPermission();
+            requestLocationPermission(0);
         }
 
         mMarkerManager = new MarkerManager(getContext(), mMap);
@@ -251,7 +248,7 @@ public class MapsFragment extends Fragment implements
 
     public void onMyLocationClick() {
         if (!Utils.checkLocationPermission(getContext())) {
-            requestLocationPermission();
+            requestLocationPermission(RC_MY_LOCATION_CLICK);
         } else {
             centerMapOnMyLocation(null);
         }
@@ -282,12 +279,10 @@ public class MapsFragment extends Fragment implements
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        if (requestCode == MY_LOCATION_REQUEST_CODE) {
-            if (Utils.checkLocationPermission(getContext())) {
-                if (mUserProfile == null) {
-                    centerMapOnMyLocation(defaultCenterMyLocationCallback);
-                }
+    public void onLocationPermissionGranted(int locationRequestCode) {
+        if (locationRequestCode == RC_MY_LOCATION_CLICK) {
+            if (mUserProfile == null) {
+                centerMapOnMyLocation(defaultCenterMyLocationCallback);
             }
         }
     }
@@ -440,12 +435,6 @@ public class MapsFragment extends Fragment implements
             LatLng myPosition = new LatLng(myLocation.getLatitude(), myLocation.getLongitude());
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myPosition, 16), 2000, callback);
         }
-    }
-
-    private void requestLocationPermission() {
-        ActivityCompat.requestPermissions(getActivity(),
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                MY_LOCATION_REQUEST_CODE);
     }
 
     private void centerMapOnVisibleMarkers() {
