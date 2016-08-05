@@ -11,7 +11,7 @@ import android.support.v7.app.AlertDialog;
 
 /**
  * This is general persistent dialog fragment, that is recreated after rotation changes.
- * <p/>
+ * <p>
  * Created by ioane5 on 6/22/16.
  */
 public class PersistentDialogFragment extends DialogFragment {
@@ -41,6 +41,15 @@ public class PersistentDialogFragment extends DialogFragment {
         PersistentDialogFragment fragment = new PersistentDialogFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public static PersistentDialogFragment newInstance(Context context, int requestCode, @StringRes int msg, @StringRes int positiveBtn) {
+        return newInstance(requestCode,
+                null,
+                context.getString(msg),
+                context.getString(positiveBtn),
+                null,
+                false);
     }
 
     public static PersistentDialogFragment newInstance(Context context, int requestCode, @StringRes int msg, @StringRes int positiveBtn, @StringRes int negativeBtn) {

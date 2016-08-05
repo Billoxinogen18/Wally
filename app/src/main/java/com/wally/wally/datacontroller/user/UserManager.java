@@ -17,6 +17,10 @@ public class UserManager {
         this.authManager = authManager;
     }
 
+    public void signOut() {
+        authManager.signOut();
+    }
+
     public User getCurrentUser() {
         if (currentUser != null) return currentUser;
         FirebaseUser user = authManager.getCurrentUser();
@@ -45,6 +49,7 @@ public class UserManager {
 
     public interface UserFetchListener {
         void onUserFetchSuccess(User user);
+
         void onUserFetchFail(Exception e);
     }
 

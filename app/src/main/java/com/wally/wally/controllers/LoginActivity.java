@@ -1,12 +1,9 @@
 package com.wally.wally.controllers;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
@@ -16,6 +13,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.plus.Plus;
@@ -26,6 +24,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.wally.wally.App;
+import com.wally.wally.BaseActivity;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfManager;
@@ -38,21 +37,20 @@ import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.SocialUserManager;
 
-public class LoginActivity extends AppCompatActivity implements
-        SocialUserManager.UserLoadListener,
-        GoogleApiClient.ConnectionCallbacks {
+public class LoginActivity extends BaseActivity implements
+        SocialUserManager.UserLoadListener, GoogleApiClient.ConnectionCallbacks {
 
     @SuppressWarnings("unused")
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 100;
-    private static final int REQ_CODE_LOCATION = 129;
+    private static final int RC_CREATE_ADF = 129;
     /**
      * Tango
      */
     private GoogleApiClient mGoogleApiClient;
     private View mLoadingView;
 
-    private boolean mFlagSignIn = true;
+    private boolean mFirst = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,10 +72,7 @@ public class LoginActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if (mFlagSignIn) {
-            mFlagSignIn = false;
-            trySignIn();
-        }
+        silentSignInWithGoogle();
     }
 
     @Override
@@ -87,28 +82,53 @@ public class LoginActivity extends AppCompatActivity implements
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                Log.d(TAG, "onActivityResult: " + result.getSignInAccount().getEmail());
-                firebaseAuthWithGoogle(result.getSignInAccount());
+            GoogleSignInAccount account = result.getSignInAccount();
+            if (result.isSuccess() && account != null) {
+                firebaseAuthWithGoogle(account);
             } else {
-                requestSignIn();
+                signInWithGoogle();
             }
         }
     }
 
+    /**
+     * Called after location permission is granted.
+     *
+     * @param locationRequestCode request code that was passed when {@link #requestLocationPermission(int)}
+     */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQ_CODE_LOCATION) {
-            if (Utils.checkLocationPermission(this)) {
+    public void onLocationPermissionGranted(int locationRequestCode) {
+        switch (locationRequestCode) {
+            case RC_CREATE_ADF:
                 createAdfManager();
-            } else {
-                // TODO show user that program needs Location and exit
-            }
+                break;
         }
+    }
+
+    private void silentSignInWithGoogle() {
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        if (opr.isDone()) {
+            // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
+            // and the GoogleSignInResult will be available instantly.
+            GoogleSignInResult result = opr.get();
+            if (result.getSignInAccount() != null) {
+                firebaseAuthWithGoogle(result.getSignInAccount());
+            } else {
+                // Clean cache from firebase.
+                DataControllerFactory.getUserManagerInstance().signOut();
+            }
+        } else {
+            DataControllerFactory.getUserManagerInstance().signOut();
+            signInWithGoogle();
+        }
+    }
+
+    public void signInWithGoogle() {
+        Auth.GoogleSignInApi.signOut(getGoogleApiClient());
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(getGoogleApiClient());
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     /**
@@ -120,22 +140,18 @@ public class LoginActivity extends AppCompatActivity implements
             // already signed in
             saveUserInContext(user);
         } else {
-            requestSignIn();
+            signInWithGoogle();
         }
     }
 
-    public void requestSignIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(getGoogleApiClient());
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+    private void firebaseAuthWithGoogle(@NonNull GoogleSignInAccount acct) {
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mLoadingView.setVisibility(View.VISIBLE);
         FirebaseAuth.getInstance().signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
+                        //noinspection ThrowableResultOfMethodCallIgnored
                         Log.d(TAG, "onComplete: " + task.getException());
                         mLoadingView.setVisibility(View.INVISIBLE);
                         trySignIn();
@@ -150,8 +166,7 @@ public class LoginActivity extends AppCompatActivity implements
 
     @Override
     public void onUserLoadFailed() {
-        trySignIn();
-        //TODO implementation missing, show error dialog
+        signInWithGoogle();
     }
 
     private void saveUserInContext(User user) {
@@ -163,9 +178,7 @@ public class LoginActivity extends AppCompatActivity implements
         mLoadingView.setVisibility(View.VISIBLE);
 
         if (!Utils.checkLocationPermission(this)) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQ_CODE_LOCATION);
+            requestLocationPermission(RC_CREATE_ADF);
             return;
         }
         Utils.getNewLocation(mGoogleApiClient, new Utils.Callback<SerializableLatLng>() {
@@ -226,5 +239,17 @@ public class LoginActivity extends AppCompatActivity implements
                 .addApi(LocationServices.API)
                 .build();
         return mGoogleApiClient;
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("mFirst", mFirst);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mFirst = savedInstanceState.getBoolean("mFirst", false);
     }
 }

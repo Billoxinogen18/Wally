@@ -63,4 +63,6 @@
     <string name="done">Done</string>
     <string name="map_style_url">mapbox://styles/wallynotes/ciqrsooto000dc7nic64jfgfn</string>
     <string name="profile">Profile</string>
+    <string name="explain_location_permission">Wally needs location permission to show or share content with other users</string>
+    <string name="go_to_settings">Go to Settings</string>
 </resources>
