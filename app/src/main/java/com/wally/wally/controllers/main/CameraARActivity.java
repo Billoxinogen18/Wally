@@ -104,7 +104,7 @@ public abstract class CameraARActivity extends AppCompatActivity implements
 
         mAnalytics = WallyAnalytics.getInstance(this);
         mTipView = (TipView)findViewById(R.id.tip_view);
-        mTipView.show("Shut", "Shit", 1000);
+        mTipView.show("Did you know:", "Bla bla bla", 5000);
     }
 
     protected void onStart() {

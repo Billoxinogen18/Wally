@@ -5,8 +5,6 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,6 +15,9 @@ import com.wally.wally.Utils;
  * Created by Meravici on 8/4/2016. yea
  */
 public class TipView extends LinearLayout {
+    private static final int BACKGROUND_COLOR = Color.GRAY;
+    private static final int PADDING_DP = 8;
+
     private TextView titleTV;
     private TextView messageTV;
 //    private ImageView iconIV;
@@ -43,9 +44,14 @@ public class TipView extends LinearLayout {
     private void init() {
         inflate(getContext(), R.layout.tip, this);
 
-        setBackgroundColor(Color.CYAN);
-        setPadding(Utils.dpToPx(getContext(), 20), Utils.dpToPx(getContext(), 20), Utils.dpToPx(getContext(), 20), Utils.dpToPx(getContext(), 20));
-//        setVisibility(GONE);
+        setBackgroundColor(BACKGROUND_COLOR);
+        setPadding(
+                Utils.dpToPx(getContext(), PADDING_DP),
+                Utils.dpToPx(getContext(), PADDING_DP),
+                Utils.dpToPx(getContext(), PADDING_DP),
+                Utils.dpToPx(getContext(), PADDING_DP)
+        );
+        setVisibility(GONE);
 
         this.titleTV = (TextView) findViewById(R.id.title);
         this.messageTV = (TextView) findViewById(R.id.message);
