@@ -1,25 +1,25 @@
 {
   "tips":{
-    "tip1_id": {
-      "title": "tip11 title",
-      "message": "tip11 message"
+    "tip_1": {
+      "title": "Tip",
+      "message": "Avoid too dark/bright areas"
     },
-    "tip2_id": {
-      "title": "tip22 title",
-      "message": "tip22 message"
+    "tip_2": {
+      "title": "Tip",
+      "message": "Cover as much area as possible"
     },
-    "tip3_id": {
-      "title": "tip33 title",
-      "message": "tip33 message"
+    "tip_3": {
+      "title": "Tip",
+      "message": "Prefer non-uniform surfaces"
     },
-    "tip4_id": {
-      "title": "tip44 title",
-      "message": "tip44 message"
+    "tip_4": {
+      "title": "Tip",
+      "message": "Message"
     }
   },
 
   "tags": {
-    "Tag1": ["tip1_id", "tip2_id"],
-    "Tag2": ["tip1_id", "tip3_id", "tip4_id"]
+    "Learning": ["tip_1", "tip_2", "tip_3"],
+    "Localization": ["tip_4"]
   }
 }
