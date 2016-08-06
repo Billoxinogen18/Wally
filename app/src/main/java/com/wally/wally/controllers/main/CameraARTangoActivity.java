@@ -41,6 +41,8 @@ import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.WallyTangoUx;
+import com.wally.wally.tip.LocalTipService;
+import com.wally.wally.tip.TipService;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
@@ -114,8 +116,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
         TangoFactory tangoFactory = new TangoFactory(context);
 
         AdfManager adfManager = App.getInstance().getAdfManager();
+
+        TipService tipService = new LocalTipService(Utils.getAssetContentAsString(getBaseContext(), "tips.json"));
+
         mTangoManager = new TangoManager(config, mAnalytics, tangoUpdater,
-                pointCloudManager, mRenderer, mTangoUx, tangoFactory, adfManager, evaluator);
+                pointCloudManager, mRenderer, mTangoUx, mTipView, tangoFactory, adfManager, evaluator, tipService);
         restoreState(savedInstanceState);
 
 

@@ -20,7 +20,10 @@ import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
+import com.wally.wally.controllers.main.TipView;
 import com.wally.wally.renderer.WallyRenderer;
+import com.wally.wally.tip.Tip;
+import com.wally.wally.tip.TipService;
 
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
@@ -40,6 +43,9 @@ public class TangoManager implements LocalizationListener {
 
     private Tango mTango;
     private WallyTangoUx mTangoUx;
+    private TipView mTipView;
+    private TipService mTipService;
+
     private DeviceExtrinsics mExtrinsics;
     private TangoCameraIntrinsics mIntrinsics;
     private TangoPointCloudManager mPointCloudManager;
@@ -78,15 +84,19 @@ public class TangoManager implements LocalizationListener {
             TangoPointCloudManager pointCloudManager,
             WallyRenderer wallyRenderer,
             WallyTangoUx tangoUx,
+            TipView tipView,
             TangoFactory tangoFactory,
             AdfManager adfManager,
-            LearningEvaluator evaluator
+            LearningEvaluator evaluator,
+            TipService tipService
     ) {
         mConfig = config;
         mAnalytics = analytics;
         mTangoUpdater = tangoUpdater;
         mRenderer = wallyRenderer;
         mTangoUx = tangoUx;
+        mTipView = tipView;
+        mTipService = tipService;
         TangoUx.StartParams params = new TangoUx.StartParams();
         params.showConnectionScreen = false;
         mTangoUx.start(params);
@@ -214,6 +224,9 @@ public class TangoManager implements LocalizationListener {
 
     private synchronized void startLearning() {
         Log.d(TAG, "startLearning()");
+        Tip tip = mTipService.getRandom(TipService.Tag.LEARNING);
+        mTipView.show(tip.getTitle(), tip.getMessage(), 5000);
+
         String msg = mConfig.getString(TangoManagerConstants.LEARNING_AREA);
         mTangoUx.showCustomMessage(msg);
         prepareForLearning();

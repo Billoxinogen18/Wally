@@ -58,7 +58,7 @@ public abstract class CameraARActivity extends BaseActivity implements
     private View mMapButton;
     private View mProfileBar;
     private View mWaterMark;
-    private TipView mTipView;
+    protected TipView mTipView; //TODO getter maybe?
 
     public abstract void onDeleteContent(Content selectedContent);
 
