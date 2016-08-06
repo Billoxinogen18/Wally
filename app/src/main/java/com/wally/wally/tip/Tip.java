@@ -24,4 +24,12 @@ public class Tip {
     public String getTitle() {
         return title;
     }
+
+    @Override
+    public String toString() {
+        return "Tip{" +
+                "title='" + title + '\'' +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }

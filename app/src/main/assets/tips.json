@@ -1,0 +1,25 @@
+{
+  "tips":{
+    "tip1_id": {
+      "title": "tip11 title",
+      "message": "tip11 message"
+    },
+    "tip2_id": {
+      "title": "tip22 title",
+      "message": "tip22 message"
+    },
+    "tip3_id": {
+      "title": "tip33 title",
+      "message": "tip33 message"
+    },
+    "tip4_id": {
+      "title": "tip44 title",
+      "message": "tip44 message"
+    }
+  },
+
+  "tags": {
+    "Tag1": ["tip1_id", "tip2_id"],
+    "Tag2": ["tip1_id", "tip3_id", "tip4_id"]
+  }
+}

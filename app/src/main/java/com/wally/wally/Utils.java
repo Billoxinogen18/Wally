@@ -46,7 +46,11 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Locale;
 
@@ -450,5 +454,23 @@ public final class Utils {
     public interface Callback<T> {
         void onResult(T result);
         void onError(Exception e);
+    }
+
+    public static String  getAssetContentAsString(Context context, String filepath) {
+        String content = "";
+        try {
+            InputStream is = context.getAssets().open(filepath);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            while (true) {
+                String line = reader.readLine();
+                if(line == null) break;
+                content += line;
+            }
+            reader.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            content = null;
+        }
+        return content;
     }
 }

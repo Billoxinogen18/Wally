@@ -37,7 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public abstract void onLocationPermissionGranted(int locationRequestCode);
 
     private void onLocationPermissionGranted() {
-        if (mLocationRequestCode > 0) {
+        if (mLocationRequestCode < 0) {
             Log.e(TAG, "onLocationPermissionGranted: called when mLocationRequestCode was -1");
             return;
         }

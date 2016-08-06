@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-public class StubTipManager implements TipManager{
+public class StubTipService implements TipService {
 
     private Map<Tag, List<Tip>> tips;
 
-    public StubTipManager() {
+    public StubTipService() {
         tips = new HashMap<>();
     }
 
