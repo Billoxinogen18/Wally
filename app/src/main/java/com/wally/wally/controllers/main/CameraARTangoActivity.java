@@ -36,7 +36,6 @@ import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.LearningEvaluator;
-import com.wally.wally.tango.LocalizationListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoManager;
 import com.wally.wally.tango.TangoUpdater;
@@ -52,7 +51,7 @@ import java.util.List;
 
 public class CameraARTangoActivity extends CameraARActivity implements
         ContentFitter.OnContentFitListener,
-        LocalizationListener,
+        TangoUpdater.LocalizationListener,
         ImportExportPermissionDialogFragment.ImportExportPermissionListener {
 
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();

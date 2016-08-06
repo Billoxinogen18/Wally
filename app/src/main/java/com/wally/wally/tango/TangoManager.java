@@ -29,7 +29,7 @@ import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
 
-public class TangoManager implements LocalizationListener {
+public class TangoManager implements TangoUpdater.LocalizationListener {
     public static final TangoCoordinateFramePair FRAME_PAIR =
             new TangoCoordinateFramePair(
                     TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,

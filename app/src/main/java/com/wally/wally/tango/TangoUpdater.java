@@ -157,4 +157,9 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     public interface ValidPoseListener {
         void onValidPose(TangoPoseData data);
     }
+
+    public interface LocalizationListener {
+        void localized();
+        void notLocalized();
+    }
 }
