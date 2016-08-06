@@ -24,7 +24,7 @@ public class TangoMock extends Tango{
 
     public static Tango getTango(){
         Objenesis objenesis = new ObjenesisStd(); // or ObjenesisSerializer
-        TangoMock res = (TangoMock) objenesis.newInstance(TangoMock.class);
+        TangoMock res = objenesis.newInstance(TangoMock.class);
 
         return res;
     }

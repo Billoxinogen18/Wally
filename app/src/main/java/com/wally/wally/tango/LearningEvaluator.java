@@ -86,10 +86,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
             return true;
         }
 
-        if (time > maxTimeMs){
-            return true;
-        }
-        return false;
+        return time > maxTimeMs;
     }
 
     private int getAngleCount(){
@@ -131,11 +128,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
         @Override
         public boolean equals(Object o){
             Cell c = (Cell) o;
-            if (c.x == x && c.y == y) {
-                return true;
-            } else{
-                return false;
-            }
+            return c.x == x && c.y == y;
         }
 
         @Override

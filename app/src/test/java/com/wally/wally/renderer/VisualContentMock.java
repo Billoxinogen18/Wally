@@ -19,7 +19,7 @@ public class VisualContentMock extends VisualContent {
 
     public static VisualContent getVisualContent(){
         Objenesis objenesis = new ObjenesisStd(); // or ObjenesisSerializer
-        VisualContentMock res = (VisualContentMock) objenesis.newInstance(VisualContentMock.class);
+        VisualContentMock res = objenesis.newInstance(VisualContentMock.class);
 
         return res;
     }

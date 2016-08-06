@@ -195,7 +195,7 @@ public class VisualContentManager {
     }
 
     public void scaleActiveContent(float scale){
-        synchronized (mActiveContent){
+        synchronized (mActiveContentLock){
             if (mActiveContent != null){
                 mActiveContent.scaleContent(scale);
             } else {
