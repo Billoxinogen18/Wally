@@ -6,7 +6,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.wally.wally.adf.AdfService;
-import com.wally.wally.datacontroller.content.ContentManager;
 import com.wally.wally.datacontroller.user.UserManager;
 
 public class DataControllerFactory {

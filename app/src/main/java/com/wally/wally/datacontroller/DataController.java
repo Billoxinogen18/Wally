@@ -3,7 +3,6 @@ package com.wally.wally.datacontroller;
 import static com.wally.wally.datacontroller.DataControllerFactory.getUserManagerInstance;
 
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.ContentManager;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
