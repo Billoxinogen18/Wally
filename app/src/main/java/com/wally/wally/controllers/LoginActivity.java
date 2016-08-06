@@ -50,7 +50,7 @@ public class LoginActivity extends BaseActivity implements
     private GoogleApiClient mGoogleApiClient;
     private View mLoadingView;
 
-    private boolean mFirst = false;
+    private boolean mFirst = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,10 @@ public class LoginActivity extends BaseActivity implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        silentSignInWithGoogle();
+        if (mFirst) {
+            mFirst = false;
+            silentSignInWithGoogle();
+        }
     }
 
     @Override
