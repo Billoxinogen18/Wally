@@ -1,8 +1,7 @@
-package com.wally.wally.tango;
+package com.wally.wally.renderer;
 
 import android.support.annotation.NonNull;
 
-import com.google.atap.tangoservice.Tango;
 import com.wally.wally.datacontroller.content.Content;
 
 import org.objenesis.Objenesis;

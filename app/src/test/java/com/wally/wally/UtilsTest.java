@@ -4,8 +4,7 @@ import android.content.Context;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.tango.WallyRenderer;
+import com.wally.wally.renderer.WallyRenderer;
 
 import org.junit.Test;
 import static org.junit.Assert.*;

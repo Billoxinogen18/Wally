@@ -20,6 +20,7 @@ import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
+import com.wally.wally.renderer.WallyRenderer;
 
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;

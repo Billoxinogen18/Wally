@@ -1,4 +1,6 @@
-package com.wally.wally.tango;
+package com.wally.wally.renderer;
+
+import com.wally.wally.renderer.VisualContent;
 
 /**
  * Interface for listening VisualContent selects

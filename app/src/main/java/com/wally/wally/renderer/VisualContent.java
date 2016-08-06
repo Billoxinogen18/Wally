@@ -1,4 +1,4 @@
-package com.wally.wally.tango;
+package com.wally.wally.renderer;
 
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;

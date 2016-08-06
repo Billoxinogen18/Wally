@@ -1,4 +1,4 @@
-package com.wally.wally.tango;
+package com.wally.wally.renderer;
 
 import android.opengl.GLES20;
 import android.util.Log;

@@ -4,12 +4,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.atap.tangoservice.TangoPoseData;
-import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.datacontroller.content.Content;
-
-import org.rajawali3d.math.Quaternion;
-import org.rajawali3d.math.vector.Vector3;
+import com.wally.wally.renderer.VisualContentManager;
 
 /**
  * Thread that fits content on the wall.

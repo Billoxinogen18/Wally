@@ -31,15 +31,15 @@ import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
-import com.wally.wally.tango.ActiveContentScaleGestureDetector;
+import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.LocalizationListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoManager;
 import com.wally.wally.tango.TangoUpdater;
-import com.wally.wally.tango.VisualContentManager;
-import com.wally.wally.tango.WallyRenderer;
+import com.wally.wally.renderer.VisualContentManager;
+import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
@@ -400,7 +400,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mVisualContentManager.localized();
+                mVisualContentManager.visualContentRestoreAndShow();
                 mFinishFittingFab.setEnabled(true);
                 if (!mTangoManager.isLearningMode()) {
                     mCreateNewContent.setVisibility(View.VISIBLE);
@@ -418,7 +418,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mVisualContentManager.notLocalized();
+                mVisualContentManager.visualContentSaveAndClear();
                 mFinishFittingFab.setEnabled(false);
                 mCreateNewContent.setVisibility(View.GONE);
             }

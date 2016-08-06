@@ -1,9 +1,9 @@
-package com.wally.wally.tango;
+package com.wally.wally.renderer;
 
-import com.google.atap.tangoservice.Tango;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
+import com.wally.wally.renderer.ActiveVisualContent;
 
 import org.junit.Test;
 import org.rajawali3d.math.vector.Vector3;

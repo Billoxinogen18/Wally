@@ -1,4 +1,4 @@
-package com.wally.wally.tango;
+package com.wally.wally.renderer;
 
 import android.util.Log;
 
@@ -15,12 +15,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import static com.wally.wally.tango.VisualContent.RenderStatus;
-
 /**
  * Created by shota on 5/30/16.
  */
-public class VisualContentManager implements LocalizationListener {
+public class VisualContentManager {
     private static final String TAG = VisualContentManager.class.getSimpleName();
     private final Object mLocalizationLock = new Object();
     //Active Content
@@ -48,9 +46,8 @@ public class VisualContentManager implements LocalizationListener {
      * Is called from TangoUpdater through LocalizationListener
      * indicates localized tango device
      */
-    @Override
-    public void localized() {
-        Log.d(TAG, "localized() called with: " + "");
+    public void visualContentRestoreAndShow() {
+        Log.d(TAG, "visualContentRestoreAndShow() called with: " + "");
         synchronized (mLocalizationLock) {
             mIsLocalized = true;
             synchronized (mActiveContentLock){
@@ -70,9 +67,9 @@ public class VisualContentManager implements LocalizationListener {
 
     private ActiveVisualContent getLocalizationNewActiveContent(ActiveVisualContent savedContent, ActiveVisualContent contentNow){
         ActiveVisualContent res = savedContent;
-        if ((savedContent.getStatus() == RenderStatus.Rendered || savedContent.getStatus() == RenderStatus.PendingRender)
-                && (contentNow == null || (contentNow.getStatus() != RenderStatus.Rendered && contentNow.getStatus() != RenderStatus.PendingRemove))) {
-            res.setStatus(RenderStatus.PendingRender);
+        if ((savedContent.getStatus() == VisualContent.RenderStatus.Rendered || savedContent.getStatus() == VisualContent.RenderStatus.PendingRender)
+                && (contentNow == null || (contentNow.getStatus() != VisualContent.RenderStatus.Rendered && contentNow.getStatus() != VisualContent.RenderStatus.PendingRemove))) {
+            res.setStatus(VisualContent.RenderStatus.PendingRender);
         }
 
         return res;
@@ -82,8 +79,7 @@ public class VisualContentManager implements LocalizationListener {
      * Is called from TangoUpdater through LocalizationListener
      * indicates not localized tango device
      */
-    @Override
-    public void notLocalized() {
+    public void visualContentSaveAndClear() {
         Log.d(TAG, "notLocalized() called with: " + "");
         synchronized (mLocalizationLock) {
             mIsLocalized = false;
@@ -132,18 +128,18 @@ public class VisualContentManager implements LocalizationListener {
         for (VisualContent oldC : savedContent){
             VisualContent newC = findVisualContentInStaticContentList(oldC, contentNow);
             if (newC != null){
-                if((oldC.getStatus() == RenderStatus.Rendered || oldC.getStatus() == RenderStatus.PendingRender) &&
-                        (newC.getStatus() != RenderStatus.Rendered && newC.getStatus() != RenderStatus.PendingRemove)){
-                    oldC.setStatus(RenderStatus.PendingRender);
+                if((oldC.getStatus() == VisualContent.RenderStatus.Rendered || oldC.getStatus() == VisualContent.RenderStatus.PendingRender) &&
+                        (newC.getStatus() != VisualContent.RenderStatus.Rendered && newC.getStatus() != VisualContent.RenderStatus.PendingRemove)){
+                    oldC.setStatus(VisualContent.RenderStatus.PendingRender);
                     newCon.add(oldC);
-                } else if (oldC.getStatus() == RenderStatus.PendingRemove && newC.getStatus() != RenderStatus.None){
+                } else if (oldC.getStatus() == VisualContent.RenderStatus.PendingRemove && newC.getStatus() != VisualContent.RenderStatus.None){
                     newCon.add(oldC);
                 }
             } else {
-                if (oldC.getStatus() == RenderStatus.Rendered){
-                    oldC.setStatus(RenderStatus.PendingRender);
+                if (oldC.getStatus() == VisualContent.RenderStatus.Rendered){
+                    oldC.setStatus(VisualContent.RenderStatus.PendingRender);
                     newCon.add(oldC);
-                } else if (oldC.getStatus() == RenderStatus.PendingRender){
+                } else if (oldC.getStatus() == VisualContent.RenderStatus.PendingRender){
                     newCon.add(oldC);
                 }
             }
@@ -155,10 +151,10 @@ public class VisualContentManager implements LocalizationListener {
         //TODO buggy when renderer gets pending staticContent it will be rendered anyway.
         synchronized (mStaticContentLock) {
             for (VisualContent vc : mStaticContent) {
-                if (vc.getStatus() == RenderStatus.Rendered) {
-                    vc.setStatus(RenderStatus.PendingRemove);
-                } else if (vc.getStatus() == RenderStatus.PendingRender) {
-                    vc.setStatus(RenderStatus.None);
+                if (vc.getStatus() == VisualContent.RenderStatus.Rendered) {
+                    vc.setStatus(VisualContent.RenderStatus.PendingRemove);
+                } else if (vc.getStatus() == VisualContent.RenderStatus.PendingRender) {
+                    vc.setStatus(VisualContent.RenderStatus.None);
                 }
             }
         }
@@ -181,7 +177,7 @@ public class VisualContentManager implements LocalizationListener {
                 }
                 content.withTangoData(td);
                 this.mActiveContent = new ActiveVisualContent(content);
-                mActiveContent.setStatus(RenderStatus.PendingRender);
+                mActiveContent.setStatus(VisualContent.RenderStatus.PendingRender);
             } else {
                 Utils.throwError();
             }
@@ -216,9 +212,9 @@ public class VisualContentManager implements LocalizationListener {
         synchronized (mActiveContentLock) {
             if (mActiveContent != null) {
                 Log.d(TAG, "removePendingActiveContent() called with: " + mActiveContent.getStatus());
-                if (mActiveContent.getStatus() == RenderStatus.Rendered) {
-                    mActiveContent.setStatus(RenderStatus.PendingRemove);
-                } else if (mActiveContent.getStatus() == RenderStatus.PendingRender) {
+                if (mActiveContent.getStatus() == VisualContent.RenderStatus.Rendered) {
+                    mActiveContent.setStatus(VisualContent.RenderStatus.PendingRemove);
+                } else if (mActiveContent.getStatus() == VisualContent.RenderStatus.PendingRender) {
                     //mActiveContent.setStatus(RenderStatus.None);
                     mActiveContent = null;
                 }
@@ -234,7 +230,7 @@ public class VisualContentManager implements LocalizationListener {
     public void setActiveContentAdded() {
         synchronized (mActiveContentLock) {
             if (mActiveContent != null) {
-                mActiveContent.setStatus(RenderStatus.Rendered);
+                mActiveContent.setStatus(VisualContent.RenderStatus.Rendered);
             } else {
                 Utils.throwError();
             }
@@ -244,7 +240,7 @@ public class VisualContentManager implements LocalizationListener {
     public void setActiveContentFinishFitting() {
         synchronized (mActiveContentLock) {
             synchronized (mStaticContentLock) {
-                if (mActiveContent.getStatus() == RenderStatus.Rendered) {
+                if (mActiveContent.getStatus() == VisualContent.RenderStatus.Rendered) {
                     int index = mStaticContent.indexOf(mActiveContent);
                     if (index == -1) {
                         mStaticContent.add(mActiveContent);
@@ -261,7 +257,7 @@ public class VisualContentManager implements LocalizationListener {
 
     public void setActiveContentRemoved() {
         synchronized (mActiveContentLock) {
-            if (mActiveContent.getStatus() == RenderStatus.PendingRemove || mActiveContent.getStatus() == RenderStatus.None) {
+            if (mActiveContent.getStatus() == VisualContent.RenderStatus.PendingRemove || mActiveContent.getStatus() == VisualContent.RenderStatus.None) {
                 mActiveContent = null;
             } else {
                 Utils.throwError();
@@ -289,7 +285,7 @@ public class VisualContentManager implements LocalizationListener {
     public boolean shouldActiveContentRenderOnScreen() {
         synchronized (mLocalizationLock) {
             synchronized (mActiveContentLock) {
-                return mActiveContent != null && mActiveContent.getStatus() == RenderStatus.PendingRender && isLocalized();
+                return mActiveContent != null && mActiveContent.getStatus() == VisualContent.RenderStatus.PendingRender && isLocalized();
             }
         }
     }
@@ -301,7 +297,7 @@ public class VisualContentManager implements LocalizationListener {
      */
     public boolean shouldActiveContentRemoveFromScreen() {
         synchronized (mActiveContentLock) {
-            return mActiveContent != null && mActiveContent.getStatus() == RenderStatus.PendingRemove;
+            return mActiveContent != null && mActiveContent.getStatus() == VisualContent.RenderStatus.PendingRemove;
         }
     }
 
@@ -342,7 +338,7 @@ public class VisualContentManager implements LocalizationListener {
 
     public void setStaticContentAdded(VisualContent visualContent) {
         synchronized (mStaticContentLock) {
-            visualContent.setStatus(RenderStatus.Rendered);
+            visualContent.setStatus(VisualContent.RenderStatus.Rendered);
             int index = mStaticContent.indexOf(visualContent);
             if (index != -1) {
                 mStaticContent.set(index, visualContent);
@@ -368,7 +364,7 @@ public class VisualContentManager implements LocalizationListener {
         synchronized (mLocalizationLock) {
             synchronized (mStaticContentLock) {
                 if (isLocalized()) {
-                    return filterStaticVisualContentList(RenderStatus.PendingRender);
+                    return filterStaticVisualContentList(VisualContent.RenderStatus.PendingRender);
                 } else {
                     return Collections.emptyIterator();
                 }
@@ -378,7 +374,7 @@ public class VisualContentManager implements LocalizationListener {
 
     public Iterator<VisualContent> getStaticVisualContentToRemove() {
         synchronized (mStaticContentLock) {
-            return filterStaticVisualContentList(RenderStatus.PendingRemove);
+            return filterStaticVisualContentList(VisualContent.RenderStatus.PendingRemove);
         }
     }
 
@@ -396,7 +392,7 @@ public class VisualContentManager implements LocalizationListener {
     public VisualContent findContentByObject3D(Object3D object) {
         synchronized (mStaticContentLock) {
             for (VisualContent vc : mStaticContent) {
-                if (vc.getVisual().equals(object) && vc.getStatus() == RenderStatus.Rendered) {
+                if (vc.getVisual().equals(object) && vc.getStatus() == VisualContent.RenderStatus.Rendered) {
                     return vc;
                 }
             }
@@ -404,7 +400,7 @@ public class VisualContentManager implements LocalizationListener {
         return null;
     }
 
-    private Iterator<VisualContent> filterStaticVisualContentList(RenderStatus status) {
+    private Iterator<VisualContent> filterStaticVisualContentList(VisualContent.RenderStatus status) {
         List<VisualContent> res = new ArrayList<>();
         for (VisualContent vc : mStaticContent) {
             if (vc.getStatus() == status) {
@@ -417,7 +413,7 @@ public class VisualContentManager implements LocalizationListener {
 
     private void addPendingStaticContent(VisualContent visualContent) {
         synchronized (mStaticContentLock) {
-            visualContent.setStatus(RenderStatus.PendingRender);
+            visualContent.setStatus(VisualContent.RenderStatus.PendingRender);
             int index = mStaticContent.indexOf(visualContent);
             if (index == -1) {
                 mStaticContent.add(visualContent);
@@ -429,7 +425,7 @@ public class VisualContentManager implements LocalizationListener {
 
     private void addSavedPendingStaticContent(VisualContent visualContent) {
         synchronized (mStaticContentLock) {
-            visualContent.setStatus(RenderStatus.PendingRender);
+            visualContent.setStatus(VisualContent.RenderStatus.PendingRender);
             int index = mSavedStaticContent.indexOf(visualContent);
             if (index == -1) {
                 mSavedStaticContent.add(visualContent);
@@ -441,7 +437,7 @@ public class VisualContentManager implements LocalizationListener {
 
     private void removePendingStaticContent(VisualContent visualContent) {
         synchronized (mStaticContentLock) {
-            visualContent.setStatus(RenderStatus.PendingRemove);
+            visualContent.setStatus(VisualContent.RenderStatus.PendingRemove);
             int index = mStaticContent.indexOf(visualContent);
             if (index == -1) {
             } else {

@@ -22,8 +22,8 @@ import com.wally.wally.controllers.map.MapsFragment;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
-import com.wally.wally.tango.OnVisualContentSelectedListener;
-import com.wally.wally.tango.VisualContent;
+import com.wally.wally.renderer.OnVisualContentSelectedListener;
+import com.wally.wally.renderer.VisualContent;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.SocialUserManager;
 

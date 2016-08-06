@@ -1,15 +1,14 @@
-package com.wally.wally.tango;
+package com.wally.wally.renderer;
 
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
+import com.wally.wally.renderer.VisualContent;
 
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.rajawali3d.math.vector.Vector3;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.*;
 
 /**
  * Created by shota on 5/24/16.

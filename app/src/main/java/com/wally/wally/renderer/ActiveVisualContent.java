@@ -1,4 +1,4 @@
-package com.wally.wally.tango;
+package com.wally.wally.renderer;
 
 import android.util.Log;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -9,7 +9,6 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 
 import org.rajawali3d.animation.Animation3D;
-import org.rajawali3d.animation.EllipticalOrbitAnimation3D;
 import org.rajawali3d.animation.SlerpAnimation3D;
 import org.rajawali3d.animation.TranslateAnimation3D;
 import org.rajawali3d.scene.RajawaliScene;
