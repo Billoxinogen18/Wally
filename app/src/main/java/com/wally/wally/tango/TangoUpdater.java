@@ -124,11 +124,11 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
             isLocalized = localization;
             if (isLocalized) {
                 for (LocalizationListener listener : mLocalizationListeners) {
-                    listener.localized();
+                    listener.onLocalize();
                 }
             } else {
                 for (LocalizationListener listener : mLocalizationListeners) {
-                    listener.notLocalized();
+                    listener.onNotLocalize();
                 }
             }
         }
@@ -159,7 +159,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     }
 
     public interface LocalizationListener {
-        void localized();
-        void notLocalized();
+        void onLocalize();
+        void onNotLocalize();
     }
 }

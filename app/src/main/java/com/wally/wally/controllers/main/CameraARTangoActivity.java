@@ -400,7 +400,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
 
     @Override
-    public void localized() {
+    public void onLocalize() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -418,7 +418,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     @Override
-    public void notLocalized() {
+    public void onNotLocalize() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -224,8 +224,8 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
 
     private synchronized void startLearning() {
         Log.d(TAG, "startLearning()");
-        Tip tip = mTipService.getRandom(TipService.Tag.LEARNING);
-        mTipView.show(tip.getTitle(), tip.getMessage(), 5000);
+//        Tip tip = mTipService.getRandom(TipService.Tag.LEARNING);
+//        mTipView.show(tip.getTitle(), tip.getMessage(), 5000);
 
         String msg = mConfig.getString(TangoManagerConstants.LEARNING_AREA);
         mTangoUx.showCustomMessage(msg);
@@ -460,7 +460,7 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
     }
 
     @Override
-    public void localized() {
+    public void onLocalize() {
         Log.d(TAG, "localized() called with: " + "");
 
         if (mLocalizationWatchdog != null) {
@@ -482,7 +482,7 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
     }
 
     @Override
-    public void notLocalized() {
+    public void onNotLocalize() {
         Log.d(TAG, "notLocalized() called with: " + "");
         mIsLocalized = false;
         String msg;
