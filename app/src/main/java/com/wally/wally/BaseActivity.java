@@ -15,6 +15,8 @@ import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.components.PersistentDialogFragment.PersistentDialogListener;
 import com.wally.wally.controllers.map.BaseFragment;
 
+import java.util.List;
+
 /**
  * Abstract activity that helps to manage things used in activities.
  * Created by ioane5 on 8/4/16.
@@ -42,9 +44,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
             return;
         }
         onLocationPermissionGranted(mLocationRequestCode);
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            if (fragment instanceof BaseFragment) {
-                ((BaseFragment) fragment).onLocationPermissionGranted(mLocationRequestCode);
+        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+        if (fragmentList != null) {
+            for (Fragment fragment : fragmentList) {
+                if (fragment instanceof BaseFragment) {
+                    ((BaseFragment) fragment).onLocationPermissionGranted(mLocationRequestCode);
+                }
             }
         }
         mLocationRequestCode = -1;
@@ -58,7 +63,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
      */
     public final void requestLocationPermission(int locationRequestCode) {
         mLocationRequestCode = locationRequestCode;
-        if (Utils.checkLocationPermission(this)) {
+        if (Utils.checkHasLocationPermission(this)) {
             onLocationPermissionGranted();
             return;
         }
@@ -75,7 +80,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == RC_LOCATION_PERMISSION) {
-            if (Utils.checkLocationPermission(this)) {
+            if (Utils.checkHasLocationPermission(this)) {
                 onLocationPermissionGranted();
             } else {
                 // Note that because fragment/Dialog transactions can't happen here
@@ -91,7 +96,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         // Check if location permission was granted in settings screen.
         if (mStartedAppSettingsScreen) {
             mStartedAppSettingsScreen = false;
-            if (Utils.checkLocationPermission(this)) {
+            if (Utils.checkHasLocationPermission(this)) {
                 onLocationPermissionGranted();
             } else {
                 // If still not granted show Explanation again.

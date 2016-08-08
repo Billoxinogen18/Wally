@@ -17,6 +17,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
@@ -95,9 +96,10 @@ public final class Utils {
      * @param context to check permission.
      * @return true if we have location permission.
      */
-    public static boolean checkLocationPermission(Context context) {
-        return ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    public static boolean checkHasLocationPermission(Context context) {
+        return Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ||
+                ActivityCompat.checkSelfPermission(context,
+                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(context,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
@@ -451,19 +453,14 @@ public final class Utils {
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public interface Callback<T> {
-        void onResult(T result);
-        void onError(Exception e);
-    }
-
-    public static String  getAssetContentAsString(Context context, String filepath) {
+    public static String getAssetContentAsString(Context context, String filepath) {
         String content = "";
         try {
             InputStream is = context.getAssets().open(filepath);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             while (true) {
                 String line = reader.readLine();
-                if(line == null) break;
+                if (line == null) break;
                 content += line;
             }
             reader.close();
@@ -472,5 +469,11 @@ public final class Utils {
             content = null;
         }
         return content;
+    }
+
+    public interface Callback<T> {
+        void onResult(T result);
+
+        void onError(Exception e);
     }
 }

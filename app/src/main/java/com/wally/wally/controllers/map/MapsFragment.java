@@ -204,7 +204,7 @@ public class MapsFragment extends BaseFragment implements
     public void onMapReady(MapboxMap mapboxMap) {
         mMap = mapboxMap;
 
-        if (Utils.checkLocationPermission(getContext())) {
+        if (Utils.checkHasLocationPermission(getContext())) {
             mMap.setMyLocationEnabled(true);
         } else {
             requestLocationPermission(0);
@@ -247,7 +247,7 @@ public class MapsFragment extends BaseFragment implements
     }
 
     public void onMyLocationClick() {
-        if (!Utils.checkLocationPermission(getContext())) {
+        if (!Utils.checkHasLocationPermission(getContext())) {
             requestLocationPermission(RC_MY_LOCATION_CLICK);
         } else {
             centerMapOnMyLocation(null);
@@ -425,7 +425,7 @@ public class MapsFragment extends BaseFragment implements
     }
 
     private void centerMapOnMyLocation(MapboxMap.CancelableCallback callback) {
-        if (Utils.checkLocationPermission(getContext())) {
+        if (Utils.checkHasLocationPermission(getContext())) {
             Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
             if (myLocation == null) {

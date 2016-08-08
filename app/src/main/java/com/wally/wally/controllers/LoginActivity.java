@@ -180,7 +180,7 @@ public class LoginActivity extends BaseActivity implements
     private void createAdfManager() {
         mLoadingView.setVisibility(View.VISIBLE);
 
-        if (!Utils.checkLocationPermission(this)) {
+        if (!Utils.checkHasLocationPermission(this)) {
             requestLocationPermission(RC_CREATE_ADF);
             return;
         }

@@ -22,14 +22,13 @@ import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
 import com.wally.wally.controllers.main.TipView;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.tip.Tip;
 import com.wally.wally.tip.TipService;
 
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
 
-public class TangoManager implements LocalizationListener {
+public class TangoManager implements TangoUpdater.LocalizationListener {
     public static final TangoCoordinateFramePair FRAME_PAIR =
             new TangoCoordinateFramePair(
                     TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
@@ -183,7 +182,7 @@ public class TangoManager implements LocalizationListener {
             @Override
             public void onLearningFinish() {
                 mIsReadyToSaveAdf = true;
-                mTangoUpdater.removeValidPoserListener(mLearningEvaluator);
+                mTangoUpdater.removeValidPoseListener(mLearningEvaluator);
                 if (mIsLocalized) {
                     finishLearning();
                 }
@@ -191,7 +190,7 @@ public class TangoManager implements LocalizationListener {
 
             @Override
             public void onLearningFailed() {
-                mTangoUpdater.removeValidPoserListener(mLearningEvaluator);
+                mTangoUpdater.removeValidPoseListener(mLearningEvaluator);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -225,8 +224,8 @@ public class TangoManager implements LocalizationListener {
 
     private synchronized void startLearning() {
         Log.d(TAG, "startLearning()");
-        Tip tip = mTipService.getRandom(TipService.Tag.LEARNING);
-        mTipView.show(tip.getTitle(), tip.getMessage(), 5000);
+//        Tip tip = mTipService.getRandom(TipService.Tag.LEARNING);
+//        mTipView.show(tip.getTitle(), tip.getMessage(), 5000);
 
         String msg = mConfig.getString(TangoManagerConstants.LEARNING_AREA);
         mTangoUx.showCustomMessage(msg);
@@ -461,7 +460,7 @@ public class TangoManager implements LocalizationListener {
     }
 
     @Override
-    public void localized() {
+    public void onLocalize() {
         Log.d(TAG, "localized() called with: " + "");
 
         if (mLocalizationWatchdog != null) {
@@ -483,7 +482,7 @@ public class TangoManager implements LocalizationListener {
     }
 
     @Override
-    public void notLocalized() {
+    public void onNotLocalize() {
         Log.d(TAG, "notLocalized() called with: " + "");
         mIsLocalized = false;
         String msg;

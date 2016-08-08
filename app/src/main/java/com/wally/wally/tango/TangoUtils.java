@@ -24,16 +24,16 @@ public class TangoUtils {
         TangoCoordinateFramePair framePair = new TangoCoordinateFramePair();
         framePair.baseFrame = TangoPoseData.COORDINATE_FRAME_IMU;
         framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR;
-        TangoPoseData imuTrgbPose = tango.getPoseAtTime(0.0, framePair);
+        TangoPoseData rgbPose = tango.getPoseAtTime(0.0, framePair);
 
         // Create device to IMU transform.
         framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_DEVICE;
-        TangoPoseData imuTdevicePose = tango.getPoseAtTime(0.0, framePair);
+        TangoPoseData devicePose = tango.getPoseAtTime(0.0, framePair);
 
         // Create depth camera to IMU transform.
         framePair.targetFrame = TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH;
-        TangoPoseData imuTdepthPose = tango.getPoseAtTime(0.0, framePair);
+        TangoPoseData depthPose = tango.getPoseAtTime(0.0, framePair);
 
-        return new DeviceExtrinsics(imuTdevicePose, imuTrgbPose, imuTdepthPose);
+        return new DeviceExtrinsics(devicePose, rgbPose, depthPose);
     }
 }

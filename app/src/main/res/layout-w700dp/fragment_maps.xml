@@ -26,7 +26,7 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/iv_owner_image"
             android:layout_width="48dp"
             android:layout_height="48dp"

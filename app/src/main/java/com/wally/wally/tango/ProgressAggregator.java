@@ -9,7 +9,7 @@ import java.util.Map;
  * Created by shota on 8/7/16.
  *
  */
-public class A implements ProgressReporter, ProgressListener{
+public class ProgressAggregator implements ProgressReporter, ProgressListener{
     private Map<ProgressReporter, Double> reporters;
     private Map<ProgressReporter, Double> progresses;
     private List<ProgressListener> listeners;
