@@ -62,6 +62,10 @@ public class AdfManager {
         });
     }
 
+    public int getAdfTotalCount() {
+        return metadatas.size();
+    }
+
     interface AdfManagerStateListener {
         void onAdfReady(AdfInfo info);
         void onNoMoreAdfs();
