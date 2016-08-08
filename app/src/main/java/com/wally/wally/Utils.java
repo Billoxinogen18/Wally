@@ -17,6 +17,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
@@ -96,8 +97,9 @@ public final class Utils {
      * @return true if we have location permission.
      */
     public static boolean checkLocationPermission(Context context) {
-        return ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        return Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP ||
+                ActivityCompat.checkSelfPermission(context,
+                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
                 || ActivityCompat.checkSelfPermission(context,
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
@@ -453,6 +455,7 @@ public final class Utils {
 
     public interface Callback<T> {
         void onResult(T result);
+
         void onError(Exception e);
     }
 

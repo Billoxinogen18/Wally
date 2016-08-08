@@ -439,7 +439,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     private void setLocalizationLocation() {
-        if (Utils.checkLocationPermission(this)) {
+        if (!Utils.checkLocationPermission(this)) {
             requestLocationPermission(RC_SET_LOCALIZATION_LOCATION);
             return;
         }

@@ -15,6 +15,8 @@ import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.components.PersistentDialogFragment.PersistentDialogListener;
 import com.wally.wally.controllers.map.BaseFragment;
 
+import java.util.List;
+
 /**
  * Abstract activity that helps to manage things used in activities.
  * Created by ioane5 on 8/4/16.
@@ -42,9 +44,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
             return;
         }
         onLocationPermissionGranted(mLocationRequestCode);
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
-            if (fragment instanceof BaseFragment) {
-                ((BaseFragment) fragment).onLocationPermissionGranted(mLocationRequestCode);
+        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+        if (fragmentList != null) {
+            for (Fragment fragment : fragmentList) {
+                if (fragment instanceof BaseFragment) {
+                    ((BaseFragment) fragment).onLocationPermissionGranted(mLocationRequestCode);
+                }
             }
         }
         mLocationRequestCode = -1;
