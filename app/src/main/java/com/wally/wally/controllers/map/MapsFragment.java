@@ -34,6 +34,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
+import com.wally.wally.components.CircleTransform;
 import com.wally.wally.controllers.map.contentList.Adapter;
 import com.wally.wally.controllers.map.contentList.OnScrollListener;
 import com.wally.wally.controllers.map.contentList.PagingRetriever;
@@ -335,6 +336,7 @@ public class MapsFragment extends BaseFragment implements
                     .crossFade()
                     .fitCenter()
                     .thumbnail(0.1f)
+                    .transform(new CircleTransform(getContext()))
                     .placeholder(R.drawable.ic_account_circle_black_24dp)
                     .dontAnimate()
                     .into(ownerImage);
