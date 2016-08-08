@@ -19,9 +19,11 @@ public class AdfScheduler extends Thread implements ProgressReporter{
     private List<AdfSchedulerListener> callbackList;
 
     private ProgressListener listener;
+    private int adfsSoFar;
 
     public AdfScheduler(AdfManager adfManager) {
         done = false;
+        adfsSoFar = 0;
         timeout = DEFAULT_TIMEOUT;
         this.mAdfManager = adfManager;
         callbackList = new ArrayList<>();
@@ -63,6 +65,7 @@ public class AdfScheduler extends Thread implements ProgressReporter{
                 public void onAdfReady(AdfInfo info) {
                     if (done || isInterrupted()) return;
                     fireSuccess(info);
+                    fireProgress();
                     latch.countDown();
                 }
 
@@ -77,6 +80,17 @@ public class AdfScheduler extends Thread implements ProgressReporter{
                 Thread.sleep(timeout);
             } catch (InterruptedException e) { break; }
         }
+    }
+
+    private void fireProgress() {
+        adfsSoFar++;
+        double progress = (double) adfsSoFar / mAdfManager.getAdfTotalCount();
+        listener.onProgressUpdate(this, progress);
+    }
+
+    @Override
+    public void forceReport() {
+        listener.onProgressUpdate(this, 1);
     }
 
     @Override

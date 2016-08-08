@@ -63,22 +63,27 @@ public class CameraARTangoActivity extends CameraARActivity implements
     // Permission Request codes
     private static final int RC_REQ_AREA_LEARNING = 17;
     private static final int RC_SET_LOCALIZATION_LOCATION = 102;
+
     private boolean mExplainAdfPermission;
 
     private TangoManager mTangoManager;
     private WallyTangoUx mTangoUx;
+
     private FloatingActionButton mCreateNewContent;
     private FloatingActionButton mFinishFitting;
-    private View mLayoutFitting;
     private FloatingActionButton mFinishFittingFab;
+    private View mLayoutFitting;
     private List<View> mNonFittingModeViews;
 
 
     private ContentFitter mContentFitter;
     private VisualContentManager mVisualContentManager;
     private WallyRenderer mRenderer;
+
     private SerializableLatLng mLocalizationLocation;
     private Content editableContent;
+
+    private TipManager mTipManager;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, CameraARTangoActivity.class);
@@ -120,6 +125,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
         TipService tipService = new LocalTipService(Utils.getAssetContentAsString(getBaseContext(), "tips.json"));
 
+        mTipManager = new TipManager(mTipView, tipService);
+
         AdfScheduler adfScheduler = new AdfScheduler(adfManager);
 
         ProgressAggregator progressAggregator = new ProgressAggregator();
@@ -127,7 +134,10 @@ public class CameraARTangoActivity extends CameraARActivity implements
         progressAggregator.addProgressReporter(evaluator, 0.6);
 
         mTangoManager = new TangoManager(config, mAnalytics, tangoUpdater,
-                pointCloudManager, mRenderer, mTangoUx, mTipView, tangoFactory, adfManager, adfScheduler, evaluator, tipService);
+                pointCloudManager, mRenderer, mTangoUx, tangoFactory, adfManager, adfScheduler, evaluator);
+
+        mTangoManager.addEventListener(mTipManager);
+
         restoreState(savedInstanceState);
 
 

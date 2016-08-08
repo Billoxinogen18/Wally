@@ -25,7 +25,7 @@ public class ProgressAggregator implements ProgressReporter, ProgressListener{
     @Override
     public void onProgressUpdate(ProgressReporter reporter, double progress) {
         progresses.put(reporter, progress);
-        fireProgress();
+        fireProgress(getProgress());
     }
 
     public void addProgressReporter(ProgressReporter reporter, double weight){
@@ -34,12 +34,16 @@ public class ProgressAggregator implements ProgressReporter, ProgressListener{
         weightSum += weight;
     }
 
+    @Override
+    public void forceReport() {
+        fireProgress(1);
+    }
+
     public void addProgressListener(ProgressListener listener){
         listeners.add(listener);
     }
 
-    private void fireProgress() {
-        double progress = getProgress();
+    private void fireProgress(double progress) {
         for (ProgressListener listener: listeners){
             listener.onProgressUpdate(this, progress);
         }

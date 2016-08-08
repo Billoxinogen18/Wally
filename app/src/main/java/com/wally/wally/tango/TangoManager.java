@@ -20,13 +20,14 @@ import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
-import com.wally.wally.controllers.main.TipView;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.tip.TipService;
 
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TangoManager implements TangoUpdater.LocalizationListener {
     public static final TangoCoordinateFramePair FRAME_PAIR =
@@ -42,8 +43,6 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
 
     private Tango mTango;
     private WallyTangoUx mTangoUx;
-    private TipView mTipView;
-    private TipService mTipService;
 
     private DeviceExtrinsics mExtrinsics;
     private TangoCameraIntrinsics mIntrinsics;
@@ -71,6 +70,8 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
     private boolean mIsLearningMode;
     private boolean mIsReadyToSaveAdf;
 
+    private List<EventListener> eventListeners = new ArrayList<>();
+
     private Thread mLocalizationWatchdog;
     private LocalizationState localizationState = LocalizationState.NONE;
     private int adfCounter = 0;
@@ -83,20 +84,16 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
             TangoPointCloudManager pointCloudManager,
             WallyRenderer wallyRenderer,
             WallyTangoUx tangoUx,
-            TipView tipView,
             TangoFactory tangoFactory,
             AdfManager adfManager,
             AdfScheduler adfScheduler,
-            LearningEvaluator evaluator,
-            TipService tipService
+            LearningEvaluator evaluator
     ) {
         mConfig = config;
         mAnalytics = analytics;
         mTangoUpdater = tangoUpdater;
         mRenderer = wallyRenderer;
         mTangoUx = tangoUx;
-        mTipView = tipView;
-        mTipService = tipService;
         TangoUx.StartParams params = new TangoUx.StartParams();
         params.showConnectionScreen = false;
         mTangoUx.start(params);
@@ -224,8 +221,10 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
 
     private synchronized void startLearning() {
         Log.d(TAG, "startLearning()");
-//        Tip tip = mTipService.getRandom(TipService.Tag.LEARNING);
-//        mTipView.show(tip.getTitle(), tip.getMessage(), 5000);
+
+        for (EventListener eventListener : eventListeners) {
+            eventListener.onLearningStart();
+        }
 
         String msg = mConfig.getString(TangoManagerConstants.LEARNING_AREA);
         mTangoUx.showCustomMessage(msg);
@@ -524,6 +523,10 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
         if (success && localizationState != LocalizationState.AFTER_LEARNING){
             mAnalytics.logLocalizationTimeForAdf("NAN", System.currentTimeMillis() - timeForAdfLocalization);
         }
+    }
+
+    public void addEventListener(EventListener eventListener) {
+        eventListeners.add(eventListener);
     }
 
     enum LocalizationState {
