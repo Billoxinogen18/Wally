@@ -86,9 +86,8 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
             WallyTangoUx tangoUx,
             TangoFactory tangoFactory,
             AdfManager adfManager,
-            LearningEvaluator evaluator
             AdfScheduler adfScheduler,
-            LearningEvaluator evaluator,
+            LearningEvaluator evaluator
     ) {
         mConfig = config;
         mAnalytics = analytics;
