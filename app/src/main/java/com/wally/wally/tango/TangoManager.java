@@ -22,7 +22,6 @@ import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
 import com.wally.wally.controllers.main.TipView;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.tip.Tip;
 import com.wally.wally.tip.TipService;
 
 import org.rajawali3d.math.Quaternion;
@@ -182,7 +181,7 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
             @Override
             public void onLearningFinish() {
                 mIsReadyToSaveAdf = true;
-                mTangoUpdater.removeValidPoserListener(mLearningEvaluator);
+                mTangoUpdater.removeValidPoseListener(mLearningEvaluator);
                 if (mIsLocalized) {
                     finishLearning();
                 }
@@ -190,7 +189,7 @@ public class TangoManager implements TangoUpdater.LocalizationListener {
 
             @Override
             public void onLearningFailed() {
-                mTangoUpdater.removeValidPoserListener(mLearningEvaluator);
+                mTangoUpdater.removeValidPoseListener(mLearningEvaluator);
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
