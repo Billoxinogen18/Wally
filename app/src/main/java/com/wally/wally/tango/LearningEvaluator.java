@@ -116,6 +116,11 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
     }
 
     @Override
+    public void forceReport() {
+        progressListener.onProgressUpdate(this, 1);
+    }
+
+    @Override
     public void addProgressListener(ProgressListener listener) {
         progressListener = listener;
     }

@@ -84,8 +84,13 @@ public class AdfScheduler extends Thread implements ProgressReporter{
 
     private void fireProgress() {
         adfsSoFar++;
-        double progress = (adfsSoFar * 100.0) / mAdfManager.getAdfTotalCount();
+        double progress = (double) adfsSoFar / mAdfManager.getAdfTotalCount();
         listener.onProgressUpdate(this, progress);
+    }
+
+    @Override
+    public void forceReport() {
+        listener.onProgressUpdate(this, 1);
     }
 
     @Override
