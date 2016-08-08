@@ -87,6 +87,7 @@ public class TangoManager implements LocalizationListener {
             TipView tipView,
             TangoFactory tangoFactory,
             AdfManager adfManager,
+            AdfScheduler adfScheduler,
             LearningEvaluator evaluator,
             TipService tipService
     ) {
@@ -103,6 +104,7 @@ public class TangoManager implements LocalizationListener {
         mPointCloudManager = pointCloudManager;
         mTangoFactory = tangoFactory;
         mAdfManager = adfManager;
+        mAdfScheduler = adfScheduler;
         mLearningEvaluator = evaluator;
         mTangoUpdater.addLocalizationListener(this);
     }
@@ -140,10 +142,9 @@ public class TangoManager implements LocalizationListener {
         } else {
             int timeout = mConfig.getInt(TangoManagerConstants.LOCALIZATION_TIMEOUT);
             adfCounter = 0;
-            mAdfScheduler = new AdfScheduler(mAdfManager)
+            mAdfScheduler = mAdfScheduler
                     .withTimeout(timeout)
                     .addListener(createAdfSchedulerListener());
-            // TODO: probably should be injected in constructor
             mAdfScheduler.start();
         }
     }

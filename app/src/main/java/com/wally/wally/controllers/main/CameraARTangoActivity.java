@@ -23,6 +23,7 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfManager;
+import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.adf.AdfService;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.config.CameraTangoActivityConstants;
@@ -35,6 +36,7 @@ import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.LocalizationListener;
+import com.wally.wally.tango.ProgressAggregator;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoManager;
 import com.wally.wally.tango.TangoUpdater;
@@ -119,8 +121,14 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
         TipService tipService = new LocalTipService(Utils.getAssetContentAsString(getBaseContext(), "tips.json"));
 
+        AdfScheduler adfScheduler = new AdfScheduler(adfManager);
+
+        ProgressAggregator progressAggregator = new ProgressAggregator();
+        progressAggregator.addProgressReporter(adfScheduler, 0.4);
+        progressAggregator.addProgressReporter(evaluator, 0.6);
+
         mTangoManager = new TangoManager(config, mAnalytics, tangoUpdater,
-                pointCloudManager, mRenderer, mTangoUx, mTipView, tangoFactory, adfManager, evaluator, tipService);
+                pointCloudManager, mRenderer, mTangoUx, mTipView, tangoFactory, adfManager, adfScheduler, evaluator, tipService);
         restoreState(savedInstanceState);
 
 

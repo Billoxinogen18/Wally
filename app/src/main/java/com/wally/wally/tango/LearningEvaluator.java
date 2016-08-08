@@ -12,7 +12,7 @@ import org.rajawali3d.math.Quaternion;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
+public class LearningEvaluator implements TangoUpdater.ValidPoseListener, ProgressReporter {
     public static final String TAG = LearningEvaluator.class.getSimpleName();
 
     private int minTimeMs;
@@ -26,6 +26,8 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
     private long latestUpdateTime;
     private LearningEvaluatorListener listener;
     private boolean isFinished;
+
+    private ProgressListener progressListener;
 
     public LearningEvaluator(Config config) {
         minTimeMs = config.getInt(LearningEvaluatorConstants.MIN_TIME_S) * 1000;
@@ -79,6 +81,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
     }
 
     private boolean canFinish(){
+        progressListener.onProgressUpdate(this, 0.3);
         int angleCount = getAngleCount();
         int size = cells.size();
         long time = System.currentTimeMillis() - startTime;
@@ -112,6 +115,10 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener {
         return this;
     }
 
+    @Override
+    public void addProgressListener(ProgressListener listener) {
+        progressListener = listener;
+    }
 
 
     interface LearningEvaluatorListener{

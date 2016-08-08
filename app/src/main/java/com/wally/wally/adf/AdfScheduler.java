@@ -2,11 +2,14 @@ package com.wally.wally.adf;
 
 import android.util.Log;
 
+import com.wally.wally.tango.ProgressListener;
+import com.wally.wally.tango.ProgressReporter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-public class AdfScheduler extends Thread {
+public class AdfScheduler extends Thread implements ProgressReporter{
     public static final String TAG = AdfScheduler.class.getSimpleName();
     public static final int DEFAULT_TIMEOUT = 1000;
 
@@ -14,6 +17,8 @@ public class AdfScheduler extends Thread {
     private int timeout;
     private AdfManager mAdfManager;
     private List<AdfSchedulerListener> callbackList;
+
+    private ProgressListener listener;
 
     public AdfScheduler(AdfManager adfManager) {
         done = false;
@@ -72,6 +77,11 @@ public class AdfScheduler extends Thread {
                 Thread.sleep(timeout);
             } catch (InterruptedException e) { break; }
         }
+    }
+
+    @Override
+    public void addProgressListener(ProgressListener listener) {
+        this.listener = listener;
     }
 
     public interface AdfSchedulerListener {
