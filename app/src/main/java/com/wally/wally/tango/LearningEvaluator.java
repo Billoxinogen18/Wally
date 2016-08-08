@@ -14,6 +14,7 @@ import java.util.List;
 
 public class LearningEvaluator implements TangoUpdater.ValidPoseListener, ProgressReporter {
     public static final String TAG = LearningEvaluator.class.getSimpleName();
+    private static final double RATIO = 0.7;
 
     private int minTimeMs;
     private int maxTimeMs;
@@ -26,6 +27,8 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
     private long latestUpdateTime;
     private LearningEvaluatorListener listener;
     private boolean isFinished;
+    private int progress;
+    private int iteration;
 
     private ProgressListener progressListener;
 
@@ -40,6 +43,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
     public void addLearningEvaluatorListener(final LearningEvaluatorListener listener){
         this.listener = listener;
         isFinished = false;
+        iteration++;
         start();
     }
 
@@ -59,17 +63,25 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         double yaw = Math.toDegrees(q.getYaw());
         if (yaw < 0) yaw += 360;
         int angleIndex = ((int)(yaw / 360 * angleResolution)) % angleResolution;
-        c.angleVisited[angleIndex] = true;
+        if (!c.angleVisited[angleIndex]) {
+            c.angleVisited[angleIndex] = true;
+            progress++;
+        }
         int index = cells.indexOf(c);
         if (index == -1){
             cells.add(c);
+            progress++;
         } else {
             cells.get(index).angleVisited[angleIndex] = true;
         }
         //Log.d(TAG, "pose = " + pose + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
 
+        progressListener.onProgressUpdate(this, getProgress());
+
+
         if (canFinish() && !isFinished) {
             isFinished = true;
+            progressListener.onProgressUpdate(this, 1);
             Log.d(TAG, "pose = " + pose + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
             new Thread(new Runnable() {
                 @Override
@@ -80,8 +92,17 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         }
     }
 
+    private double getProgress(){
+        double n = ((double)progress)/(minCellCount+minAngleCount);
+        double gavlili = 0;
+        for (int i=0; i<iteration; i++){
+            gavlili += (1-gavlili) * RATIO;
+        }
+        gavlili += (1-gavlili) * RATIO * n;
+        return gavlili;
+    }
+
     private boolean canFinish(){
-        progressListener.onProgressUpdate(this, 0.3);
         int angleCount = getAngleCount();
         int size = cells.size();
         long time = System.currentTimeMillis() - startTime;
@@ -106,6 +127,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         cells = new ArrayList<>();
         startTime = System.currentTimeMillis();
         latestUpdateTime = startTime;
+        progress = 0;
         return this;
     }
 
