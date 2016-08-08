@@ -44,13 +44,12 @@ public abstract class CameraARActivity extends BaseActivity implements
     protected DataController mDataController;
     protected GoogleApiClient mGoogleApiClient;
     protected WallyAnalytics mAnalytics;
+    protected TipView mTipView; //TODO getter maybe?
     private SocialUserManager mSocialUserManager;
-
     private long mLastSelectTime;
     private Content mSelectedContent; //TODO may be needed to remove
     private Content mContentToSave;
     private long mNewContentButtonLastClickTime;
-
     // Views
     private SelectedMenuView mSelectedMenuView;
     private RajawaliSurfaceView mRajawaliView;
@@ -58,7 +57,6 @@ public abstract class CameraARActivity extends BaseActivity implements
     private View mMapButton;
     private View mProfileBar;
     private View mWaterMark;
-    protected TipView mTipView; //TODO getter maybe?
 
     public abstract void onDeleteContent(Content selectedContent);
 
@@ -245,7 +243,7 @@ public abstract class CameraARActivity extends BaseActivity implements
 
     protected void saveActiveContent(final Content content) {
         mContentToSave = content;
-        if (Utils.checkLocationPermission(this)) {
+        if (!Utils.checkHasLocationPermission(this)) {
             requestLocationPermission(RC_SAVE_CONTENT);
             return;
         }

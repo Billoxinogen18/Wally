@@ -63,7 +63,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
      */
     public final void requestLocationPermission(int locationRequestCode) {
         mLocationRequestCode = locationRequestCode;
-        if (Utils.checkLocationPermission(this)) {
+        if (Utils.checkHasLocationPermission(this)) {
             onLocationPermissionGranted();
             return;
         }
@@ -80,7 +80,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == RC_LOCATION_PERMISSION) {
-            if (Utils.checkLocationPermission(this)) {
+            if (Utils.checkHasLocationPermission(this)) {
                 onLocationPermissionGranted();
             } else {
                 // Note that because fragment/Dialog transactions can't happen here
@@ -96,7 +96,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         // Check if location permission was granted in settings screen.
         if (mStartedAppSettingsScreen) {
             mStartedAppSettingsScreen = false;
-            if (Utils.checkLocationPermission(this)) {
+            if (Utils.checkHasLocationPermission(this)) {
                 onLocationPermissionGranted();
             } else {
                 // If still not granted show Explanation again.

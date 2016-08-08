@@ -32,14 +32,14 @@ import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
+import com.wally.wally.renderer.VisualContentManager;
+import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.LocalizationListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoManager;
 import com.wally.wally.tango.TangoUpdater;
-import com.wally.wally.renderer.VisualContentManager;
-import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.WallyTangoUx;
 import com.wally.wally.tip.LocalTipService;
 import com.wally.wally.tip.TipService;
@@ -365,7 +365,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
      * Note that we only sync when localized.
      */
     private void startUploadingAdf(final AdfInfo adfInfo) {
-        if (!Utils.checkLocationPermission(this) || !mGoogleApiClient.isConnected()) {
+        if (!Utils.checkHasLocationPermission(this) || !mGoogleApiClient.isConnected()) {
             uploadAdf(adfInfo);
             return;
         }
@@ -439,7 +439,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     private void setLocalizationLocation() {
-        if (!Utils.checkLocationPermission(this)) {
+        if (!Utils.checkHasLocationPermission(this)) {
             requestLocationPermission(RC_SET_LOCALIZATION_LOCATION);
             return;
         }
