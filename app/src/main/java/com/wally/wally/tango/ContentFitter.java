@@ -8,6 +8,9 @@ import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.renderer.VisualContentManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Thread that fits content on the wall.
  * <p/>
@@ -22,16 +25,19 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
 
     private TangoManager mTangoManager;
     private Content mContent;
-    private OnContentFitListener mFittingStatusListener;
+    private List<OnContentFitListener> mOnContentFitListeners = new ArrayList<>();
     private TangoPoseData lastPose;
     private VisualContentManager mVisualContentManager;
 
-    public ContentFitter(Content content, TangoManager tangoManager, VisualContentManager visualContentManager, OnContentFitListener fittingStatusListener) {
-        Log.d(TAG, "ContentFitter() called with: " + "content = [" + content + "], tangoManager = [" + tangoManager + "], visualContentManager = [" + visualContentManager + "], fittingStatusListener = [" + fittingStatusListener + "]");
+    public ContentFitter(Content content, TangoManager tangoManager, VisualContentManager visualContentManager) {
+        Log.d(TAG, "ContentFitter() called with: " + "content = [" + content + "], tangoManager = [" + tangoManager + "], visualContentManager = [" + visualContentManager + "]");
         mContent = content;
         mTangoManager = tangoManager;
         mVisualContentManager = visualContentManager;
-        mFittingStatusListener = fittingStatusListener;
+    }
+
+    public void addOnContentFitListener(OnContentFitListener onContentFitListener){
+        mOnContentFitListeners.add(onContentFitListener);
     }
 
     public Content getContent() {
@@ -44,7 +50,9 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         TangoPoseData tangoPoseData = null;
         while (tangoPoseData == null) {
             tangoPoseData = getValidPose();
-            mFittingStatusListener.onContentFit(null);
+            for (OnContentFitListener onContentFitListener : mOnContentFitListeners) {
+                onContentFitListener.onContentFit(null);
+            }
             if (isCancelled()) {
                 return null;
             }
@@ -55,7 +63,9 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
                 return null;
             }
         }
-        mFittingStatusListener.onContentFit(null);
+        for (OnContentFitListener onContentFitListener : mOnContentFitListeners) {
+            onContentFitListener.onContentFit(null);
+        }
         mVisualContentManager.addPendingActiveContent(ScenePoseCalculator.toOpenGLPose(tangoPoseData), getContent());
 
         // Update content timely, while we are cancelled.
@@ -80,7 +90,9 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         if (newPose != null && newPose.statusCode == TangoPoseData.POSE_INVALID) {
             newPose = null;
         }
-        mFittingStatusListener.onContentFit(newPose);
+        for (OnContentFitListener onContentFitListener : mOnContentFitListeners) {
+            onContentFitListener.onContentFit(newPose);
+        }
         lastPose = newPose;
         if (mVisualContentManager.isActiveContent()) { //TODO cancel contentfitter when not localized
             if (newPose != null) {
@@ -115,7 +127,9 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     public void finishFitting() {
         Log.d(TAG, "finishFitting()");
         // Order of this calls matter!!!
-        mFittingStatusListener.onContentFittingFinished(getContent());
+        for (OnContentFitListener onContentFitListener : mOnContentFitListeners) {
+            onContentFitListener.onContentFittingFinished(getContent());
+        }
         //mVisualContentManager.setActiveContentAdded();
         // TODO here we might lost localization (Theoretically possible)
         mVisualContentManager.setActiveContentFinishFitting();

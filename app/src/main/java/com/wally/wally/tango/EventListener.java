@@ -6,4 +6,5 @@ package com.wally.wally.tango;
 public interface EventListener {
 
     void onLearningStart();
+    void onLocalizationStart();
 }

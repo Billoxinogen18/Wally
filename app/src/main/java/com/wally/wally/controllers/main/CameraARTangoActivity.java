@@ -231,7 +231,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("FITTING_CONTENT")) {
                 Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
-                mContentFitter = new ContentFitter(c, mTangoManager, mVisualContentManager, this);
+                mContentFitter = new ContentFitter(c, mTangoManager, mVisualContentManager);
+                mContentFitter.addOnContentFitListener(this);
+                mContentFitter.addOnContentFitListener(mTipManager);
             }
         }
     }
@@ -286,7 +288,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
             Log.e(TAG, "onContentCreated: called when content was already fitting");
             return;
         }
-        mContentFitter = new ContentFitter(contentCreated, mTangoManager, mVisualContentManager, this);
+        mContentFitter = new ContentFitter(contentCreated, mTangoManager, mVisualContentManager);
+        mContentFitter.addOnContentFitListener(this);
+        mContentFitter.addOnContentFitListener(mTipManager);
         mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         onFitStatusChange(true);
@@ -322,7 +326,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
             if (mContentFitter != null) {
                 if (mContentFitter.isCancelled()) {
-                    mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager, mVisualContentManager, this);
+                    mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager, mVisualContentManager);
+                    mContentFitter.addOnContentFitListener(this);
+                    mContentFitter.addOnContentFitListener(mTipManager);
                 }
                 mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 onFitStatusChange(true);
