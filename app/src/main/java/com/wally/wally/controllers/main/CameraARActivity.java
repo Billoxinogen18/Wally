@@ -69,7 +69,7 @@ public abstract class CameraARActivity extends BaseActivity implements
     /**
      * @return true if new content can be added
      */
-    public abstract boolean isNewContentFabVisible();
+    public abstract boolean isNewContentCreationEnabled();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +83,7 @@ public abstract class CameraARActivity extends BaseActivity implements
         mSocialUserManager = ((App) getApplicationContext()).getSocialUserManager(); //TODO get LoginManager from the Factory!
         mDataController = ((App) getApplicationContext()).getDataController();
 
-        mNewContentButton = findViewById(R.id.btn_new_post);
+        mNewContentButton = findViewById(R.id.new_post);
         mMapButton = findViewById(R.id.btn_map);
         mProfileBar = findViewById(R.id.profile_bar);
         mWaterMark = findViewById(R.id.watermark);
@@ -182,6 +182,9 @@ public abstract class CameraARActivity extends BaseActivity implements
 
 
     public void onNewContentClick(View v) {
+        if (!isNewContentCreationEnabled()) {
+            return;
+        }
         mAnalytics.onButtonClick("New_Content");
         if (SystemClock.elapsedRealtime() - mNewContentButtonLastClickTime < 1000) {
             return;
@@ -300,7 +303,7 @@ public abstract class CameraARActivity extends BaseActivity implements
             mWaterMark.setVisibility(View.GONE);
         } else {
             mRajawaliView.setFrameRate(30);
-            mNewContentButton.setVisibility(isNewContentFabVisible() ? View.VISIBLE : View.GONE);
+            mNewContentButton.setVisibility(isNewContentCreationEnabled() ? View.VISIBLE : View.GONE);
             mMapButton.setVisibility(View.VISIBLE);
             mProfileBar.setVisibility(View.VISIBLE);
             mWaterMark.setVisibility(View.VISIBLE);

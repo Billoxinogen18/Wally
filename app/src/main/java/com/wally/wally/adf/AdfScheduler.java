@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-public class AdfScheduler extends Thread implements ProgressReporter{
+public class AdfScheduler extends Thread implements ProgressReporter {
     public static final String TAG = AdfScheduler.class.getSimpleName();
     public static final int DEFAULT_TIMEOUT = 1000;
 
@@ -78,7 +78,9 @@ public class AdfScheduler extends Thread implements ProgressReporter{
             try {
                 latch.await();
                 Thread.sleep(timeout);
-            } catch (InterruptedException e) { break; }
+            } catch (InterruptedException e) {
+                break;
+            }
         }
     }
 
@@ -100,6 +102,7 @@ public class AdfScheduler extends Thread implements ProgressReporter{
 
     public interface AdfSchedulerListener {
         void onNewAdfSchedule(AdfInfo info);
+
         void onScheduleFinish();
     }
 }

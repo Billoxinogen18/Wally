@@ -35,7 +35,7 @@ public class CameraARStandardActivity extends CameraARActivity {
     }
 
     @Override
-    public boolean isNewContentFabVisible() {
+    public boolean isNewContentCreationEnabled() {
         return true;
     }
 

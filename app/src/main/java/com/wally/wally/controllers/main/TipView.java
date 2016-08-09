@@ -69,7 +69,6 @@ public class TipView extends LinearLayout {
 
     public void show(final String title, final String message, int durationMs) {
         mainThreadHandler.removeCallbacks(hideRunnable);
-        setVisibility(GONE);
 
         mainThreadHandler.post(new Runnable() {
             @Override
