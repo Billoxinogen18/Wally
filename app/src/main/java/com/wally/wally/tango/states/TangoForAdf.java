@@ -57,6 +57,7 @@ public abstract class TangoForAdf extends TangoBase {
     }
 
     protected void changeToReadyState(){
+        Log.d(TAG, "changeToReadyState");
         TangoBase nextTango = ((TangoForReadyState)mTangoStatePool.get(TangoForReadyState.class)).withTangoAndAdf(mTango, mAdfInfo);
         changeState(nextTango);
     }
@@ -71,8 +72,10 @@ public abstract class TangoForAdf extends TangoBase {
                     return;
                 }
                 if (!mIsLocalized) {
+                    Log.d(TAG, "startLocalizationWatchDog failed");
                     mLocalizationAnalytics.logLocalization(false);
                     pause();
+                    Log.d(TAG, "changeToCloudAdfState");
                     TangoBase nextTango = mTangoStatePool.get(TangoForCloudAdfs.class);
                     changeState(nextTango);
                 }

@@ -1,5 +1,7 @@
 package com.wally.wally.tango.states;
 
+import android.util.Log;
+
 import com.google.atap.tangoservice.Tango;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
@@ -17,6 +19,8 @@ import java.util.Map;
  * Manages Tango for Ready State
  */
 public class TangoForReadyState extends TangoBase {
+    private static final String TAG = TangoForReadyState.class.getSimpleName();
+
     private AdfInfo mAdfInfo;
 
     public TangoForReadyState(Config config,
@@ -37,6 +41,7 @@ public class TangoForReadyState extends TangoBase {
 
     @Override
     public synchronized void pause() {
+        Log.d(TAG, "changeToSavedAdfState");
         TangoBase nextTango = ((TangoForSavedAdf)mTangoStatePool.get(TangoForSavedAdf.class)).withAdf(mAdfInfo);
         changeState(nextTango);
     }

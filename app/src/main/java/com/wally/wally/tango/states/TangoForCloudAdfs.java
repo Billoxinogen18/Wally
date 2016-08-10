@@ -1,5 +1,7 @@
 package com.wally.wally.tango.states;
 
+import android.util.Log;
+
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfScheduler;
@@ -16,6 +18,8 @@ import java.util.Map;
  * Manages Tango which downloads Adfs and tries to localize
  */
 public class TangoForCloudAdfs extends TangoForSavedAdf{
+    private static final String TAG = TangoForCloudAdfs.class.getSimpleName();
+
     private long mLocalizationTimeout = 20000;
     private AdfScheduler mAdfScheduler;
 
@@ -79,6 +83,7 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
 
 
     private void changeToLearningState(){
+        Log.d(TAG, "changeToLearningState");
         TangoBase nextTango = mTangoStatePool.get(TangoForLearning.class);
         changeState(nextTango);
         nextTango.resume();
