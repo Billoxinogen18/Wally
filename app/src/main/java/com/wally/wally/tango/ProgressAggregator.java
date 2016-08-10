@@ -9,6 +9,8 @@ import java.util.Map;
  * Created by shota on 8/7/16.
  */
 public class ProgressAggregator implements ProgressReporter, ProgressListener {
+
+    private static final String TAG = ProgressAggregator.class.getSimpleName();
     private Map<ProgressReporter, Double> reporters;
     private Map<ProgressReporter, Double> progresses;
     private List<ProgressListener> listeners;
