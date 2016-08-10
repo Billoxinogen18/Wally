@@ -17,8 +17,43 @@ public class TipManager implements EventListener {
     }
 
     @Override
+    public void onTangoReady() {
+
+    }
+
+    @Override
     public void onLearningStart() {
         Tip tip = mTipService.getRandom(TipService.Tag.LEARNING);
         mTipView.show(tip.getTitle(), tip.getMessage(), 5000);
+    }
+
+    @Override
+    public void onTangoOutOfDate() {
+
+    }
+
+    @Override
+    public void onLearningFinish() {
+
+    }
+
+    @Override
+    public void onLocalizationStart() {
+
+    }
+
+    @Override
+    public void onLocalizationStartAfterLearning() {
+
+    }
+
+    @Override
+    public void onLocalizationFinishAfterLearning() {
+
+    }
+
+    @Override
+    public void onLocalizationFinishAfterSavedAdf() {
+
     }
 }
