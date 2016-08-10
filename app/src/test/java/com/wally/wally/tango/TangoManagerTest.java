@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 
 public class TangoManagerTest {
     AdfInfo adf;
-    private TangoManager mTangoManager;
+//    private TangoManager mTangoManager;
     private WallyRenderer renderer;
     private TangoPointCloudManager pointCloudManager;
     private TangoUpdater tangoUpdater;
