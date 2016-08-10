@@ -29,7 +29,7 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.tango.ContentFitter;
-import com.wally.wally.tango.Refactor.MainFactory;
+import com.wally.wally.tango.MainFactory;
 import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.WallyTangoUx;
@@ -131,7 +131,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 requestADFPermission();
                 break;
             case RC_EXPLAIN_ADF_EXPORT:
-                requestExportPermission(mTangoManager.getCurrentAdf());
+                requestExportPermission(mTangoDriver.getAdf());
                 break;
         }
     }
@@ -170,7 +170,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("FITTING_CONTENT")) {
                 Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
-                mContentFitter = new ContentFitter(c, mTangoManager, mVisualContentManager, this);
+                mContentFitter = mMainFactory.getContentFitter(c, this);
             }
         }
     }
@@ -183,9 +183,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public void onSaveContent(Content content) {
-        AdfInfo adfInfo = mTangoManager.getCurrentAdf();
+        AdfInfo adfInfo = mTangoDriver.getAdf();
         content.withUuid(adfInfo.withCreationLocation(mLocalizationLocation).getUuid());
-        if (!adfInfo.isUploaded()) requestExportPermission(adfInfo);
+        if (!adfInfo.isUploaded()) {
+            requestExportPermission(adfInfo);
+        }
     }
 
     private void requestExportPermission(AdfInfo adfInfo) {
@@ -225,7 +227,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
             Log.e(TAG, "onContentCreated: called when content was already fitting");
             return;
         }
-        mContentFitter = new ContentFitter(contentCreated, mTangoManager, mVisualContentManager, this);
+        mContentFitter = mMainFactory.getContentFitter(contentCreated, this);
         mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         onFitStatusChange(true);
@@ -235,7 +237,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     @Override
     protected void onPause() {
         super.onPause();
-        mTangoManager.onPause();
+        mTangoDriver.pause();
 
         if (mContentFitter != null) {
             mContentFitter.cancel(true);
@@ -257,11 +259,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
         }
 
         if (Utils.hasADFPermissions(this)) {
-            mTangoManager.onResume();
+            mTangoDriver.resume();
 
             if (mContentFitter != null) {
                 if (mContentFitter.isCancelled()) {
-                    mContentFitter = new ContentFitter(mContentFitter.getContent(), mTangoManager, mVisualContentManager, this);
+                    mContentFitter = mMainFactory.getContentFitter(mContentFitter.getContent(), this);
                 }
                 mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 onFitStatusChange(true);
@@ -367,10 +369,10 @@ public class CameraARTangoActivity extends CameraARActivity implements
             public void run() {
                 mVisualContentManager.visualContentRestoreAndShow();
                 mFinishFittingFab.setEnabled(true);
-                if (!mTangoManager.isLearningMode()) {
+                if (!mTangoDriver.isLearningState()) {
                     mCreateNewContent.setVisibility(View.VISIBLE);
                     if (!mVisualContentManager.getStaticVisualContentToAdd().hasNext()) {
-                        fetchContentForAdf(mTangoManager.getCurrentAdf().getUuid());
+                        fetchContentForAdf(mTangoDriver.getAdf().getUuid());
                     }
                 }
                 setLocalizationLocation();
