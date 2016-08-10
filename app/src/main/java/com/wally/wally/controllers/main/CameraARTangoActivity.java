@@ -133,8 +133,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
         AdfScheduler adfScheduler = new AdfScheduler(adfManager);
 
         ProgressAggregator progressAggregator = new ProgressAggregator();
-        progressAggregator.addProgressReporter(adfScheduler, 0.4);
-        progressAggregator.addProgressReporter(evaluator, 0.6);
+        progressAggregator.addProgressReporter(adfScheduler, 0.3);
+        progressAggregator.addProgressReporter(evaluator, 0.7);
         progressAggregator.addProgressListener(this);
 
         mTangoManager = new TangoManager(config, mAnalytics, tangoUpdater,
@@ -437,6 +437,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 if (!mTangoManager.isLearningMode()) {
                     if (!mVisualContentManager.getStaticVisualContentToAdd().hasNext()) {
                         fetchContentForAdf(mTangoManager.getCurrentAdf().getUuid());
+                        mCreateNewContent.setProgress(100);
                     }
                 }
                 setLocalizationLocation();
