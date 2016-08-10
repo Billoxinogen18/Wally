@@ -101,7 +101,7 @@ public class TangoFactory {
     }
 
 
-    interface RunnableWithError {
+    public interface RunnableWithError {
         void run();
 
         void onError(Exception e);
