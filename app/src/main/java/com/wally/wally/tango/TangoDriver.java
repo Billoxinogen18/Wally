@@ -3,7 +3,7 @@ package com.wally.wally.tango;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.adf.AdfInfo;
-import com.wally.wally.tango.Refactor.TangoBase;
+import com.wally.wally.tango.states.TangoBase;
 
 
 /**
