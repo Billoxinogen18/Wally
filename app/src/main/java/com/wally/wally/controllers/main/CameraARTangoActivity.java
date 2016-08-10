@@ -20,6 +20,7 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfService;
+import com.wally.wally.components.LoadingFab;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.config.CameraTangoActivityConstants;
 import com.wally.wally.config.Config;
@@ -31,6 +32,12 @@ import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.MainFactory;
 import com.wally.wally.tango.TangoDriver;
+import com.wally.wally.tango.LearningEvaluator;
+import com.wally.wally.tango.ProgressAggregator;
+import com.wally.wally.tango.ProgressListener;
+import com.wally.wally.tango.ProgressReporter;
+import com.wally.wally.tango.TangoFactory;
+import com.wally.wally.tango.TangoManager;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.WallyTangoUx;
 
@@ -43,7 +50,7 @@ import java.util.List;
 public class CameraARTangoActivity extends CameraARActivity implements
         ContentFitter.OnContentFitListener,
         TangoUpdater.LocalizationListener,
-        ImportExportPermissionDialogFragment.ImportExportPermissionListener {
+        ImportExportPermissionDialogFragment.ImportExportPermissionListener, ProgressListener {
 
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
     // Permission Denied explain codes
@@ -57,12 +64,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private TangoDriver mTangoDriver;
     private boolean mExplainAdfPermission;
 
+    private LoadingFab mCreateNewContent;
+    private FloatingActionButton mFinishFitting;
+    private FloatingActionButton mFinishFittingFab;
     private View mLayoutFitting;
     private List<View> mNonFittingModeViews;
-    private FloatingActionButton mFinishFitting;
-    private FloatingActionButton mCreateNewContent;
-    private FloatingActionButton mFinishFittingFab;
-
 
     private ContentFitter mContentFitter;
     private VisualContentManager mVisualContentManager;
@@ -80,8 +86,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
         Context context = getBaseContext();
         mLayoutFitting = findViewById(R.id.layout_fitting);
         mFinishFittingFab = (FloatingActionButton) mLayoutFitting.findViewById(R.id.btn_finish_fitting);
-        mCreateNewContent = (FloatingActionButton) findViewById(R.id.btn_new_post);
-        mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
+        mCreateNewContent = (LoadingFab) findViewById(R.id.new_post);
+        mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         TangoUxLayout tangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         RajawaliSurfaceView surfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
@@ -104,7 +110,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     @Override
-    public boolean isNewContentFabVisible() {
+    public boolean isNewContentCreationEnabled() {
         return mTangoDriver.isTangoLocalized() && !mTangoDriver.isLearningState();
     }
 
@@ -370,9 +376,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 mVisualContentManager.visualContentRestoreAndShow();
                 mFinishFittingFab.setEnabled(true);
                 if (!mTangoDriver.isLearningState()) {
-                    mCreateNewContent.setVisibility(View.VISIBLE);
                     if (!mVisualContentManager.getStaticVisualContentToAdd().hasNext()) {
                         fetchContentForAdf(mTangoDriver.getAdf().getUuid());
+                        mCreateNewContent.setProgress(100);
                     }
                 }
                 setLocalizationLocation();
@@ -387,7 +393,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
             public void run() {
                 mVisualContentManager.visualContentSaveAndClear();
                 mFinishFittingFab.setEnabled(false);
-                mCreateNewContent.setVisibility(View.GONE);
             }
         });
     }
@@ -425,5 +430,16 @@ public class CameraARTangoActivity extends CameraARActivity implements
     public void onMapOpen() {
         super.onMapOpen();
         mTangoUx.setVisible(false);
+    }
+
+    @Override
+    public void onProgressUpdate(ProgressReporter self, final double progress) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mCreateNewContent.setVisibility(View.VISIBLE);
+                mCreateNewContent.setProgress((int) (progress * 100));
+            }
+        });
     }
 }

@@ -52,14 +52,14 @@
             app:backgroundTint="@color/btn_finish_fitting_background_color" />
     </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btn_new_post"
+    <com.wally.wally.components.LoadingFab
+        android:id="@+id/new_post"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
+        android:layout_margin="16dp"
         android:onClick="onNewContentClick"
-        android:src="@drawable/ic_add_black_24dp"
+        android:src="@drawable/ic_add_white_24dp"
         android:visibility="gone" />
 
     <ImageView

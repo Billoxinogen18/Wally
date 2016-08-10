@@ -40,7 +40,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         angleResolution = config.getInt(LearningEvaluatorConstants.ANGLE_RESOLUTION);
     }
 
-    public void addLearningEvaluatorListener(final LearningEvaluatorListener listener){
+    public void addLearningEvaluatorListener(final LearningEvaluatorListener listener) {
         this.listener = listener;
         isFinished = false;
         iteration++;
@@ -49,26 +49,26 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
 
     @Override
     public synchronized void onValidPose(TangoPoseData pose) {
-        if (System.currentTimeMillis() - latestUpdateTime < 100 ||  isFinished){
+        if (System.currentTimeMillis() - latestUpdateTime < 100 || isFinished) {
             return;
         }
         latestUpdateTime = System.currentTimeMillis();
 
-        int x = (int)(pose.translation[0]/Cell.CELL_SIZE_M);
-        int y = (int)(pose.translation[1]/Cell.CELL_SIZE_M);
+        int x = (int) (pose.translation[0] / Cell.CELL_SIZE_M);
+        int y = (int) (pose.translation[1] / Cell.CELL_SIZE_M);
         Cell c = new Cell();
         c.x = x;
         c.y = y;
-        Quaternion q = new Quaternion(pose.rotation[0],pose.rotation[1],pose.rotation[2],pose.rotation[3]);
+        Quaternion q = new Quaternion(pose.rotation[0], pose.rotation[1], pose.rotation[2], pose.rotation[3]);
         double yaw = Math.toDegrees(q.getYaw());
         if (yaw < 0) yaw += 360;
-        int angleIndex = ((int)(yaw / 360 * angleResolution)) % angleResolution;
+        int angleIndex = ((int) (yaw / 360 * angleResolution)) % angleResolution;
         if (!c.angleVisited[angleIndex]) {
             c.angleVisited[angleIndex] = true;
             progress++;
         }
         int index = cells.indexOf(c);
-        if (index == -1){
+        if (index == -1) {
             cells.add(c);
             progress++;
         } else {
@@ -82,7 +82,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         if (canFinish() && !isFinished) {
             isFinished = true;
             progressListener.onProgressUpdate(this, 1);
-            Log.d(TAG, "pose = " + pose + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
+            Log.d(TAG, "pose = " + pose + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " + cells);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -92,13 +92,17 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         }
     }
 
-    private double getProgress(){
-        double n = ((double)progress)/(minCellCount+minAngleCount);
+    private double getProgress() {
+        long timePassed = System.currentTimeMillis() - startTime;
+        double timePercent = (double) timePassed / minTimeMs;
+        double n = Math.min(((double) progress) / (minCellCount + minAngleCount), timePercent);
+        n = Math.min(n, 1);
+
         double gavlili = 0;
-        for (int i=0; i<iteration; i++){
-            gavlili += (1-gavlili) * RATIO;
+        for (int i = 0; i < iteration; i++) {
+            gavlili += (1 - gavlili) * RATIO;
         }
-        gavlili += (1-gavlili) * RATIO * n;
+        gavlili += (1 - gavlili) * RATIO * n;
         return gavlili;
     }
 
@@ -109,17 +113,17 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         return angleCount >= minAngleCount && size >= minCellCount && time > minTimeMs || time > maxTimeMs;
     }
 
-    private int getAngleCount(){
+    private int getAngleCount() {
         int res = 0;
-        for (Cell c : cells){
-            for (int i = 0; i<angleResolution; i++){
+        for (Cell c : cells) {
+            for (int i = 0; i < angleResolution; i++) {
                 if (c.angleVisited[i]) res++;
             }
         }
         return res;
     }
 
-    public LearningEvaluator start(){
+    public LearningEvaluator start() {
         cells = new ArrayList<>();
         startTime = System.currentTimeMillis();
         latestUpdateTime = startTime;
@@ -146,10 +150,11 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
 
     public interface LearningEvaluatorListener{
         void onLearningFinish();
+
         void onLearningFailed();
     }
 
-    class Cell{
+    class Cell {
         public static final double CELL_SIZE_M = 1; //Cell size in meters.
         public int x;
         public int y;
@@ -166,7 +171,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
 
         @Override
         public String toString() {
-            return "(" + x + "," +y + ")";
+            return "(" + x + "," + y + ")";
         }
     }
 }
