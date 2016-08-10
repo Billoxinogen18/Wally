@@ -8,8 +8,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Toast;
 
@@ -17,13 +15,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoPoseData;
-import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfInfo;
-import com.wally.wally.adf.AdfManager;
-import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.adf.AdfService;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.config.CameraTangoActivityConstants;
@@ -32,18 +27,12 @@ import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
-import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.renderer.VisualContentManager;
-import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.ContentFitter;
-import com.wally.wally.tango.LearningEvaluator;
-import com.wally.wally.tango.ProgressAggregator;
-import com.wally.wally.tango.TangoFactory;
-import com.wally.wally.tango.TangoManager;
+import com.wally.wally.tango.Refactor.MainFactory;
+import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.WallyTangoUx;
-import com.wally.wally.tip.LocalTipService;
-import com.wally.wally.tip.TipService;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
@@ -64,105 +53,59 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private static final int RC_REQ_AREA_LEARNING = 17;
     private static final int RC_SET_LOCALIZATION_LOCATION = 102;
 
+    private WallyTangoUx mTangoUx;
+    private TangoDriver mTangoDriver;
     private boolean mExplainAdfPermission;
 
-    private TangoManager mTangoManager;
-    private WallyTangoUx mTangoUx;
-
-    private FloatingActionButton mCreateNewContent;
-    private FloatingActionButton mFinishFitting;
-    private FloatingActionButton mFinishFittingFab;
     private View mLayoutFitting;
     private List<View> mNonFittingModeViews;
+    private FloatingActionButton mFinishFitting;
+    private FloatingActionButton mCreateNewContent;
+    private FloatingActionButton mFinishFittingFab;
 
 
     private ContentFitter mContentFitter;
     private VisualContentManager mVisualContentManager;
-    private WallyRenderer mRenderer;
 
-    private SerializableLatLng mLocalizationLocation;
     private Content editableContent;
+    private SerializableLatLng mLocalizationLocation;
+    private MainFactory mMainFactory;
 
-    private TipManager mTipManager;
 
     public static Intent newIntent(Context context) {
         return new Intent(context, CameraARTangoActivity.class);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    private void start() {
+        Context context = getBaseContext();
         mLayoutFitting = findViewById(R.id.layout_fitting);
         mFinishFittingFab = (FloatingActionButton) mLayoutFitting.findViewById(R.id.btn_finish_fitting);
         mCreateNewContent = (FloatingActionButton) findViewById(R.id.btn_new_post);
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.btn_new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
-        RajawaliSurfaceView mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-        Config config = Config.getInstance();
-        Context context = getBaseContext();
+        TangoUxLayout tangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
+        RajawaliSurfaceView surfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+        mMainFactory = new MainFactory(context, mTipView, tangoUxLayout, surfaceView, this, this);
+        mTangoDriver = mMainFactory.getTangoDriver();
+        mVisualContentManager = mMainFactory.getVisualContentManager();
+        mTangoUx = mMainFactory.getTangoUx();
 
-        TangoUxLayout mTangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
-
-        mVisualContentManager = new VisualContentManager();
-//        fetchContentForAdf(context, mAdfUuid);
-
-        mRenderer = new WallyRenderer(context, mVisualContentManager, this);
-
-        mSurfaceView.setSurfaceRenderer(mRenderer);
-        mTangoUx = new WallyTangoUx(context);
-        LearningEvaluator evaluator = new LearningEvaluator(config);
-
-        TangoPointCloudManager pointCloudManager = new TangoPointCloudManager();
-
-        mTangoUx.setLayout(mTangoUxLayout);
-        TangoUpdater tangoUpdater = new TangoUpdater(mTangoUx, mSurfaceView, pointCloudManager);
-        tangoUpdater.addLocalizationListener(this);
-
-        TangoFactory tangoFactory = new TangoFactory(context);
-
-        AdfManager adfManager = App.getInstance().getAdfManager();
-
-        TipService tipService = new LocalTipService(Utils.getAssetContentAsString(getBaseContext(), "tips.json"));
-
-        mTipManager = new TipManager(mTipView, tipService);
-
-        AdfScheduler adfScheduler = new AdfScheduler(adfManager);
-
-        ProgressAggregator progressAggregator = new ProgressAggregator();
-        progressAggregator.addProgressReporter(adfScheduler, 0.4);
-        progressAggregator.addProgressReporter(evaluator, 0.6);
-
-        mTangoManager = new TangoManager(config, mAnalytics, tangoUpdater,
-                pointCloudManager, mRenderer, mTangoUx, tangoFactory, adfManager, adfScheduler, evaluator);
-
-        mTangoManager.addEventListener(mTipManager);
-
-        restoreState(savedInstanceState);
-
-
-        final ScaleGestureDetector scaleDetector = new ScaleGestureDetector(getBaseContext(),
-                new ActiveContentScaleGestureDetector(mVisualContentManager));
-
-        mSurfaceView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                //TODO check!
-                scaleDetector.onTouchEvent(event);
-                mRenderer.onTouchEvent(event);
-                return true;
-            }
-        });
-
-        if (!Utils.hasADFPermissions(getBaseContext())) {
-            Log.i(TAG, "onCreate: Didn't had ADF permission, requesting permission");
+        if (!Utils.hasADFPermissions(context)) {
+            Log.i(TAG, "Request adf permission");
             requestADFPermission();
         }
     }
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        restoreState(savedInstanceState);
+        start();
+    }
+
+    @Override
     public boolean isNewContentFabVisible() {
-        return mTangoManager.isLocalized() && !mTangoManager.isLearningMode();
+        return mTangoDriver.isTangoLocalized() && !mTangoDriver.isLearningState();
     }
 
     private void requestADFPermission() {
