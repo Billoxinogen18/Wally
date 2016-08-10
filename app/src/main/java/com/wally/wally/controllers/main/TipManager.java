@@ -68,11 +68,6 @@ public class TipManager implements EventListener, ContentFitter.OnContentFitList
     }
 
     @Override
-    public void onLocalizationStart() {
-
-    }
-
-    @Override
     public void onLocalizationStartAfterLearning() {
 
     }

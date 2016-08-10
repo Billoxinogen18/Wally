@@ -164,6 +164,9 @@ public class MainFactory {
     }
 
     public ContentFitter getContentFitter(Content c, ContentFitter.OnContentFitListener listener) {
-        return new ContentFitter(c, mTangoDriver, mVisualContentManager, listener);
+        ContentFitter fitter = new ContentFitter(c, mTangoDriver, mVisualContentManager);
+        fitter.addOnContentFitListener(listener);
+        fitter.addOnContentFitListener(mTipManager);
+        return fitter;
     }
 }
