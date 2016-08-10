@@ -57,12 +57,13 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     protected final LocalizationAnalytics mLocalizationAnalytics;
     protected List<EventListener> mEventListeners;
     protected boolean mIsLocalized;
-    protected StateChangeListener mStateChangeListener;
     protected Map<Class, TangoBase> mTangoStatePool;
 
 
     private TangoPointCloudManager mPointCloudManager;
     private WallyRenderer mRenderer;
+    private StateChangeListener mStateChangeListener;
+
 
     private boolean mIsConnected;
     private TangoCameraIntrinsics mIntrinsics;
@@ -207,6 +208,17 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
             }
         };
     }
+
+    protected void resetTangoUpdaterListener(TangoUpdater.TangoUpdaterListener toAdd){
+        mTangoUpdater.removeTangoUpdaterListener(this);
+        mTangoUpdater.addTangoUpdaterListener(toAdd);
+    }
+
+    protected void changeState(TangoBase nextTango){
+        mStateChangeListener.onStateChange(nextTango);
+        resetTangoUpdaterListener(nextTango);
+    }
+
 
     /**
      * Use the TangoSupport library with point cloud data to calculate the plane

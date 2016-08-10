@@ -38,7 +38,7 @@ public class TangoForReadyState extends TangoBase {
     @Override
     public synchronized void pause() {
         TangoBase nextTango = ((TangoForSavedAdf)mTangoStatePool.get(TangoForSavedAdf.class)).withAdf(mAdfInfo);
-        mStateChangeListener.onStateChange(nextTango);
+        changeState(nextTango);
     }
 
     @Override

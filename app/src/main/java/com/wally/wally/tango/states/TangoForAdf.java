@@ -58,7 +58,7 @@ public abstract class TangoForAdf extends TangoBase {
 
     protected void changeToReadyState(){
         TangoBase nextTango = ((TangoForReadyState)mTangoStatePool.get(TangoForReadyState.class)).withTangoAndAdf(mTango, mAdfInfo);
-        mStateChangeListener.onStateChange(nextTango);
+        changeState(nextTango);
     }
 
     protected void startLocalizationWatchDog() {
@@ -74,7 +74,7 @@ public abstract class TangoForAdf extends TangoBase {
                     mLocalizationAnalytics.logLocalization(false);
                     pause();
                     TangoBase nextTango = mTangoStatePool.get(TangoForCloudAdfs.class);
-                    mStateChangeListener.onStateChange(nextTango);
+                    changeState(nextTango);
                 }
             }
         });

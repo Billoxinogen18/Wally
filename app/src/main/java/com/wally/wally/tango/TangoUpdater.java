@@ -18,7 +18,6 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private boolean isLocalized;
     private RajawaliSurfaceView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
-    private List<LocalizationListener> mLocalizationListeners;
     private List<ValidPoseListener> mValidPoseListeners;
     private ArrayList<TangoCoordinateFramePair> mFramePairs;
     private List<TangoUpdaterListener> mTangoUpdaterListeners;
@@ -28,7 +27,6 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
-        mLocalizationListeners = new ArrayList<>();
         mTangoUpdaterListeners = new ArrayList<>();
         mValidPoseListeners = new ArrayList<>();
         mFramePairs = new ArrayList<>();
@@ -100,8 +98,12 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         }
     }
 
-    public void addLocalizationListener(LocalizationListener listener) {
-        mLocalizationListeners.add(listener);
+    public void addTangoUpdaterListener(TangoUpdaterListener listener){
+        mTangoUpdaterListeners.add(listener);
+    }
+
+    public void removeTangoUpdaterListener(TangoUpdaterListener listener){
+        mTangoUpdaterListeners.remove(listener);
     }
 
     public void addValidPoseListener(ValidPoseListener listener) {
@@ -121,11 +123,6 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
 
     public interface ValidPoseListener {
         void onValidPose(TangoPoseData data);
-    }
-
-    public interface LocalizationListener {
-        void onLocalize();
-        void onNotLocalize();
     }
 
     public interface TangoUpdaterListener{

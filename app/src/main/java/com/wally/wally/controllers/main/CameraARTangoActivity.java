@@ -45,7 +45,7 @@ import java.util.List;
 
 public class CameraARTangoActivity extends CameraARActivity implements
         ContentFitter.OnContentFitListener,
-        TangoUpdater.LocalizationListener,
+        TangoUpdater.TangoUpdaterListener,
         ImportExportPermissionDialogFragment.ImportExportPermissionListener, ProgressListener {
 
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
@@ -363,9 +363,20 @@ public class CameraARTangoActivity extends CameraARActivity implements
         adfService.upload(info.withPath(path));
     }
 
+    @Override
+    public void onLocalization(boolean localization) {
+        if (localization){
+            onLocalize();
+        } else {
+            onNotLocalize();
+        }
+    }
 
     @Override
-    public void onLocalize() {
+    public void onFrameAvailable() {
+    }
+
+    private void onLocalize() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -382,8 +393,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         });
     }
 
-    @Override
-    public void onNotLocalize() {
+    private void onNotLocalize() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

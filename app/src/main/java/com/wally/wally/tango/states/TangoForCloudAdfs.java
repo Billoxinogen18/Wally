@@ -80,7 +80,7 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
 
     private void changeToLearningState(){
         TangoBase nextTango = mTangoStatePool.get(TangoForLearning.class);
-        mStateChangeListener.onStateChange(nextTango);
+        changeState(nextTango);
         nextTango.resume();
     }
 

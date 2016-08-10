@@ -60,7 +60,7 @@ public class MainFactory {
                        TipView tipView,
                        TangoUxLayout tangoUxLayout,
                        RajawaliSurfaceView surfaceView,
-                       TangoUpdater.LocalizationListener localizationListener,
+                       TangoUpdater.TangoUpdaterListener tangoUpdaterListener,
                        OnVisualContentSelectedListener onContentSelectedListener){
         set();
 
@@ -68,7 +68,7 @@ public class MainFactory {
         mTangoUx.setLayout(tangoUxLayout);
 
         mTangoUpdater = new TangoUpdater(mTangoUx, surfaceView, mPointCloudManager);
-        mTangoUpdater.addLocalizationListener(localizationListener);
+        mTangoUpdater.addTangoUpdaterListener(tangoUpdaterListener);
 
         mScaleDetector = new ScaleGestureDetector(context,
                 new ActiveContentScaleGestureDetector(mVisualContentManager));
@@ -142,6 +142,7 @@ public class MainFactory {
 
         setEventListener(mTipManager);
 
+        mTangoUpdater.addTangoUpdaterListener(tangoForCloudAdfs);
         mTangoDriver = new TangoDriver(tangoForCloudAdfs);
     }
 

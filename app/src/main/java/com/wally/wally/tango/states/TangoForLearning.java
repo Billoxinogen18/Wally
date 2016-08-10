@@ -80,13 +80,13 @@ public class TangoForLearning extends TangoBase {
         AdfInfo info = saveAdf();
         fireFinishLearning();
         mLocalizationAnalytics.onAdfCreate();
-        changeState(info);
+        changeToLearnedAdfState(info);
     }
 
-    private void changeState(AdfInfo info){
+    private void changeToLearnedAdfState(AdfInfo info){
         pause();
         TangoBase nextTango = ((TangoForLearnedAdf)mTangoStatePool.get(TangoForLearnedAdf.class)).withAdf(info);
-        mStateChangeListener.onStateChange(nextTango);
+        changeState(nextTango);
         nextTango.resume();
     }
 
