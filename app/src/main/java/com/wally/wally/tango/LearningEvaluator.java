@@ -102,15 +102,11 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         return gavlili;
     }
 
-    private boolean canFinish(){
+    private boolean canFinish() {
         int angleCount = getAngleCount();
         int size = cells.size();
         long time = System.currentTimeMillis() - startTime;
-        if (angleCount >= minAngleCount && size >= minCellCount && time > minTimeMs){
-            return true;
-        }
-
-        return time > maxTimeMs;
+        return angleCount >= minAngleCount && size >= minCellCount && time > minTimeMs || time > maxTimeMs;
     }
 
     private int getAngleCount(){
@@ -148,7 +144,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
     }
 
 
-    interface LearningEvaluatorListener{
+    public interface LearningEvaluatorListener{
         void onLearningFinish();
         void onLearningFailed();
     }
@@ -161,6 +157,9 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
 
         @Override
         public boolean equals(Object o){
+            if (!(o instanceof Cell)) {
+                return false;
+            }
             Cell c = (Cell) o;
             return c.x == x && c.y == y;
         }
