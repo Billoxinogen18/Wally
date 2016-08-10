@@ -16,12 +16,12 @@ import java.util.List;
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private WallyTangoUx mTangoUx;
     private boolean isLocalized;
-    private boolean mIsFrameAvailableTangoThread;
     private RajawaliSurfaceView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
     private List<LocalizationListener> mLocalizationListeners;
     private List<ValidPoseListener> mValidPoseListeners;
     private ArrayList<TangoCoordinateFramePair> mFramePairs;
+    private List<TangoUpdaterListener> mTangoUpdaterListeners;
 
 
     public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager) {
@@ -29,6 +29,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
         mLocalizationListeners = new ArrayList<>();
+        mTangoUpdaterListeners = new ArrayList<>();
         mValidPoseListeners = new ArrayList<>();
         mFramePairs = new ArrayList<>();
         mFramePairs.add(
@@ -68,8 +69,14 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         // update its frame on the view.
         if (cameraId == TangoCameraIntrinsics.TANGO_CAMERA_COLOR) {
             // Mark a camera frame is available for rendering in the OpenGL thread
-            setFrameAvailableTangoThread(true);
+            fireFameAvailable();
             mSurfaceView.requestRenderUpdate();
+        }
+    }
+
+    private void fireFameAvailable() {
+        for (TangoUpdaterListener listener : mTangoUpdaterListeners){
+            listener.onFrameAvailable();
         }
     }
 
@@ -85,25 +92,11 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         mTangoUx.updateTangoEvent(event);
     }
 
-    public synchronized boolean isFrameAvailableTangoThread() {
-        return mIsFrameAvailableTangoThread;
-    }
-
-    public synchronized void setFrameAvailableTangoThread(boolean available) {
-        mIsFrameAvailableTangoThread = available;
-    }
-
     public synchronized void setTangoLocalization(boolean localization) {
         if (isLocalized == localization) return;
         isLocalized = localization;
-        if (isLocalized) {
-            for (LocalizationListener listener : mLocalizationListeners) {
-                listener.onLocalize();
-            }
-        } else {
-            for (LocalizationListener listener : mLocalizationListeners) {
-                listener.onNotLocalize();
-            }
+        for (TangoUpdaterListener updaterListener : mTangoUpdaterListeners){
+            updaterListener.onLocalization(isLocalized);
         }
     }
 
@@ -133,5 +126,10 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     public interface LocalizationListener {
         void onLocalize();
         void onNotLocalize();
+    }
+
+    public interface TangoUpdaterListener{
+        void onFrameAvailable();
+        void onLocalization(boolean localization);
     }
 }
