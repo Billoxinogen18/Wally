@@ -14,7 +14,7 @@ public class AdfScheduler extends Thread implements ProgressReporter{
     public static final int DEFAULT_TIMEOUT = 1000;
 
     private boolean done;
-    private int timeout;
+    private long timeout;
     private AdfManager mAdfManager;
     private List<AdfSchedulerListener> callbackList;
 
@@ -29,7 +29,7 @@ public class AdfScheduler extends Thread implements ProgressReporter{
         callbackList = new ArrayList<>();
     }
 
-    public AdfScheduler withTimeout(int timeoutMs) {
+    public AdfScheduler withTimeout(long timeoutMs) {
         this.timeout = timeoutMs;
         return this;
     }
