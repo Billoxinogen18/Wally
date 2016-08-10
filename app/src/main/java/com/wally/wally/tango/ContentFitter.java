@@ -20,16 +20,16 @@ import com.wally.wally.renderer.VisualContentManager;
 public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     private static final String TAG = ContentFitter.class.getSimpleName();
 
-    private TangoManager mTangoManager;
+    private TangoDriver mTangoDriver;
     private Content mContent;
     private OnContentFitListener mFittingStatusListener;
     private TangoPoseData lastPose;
     private VisualContentManager mVisualContentManager;
 
-    public ContentFitter(Content content, TangoManager tangoManager, VisualContentManager visualContentManager, OnContentFitListener fittingStatusListener) {
+    public ContentFitter(Content content, TangoDriver tangoManager, VisualContentManager visualContentManager, OnContentFitListener fittingStatusListener) {
         Log.d(TAG, "ContentFitter() called with: " + "content = [" + content + "], tangoManager = [" + tangoManager + "], visualContentManager = [" + visualContentManager + "], fittingStatusListener = [" + fittingStatusListener + "]");
         mContent = content;
-        mTangoManager = tangoManager;
+        mTangoDriver = tangoManager;
         mVisualContentManager = visualContentManager;
         mFittingStatusListener = fittingStatusListener;
     }
@@ -82,11 +82,11 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         }
         mFittingStatusListener.onContentFit(newPose);
         lastPose = newPose;
-        if (mVisualContentManager.isActiveContent()) { //TODO cancel contentfitter when not localized
+        if (mVisualContentManager.isActiveContent()) { //TODO cancel content fitter when not localized
             if (newPose != null) {
                 mVisualContentManager.updateActiveContent(ScenePoseCalculator.toOpenGLPose(newPose));
             } else {
-                mVisualContentManager.updateActiveContent(mTangoManager.getDevicePoseInFront());
+                mVisualContentManager.updateActiveContent(mTangoDriver.getDevicePoseInFront());
             }
         }
 
@@ -129,10 +129,10 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
      * Tries to get valid plane pose, null if interrupted.
      */
     private TangoPoseData getValidPose() {
-        if (mTangoManager.isConnected()) {
+        if (mTangoDriver.isTangoConnected()) {
             TangoPoseData tangoPose;
             try {
-                tangoPose = mTangoManager.findPlaneInMiddle();
+                tangoPose = mTangoDriver.findPlaneInMiddle();
                 if (tangoPose != null) {
                     return tangoPose;
                 }
