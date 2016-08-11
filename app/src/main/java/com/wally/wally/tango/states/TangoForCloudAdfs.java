@@ -38,11 +38,13 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
 
     @Override
     public synchronized void pause() {
+        Log.d(TAG, "pause");
         super.pause();
     }
 
     @Override
     public void resume() {
+        Log.d(TAG, "resume");
         mAdfScheduler = mAdfScheduler
                 .withTimeout(mLocalizationTimeout)
                 .addListener(createAdfSchedulerListener());
@@ -83,6 +85,7 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
 
     @Override
     public void onLocalization(boolean localization) {//TODO refactor inheritance
+        Log.d(TAG, "onLocalization() called with: " + "localization = [" + localization + "]");
         mIsLocalized = localization;
         if (localization) {
             mAdfScheduler.finish();

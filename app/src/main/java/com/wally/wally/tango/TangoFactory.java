@@ -1,6 +1,7 @@
 package com.wally.wally.tango;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
@@ -13,6 +14,8 @@ import com.projecttango.tangosupport.TangoSupport;
  * Created by shota on 5/28/16.
  */
 public class TangoFactory {
+    public static final String TAG = TangoFactory.class.getSimpleName();
+
     private Context mContext;
 
     public TangoFactory(Context context) {
@@ -38,6 +41,7 @@ public class TangoFactory {
                 }
             }
         });
+        Log.d(TAG, "getTangoForLearning = " + mTango);
         return mTango;
     }
 
@@ -54,6 +58,7 @@ public class TangoFactory {
                 }
             }
         });
+        Log.d(TAG, "getTango = " + mTango);
         return mTango;
     }
 
@@ -70,6 +75,7 @@ public class TangoFactory {
                 }
             }
         });
+        Log.d(TAG, "getTangoWithUuid = " + mTango);
         return mTango;
     }
 

@@ -34,7 +34,14 @@ public class TangoForSavedAdf extends TangoForAdf {
     }
 
     @Override
+    public synchronized void pause() {
+        Log.d(TAG, "pause");
+        super.pause();
+    }
+
+    @Override
     public void resume() {
+        Log.d(TAG, "resume");
         startLocalizing();
         startLocalizationWatchDog();
     }
@@ -54,6 +61,7 @@ public class TangoForSavedAdf extends TangoForAdf {
                 r.onError(e);
             }
         });
+        Log.d(TAG, "startLocalizing() mTango = " + mTango);
         fireLocalizationStart();
     }
 

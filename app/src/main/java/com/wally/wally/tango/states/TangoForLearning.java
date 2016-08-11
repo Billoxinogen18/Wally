@@ -32,11 +32,18 @@ public class TangoForLearning extends TangoBase {
     }
 
     @Override
+    public synchronized void pause() {
+        Log.d(TAG, "pause");
+        super.pause();
+    }
+
+    @Override
     public synchronized void resume(){
         Log.d(TAG, "startLearning");
         mLearningEvaluator.addLearningEvaluatorListener(getLearningEvaluatorListener());
         mTangoUpdater.addValidPoseListener(mLearningEvaluator);
         mTango = mTangoFactory.getTangoForLearning(getTangoInitializer());
+        Log.d(TAG, "resume() mTango = " + mTango);
         fireStartLearning();
     }
 
@@ -81,9 +88,12 @@ public class TangoForLearning extends TangoBase {
     private void changeToLearnedAdfState(AdfInfo info){
         Log.d(TAG, "changeToLearnedAdfState with: adf = [" + info + "]");
         pause();
+        Log.d(TAG, "changeToLearnedAdfState after pause");
         TangoBase nextTango = ((TangoForLearnedAdf)mTangoStatePool.get(TangoForLearnedAdf.class)).withAdf(info);
         changeState(nextTango);
+        Log.d(TAG, "changeToLearnedAdfState after change");
         nextTango.resume();
+        Log.d(TAG, "changeToLearnedAdfState after resume");
     }
 
     private AdfInfo saveAdf() {

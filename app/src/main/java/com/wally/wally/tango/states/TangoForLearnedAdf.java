@@ -28,9 +28,16 @@ public class TangoForLearnedAdf extends TangoForAdf {
     }
 
     @Override
+    public synchronized void pause() {
+        Log.d(TAG, "pause");
+        super.pause();
+    }
+
+    @Override
     public synchronized void resume() {
         Log.d(TAG, "Localize With Learned adf = [" + mAdfInfo + "]");
         mTango = mTangoFactory.getTangoWithUuid(getTangoInitializer(), mAdfInfo.getUuid());
+        Log.d(TAG, "resume() mTango = " + mTango);
         startLocalizationWatchDog();
         fireLocalizationStartAfterLearning();
     }

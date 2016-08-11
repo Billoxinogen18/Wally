@@ -99,19 +99,19 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         }
     }
 
-    public void addTangoUpdaterListener(TangoUpdaterListener listener){
+    public synchronized void addTangoUpdaterListener(TangoUpdaterListener listener){
         mTangoUpdaterListeners.add(listener);
     }
 
-    public void removeTangoUpdaterListener(TangoUpdaterListener listener){
+    public synchronized void removeTangoUpdaterListener(TangoUpdaterListener listener){
         mTangoUpdaterListeners.remove(listener);
     }
 
-    public void addValidPoseListener(ValidPoseListener listener) {
+    public synchronized void addValidPoseListener(ValidPoseListener listener) {
         mValidPoseListeners.add(listener);
     }
 
-    public void removeValidPoseListener(ValidPoseListener listener) {
+    public synchronized void removeValidPoseListener(ValidPoseListener listener) {
         mValidPoseListeners.remove(listener);
     }
 

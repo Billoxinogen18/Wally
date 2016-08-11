@@ -30,6 +30,7 @@ public class TangoForReadyState extends TangoBase {
     }
 
     public TangoForReadyState withTangoAndAdf(Tango tango, AdfInfo adf) {
+        Log.d(TAG, "withTangoAndAdf() called with: " + "tango = [" + tango + "], adf = [" + adf + "]");
         super.mTango = tango;
         this.mAdfInfo = adf;
         return this;
@@ -44,6 +45,7 @@ public class TangoForReadyState extends TangoBase {
 
     @Override
     public void resume() {
+        Log.d(TAG, "resume");
         fireOnTangoReady();
     }
 

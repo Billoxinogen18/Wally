@@ -90,17 +90,14 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
 
 
     public synchronized void pause(){
+        Log.d(TAG, "pause");
         disconnect();
     }
 
-    public void resume(){
+    public synchronized void resume(){
+        Log.d(TAG, "resume");
 
     }
-
-    public void start(){
-
-    }
-
 
     public void disconnect(){
         Log.d(TAG, "Disconnect Tango");
@@ -111,18 +108,27 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
         // Tango.disconnect will block here until all Tango callback calls are finished.
         // If you lock against this object in a Tango callback thread it will cause a deadlock.
         if (mIsConnected) {
+            Log.d(TAG, "disconnect - mIsConnected = " + mIsConnected);
             mRenderer.getCurrentScene().clearFrameCallbacks();
             mTango.disconnectCamera(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
+            Log.d(TAG, "disconnect - remove renderer" );
+
             // We need to invalidate the connected texture ID,
             // this will cause re-connection in the OpenGL thread after resume
             mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
 
             mIsConnected = false;
+            Log.d(TAG, "disconnect - mIsConnected = " + mIsConnected);
+
         }
         if (mTango != null) {
             mTango.disconnect();
         }
+        Log.d(TAG, "disconnect - disconnected");
+
         mTangoUpdater.setTangoLocalization(false);
+        Log.d(TAG, "disconnect - localization false");
+
     }
 
     /**
@@ -151,6 +157,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
 
     @Override
     public void onLocalization(boolean localization) {
+        Log.d(TAG, "onLocalization - " + localization);
         mIsLocalized = localization;
     }
 
@@ -198,14 +205,15 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
         };
     }
 
-    protected void resetTangoUpdaterListener(TangoUpdater.TangoUpdaterListener toAdd){
-        mTangoUpdater.removeTangoUpdaterListener(this);
-        mTangoUpdater.addTangoUpdaterListener(toAdd);
-    }
 
     protected void changeState(TangoBase nextTango){
         mStateChangeListener.onStateChange(nextTango);
         resetTangoUpdaterListener(nextTango);
+    }
+
+    private void resetTangoUpdaterListener(TangoUpdater.TangoUpdaterListener toAdd){
+        mTangoUpdater.removeTangoUpdaterListener(this);
+        mTangoUpdater.addTangoUpdaterListener(toAdd);
     }
 
 
