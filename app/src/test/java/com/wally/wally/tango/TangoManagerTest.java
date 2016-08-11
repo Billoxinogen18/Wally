@@ -6,6 +6,7 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfManager;
 import com.wally.wally.renderer.WallyRenderer;
+import com.wally.wally.ux.WallyTangoUx;
 
 import org.junit.Before;
 

@@ -1,4 +1,4 @@
-package com.wally.wally.tango;
+package com.wally.wally.ux;
 
 import android.content.Context;
 import android.graphics.Color;

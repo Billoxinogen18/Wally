@@ -30,12 +30,12 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.tango.ContentFitter;
-import com.wally.wally.tango.MainFactory;
+import com.wally.wally.factory.MainFactory;
 import com.wally.wally.tango.ProgressListener;
 import com.wally.wally.tango.ProgressReporter;
 import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoUpdater;
-import com.wally.wally.tango.WallyTangoUx;
+import com.wally.wally.ux.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 

@@ -25,7 +25,7 @@ import com.wally.wally.tango.ProgressAggregator;
 import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
-import com.wally.wally.tango.WallyTangoUx;
+import com.wally.wally.ux.WallyTangoUx;
 import com.wally.wally.tango.states.TangoBase;
 import com.wally.wally.tango.states.TangoForCloudAdfs;
 import com.wally.wally.tango.states.TangoForLearnedAdf;
