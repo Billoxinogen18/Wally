@@ -25,10 +25,9 @@ public abstract class TangoForAdf extends TangoBase {
     public TangoForAdf(TangoUpdater tangoUpdater,
                        TangoFactory tangoFactory,
                        WallyRenderer wallyRenderer,
-                       LocalizationAnalytics analytics,
                        Map<Class, TangoBase> tangoStatePool,
                        TangoPointCloudManager pointCloudManager){
-        super(tangoUpdater, tangoFactory, wallyRenderer, analytics, tangoStatePool, pointCloudManager);
+        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
     }
 
     public TangoForAdf withAdf(AdfInfo adf){
@@ -70,7 +69,6 @@ public abstract class TangoForAdf extends TangoBase {
                     return;
                 }
                 if (!mIsLocalized) {
-                    mLocalizationAnalytics.logLocalization(false);
                     pause();
                     TangoBase nextTango = mTangoStatePool.get(TangoForCloudAdfs.class);
                     changeState(nextTango);

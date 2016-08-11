@@ -16,7 +16,6 @@ import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.EventListener;
-import com.wally.wally.tango.LocalizationAnalytics;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.TangoUtils;
@@ -52,7 +51,6 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     protected Tango mTango;
     protected TangoUpdater mTangoUpdater;
     protected TangoFactory mTangoFactory;
-    protected final LocalizationAnalytics mLocalizationAnalytics;
     protected List<EventListener> mEventListeners;
     protected boolean mIsLocalized;
     protected Map<Class, TangoBase> mTangoStatePool;
@@ -79,10 +77,8 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     public TangoBase(TangoUpdater tangoUpdater,
                      TangoFactory tangoFactory,
                      WallyRenderer wallyRenderer,
-                     LocalizationAnalytics analytics,
                      Map<Class, TangoBase> tangoStatePool,
                      TangoPointCloudManager pointCloudManager){
-        mLocalizationAnalytics = analytics;
         mRenderer = wallyRenderer;
         mTangoUpdater = tangoUpdater;
         mPointCloudManager = pointCloudManager;
@@ -156,9 +152,6 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     @Override
     public void onLocalization(boolean localization) {
         mIsLocalized = localization;
-        if (localization) {
-            mLocalizationAnalytics.logLocalization(true);
-        }
     }
 
     public void addEventListener(EventListener listener){

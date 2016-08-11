@@ -5,7 +5,6 @@ import android.util.Log;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.EventListener;
-import com.wally.wally.tango.LocalizationAnalytics;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 
@@ -22,19 +21,16 @@ public class TangoForLearnedAdf extends TangoForAdf {
     public TangoForLearnedAdf(TangoUpdater tangoUpdater,
                               TangoFactory tangoFactory,
                               WallyRenderer wallyRenderer,
-                              LocalizationAnalytics analytics,
                               Map<Class, TangoBase> tangoStatePool,
                               TangoPointCloudManager pointCloudManager) {
 
-        super(tangoUpdater, tangoFactory, wallyRenderer, analytics, tangoStatePool, pointCloudManager);
+        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
     }
 
     @Override
     public synchronized void resume() {
         Log.d(TAG, "Localize With Learned adf = [" + mAdfInfo + "]");
-        mLocalizationAnalytics.startAdfLocalizationStopWatch();
         mTango = mTangoFactory.getTangoWithUuid(getTangoInitializer(), mAdfInfo.getUuid());
-        mLocalizationAnalytics.setLocalizationState(LocalizationAnalytics.LocalizationState.AFTER_LEARNING);
         startLocalizationWatchDog();
         fireLocalizationStartAfterLearning();
     }

@@ -4,7 +4,6 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.tango.LocalizationAnalytics;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 
@@ -21,11 +20,10 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
     public TangoForCloudAdfs(TangoUpdater tangoUpdater,
                              TangoFactory tangoFactory,
                              WallyRenderer wallyRenderer,
-                             LocalizationAnalytics analytics,
                              Map<Class, TangoBase> tangoStatePool,
                              TangoPointCloudManager pointCloudManager,
                              AdfScheduler adfScheduler){
-        super(tangoUpdater, tangoFactory, wallyRenderer, analytics, tangoStatePool, pointCloudManager);
+        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
         mAdfScheduler = adfScheduler;
     }
 
@@ -41,7 +39,6 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
 
     @Override
     public void resume() {
-        mLocalizationAnalytics.resetAdfCounter();
         mAdfScheduler = mAdfScheduler
                 .withTimeout(mLocalizationTimeout)
                 .addListener(createAdfSchedulerListener());
@@ -52,16 +49,12 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
         return new AdfScheduler.AdfSchedulerListener() {
             @Override
             public void onNewAdfSchedule(AdfInfo info) {
-                mLocalizationAnalytics.incrementAdfCounter();
-                mLocalizationAnalytics.logLocalization(false);
                 if (mIsLocalized) {
                     return;
                 }
                 if (info == null) {
-                    mLocalizationAnalytics.logAdfNumberBeforeLearning();
                     changeToLearningState();
                 } else {
-                    mLocalizationAnalytics.setLocalizationState(LocalizationAnalytics.LocalizationState.AFTER_DOWNLOAD);
                     withAdf(info);
                     startLocalizing();
                 }
@@ -87,7 +80,6 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
     public void onLocalization(boolean localization) {//TODO refactor inheritance
         mIsLocalized = localization;
         if (localization) {
-            mLocalizationAnalytics.logLocalization(true);
             mAdfScheduler.finish();
             changeToReadyState();
         }
