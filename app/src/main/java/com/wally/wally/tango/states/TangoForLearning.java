@@ -4,11 +4,9 @@ import android.util.Log;
 
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
-import com.wally.wally.config.Config;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.EventListener;
 import com.wally.wally.tango.LearningEvaluator;
-import com.wally.wally.tango.LocalizationAnalytics;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 
@@ -23,15 +21,13 @@ public class TangoForLearning extends TangoBase {
     private LearningEvaluator mLearningEvaluator;
 
 
-    public TangoForLearning(Config config,
-                            TangoUpdater tangoUpdater,
+    public TangoForLearning(TangoUpdater tangoUpdater,
                             TangoFactory tangoFactory,
                             WallyRenderer wallyRenderer,
                             LearningEvaluator evaluator,
-                            LocalizationAnalytics analytics,
                             Map<Class, TangoBase> tangoStatePool,
                             TangoPointCloudManager pointCloudManager) {
-        super(config, tangoUpdater, tangoFactory, wallyRenderer, analytics, tangoStatePool, pointCloudManager);
+        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
         mLearningEvaluator = evaluator;
     }
 
@@ -79,7 +75,6 @@ public class TangoForLearning extends TangoBase {
         Log.d(TAG, "finishLearning");
         AdfInfo info = saveAdf();
         fireFinishLearning();
-        mLocalizationAnalytics.onAdfCreate();
         changeToLearnedAdfState(info);
     }
 

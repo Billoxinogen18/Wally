@@ -4,9 +4,7 @@ import android.util.Log;
 
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
-import com.wally.wally.config.Config;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.tango.LocalizationAnalytics;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 
@@ -14,6 +12,7 @@ import java.util.Map;
 
 /**
  * Created by shota on 8/10/16.
+ *
  */
 public abstract class TangoForAdf extends TangoBase {
     private static final String TAG = TangoForAdf.class.getSimpleName();
@@ -22,14 +21,12 @@ public abstract class TangoForAdf extends TangoBase {
     private Thread mLocalizationWatchdog;
     private long mLocalizationTimeout = 20000;
 
-    public TangoForAdf(Config config,
-                       TangoUpdater tangoUpdater,
+    public TangoForAdf(TangoUpdater tangoUpdater,
                        TangoFactory tangoFactory,
                        WallyRenderer wallyRenderer,
-                       LocalizationAnalytics analytics,
                        Map<Class, TangoBase> tangoStatePool,
                        TangoPointCloudManager pointCloudManager){
-        super(config, tangoUpdater, tangoFactory, wallyRenderer, analytics, tangoStatePool, pointCloudManager);
+        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
     }
 
     public TangoForAdf withAdf(AdfInfo adf){
@@ -73,7 +70,6 @@ public abstract class TangoForAdf extends TangoBase {
                 }
                 if (!mIsLocalized) {
                     Log.d(TAG, "startLocalizationWatchDog failed");
-                    mLocalizationAnalytics.logLocalization(false);
                     pause();
                     Log.d(TAG, "changeToCloudAdfState");
                     TangoBase nextTango = mTangoStatePool.get(TangoForCloudAdfs.class);

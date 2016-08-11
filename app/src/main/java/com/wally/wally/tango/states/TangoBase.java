@@ -14,10 +14,8 @@ import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.adf.AdfInfo;
-import com.wally.wally.config.Config;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.EventListener;
-import com.wally.wally.tango.LocalizationAnalytics;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.TangoUtils;
@@ -53,8 +51,6 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     protected Tango mTango;
     protected TangoUpdater mTangoUpdater;
     protected TangoFactory mTangoFactory;
-    protected Config mConfig;
-    protected final LocalizationAnalytics mLocalizationAnalytics;
     protected List<EventListener> mEventListeners;
     protected boolean mIsLocalized;
     protected Map<Class, TangoBase> mTangoStatePool;
@@ -78,18 +74,14 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
 
 
-    public TangoBase(Config config,
-                     TangoUpdater tangoUpdater,
+    public TangoBase(TangoUpdater tangoUpdater,
                      TangoFactory tangoFactory,
                      WallyRenderer wallyRenderer,
-                     LocalizationAnalytics analytics,
                      Map<Class, TangoBase> tangoStatePool,
                      TangoPointCloudManager pointCloudManager){
-        mLocalizationAnalytics = analytics;
         mRenderer = wallyRenderer;
         mTangoUpdater = tangoUpdater;
         mPointCloudManager = pointCloudManager;
-        mConfig = config;
         mTangoFactory = tangoFactory;
         mTangoStatePool = tangoStatePool;
 
@@ -145,10 +137,10 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
                 mTango.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR);
         Pose p = ScenePoseCalculator.toOpenGlCameraPose(devicePose, mExtrinsics);
 
-        Vector3 addto = p.getOrientation().multiply(new Vector3(0, 0, -1));
-        Quaternion rot = new Quaternion().fromAngleAxis(addto, 180);
+        Vector3 addTo = p.getOrientation().multiply(new Vector3(0, 0, -1));
+        Quaternion rot = new Quaternion().fromAngleAxis(addTo, 180);
 
-        return new Pose(p.getPosition().add(addto), p.getOrientation().multiply(rot));
+        return new Pose(p.getPosition().add(addTo), p.getOrientation().multiply(rot));
 
     }
 
@@ -160,9 +152,6 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     @Override
     public void onLocalization(boolean localization) {
         mIsLocalized = localization;
-        if (localization) {
-            mLocalizationAnalytics.logLocalization(true);
-        }
     }
 
     public void addEventListener(EventListener listener){
@@ -235,7 +224,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
         // We need to calculate the transform between the color camera at the
         // time the user clicked and the depth camera at the time the depth
         // cloud was acquired.
-        TangoPoseData colorTdepthPose = TangoSupport.calculateRelativePose(
+        TangoPoseData depthPose = TangoSupport.calculateRelativePose(
                 rgbTimestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR,
                 xyzIj.timestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH);
 
@@ -243,7 +232,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
         // Perform plane fitting with the latest available point cloud data.
         TangoSupport.IntersectionPointPlaneModelPair intersectionPointPlaneModelPair =
                 TangoSupport.fitPlaneModelNearClick(xyzIj, mIntrinsics,
-                        colorTdepthPose, u, v);
+                        depthPose, u, v);
 
         // Get the device pose at the time the plane data was acquired.
         TangoPoseData devicePose = mTango.getPoseAtTime(xyzIj.timestamp, FRAME_PAIR);
@@ -257,7 +246,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
 
 
     /**
-     * Connects the view and renderer to the color camara and callbacks.
+     * Connects the view and renderer to the color camera and callbacks.
      */
     private void connectRenderer() {
         // Register a Rajawali Scene Frame Callback to update the scene camera pose whenever a new

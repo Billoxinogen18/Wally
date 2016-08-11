@@ -13,21 +13,43 @@ import com.wally.wally.tango.states.TangoBase;
 public class TangoDriver implements TangoBase.StateChangeListener {
     private TangoBase tangoState;
 
-    public TangoDriver(TangoBase startTangoState){
+    public TangoDriver(TangoBase startTangoState) {
         tangoState = startTangoState;
         tangoState.setStateChangeListener(this);
     }
 
-    public void pause(){
+    @Override
+    public void onStateChange(TangoBase nextTangoState) {
+        tangoState = nextTangoState;
+        tangoState.setStateChangeListener(this);
+    }
+
+    public void pause() {
         tangoState.pause();
     }
 
-    public void resume(){
+    public void resume() {
         tangoState.resume();
     }
 
+    public AdfInfo getAdf() {
+        return tangoState.getAdf();
+    }
+
+    public boolean isLearningState() {
+        return tangoState.isLearningState();
+    }
+
+    public boolean isTangoLocalized() {
+        return tangoState.isLocalized();
+    }
+
+    public boolean isTangoConnected() {
+        return tangoState.isConnected();
+    }
+
     /**
-     * / * Finds plane pose in the middle of the screen.
+     * Finds plane pose in the middle of the screen.
      */
     public TangoPoseData findPlaneInMiddle() {
         return tangoState.findPlaneInMiddle();
@@ -37,35 +59,4 @@ public class TangoDriver implements TangoBase.StateChangeListener {
         return tangoState.getDevicePoseInFront();
     }
 
-
-    public void addEventListener(EventListener listener){
-        tangoState.addEventListener(listener);
-    }
-
-    public boolean removeEventListener(EventListener listener){
-        return tangoState.removeEventListener(listener);
-    }
-
-    @Override
-    public void onStateChange(TangoBase nextTangoState) {
-        tangoState = nextTangoState;
-        tangoState.setStateChangeListener(this);
-    }
-
-    public boolean isLearningState(){
-        return tangoState.isLearningState();
-    }
-
-    public boolean isTangoLocalized(){
-        return tangoState.isLocalized();
-    }
-
-    public boolean isTangoConnected() {
-        return tangoState.isConnected();
-    }
-
-    public AdfInfo getAdf() {
-        // TODO
-        return tangoState.getAdf();
-    }
 }

@@ -5,10 +5,8 @@ import android.util.Log;
 import com.google.atap.tangoservice.Tango;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
-import com.wally.wally.config.Config;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.EventListener;
-import com.wally.wally.tango.LocalizationAnalytics;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.TangoUtils;
@@ -22,14 +20,12 @@ import java.util.Map;
 public class TangoForSavedAdf extends TangoForAdf {
     private static final String TAG = TangoForSavedAdf.class.getSimpleName();
 
-    public TangoForSavedAdf(Config config,
-                            TangoUpdater tangoUpdater,
+    public TangoForSavedAdf(TangoUpdater tangoUpdater,
                             TangoFactory tangoFactory,
                             WallyRenderer wallyRenderer,
-                            LocalizationAnalytics analytics,
                             Map<Class, TangoBase> tangoStatePool,
                             TangoPointCloudManager pointCloudManager){
-        super(config, tangoUpdater, tangoFactory, wallyRenderer, analytics, tangoStatePool, pointCloudManager);
+        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
     }
 
     public TangoForAdf withAdf(AdfInfo adf){
@@ -40,13 +36,11 @@ public class TangoForSavedAdf extends TangoForAdf {
     @Override
     public void resume() {
         startLocalizing();
-        mLocalizationAnalytics.setLocalizationState(LocalizationAnalytics.LocalizationState.AFTER_ON_RESUME);
         startLocalizationWatchDog();
     }
 
     protected void startLocalizing(){
         Log.d(TAG, "startLocalizing with: adf = [" + mAdfInfo + "]");
-        mLocalizationAnalytics.startAdfLocalizationStopWatch();
         final TangoFactory.RunnableWithError r = getTangoInitializer();
         mTango = mTangoFactory.getTango(new TangoFactory.RunnableWithError() {
             @Override

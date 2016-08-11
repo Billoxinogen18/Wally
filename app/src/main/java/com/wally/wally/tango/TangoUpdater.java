@@ -1,5 +1,6 @@
 package com.wally.wally.tango;
 
+import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
-    private WallyTangoUx mTangoUx;
+    private TangoUx mTangoUx;
     private boolean isLocalized;
     private RajawaliSurfaceView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
@@ -23,7 +24,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private List<TangoUpdaterListener> mTangoUpdaterListeners;
 
 
-    public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager) {
+    public TangoUpdater(TangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager) {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
