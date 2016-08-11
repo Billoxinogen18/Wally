@@ -3,7 +3,6 @@ package com.wally.wally.tango.states;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfScheduler;
-import com.wally.wally.config.Config;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.LocalizationAnalytics;
 import com.wally.wally.tango.TangoFactory;
@@ -19,15 +18,14 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
     private long mLocalizationTimeout = 20000;
     private AdfScheduler mAdfScheduler;
 
-    public TangoForCloudAdfs(Config config,
-                             TangoUpdater tangoUpdater,
+    public TangoForCloudAdfs(TangoUpdater tangoUpdater,
                              TangoFactory tangoFactory,
                              WallyRenderer wallyRenderer,
                              LocalizationAnalytics analytics,
                              Map<Class, TangoBase> tangoStatePool,
                              TangoPointCloudManager pointCloudManager,
                              AdfScheduler adfScheduler){
-        super(config, tangoUpdater, tangoFactory, wallyRenderer, analytics, tangoStatePool, pointCloudManager);
+        super(tangoUpdater, tangoFactory, wallyRenderer, analytics, tangoStatePool, pointCloudManager);
         mAdfScheduler = adfScheduler;
     }
 
@@ -89,7 +87,7 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
     public void onLocalization(boolean localization) {//TODO refactor inheritance
         mIsLocalized = localization;
         if (localization) {
-            mLocalizationAnalytics.logLocalization(localization);
+            mLocalizationAnalytics.logLocalization(true);
             mAdfScheduler.finish();
             changeToReadyState();
         }

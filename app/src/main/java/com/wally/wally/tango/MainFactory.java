@@ -61,7 +61,7 @@ public class MainFactory {
                        TangoUxLayout tangoUxLayout,
                        RajawaliSurfaceView surfaceView,
                        TangoUpdater.TangoUpdaterListener tangoUpdaterListener,
-                       OnVisualContentSelectedListener onContentSelectedListener){
+                       OnVisualContentSelectedListener onContentSelectedListener) {
         set();
 
         mTangoUx = new WallyTangoUx(context);
@@ -97,7 +97,7 @@ public class MainFactory {
     }
 
 
-    private void set(){
+    private void set() {
         tangoManagers = new HashMap<>();
 
         mConfig = Config.getInstance();
@@ -116,27 +116,32 @@ public class MainFactory {
     }
 
 
-    public TangoBase getTangoManager(Class cl){
-        return  tangoManagers.get(cl);
+    public TangoBase getTangoManager(Class cl) {
+        return tangoManagers.get(cl);
     }
 
-    private void createTangoManagers(){
+    private void createTangoManagers() {
         long localizationTimeout = mConfig.getInt(TangoManagerConstants.LOCALIZATION_TIMEOUT);
-        TangoForLearnedAdf tangoForLearnedAdf = new TangoForLearnedAdf(mConfig,mTangoUpdater,mTangoFactory,mRenderer,mLocalizationAnalytics,tangoManagers,mPointCloudManager);
+        TangoForLearnedAdf tangoForLearnedAdf =
+                new TangoForLearnedAdf(mTangoUpdater, mTangoFactory, mRenderer, mLocalizationAnalytics, tangoManagers, mPointCloudManager);
         tangoForLearnedAdf.withLocalizationTimeout(localizationTimeout);
         tangoManagers.put(TangoForLearnedAdf.class, tangoForLearnedAdf);
 
-        TangoForLearning tangoForLearning = new TangoForLearning(mConfig,mTangoUpdater,mTangoFactory,mRenderer,mLearningEvaluator,mLocalizationAnalytics,tangoManagers,mPointCloudManager);
+        TangoForLearning tangoForLearning =
+                new TangoForLearning(mTangoUpdater, mTangoFactory, mRenderer, mLearningEvaluator, mLocalizationAnalytics, tangoManagers, mPointCloudManager);
         tangoManagers.put(TangoForLearning.class, tangoForLearning);
 
-        TangoForReadyState tangoForReadyState = new TangoForReadyState(mConfig,mTangoUpdater,mTangoFactory,mRenderer,mLocalizationAnalytics,tangoManagers,mPointCloudManager);
+        TangoForReadyState tangoForReadyState =
+                new TangoForReadyState(mTangoUpdater, mTangoFactory, mRenderer, mLocalizationAnalytics, tangoManagers, mPointCloudManager);
         tangoManagers.put(TangoForReadyState.class, tangoForReadyState);
 
-        TangoForCloudAdfs tangoForCloudAdfs = new TangoForCloudAdfs(mConfig,mTangoUpdater,mTangoFactory,mRenderer,mLocalizationAnalytics,tangoManagers,mPointCloudManager,mAdfScheduler);
+        TangoForCloudAdfs tangoForCloudAdfs =
+                new TangoForCloudAdfs(mTangoUpdater, mTangoFactory, mRenderer, mLocalizationAnalytics, tangoManagers, mPointCloudManager, mAdfScheduler);
         tangoForCloudAdfs.withLocalizationTimeout(localizationTimeout);
         tangoManagers.put(TangoForCloudAdfs.class, tangoForCloudAdfs);
 
-        TangoForSavedAdf tangoForSavedAdf = new TangoForSavedAdf(mConfig,mTangoUpdater,mTangoFactory,mRenderer,mLocalizationAnalytics,tangoManagers,mPointCloudManager);
+        TangoForSavedAdf tangoForSavedAdf =
+                new TangoForSavedAdf(mTangoUpdater, mTangoFactory, mRenderer, mLocalizationAnalytics, tangoManagers, mPointCloudManager);
         tangoForSavedAdf.withLocalizationTimeout(localizationTimeout);
         tangoManagers.put(TangoForSavedAdf.class, tangoForSavedAdf);
 
@@ -146,12 +151,12 @@ public class MainFactory {
         mTangoDriver = new TangoDriver(tangoForCloudAdfs);
     }
 
-    public TangoDriver getTangoDriver(){
+    public TangoDriver getTangoDriver() {
         return mTangoDriver;
     }
 
     public void setEventListener(TipManager eventListener) {
-        for (TangoBase tango : tangoManagers.values()){
+        for (TangoBase tango : tangoManagers.values()) {
             tango.addEventListener(eventListener);
         }
     }

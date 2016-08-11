@@ -14,7 +14,6 @@ import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.adf.AdfInfo;
-import com.wally.wally.config.Config;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.EventListener;
 import com.wally.wally.tango.LocalizationAnalytics;
@@ -53,7 +52,6 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     protected Tango mTango;
     protected TangoUpdater mTangoUpdater;
     protected TangoFactory mTangoFactory;
-    protected Config mConfig;
     protected final LocalizationAnalytics mLocalizationAnalytics;
     protected List<EventListener> mEventListeners;
     protected boolean mIsLocalized;
@@ -78,8 +76,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
 
 
-    public TangoBase(Config config,
-                     TangoUpdater tangoUpdater,
+    public TangoBase(TangoUpdater tangoUpdater,
                      TangoFactory tangoFactory,
                      WallyRenderer wallyRenderer,
                      LocalizationAnalytics analytics,
@@ -89,7 +86,6 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
         mRenderer = wallyRenderer;
         mTangoUpdater = tangoUpdater;
         mPointCloudManager = pointCloudManager;
-        mConfig = config;
         mTangoFactory = tangoFactory;
         mTangoStatePool = tangoStatePool;
 
@@ -257,7 +253,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
 
 
     /**
-     * Connects the view and renderer to the color camara and callbacks.
+     * Connects the view and renderer to the color camera and callbacks.
      */
     private void connectRenderer() {
         // Register a Rajawali Scene Frame Callback to update the scene camera pose whenever a new

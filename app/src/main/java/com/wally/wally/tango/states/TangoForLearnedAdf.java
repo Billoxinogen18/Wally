@@ -3,7 +3,6 @@ package com.wally.wally.tango.states;
 import android.util.Log;
 
 import com.projecttango.tangosupport.TangoPointCloudManager;
-import com.wally.wally.config.Config;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.EventListener;
 import com.wally.wally.tango.LocalizationAnalytics;
@@ -20,15 +19,14 @@ public class TangoForLearnedAdf extends TangoForAdf {
     private static final String TAG = TangoForLearnedAdf.class.getSimpleName();
 
 
-    public TangoForLearnedAdf(Config config,
-                              TangoUpdater tangoUpdater,
+    public TangoForLearnedAdf(TangoUpdater tangoUpdater,
                               TangoFactory tangoFactory,
                               WallyRenderer wallyRenderer,
                               LocalizationAnalytics analytics,
                               Map<Class, TangoBase> tangoStatePool,
                               TangoPointCloudManager pointCloudManager) {
 
-        super(config, tangoUpdater, tangoFactory, wallyRenderer, analytics, tangoStatePool, pointCloudManager);
+        super(tangoUpdater, tangoFactory, wallyRenderer, analytics, tangoStatePool, pointCloudManager);
     }
 
     @Override
