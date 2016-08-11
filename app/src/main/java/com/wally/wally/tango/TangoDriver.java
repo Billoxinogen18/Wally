@@ -13,16 +13,16 @@ import com.wally.wally.tango.states.TangoBase;
 public class TangoDriver implements TangoBase.StateChangeListener {
     private TangoBase tangoState;
 
-    public TangoDriver(TangoBase startTangoState){
+    public TangoDriver(TangoBase startTangoState) {
         tangoState = startTangoState;
         tangoState.setStateChangeListener(this);
     }
 
-    public void pause(){
+    public void pause() {
         tangoState.pause();
     }
 
-    public void resume(){
+    public void resume() {
         tangoState.resume();
     }
 
@@ -38,11 +38,11 @@ public class TangoDriver implements TangoBase.StateChangeListener {
     }
 
 
-    public void addEventListener(EventListener listener){
+    public void addEventListener(EventListener listener) {
         tangoState.addEventListener(listener);
     }
 
-    public boolean removeEventListener(EventListener listener){
+    public boolean removeEventListener(EventListener listener) {
         return tangoState.removeEventListener(listener);
     }
 
@@ -52,11 +52,11 @@ public class TangoDriver implements TangoBase.StateChangeListener {
         tangoState.setStateChangeListener(this);
     }
 
-    public boolean isLearningState(){
+    public boolean isLearningState() {
         return tangoState.isLearningState();
     }
 
-    public boolean isTangoLocalized(){
+    public boolean isTangoLocalized() {
         return tangoState.isLocalized();
     }
 
@@ -65,7 +65,6 @@ public class TangoDriver implements TangoBase.StateChangeListener {
     }
 
     public AdfInfo getAdf() {
-        // TODO
         return tangoState.getAdf();
     }
 }
