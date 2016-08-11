@@ -1,4 +1,4 @@
-package com.wally.wally.tango;
+package com.wally.wally.factory;
 
 import android.content.Context;
 import android.view.MotionEvent;
@@ -19,6 +19,13 @@ import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.renderer.OnVisualContentSelectedListener;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
+import com.wally.wally.tango.ContentFitter;
+import com.wally.wally.tango.LearningEvaluator;
+import com.wally.wally.tango.ProgressAggregator;
+import com.wally.wally.tango.TangoDriver;
+import com.wally.wally.tango.TangoFactory;
+import com.wally.wally.tango.TangoUpdater;
+import com.wally.wally.tango.WallyTangoUx;
 import com.wally.wally.tango.states.TangoBase;
 import com.wally.wally.tango.states.TangoForCloudAdfs;
 import com.wally.wally.tango.states.TangoForLearnedAdf;
