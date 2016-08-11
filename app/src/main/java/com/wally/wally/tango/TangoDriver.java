@@ -18,6 +18,12 @@ public class TangoDriver implements TangoBase.StateChangeListener {
         tangoState.setStateChangeListener(this);
     }
 
+    @Override
+    public void onStateChange(TangoBase nextTangoState) {
+        tangoState = nextTangoState;
+        tangoState.setStateChangeListener(this);
+    }
+
     public void pause() {
         tangoState.pause();
     }
@@ -26,30 +32,8 @@ public class TangoDriver implements TangoBase.StateChangeListener {
         tangoState.resume();
     }
 
-    /**
-     * / * Finds plane pose in the middle of the screen.
-     */
-    public TangoPoseData findPlaneInMiddle() {
-        return tangoState.findPlaneInMiddle();
-    }
-
-    public Pose getDevicePoseInFront() {
-        return tangoState.getDevicePoseInFront();
-    }
-
-
-    public void addEventListener(EventListener listener) {
-        tangoState.addEventListener(listener);
-    }
-
-    public boolean removeEventListener(EventListener listener) {
-        return tangoState.removeEventListener(listener);
-    }
-
-    @Override
-    public void onStateChange(TangoBase nextTangoState) {
-        tangoState = nextTangoState;
-        tangoState.setStateChangeListener(this);
+    public AdfInfo getAdf() {
+        return tangoState.getAdf();
     }
 
     public boolean isLearningState() {
@@ -63,8 +47,16 @@ public class TangoDriver implements TangoBase.StateChangeListener {
     public boolean isTangoConnected() {
         return tangoState.isConnected();
     }
-
-    public AdfInfo getAdf() {
-        return tangoState.getAdf();
+    
+    /**
+     * Finds plane pose in the middle of the screen.
+     */
+    public TangoPoseData findPlaneInMiddle() {
+        return tangoState.findPlaneInMiddle();
     }
+
+    public Pose getDevicePoseInFront() {
+        return tangoState.getDevicePoseInFront();
+    }
+
 }
