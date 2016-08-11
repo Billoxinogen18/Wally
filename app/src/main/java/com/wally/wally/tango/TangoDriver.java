@@ -47,7 +47,7 @@ public class TangoDriver implements TangoBase.StateChangeListener {
     public boolean isTangoConnected() {
         return tangoState.isConnected();
     }
-    
+
     /**
      * Finds plane pose in the middle of the screen.
      */
