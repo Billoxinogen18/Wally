@@ -9,7 +9,6 @@ import com.google.atap.tango.ux.TangoUxLayout;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.App;
 import com.wally.wally.Utils;
-import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
@@ -36,7 +35,7 @@ import java.util.Map;
 
 /**
  * Created by shota on 8/9/16.
- * Main Factory reponsible for creating Tango Managers
+ * Main Factory responsible for creating Tango Managers
  */
 public class MainFactory {
     private TangoUpdater mTangoUpdater;
@@ -101,18 +100,11 @@ public class MainFactory {
         mPointCloudManager = new TangoPointCloudManager();
 
         mVisualContentManager = new VisualContentManager();
-
-        AdfManager mAdfManager = App.getInstance().getAdfManager();
-        mAdfScheduler = new AdfScheduler(mAdfManager);
+        mAdfScheduler = new AdfScheduler(App.getInstance().getAdfManager());
 
         ProgressAggregator mProgressAggregator = new ProgressAggregator();
         mProgressAggregator.addProgressReporter(mAdfScheduler, 0.4);
         mProgressAggregator.addProgressReporter(mLearningEvaluator, 0.6);
-    }
-
-
-    public TangoBase getTangoManager(Class cl) {
-        return tangoManagers.get(cl);
     }
 
     private void createTangoManagers() {
