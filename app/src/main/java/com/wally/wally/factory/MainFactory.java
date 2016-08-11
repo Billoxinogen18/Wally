@@ -20,6 +20,7 @@ import com.wally.wally.renderer.OnVisualContentSelectedListener;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.ContentFitter;
+import com.wally.wally.tango.EventListener;
 import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.ProgressAggregator;
 import com.wally.wally.tango.TangoDriver;
@@ -140,6 +141,7 @@ public class MainFactory {
         tangoManagers.put(TangoForSavedAdf.class, tangoForSavedAdf);
 
         setEventListener(mTipManager);
+        setEventListener(mTangoUx);
 
         mTangoUpdater.addTangoUpdaterListener(tangoForCloudAdfs);
         mTangoDriver = new TangoDriver(tangoForCloudAdfs);
@@ -149,7 +151,7 @@ public class MainFactory {
         return mTangoDriver;
     }
 
-    public void setEventListener(TipManager eventListener) {
+    public void setEventListener(EventListener eventListener) {
         for (TangoBase tango : tangoManagers.values()) {
             tango.addEventListener(eventListener);
         }
