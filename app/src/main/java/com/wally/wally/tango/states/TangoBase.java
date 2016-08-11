@@ -137,10 +137,10 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
                 mTango.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR);
         Pose p = ScenePoseCalculator.toOpenGlCameraPose(devicePose, mExtrinsics);
 
-        Vector3 addto = p.getOrientation().multiply(new Vector3(0, 0, -1));
-        Quaternion rot = new Quaternion().fromAngleAxis(addto, 180);
+        Vector3 addTo = p.getOrientation().multiply(new Vector3(0, 0, -1));
+        Quaternion rot = new Quaternion().fromAngleAxis(addTo, 180);
 
-        return new Pose(p.getPosition().add(addto), p.getOrientation().multiply(rot));
+        return new Pose(p.getPosition().add(addTo), p.getOrientation().multiply(rot));
 
     }
 
@@ -224,7 +224,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
         // We need to calculate the transform between the color camera at the
         // time the user clicked and the depth camera at the time the depth
         // cloud was acquired.
-        TangoPoseData colorTdepthPose = TangoSupport.calculateRelativePose(
+        TangoPoseData depthPose = TangoSupport.calculateRelativePose(
                 rgbTimestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR,
                 xyzIj.timestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH);
 
@@ -232,7 +232,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
         // Perform plane fitting with the latest available point cloud data.
         TangoSupport.IntersectionPointPlaneModelPair intersectionPointPlaneModelPair =
                 TangoSupport.fitPlaneModelNearClick(xyzIj, mIntrinsics,
-                        colorTdepthPose, u, v);
+                        depthPose, u, v);
 
         // Get the device pose at the time the plane data was acquired.
         TangoPoseData devicePose = mTango.getPoseAtTime(xyzIj.timestamp, FRAME_PAIR);
