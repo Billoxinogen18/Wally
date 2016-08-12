@@ -54,7 +54,7 @@ public class TipManager implements EventListener, ContentFitter.OnContentFitList
 
     private void showTip(String type){
         Tip tip = mTipService.getRandom(type);
-        mTipView.show(tip.getTitle(), tip.getMessage(), 5000);
+        mTipView.show(tip.getMessage(), "", 0);
     }
 
     @Override

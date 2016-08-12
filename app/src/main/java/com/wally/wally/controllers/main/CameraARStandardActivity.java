@@ -3,12 +3,15 @@ package com.wally.wally.controllers.main;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.wally.wally.R;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.tip.Tip;
+import com.wally.wally.userManager.SocialUser;
 
 public class CameraARStandardActivity extends CameraARActivity {
 
@@ -44,6 +47,13 @@ public class CameraARStandardActivity extends CameraARActivity {
         super.onCreate(savedInstanceState);
         View mSurfaceView = findViewById(R.id.rajawali_surface);
         ((ViewGroup) mSurfaceView.getParent()).removeView(mSurfaceView); //TODO should not delete rajawali
+
+        mTipView.show("The amount of long tips is too damn high, The amount of long tips is too damn high", "id", 0);
+    }
+
+    @Override
+    public void onProfileClick(SocialUser user, boolean type) {
+        mTipView.show("The amount of long tips is too damn high, The amount of long tips is too damn high", "id", 0);
     }
 
 }
