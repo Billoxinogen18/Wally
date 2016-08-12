@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-public class AdfScheduler extends Thread implements ProgressReporter {
+public class AdfScheduler implements ProgressReporter {
     public static final String TAG = AdfScheduler.class.getSimpleName();
     public static final int DEFAULT_TIMEOUT = 1000;
 
@@ -20,6 +20,7 @@ public class AdfScheduler extends Thread implements ProgressReporter {
 
     private ProgressListener listener;
     private int adfsSoFar;
+    private Thread scheduler;
 
     public AdfScheduler(AdfManager adfManager) {
         done = false;
@@ -41,7 +42,9 @@ public class AdfScheduler extends Thread implements ProgressReporter {
 
     public void finish() {
         this.done = true;
-        interrupt();
+        if (!scheduler.isInterrupted()) {
+            scheduler.interrupt();
+        }
     }
 
     private void fireSuccess(AdfInfo info) {
@@ -56,14 +59,23 @@ public class AdfScheduler extends Thread implements ProgressReporter {
         }
     }
 
-    @Override
-    public void run() {
-        while (!done && !isInterrupted()) {
+    public void start() {
+        scheduler = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                schedulingLoop();
+            }
+        });
+        scheduler.start();
+    }
+
+    private void schedulingLoop() {
+        while (!done && !scheduler.isInterrupted()) {
             final CountDownLatch latch = new CountDownLatch(1);
             mAdfManager.getAdf(new AdfManager.AdfManagerStateListener() {
                 @Override
                 public void onAdfReady(AdfInfo info) {
-                    if (done || isInterrupted()) return;
+                    if (done || scheduler.isInterrupted()) return;
                     fireSuccess(info);
                     fireProgress();
                     latch.countDown();
