@@ -21,47 +21,47 @@ public class TangoDriver implements TangoBase.StateChangeListener {
         tangoState = startTangoState;
         tangoState.setStateChangeListener(this);
     }
-    
-    public void pause() {
+
+    public synchronized void pause() {
         tangoState.pause();
     }
 
-    public void resume() {
+    public synchronized void resume() {
         tangoState.resume();
     }
 
     @Override
-    public void onStateChange(TangoBase nextTangoState) {
+    public synchronized void onStateChange(TangoBase nextTangoState) {
         Log.d(TAG, "onStateChange from =" + tangoState + " -- To [" + nextTangoState + "]");
         tangoState = nextTangoState;
         tangoState.setStateChangeListener(this);
     }
 
-    public boolean isLearningState() {
+    public synchronized boolean isLearningState() {
         return tangoState.isLearningState();
     }
 
-    public boolean isTangoLocalized() {
+    public synchronized boolean isTangoLocalized() {
         return tangoState.isLocalized();
     }
 
-    public boolean isTangoConnected() {
+    public synchronized boolean isTangoConnected() {
         return tangoState.isConnected();
     }
 
     /**
      * Finds plane pose in the middle of the screen.
      */
-    public TangoPoseData findPlaneInMiddle() {
+    public synchronized TangoPoseData findPlaneInMiddle() {
         return tangoState.findPlaneInMiddle();
     }
 
-    public AdfInfo getAdf() {
+    public synchronized AdfInfo getAdf() {
         Log.d(TAG, "getAdf");
         return tangoState.getAdf();
     }
 
-    public Pose getDevicePoseInFront() {
+    public synchronized Pose getDevicePoseInFront() {
         return tangoState.getDevicePoseInFront();
     }
 

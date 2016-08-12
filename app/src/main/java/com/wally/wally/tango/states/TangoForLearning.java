@@ -33,13 +33,13 @@ public class TangoForLearning extends TangoBase {
 
     @Override
     public synchronized void pause() {
-        Log.d(TAG, "pause");
+        Log.d(TAG, "pause Thread = " + Thread.currentThread());
         super.pause();
     }
 
     @Override
     public synchronized void resume(){
-        Log.d(TAG, "startLearning");
+        Log.d(TAG, "startLearning Thread = " + Thread.currentThread());
         mLearningEvaluator.addLearningEvaluatorListener(getLearningEvaluatorListener());
         mTangoUpdater.addValidPoseListener(mLearningEvaluator);
         mTango = mTangoFactory.getTangoForLearning(getTangoInitializer());

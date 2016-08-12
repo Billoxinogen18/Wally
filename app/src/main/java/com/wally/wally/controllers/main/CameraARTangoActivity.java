@@ -238,8 +238,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "onPause() called with: Thread = " + Thread.currentThread());
         super.onPause();
-        mTangoDriver.pause();
+        if (mTangoDriver.isTangoConnected()) {
+            mTangoDriver.pause();
+        }
 
         if (mContentFitter != null) {
             mContentFitter.cancel(true);
@@ -248,6 +251,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume() called with: Thread = " + Thread.currentThread());
         super.onResume();
         if (mExplainAdfPermission) {
             mExplainAdfPermission = false;
@@ -261,6 +265,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         }
 
         if (Utils.hasADFPermissions(this)) {
+            Log.d(TAG, "onResume() hasADFPermissions " + "");
             mTangoDriver.resume();
 
             if (mContentFitter != null) {

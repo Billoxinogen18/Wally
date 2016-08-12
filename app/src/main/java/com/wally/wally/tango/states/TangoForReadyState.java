@@ -38,14 +38,14 @@ public class TangoForReadyState extends TangoBase {
 
     @Override
     public synchronized void pause() {
-        Log.d(TAG, "changeToSavedAdfState");
+        Log.d(TAG, "changeToSavedAdfState Thread = " + Thread.currentThread());
         TangoBase nextTango = ((TangoForSavedAdf)mTangoStatePool.get(TangoForSavedAdf.class)).withAdf(mAdfInfo);
         changeState(nextTango);
     }
 
     @Override
     public void resume() {
-        Log.d(TAG, "resume");
+        Log.d(TAG, "resume Thread = " + Thread.currentThread());
         fireOnTangoReady();
     }
 

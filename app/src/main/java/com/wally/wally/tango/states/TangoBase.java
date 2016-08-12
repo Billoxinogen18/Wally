@@ -90,12 +90,12 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
 
 
     public synchronized void pause(){
-        Log.d(TAG, "pause");
+        Log.d(TAG, "pause. Thread = " + Thread.currentThread());
         disconnect();
     }
 
     public synchronized void resume(){
-        Log.d(TAG, "resume");
+        Log.d(TAG, "resume Thread = " + Thread.currentThread());
 
     }
 
