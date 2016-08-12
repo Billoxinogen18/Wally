@@ -4,8 +4,9 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.wally.wally.tango.EventListener;
 
-public class WallyAnalytics {
+public class WallyAnalytics implements EventListener {
     public static final String TAG = WallyAnalytics.class.getSimpleName();
     private static WallyAnalytics instance;
     private final FirebaseAnalytics analytics;
@@ -13,22 +14,6 @@ public class WallyAnalytics {
     public WallyAnalytics(FirebaseAnalytics analytics) {
         this.analytics = analytics;
 
-    }
-
-    public void onAdfCreate() {
-        Bundle bundle = new Bundle();
-        bundle.putInt("Count", 1);
-        analytics.logEvent("ADF_created", bundle);
-    }
-
-    public void onLocalizeOnNewAdf(boolean status) {
-        Bundle bundle = new Bundle();
-        bundle.putInt("Count", 1);
-        if (status) {
-            analytics.logEvent("ADF_new_localize_success", bundle);
-        } else {
-            analytics.logEvent("ADF_new_localize_fail", bundle);
-        }
     }
 
     public void onLocalizeOnDownloadedAdf(boolean status) {
@@ -108,11 +93,67 @@ public class WallyAnalytics {
         analytics.logEvent("ADF_TIME_ON_LOCALIZATION", bundle);
     }
 
+    public void onLocalizeOnNewAdf(boolean status) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("Count", 1);
+        if (status) {
+            analytics.logEvent("ADF_new_localize_success", bundle);
+        } else {
+            analytics.logEvent("ADF_new_localize_fail", bundle);
+        }
+    }
+
     public static WallyAnalytics getInstance(Context context) {
         if (instance == null) {
             FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(context);
             instance = new WallyAnalytics(analytics);
         }
         return instance;
+    }
+
+    @Override
+    public void onTangoReady() {
+
+    }
+
+    @Override
+    public void onLearningStart() {
+
+    }
+
+    @Override
+    public void onTangoOutOfDate() {
+
+    }
+
+    @Override
+    public void onLearningFinish() {
+        analytics.logEvent("ADF_created", getDefaultBundle());
+    }
+
+    @Override
+    public void onLocalizationStart() {
+
+    }
+
+    @Override
+    public void onLocalizationStartAfterLearning() {
+
+    }
+
+    @Override
+    public void onLocalizationFinishAfterLearning() {
+        analytics.logEvent("ADF_new_localize_success", getDefaultBundle());
+    }
+
+    @Override
+    public void onLocalizationFinishAfterSavedAdf() {
+
+    }
+
+    private Bundle getDefaultBundle() {
+        Bundle bundle = new Bundle();
+        bundle.putInt("Count", 1);
+        return  bundle;
     }
 }
