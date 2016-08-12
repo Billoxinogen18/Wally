@@ -24,7 +24,7 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
     public TangoForCloudAdfs(TangoUpdater tangoUpdater,
                              TangoFactory tangoFactory,
                              WallyRenderer wallyRenderer,
-                             Map<Class, TangoBase> tangoStatePool,
+                             Map<Class, TangoState> tangoStatePool,
                              TangoPointCloudManager pointCloudManager,
                              AdfScheduler adfScheduler){
         super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
@@ -77,7 +77,7 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
 
     private void changeToLearningState(){
         Log.d(TAG, "changeToLearningState");
-        TangoBase nextTango = mTangoStatePool.get(TangoForLearning.class);
+        TangoState nextTango = mTangoStatePool.get(TangoForLearning.class);
         changeState(nextTango);
         nextTango.resume();
     }

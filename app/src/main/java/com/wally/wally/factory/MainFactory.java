@@ -28,7 +28,7 @@ import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.ux.WallyTangoUx;
-import com.wally.wally.tango.states.TangoBase;
+import com.wally.wally.tango.states.TangoState;
 import com.wally.wally.tango.states.TangoForCloudAdfs;
 import com.wally.wally.tango.states.TangoForLearnedAdf;
 import com.wally.wally.tango.states.TangoForLearning;
@@ -59,7 +59,7 @@ public class MainFactory {
     private final ScaleGestureDetector mScaleDetector;
     private TangoDriver mTangoDriver;
 
-    private Map<Class, TangoBase> tangoManagers;
+    private Map<Class, TangoState> tangoManagers;
     private WallyTangoUx mTangoUx;
 
     public MainFactory(Context context,
@@ -156,7 +156,7 @@ public class MainFactory {
     }
 
     public void setEventListener(EventListener eventListener) {
-        for (TangoBase tango : tangoManagers.values()) {
+        for (TangoState tango : tangoManagers.values()) {
             tango.addEventListener(eventListener);
         }
     }

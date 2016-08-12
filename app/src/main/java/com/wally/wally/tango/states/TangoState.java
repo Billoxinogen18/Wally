@@ -39,8 +39,8 @@ import java.util.Map;
  * 6. Connected: Try to identify area : localization lost
  * 7. Connected: area identified : localization lost
  */
-public class TangoBase implements TangoUpdater.TangoUpdaterListener{
-    private static final String TAG = TangoBase.class.getSimpleName();
+public class TangoState implements TangoUpdater.TangoUpdaterListener{
+    private static final String TAG = TangoState.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
     private static final TangoCoordinateFramePair FRAME_PAIR =
             new TangoCoordinateFramePair(
@@ -53,7 +53,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     protected TangoFactory mTangoFactory;
     protected List<EventListener> mEventListeners;
     protected boolean mIsLocalized;
-    protected Map<Class, TangoBase> mTangoStatePool;
+    protected Map<Class, TangoState> mTangoStatePool;
 
 
     private TangoPointCloudManager mPointCloudManager;
@@ -74,11 +74,11 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
 
 
-    public TangoBase(TangoUpdater tangoUpdater,
-                     TangoFactory tangoFactory,
-                     WallyRenderer wallyRenderer,
-                     Map<Class, TangoBase> tangoStatePool,
-                     TangoPointCloudManager pointCloudManager){
+    public TangoState(TangoUpdater tangoUpdater,
+                      TangoFactory tangoFactory,
+                      WallyRenderer wallyRenderer,
+                      Map<Class, TangoState> tangoStatePool,
+                      TangoPointCloudManager pointCloudManager){
         mRenderer = wallyRenderer;
         mTangoUpdater = tangoUpdater;
         mPointCloudManager = pointCloudManager;
@@ -206,7 +206,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     }
 
 
-    protected void changeState(TangoBase nextTango){
+    protected void changeState(TangoState nextTango){
         mStateChangeListener.onStateChange(nextTango);
         resetTangoUpdaterListener(nextTango);
     }
@@ -270,7 +270,7 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
 
                 // Prevent concurrent access to {@code mIsFrameAvailableTangoThread} from the Tango
                 // callback thread and service disconnection from an onPause event.
-                synchronized (TangoBase.this) {
+                synchronized (TangoState.this) {
                     // Don't execute any tango API actions if we're not connected to the service
                     if (!mIsConnected) {
                         return;
@@ -347,6 +347,10 @@ public class TangoBase implements TangoUpdater.TangoUpdaterListener{
     }
 
     public interface StateChangeListener{
-        void onStateChange(TangoBase nextTangoState);
+        void onStateChange(TangoState nextTangoState);
+    }
+
+    public interface Executor {
+        void execute(Runnable runnable);
     }
 }

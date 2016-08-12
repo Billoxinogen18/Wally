@@ -14,7 +14,7 @@ import java.util.Map;
  * Created by shota on 8/10/16.
  *
  */
-public abstract class TangoForAdf extends TangoBase {
+public abstract class TangoForAdf extends TangoState {
     private static final String TAG = TangoForAdf.class.getSimpleName();
 
     protected AdfInfo mAdfInfo;
@@ -24,7 +24,7 @@ public abstract class TangoForAdf extends TangoBase {
     public TangoForAdf(TangoUpdater tangoUpdater,
                        TangoFactory tangoFactory,
                        WallyRenderer wallyRenderer,
-                       Map<Class, TangoBase> tangoStatePool,
+                       Map<Class, TangoState> tangoStatePool,
                        TangoPointCloudManager pointCloudManager){
         super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
     }
@@ -55,7 +55,7 @@ public abstract class TangoForAdf extends TangoBase {
 
     protected void changeToReadyState(){
         Log.d(TAG, "changeToReadyState");
-        TangoBase nextTango = ((TangoForReadyState)mTangoStatePool.get(TangoForReadyState.class)).withTangoAndAdf(mTango, mAdfInfo);
+        TangoState nextTango = ((TangoForReadyState)mTangoStatePool.get(TangoForReadyState.class)).withTangoAndAdf(mTango, mAdfInfo);
         changeState(nextTango);
     }
 
@@ -72,7 +72,7 @@ public abstract class TangoForAdf extends TangoBase {
                     Log.d(TAG, "startLocalizationWatchDog failed");
                     pause();
                     Log.d(TAG, "changeToCloudAdfState");
-                    TangoBase nextTango = mTangoStatePool.get(TangoForCloudAdfs.class);
+                    TangoState nextTango = mTangoStatePool.get(TangoForCloudAdfs.class);
                     changeState(nextTango);
                 }
             }

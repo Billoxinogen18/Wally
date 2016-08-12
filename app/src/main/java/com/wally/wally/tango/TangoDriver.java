@@ -5,19 +5,19 @@ import android.util.Log;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.adf.AdfInfo;
-import com.wally.wally.tango.states.TangoBase;
+import com.wally.wally.tango.states.TangoState;
 
 
 /**
  * Created by shota on 8/9/16.
  *
  */
-public class TangoDriver implements TangoBase.StateChangeListener {
+public class TangoDriver implements TangoState.StateChangeListener {
     private static final String TAG = TangoDriver.class.getSimpleName();
 
-    private TangoBase tangoState;
+    private TangoState tangoState;
 
-    public TangoDriver(TangoBase startTangoState) {
+    public TangoDriver(TangoState startTangoState) {
         tangoState = startTangoState;
         tangoState.setStateChangeListener(this);
     }
@@ -31,7 +31,7 @@ public class TangoDriver implements TangoBase.StateChangeListener {
     }
 
     @Override
-    public synchronized void onStateChange(TangoBase nextTangoState) {
+    public synchronized void onStateChange(TangoState nextTangoState) {
         Log.d(TAG, "onStateChange from =" + tangoState + " -- To [" + nextTangoState + "]");
         tangoState = nextTangoState;
         tangoState.setStateChangeListener(this);

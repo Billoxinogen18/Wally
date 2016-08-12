@@ -16,7 +16,7 @@ import java.util.Map;
  * Created by shota on 8/9/16.
  * Manages Tango for Ready State
  */
-public class TangoForReadyState extends TangoBase {
+public class TangoForReadyState extends TangoState {
     private static final String TAG = TangoForReadyState.class.getSimpleName();
 
     private AdfInfo mAdfInfo;
@@ -24,7 +24,7 @@ public class TangoForReadyState extends TangoBase {
     public TangoForReadyState(TangoUpdater tangoUpdater,
                               TangoFactory tangoFactory,
                               WallyRenderer wallyRenderer,
-                              Map<Class, TangoBase> tangoStatePool,
+                              Map<Class, TangoState> tangoStatePool,
                               TangoPointCloudManager pointCloudManager){
         super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
     }
@@ -39,7 +39,7 @@ public class TangoForReadyState extends TangoBase {
     @Override
     public synchronized void pause() {
         Log.d(TAG, "changeToSavedAdfState Thread = " + Thread.currentThread());
-        TangoBase nextTango = ((TangoForSavedAdf)mTangoStatePool.get(TangoForSavedAdf.class)).withAdf(mAdfInfo);
+        TangoState nextTango = ((TangoForSavedAdf)mTangoStatePool.get(TangoForSavedAdf.class)).withAdf(mAdfInfo);
         changeState(nextTango);
     }
 

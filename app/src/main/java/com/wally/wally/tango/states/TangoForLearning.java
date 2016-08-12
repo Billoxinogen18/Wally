@@ -16,7 +16,7 @@ import java.util.Map;
  * Created by shota on 8/9/16.
  * Tango state for learning
  */
-public class TangoForLearning extends TangoBase {
+public class TangoForLearning extends TangoState {
     private static final String TAG = TangoForLearning.class.getSimpleName();
     private LearningEvaluator mLearningEvaluator;
 
@@ -25,7 +25,7 @@ public class TangoForLearning extends TangoBase {
                             TangoFactory tangoFactory,
                             WallyRenderer wallyRenderer,
                             LearningEvaluator evaluator,
-                            Map<Class, TangoBase> tangoStatePool,
+                            Map<Class, TangoState> tangoStatePool,
                             TangoPointCloudManager pointCloudManager) {
         super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
         mLearningEvaluator = evaluator;
@@ -89,7 +89,7 @@ public class TangoForLearning extends TangoBase {
         Log.d(TAG, "changeToLearnedAdfState with: adf = [" + info + "]");
         pause();
         Log.d(TAG, "changeToLearnedAdfState after pause");
-        TangoBase nextTango = ((TangoForLearnedAdf)mTangoStatePool.get(TangoForLearnedAdf.class)).withAdf(info);
+        TangoState nextTango = ((TangoForLearnedAdf)mTangoStatePool.get(TangoForLearnedAdf.class)).withAdf(info);
         changeState(nextTango);
         Log.d(TAG, "changeToLearnedAdfState after change");
         nextTango.resume();

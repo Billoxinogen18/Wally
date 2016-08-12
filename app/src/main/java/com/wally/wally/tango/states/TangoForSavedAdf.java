@@ -23,7 +23,7 @@ public class TangoForSavedAdf extends TangoForAdf {
     public TangoForSavedAdf(TangoUpdater tangoUpdater,
                             TangoFactory tangoFactory,
                             WallyRenderer wallyRenderer,
-                            Map<Class, TangoBase> tangoStatePool,
+                            Map<Class, TangoState> tangoStatePool,
                             TangoPointCloudManager pointCloudManager){
         super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
     }
