@@ -87,7 +87,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         TangoUxLayout tangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         RajawaliSurfaceView surfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-        mMainFactory = new MainFactory(context, mTipView, tangoUxLayout, surfaceView, this, this);
+        mMainFactory = new MainFactory(mTipView, tangoUxLayout, this, surfaceView);
         mTangoDriver = mMainFactory.getTangoDriver();
         mVisualContentManager = mMainFactory.getVisualContentManager();
         mTangoUx = mMainFactory.getTangoUx();

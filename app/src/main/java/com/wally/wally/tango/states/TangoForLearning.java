@@ -21,13 +21,14 @@ public class TangoForLearning extends TangoState {
     private LearningEvaluator mLearningEvaluator;
 
 
-    public TangoForLearning(TangoUpdater tangoUpdater,
+    public TangoForLearning(Executor executor,
+                            TangoUpdater tangoUpdater,
                             TangoFactory tangoFactory,
                             WallyRenderer wallyRenderer,
                             LearningEvaluator evaluator,
                             Map<Class, TangoState> tangoStatePool,
                             TangoPointCloudManager pointCloudManager) {
-        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
+        super(executor, tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
         mLearningEvaluator = evaluator;
     }
 

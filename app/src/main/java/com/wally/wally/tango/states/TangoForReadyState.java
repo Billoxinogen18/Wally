@@ -21,12 +21,13 @@ public class TangoForReadyState extends TangoState {
 
     private AdfInfo mAdfInfo;
 
-    public TangoForReadyState(TangoUpdater tangoUpdater,
+    public TangoForReadyState(Executor executor,
+                              TangoUpdater tangoUpdater,
                               TangoFactory tangoFactory,
                               WallyRenderer wallyRenderer,
                               Map<Class, TangoState> tangoStatePool,
                               TangoPointCloudManager pointCloudManager){
-        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
+        super(executor, tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
     }
 
     public TangoForReadyState withTangoAndAdf(Tango tango, AdfInfo adf) {

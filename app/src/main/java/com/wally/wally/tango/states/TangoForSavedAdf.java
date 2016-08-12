@@ -20,12 +20,13 @@ import java.util.Map;
 public class TangoForSavedAdf extends TangoForAdf {
     private static final String TAG = TangoForSavedAdf.class.getSimpleName();
 
-    public TangoForSavedAdf(TangoUpdater tangoUpdater,
+    public TangoForSavedAdf(Executor executor,
+                            TangoUpdater tangoUpdater,
                             TangoFactory tangoFactory,
                             WallyRenderer wallyRenderer,
                             Map<Class, TangoState> tangoStatePool,
                             TangoPointCloudManager pointCloudManager){
-        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
+        super(executor, tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
     }
 
     public TangoForAdf withAdf(AdfInfo adf){

@@ -21,13 +21,14 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
     private long mLocalizationTimeout = 20000;
     private AdfScheduler mAdfScheduler;
 
-    public TangoForCloudAdfs(TangoUpdater tangoUpdater,
+    public TangoForCloudAdfs(Executor executor,
+                             TangoUpdater tangoUpdater,
                              TangoFactory tangoFactory,
                              WallyRenderer wallyRenderer,
                              Map<Class, TangoState> tangoStatePool,
                              TangoPointCloudManager pointCloudManager,
                              AdfScheduler adfScheduler){
-        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
+        super(executor, tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
         mAdfScheduler = adfScheduler;
     }
 

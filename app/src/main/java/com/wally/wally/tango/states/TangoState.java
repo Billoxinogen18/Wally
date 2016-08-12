@@ -49,17 +49,16 @@ public class TangoState implements TangoUpdater.TangoUpdaterListener{
             );
 
     protected Tango mTango;
+    protected Executor mExecutor;
+    protected boolean mIsLocalized;
     protected TangoUpdater mTangoUpdater;
     protected TangoFactory mTangoFactory;
     protected List<EventListener> mEventListeners;
-    protected boolean mIsLocalized;
     protected Map<Class, TangoState> mTangoStatePool;
-
 
     private TangoPointCloudManager mPointCloudManager;
     private WallyRenderer mRenderer;
     private StateChangeListener mStateChangeListener;
-
 
     private boolean mIsConnected;
     private TangoCameraIntrinsics mIntrinsics;
@@ -74,7 +73,8 @@ public class TangoState implements TangoUpdater.TangoUpdaterListener{
     private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
 
 
-    public TangoState(TangoUpdater tangoUpdater,
+    public TangoState(Executor executor,
+                      TangoUpdater tangoUpdater,
                       TangoFactory tangoFactory,
                       WallyRenderer wallyRenderer,
                       Map<Class, TangoState> tangoStatePool,
@@ -84,7 +84,7 @@ public class TangoState implements TangoUpdater.TangoUpdaterListener{
         mPointCloudManager = pointCloudManager;
         mTangoFactory = tangoFactory;
         mTangoStatePool = tangoStatePool;
-
+        mExecutor = executor;
         mEventListeners = new ArrayList<>();
     }
 
@@ -108,7 +108,7 @@ public class TangoState implements TangoUpdater.TangoUpdaterListener{
         // Tango.disconnect will block here until all Tango callback calls are finished.
         // If you lock against this object in a Tango callback thread it will cause a deadlock.
         if (mIsConnected) {
-            Log.d(TAG, "disconnect - mIsConnected = " + mIsConnected);
+            Log.d(TAG, "disconnect - mIsConnected = true");
             mRenderer.getCurrentScene().clearFrameCallbacks();
             mTango.disconnectCamera(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
             Log.d(TAG, "disconnect - remove renderer" );
@@ -118,7 +118,7 @@ public class TangoState implements TangoUpdater.TangoUpdaterListener{
             mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
 
             mIsConnected = false;
-            Log.d(TAG, "disconnect - mIsConnected = " + mIsConnected);
+            Log.d(TAG, "disconnect - mIsConnected = false");
 
         }
         if (mTango != null) {

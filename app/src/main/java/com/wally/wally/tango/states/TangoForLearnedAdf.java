@@ -18,13 +18,14 @@ public class TangoForLearnedAdf extends TangoForAdf {
     private static final String TAG = TangoForLearnedAdf.class.getSimpleName();
 
 
-    public TangoForLearnedAdf(TangoUpdater tangoUpdater,
+    public TangoForLearnedAdf(Executor executor,
+                              TangoUpdater tangoUpdater,
                               TangoFactory tangoFactory,
                               WallyRenderer wallyRenderer,
                               Map<Class, TangoState> tangoStatePool,
                               TangoPointCloudManager pointCloudManager) {
 
-        super(tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
+        super(executor, tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
     }
 
     @Override

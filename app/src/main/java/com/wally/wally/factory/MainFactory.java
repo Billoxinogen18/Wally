@@ -1,5 +1,6 @@
 package com.wally.wally.factory;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.view.MotionEvent;
@@ -13,11 +14,11 @@ import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
+import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.controllers.main.TipManager;
 import com.wally.wally.controllers.main.TipView;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
-import com.wally.wally.renderer.OnVisualContentSelectedListener;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.ContentFitter;
@@ -61,25 +62,25 @@ public class MainFactory {
 
     private Map<Class, TangoState> tangoManagers;
     private WallyTangoUx mTangoUx;
+    private TangoState.Executor mExecutor;
 
-    public MainFactory(Context context,
-                       TipView tipView,
+    public MainFactory(TipView tipView,
                        TangoUxLayout tangoUxLayout,
-                       RajawaliSurfaceView surfaceView,
-                       TangoUpdater.TangoUpdaterListener tangoUpdaterListener,
-                       OnVisualContentSelectedListener onContentSelectedListener) {
+                       CameraARTangoActivity activity,
+                       RajawaliSurfaceView surfaceView) {
         set();
-
+        mExecutor = createExecutor(activity);
+        Context context = activity.getBaseContext();
         mTangoUx = new WallyTangoUx(context);
         mTangoUx.setLayout(tangoUxLayout);
 
         mTangoUpdater = new TangoUpdater(mTangoUx, surfaceView, mPointCloudManager);
-        mTangoUpdater.addTangoUpdaterListener(tangoUpdaterListener);
+        mTangoUpdater.addTangoUpdaterListener(activity);
 
         mScaleDetector = new ScaleGestureDetector(context,
                 new ActiveContentScaleGestureDetector(mVisualContentManager));
 
-        mRenderer = new WallyRenderer(context, mVisualContentManager, onContentSelectedListener);
+        mRenderer = new WallyRenderer(context, mVisualContentManager, activity);
         surfaceView.setSurfaceRenderer(mRenderer);
         surfaceView.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -97,6 +98,15 @@ public class MainFactory {
         mTipManager = new TipManager(tipView, tipService);
 
         createTangoManagers();
+    }
+
+    private TangoState.Executor createExecutor(final Activity activity) {
+        return new TangoState.Executor() {
+            @Override
+            public void execute(Runnable runnable) {
+                activity.runOnUiThread(runnable);
+            }
+        };
     }
 
 
@@ -119,25 +129,25 @@ public class MainFactory {
     private void createTangoManagers() {
         long localizationTimeout = mConfig.getInt(TangoManagerConstants.LOCALIZATION_TIMEOUT);
         TangoForLearnedAdf tangoForLearnedAdf =
-                new TangoForLearnedAdf(mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager);
+                new TangoForLearnedAdf(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager);
         tangoForLearnedAdf.withLocalizationTimeout(localizationTimeout);
         tangoManagers.put(TangoForLearnedAdf.class, tangoForLearnedAdf);
 
         TangoForLearning tangoForLearning =
-                new TangoForLearning(mTangoUpdater, mTangoFactory, mRenderer, mLearningEvaluator, tangoManagers, mPointCloudManager);
+                new TangoForLearning(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mLearningEvaluator, tangoManagers, mPointCloudManager);
         tangoManagers.put(TangoForLearning.class, tangoForLearning);
 
         TangoForReadyState tangoForReadyState =
-                new TangoForReadyState(mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager);
+                new TangoForReadyState(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager);
         tangoManagers.put(TangoForReadyState.class, tangoForReadyState);
 
         TangoForCloudAdfs tangoForCloudAdfs =
-                new TangoForCloudAdfs(mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager, mAdfScheduler);
+                new TangoForCloudAdfs(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager, mAdfScheduler);
         tangoForCloudAdfs.withLocalizationTimeout(localizationTimeout);
         tangoManagers.put(TangoForCloudAdfs.class, tangoForCloudAdfs);
 
         TangoForSavedAdf tangoForSavedAdf =
-                new TangoForSavedAdf(mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager);
+                new TangoForSavedAdf(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager);
         tangoForSavedAdf.withLocalizationTimeout(localizationTimeout);
         tangoManagers.put(TangoForSavedAdf.class, tangoForSavedAdf);
 
