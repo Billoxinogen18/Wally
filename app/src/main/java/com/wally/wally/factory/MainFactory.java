@@ -1,6 +1,7 @@
 package com.wally.wally.factory;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -92,7 +93,7 @@ public class MainFactory {
 
         mTangoFactory = new TangoFactory(context);
 
-        TipService tipService = new LocalTipService(Utils.getAssetContentAsString(context, "tips.json"));
+        TipService tipService = new LocalTipService(Utils.getAssetContentAsString(context, "tips.json"), context.getSharedPreferences("tips", Context.MODE_PRIVATE));
         mTipManager = new TipManager(tipView, tipService);
 
         createTangoManagers();
