@@ -29,13 +29,12 @@ public class TangoForLearnedAdf extends TangoForAdf {
     }
 
     @Override
-    public synchronized void pause() {
+    protected void pauseHook() {
         Log.d(TAG, "pause Thread = " + Thread.currentThread());
-        super.pause();
     }
 
     @Override
-    public synchronized void resume() {
+    protected void resumeHook() {
         Log.d(TAG, "Localize With Learned adf = [" + mAdfInfo + "]. Thread = " + Thread.currentThread());
         mTango = mTangoFactory.getTangoWithUuid(getTangoInitializer(), mAdfInfo.getUuid());
         Log.d(TAG, "resume() mTango = " + mTango);

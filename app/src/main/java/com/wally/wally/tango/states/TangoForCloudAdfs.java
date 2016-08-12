@@ -38,13 +38,12 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
     }
 
     @Override
-    public synchronized void pause() {
+    protected void pauseHook() {
         Log.d(TAG, "pause Thread = " + Thread.currentThread());
-        super.pause();
     }
 
     @Override
-    public void resume() {
+    protected void resumeHook() {
         Log.d(TAG, "resume Thread = " + Thread.currentThread());
         mAdfScheduler = mAdfScheduler
                 .withTimeout(mLocalizationTimeout)

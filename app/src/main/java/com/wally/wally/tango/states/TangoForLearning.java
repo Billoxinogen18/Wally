@@ -33,13 +33,12 @@ public class TangoForLearning extends TangoState {
     }
 
     @Override
-    public synchronized void pause() {
+    protected void pauseHook() {
         Log.d(TAG, "pause Thread = " + Thread.currentThread());
-        super.pause();
     }
 
     @Override
-    public synchronized void resume(){
+    protected void resumeHook() {
         Log.d(TAG, "startLearning Thread = " + Thread.currentThread());
         mLearningEvaluator.addLearningEvaluatorListener(getLearningEvaluatorListener());
         mTangoUpdater.addValidPoseListener(mLearningEvaluator);
@@ -68,13 +67,8 @@ public class TangoForLearning extends TangoState {
             @Override
             public void onLearningFailed() {
                 mTangoUpdater.removeValidPoseListener(mLearningEvaluator);
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        pause();
-                        resume();
-                    }
-                }).start();
+                pause();
+                resume();
             }
         };
     }

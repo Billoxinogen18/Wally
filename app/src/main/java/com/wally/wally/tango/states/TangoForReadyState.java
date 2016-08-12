@@ -32,20 +32,20 @@ public class TangoForReadyState extends TangoState {
 
     public TangoForReadyState withTangoAndAdf(Tango tango, AdfInfo adf) {
         Log.d(TAG, "withTangoAndAdf() called with: " + "tango = [" + tango + "], adf = [" + adf + "]");
-        super.mTango = tango;
+        mTango = tango;
         this.mAdfInfo = adf;
         return this;
     }
 
     @Override
-    public synchronized void pause() {
+    protected void pauseHook() {
         Log.d(TAG, "changeToSavedAdfState Thread = " + Thread.currentThread());
         TangoState nextTango = ((TangoForSavedAdf)mTangoStatePool.get(TangoForSavedAdf.class)).withAdf(mAdfInfo);
         changeState(nextTango);
     }
 
     @Override
-    public void resume() {
+    protected void resumeHook() {
         Log.d(TAG, "resume Thread = " + Thread.currentThread());
         fireOnTangoReady();
     }

@@ -39,7 +39,7 @@ import java.util.Map;
  * 6. Connected: Try to identify area : localization lost
  * 7. Connected: area identified : localization lost
  */
-public class TangoState implements TangoUpdater.TangoUpdaterListener{
+public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
     private static final String TAG = TangoState.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
     private static final TangoCoordinateFramePair FRAME_PAIR =
@@ -89,15 +89,25 @@ public class TangoState implements TangoUpdater.TangoUpdaterListener{
     }
 
 
-    public synchronized void pause(){
+    public final synchronized void pause(){
         Log.d(TAG, "pause. Thread = " + Thread.currentThread());
-        disconnect();
+        mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                disconnect();
+                pauseHook();
+            }
+        });
     }
 
-    public synchronized void resume(){
+    protected abstract void pauseHook();
+
+    public final synchronized void resume(){
         Log.d(TAG, "resume Thread = " + Thread.currentThread());
-
+        resumeHook();
     }
+
+    protected abstract void resumeHook();
 
     public void disconnect(){
         Log.d(TAG, "Disconnect Tango");
