@@ -10,4 +10,5 @@ public interface TipService {
 
     Tip getRandom();
     Tip getRandom(String tag);
+    void disableTip(String id);
 }

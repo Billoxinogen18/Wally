@@ -1,5 +1,6 @@
 package com.wally.wally.tip;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -8,22 +9,28 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public class LocalTipService implements TipService {
     public static final String TAG = LocalTipService.class.getSimpleName();
-    JSONObject tips;
+    private SharedPreferences preferences;
+    private Set<String> disabled;
+    private JSONObject tips;
     private Map<String, List<String>> tipKeysForTags;
 
-    public LocalTipService(String json) {
+    public LocalTipService(String json, SharedPreferences preferences) {
+        this.preferences = preferences;
         try {
             JSONObject obj = new JSONObject(json);
-            JSONObject tags  = obj.getJSONObject("tags");
+            JSONObject tags = obj.getJSONObject("tags");
             tips = obj.getJSONObject("tips");
             tipKeysForTags = new HashMap<>();
+            setUpDisabled();
             setUpTags(tags);
             Log.d(TAG, tipKeysForTags.toString());
             Log.d(TAG, getRandom().toString());
@@ -40,18 +47,38 @@ public class LocalTipService implements TipService {
         }
     }
 
+    private void setUpDisabled(){
+        disabled = new HashSet<>(preferences.getStringSet("disabled_tips", new HashSet<String>()));
+    }
+
     private List<String> getTipKeys(JSONArray keyArray) throws JSONException {
         List<String> keys = new ArrayList<>();
         for (int i = 0; i < keyArray.length(); i++) {
-            keys.add((String) keyArray.get(i));
+            String key = keyArray.getString(i);
+            if(!disabled.contains(key))
+                keys.add(key);
         }
         return keys;
     }
 
     @Override
     public Tip getRandom(String tag) {
-        if (!tipKeysForTags.containsKey(tag)) { return null; }
+        if (!tipKeysForTags.containsKey(tag)) {
+            return null;
+        }
         return getTip(getRandom(tipKeysForTags.get(tag)));
+    }
+
+    @Override
+    public void disableTip(String id) {
+        disabled.add(id);
+
+        for(String key : tipKeysForTags.keySet()){
+            tipKeysForTags.get(key).remove(id);
+        }
+
+        preferences.edit().putStringSet("disabled_tips", disabled).apply();
+
     }
 
     private Tip getTip(String tipKey) {
@@ -74,7 +101,9 @@ public class LocalTipService implements TipService {
     }
 
     private <T> T getRandom(List<T> list) {
-        if (list.size() < 1) { return null; }
+        if (list.size() < 1) {
+            return null;
+        }
         int index = new Random().nextInt(list.size());
         return list.get(index);
     }

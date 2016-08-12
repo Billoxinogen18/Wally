@@ -14,9 +14,16 @@ public class TipManager implements EventListener, ContentFitter.OnContentFitList
     private TipView mTipView;
     private TipService mTipService;
 
-    public TipManager(TipView tipView, TipService tipService){
+    public TipManager(TipView tipView, TipService tipService) {
         mTipView = tipView;
         mTipService = tipService;
+
+        mTipView.setDismissListener(new TipView.DismissListener() {
+            @Override
+            public void onDismiss(String id) {
+                mTipService.disableTip(id);
+            }
+        });
     }
 
     @Override
@@ -35,13 +42,8 @@ public class TipManager implements EventListener, ContentFitter.OnContentFitList
     }
 
     @Override
-    public void onContentFit(TangoPoseData pose) {
-        //Not needed
-    }
-
-    @Override
     public void onFitStatusChange(boolean fittingStarted) {
-        if(fittingStarted){
+        if (fittingStarted) {
             showTip(TipService.Tag.FITTING);
         }
     }
@@ -51,8 +53,7 @@ public class TipManager implements EventListener, ContentFitter.OnContentFitList
 
     }
 
-
-    private void showTip(String type){
+    private void showTip(String type) {
         Tip tip = mTipService.getRandom(type);
         mTipView.show(tip.getMessage(), "", 0);
     }
@@ -80,5 +81,11 @@ public class TipManager implements EventListener, ContentFitter.OnContentFitList
     @Override
     public void onLocalizationFinishAfterSavedAdf() {
 
+    }
+
+    ///////////////////////////////////// not needed methods ///////////////////////////////////////
+    @Override
+    public void onContentFit(TangoPoseData pose) {
+        //Not needed
     }
 }
