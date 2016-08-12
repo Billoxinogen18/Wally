@@ -141,13 +141,18 @@ public class TipView extends LinearLayout implements View.OnTouchListener {
     }
 
     private void reset() {
-        id = null;
-        messageTV.setText("");
-        neverShowAgain.setChecked(false);
-        toolbar.setVisibility(INVISIBLE);
-        setVisibility(GONE);
-        setScaleX(1);
-        setScaleY(1);
+        mainThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                id = null;
+                messageTV.setText("");
+                neverShowAgain.setChecked(false);
+                toolbar.setVisibility(INVISIBLE);
+                setVisibility(GONE);
+                setScaleX(1);
+                setScaleY(1);
+            }
+        });
     }
 
 
