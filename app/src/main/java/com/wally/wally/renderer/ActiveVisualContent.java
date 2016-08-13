@@ -9,8 +9,8 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
 
 import org.rajawali3d.animation.Animation3D;
-import org.rajawali3d.animation.SlerpAnimation3D;
 import org.rajawali3d.animation.TranslateAnimation3D;
+import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.scene.RajawaliScene;
 
 /**
@@ -20,7 +20,6 @@ public class ActiveVisualContent extends VisualContent {
     private static final String TAG = ActiveVisualContent.class.getSimpleName();
     private static final int MOVE_ANUMATION_DURATION = 400;
     private Animation3D mMoveAnim = null;
-    private SlerpAnimation3D mRotationAnim = null;
     private Pose mNewPose;
 
     public ActiveVisualContent(Content content) {
@@ -42,18 +41,22 @@ public class ActiveVisualContent extends VisualContent {
 
         moveAnimation(mMoveAnim, scene);
 
-        // TODO make rotate animation too
-
-        mVisual.setOrientation(mNewPose.getOrientation());
+        Quaternion currRot = mVisual.getOrientation();
+        Quaternion finalRot = mNewPose.getOrientation();
         mContent.getTangoData().updatePose(mNewPose);
-        mNewPose = null;
+        if (!currRot.equals(finalRot, 0.1f)) {
+            Quaternion rot = Quaternion.slerpAndCreate(currRot, finalRot, 0.1);
+            mVisual.setOrientation(rot);
+        } else {
+            mNewPose = null;
+        }
     }
 
-    private void moveAnimation(Animation3D anim, RajawaliScene scene){
+    // TODO change move animation
+    private void moveAnimation(Animation3D anim, RajawaliScene scene) {
         if (anim != null) {
             anim.pause();
             scene.unregisterAnimation(anim);
-            anim = null;
         }
         anim = new TranslateAnimation3D(mNewPose.getPosition());
         anim.setTransformable3D(mVisual);
@@ -84,7 +87,7 @@ public class ActiveVisualContent extends VisualContent {
     }
 
     @Override
-    public ActiveVisualContent cloneContent(){
+    public ActiveVisualContent cloneContent() {
         ActiveVisualContent res = new ActiveVisualContent(mContent);
         res.setStatus(getStatus());
         res.setNewPose(mNewPose);
