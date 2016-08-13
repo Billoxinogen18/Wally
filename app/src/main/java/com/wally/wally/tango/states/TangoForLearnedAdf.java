@@ -37,7 +37,7 @@ public class TangoForLearnedAdf extends TangoForAdf {
     protected void resumeHook() {
         Log.d(TAG, "Localize With Learned adf = [" + mAdfInfo + "]. Thread = " + Thread.currentThread());
         mTango = mTangoFactory.getTangoWithUuid(getTangoInitializer(), mAdfInfo.getUuid());
-        Log.d(TAG, "resume() mTango = " + mTango);
+        Log.d(TAG, "resume() mTango = " + mTango + " isTangoConnected " + isConnected());
         startLocalizationWatchDog();
         fireLocalizationStartAfterLearning();
     }

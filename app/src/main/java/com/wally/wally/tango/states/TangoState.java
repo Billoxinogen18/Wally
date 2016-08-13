@@ -6,6 +6,7 @@ import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoException;
+import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
@@ -137,15 +138,14 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
             mIsConnected = false;
             Log.d(TAG, "disconnect - mIsConnected = false");
-        }
-        if (mTango != null) {
-            mTango.disconnect();
-        }
-        Log.d(TAG, "disconnect - disconnected");
 
+            if (mTango != null) {
+                mTango.disconnect();
+                Log.d(TAG, "disconnect - disconnected");
+            }
+        }
         mTangoUpdater.setTangoLocalization(false);
         Log.d(TAG, "disconnect - localization false");
-
     }
 
     /**
@@ -222,7 +222,10 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
             @Override
             public void onError(Exception e) {
-                fireTangoOutOfDate();
+                Log.e(TAG, "onError: " + e);
+                if (e instanceof TangoOutOfDateException) {
+                    fireTangoOutOfDate();
+                }
             }
         };
     }

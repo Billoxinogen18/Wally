@@ -4,9 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.atap.tangoservice.Tango;
-import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoConfig;
-import com.google.atap.tangoservice.TangoOutOfDateException;
+import com.google.atap.tangoservice.TangoErrorException;
 import com.projecttango.tangosupport.TangoSupport;
 
 
@@ -17,6 +16,7 @@ public class TangoFactory {
     public static final String TAG = TangoFactory.class.getSimpleName();
 
     private Context mContext;
+    private Tango mTango;
 
     public TangoFactory(Context context) {
         mContext = context;
@@ -26,8 +26,6 @@ public class TangoFactory {
         return new Tango(mContext, r);
     }
 
-    private Tango mTango;
-
     public Tango getTangoForLearning(final RunnableWithError r) {
         mTango = new Tango(mContext, new Runnable() {
             @Override
@@ -36,7 +34,8 @@ public class TangoFactory {
                     TangoSupport.initialize();
                     connectTangoForLearning(mTango);
                     r.run();
-                } catch (TangoOutOfDateException e) {
+                } catch (TangoErrorException e) {
+                    Log.e(TAG, "Cannot create tango! : " + e);
                     r.onError(e);
                 }
             }
@@ -53,7 +52,8 @@ public class TangoFactory {
                     TangoSupport.initialize();
                     connectTango(mTango);
                     r.run();
-                } catch (TangoOutOfDateException e) {
+                } catch (TangoErrorException e) {
+                    Log.e(TAG, "Cannot create tango! : " + e);
                     r.onError(e);
                 }
             }
@@ -70,7 +70,8 @@ public class TangoFactory {
                     TangoSupport.initialize();
                     connectTangoWithUuid(mTango, uuid);
                     r.run();
-                } catch (TangoOutOfDateException e) {
+                } catch (TangoErrorException e) {
+                    Log.e(TAG, "Cannot create tango! : " + e);
                     r.onError(e);
                 }
             }
@@ -87,7 +88,7 @@ public class TangoFactory {
 
     private void connectTango(Tango mTango) {
         TangoConfig config = getBasicConfig(mTango);
-       // config.putBoolean(TangoConfig.KEY_BOOLEAN_DRIFT_CORRECTION, true);
+        // config.putBoolean(TangoConfig.KEY_BOOLEAN_DRIFT_CORRECTION, true);
         mTango.connect(config);
     }
 
