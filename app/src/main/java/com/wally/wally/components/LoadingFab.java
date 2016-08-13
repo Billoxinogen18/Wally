@@ -73,6 +73,7 @@ public class LoadingFab extends FrameLayout implements Runnable {
 
     public void setProgress(int progress) {
         mProgressBar.setProgress(progress);
+        setVisibility(VISIBLE);
     }
 
     @Override
