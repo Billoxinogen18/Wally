@@ -154,11 +154,11 @@ public class MainFactory {
         setEventListener(mTipManager);
         setEventListener(mTangoUx);
 
-//        mTangoUpdater.addTangoUpdaterListener(tangoForCloudAdfs);
-//        mTangoDriver = new TangoDriver(tangoForCloudAdfs);
+        mTangoUpdater.addTangoUpdaterListener(tangoForCloudAdfs);
+        mTangoDriver = new TangoDriver(tangoForCloudAdfs);
 
-        mTangoUpdater.addTangoUpdaterListener(tangoForLearning);
-        mTangoDriver = new TangoDriver(tangoForLearning);
+//        mTangoUpdater.addTangoUpdaterListener(tangoForLearning);
+//        mTangoDriver = new TangoDriver(tangoForLearning);
     }
 
     public TangoDriver getTangoDriver() {

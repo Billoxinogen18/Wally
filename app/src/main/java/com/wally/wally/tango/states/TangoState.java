@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
+import com.google.atap.tangoservice.TangoErrorException;
 import com.google.atap.tangoservice.TangoException;
 import com.google.atap.tangoservice.TangoOutOfDateException;
 import com.google.atap.tangoservice.TangoPoseData;
@@ -28,6 +29,7 @@ import org.rajawali3d.scene.ASceneFrameCallback;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by shota on 8/9/16.
@@ -69,7 +71,8 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
     // NOTE: suffix indicates which thread is in charge of updating
     private double mRgbTimestampGlThread;
-    private boolean mIsFrameAvailableTangoThread;
+    //private boolean mIsFrameAvailableTangoThread;
+    private AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
     private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
 
 
@@ -171,7 +174,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
     @Override
     public synchronized void onFrameAvailable() {
-        mIsFrameAvailableTangoThread = true;
+        mIsFrameAvailableTangoThread.set(true);
     }
 
     @Override
@@ -297,52 +300,52 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
                 // Prevent concurrent access to {@code mIsFrameAvailableTangoThread} from the Tango
                 // callback thread and service disconnection from an onPause event.
-                synchronized (TangoState.this) {
-                    // Don't execute any tango API actions if we're not connected to the service
-                    if (!mIsConnected) {
-                        return;
-                    }
+                try {
+                    synchronized (TangoState.this) {
+                        // Don't execute any tango API actions if we're not connected to the service
+                        if (!mIsConnected) {
+                            return;
+                        }
 
-                    // Set-up scene camera projection to match RGB camera intrinsics
-                    if (!mRenderer.isSceneCameraConfigured()) {
-                        mRenderer.setProjectionMatrix(mIntrinsics);
-                    }
+                        // Set-up scene camera projection to match RGB camera intrinsics
+                        if (!mRenderer.isSceneCameraConfigured()) {
+                            mRenderer.setProjectionMatrix(mIntrinsics);
+                        }
 
-                    // Connect the camera texture to the OpenGL Texture if necessary
-                    // NOTE: When the OpenGL context is recycled, Rajawali may re-generate the
-                    // texture with a different ID.
-                    if (mConnectedTextureIdGlThread != mRenderer.getTextureId()) {
-                        mTango.connectTextureId(TangoCameraIntrinsics.TANGO_CAMERA_COLOR,
-                                mRenderer.getTextureId());
-                        mConnectedTextureIdGlThread = mRenderer.getTextureId();
-                        Log.d(TAG, "connected to texture id: " + mRenderer.getTextureId());
-                    }
+                        // Connect the camera texture to the OpenGL Texture if necessary
+                        // NOTE: When the OpenGL context is recycled, Rajawali may re-generate the
+                        // texture with a different ID.
+                        if (mConnectedTextureIdGlThread != mRenderer.getTextureId()) {
+                            mTango.connectTextureId(TangoCameraIntrinsics.TANGO_CAMERA_COLOR,
+                                    mRenderer.getTextureId());
+                            mConnectedTextureIdGlThread = mRenderer.getTextureId();
+                            Log.d(TAG, "connected to texture id: " + mRenderer.getTextureId());
+                        }
 
-                    // If there is a new RGB camera frame available, update the texture with it
-                    if (mIsFrameAvailableTangoThread) {
-                        try {
+                        // If there is a new RGB camera frame available, update the texture with it
+                        if (mIsFrameAvailableTangoThread.compareAndSet(true, false)) {
                             mRgbTimestampGlThread =
                                     mTango.updateTexture(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-                        }catch (TangoException e){
-                            e.printStackTrace();
-                        }
-                        mIsFrameAvailableTangoThread = false;
-                    }
 
-                    // If a new RGB frame has been rendered, update the camera pose to match.
-                    if (mRgbTimestampGlThread > mCameraPoseTimestamp) {
-                        // Calculate the device pose at the camera frame update time.
-                        try {
+                        }
+
+                        // If a new RGB frame has been rendered, update the camera pose to match.
+                        if (mRgbTimestampGlThread > mCameraPoseTimestamp) {
+                            // Calculate the device pose at the camera frame update time.
                             TangoPoseData lastFramePose = mTango.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR);
                             if (lastFramePose.statusCode == TangoPoseData.POSE_VALID) {
                                 // Update the camera pose from the renderer
                                 mRenderer.updateRenderCameraPose(lastFramePose, mExtrinsics);
                                 mCameraPoseTimestamp = lastFramePose.timestamp;
                             }
-                        } catch (TangoException e) {
-                            e.printStackTrace();
+
                         }
                     }
+                    // Avoid crashing the application due to unhandled exceptions
+                } catch (TangoErrorException e) {
+                    Log.e(TAG, "Tango API call error within the OpenGL render thread", e);
+                } catch (Throwable t) {
+                    Log.e(TAG, "Exception on the OpenGL thread", t);
                 }
             }
 
