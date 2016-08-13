@@ -39,7 +39,7 @@ import java.util.Map;
  * 6. Connected: Try to identify area : localization lost
  * 7. Connected: area identified : localization lost
  */
-public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
+public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     private static final String TAG = TangoState.class.getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
     private static final TangoCoordinateFramePair FRAME_PAIR =
@@ -66,7 +66,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
     private double mCameraPoseTimestamp = 0;
 
 
-
     // NOTE: suffix indicates which thread is in charge of updating
     private double mRgbTimestampGlThread;
     private boolean mIsFrameAvailableTangoThread;
@@ -78,7 +77,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
                       TangoFactory tangoFactory,
                       WallyRenderer wallyRenderer,
                       Map<Class, TangoState> tangoStatePool,
-                      TangoPointCloudManager pointCloudManager){
+                      TangoPointCloudManager pointCloudManager) {
         mRenderer = wallyRenderer;
         mTangoUpdater = tangoUpdater;
         mPointCloudManager = pointCloudManager;
@@ -89,7 +88,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
     }
 
 
-    public final synchronized void pause(){
+    public final synchronized void pause() {
         Log.d(TAG, "pause. Thread = " + Thread.currentThread());
         mExecutor.execute(new Runnable() {
             @Override
@@ -102,14 +101,19 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
 
     protected abstract void pauseHook();
 
-    public final synchronized void resume(){
+    public final synchronized void resume() {
         Log.d(TAG, "resume Thread = " + Thread.currentThread());
-        resumeHook();
+        mExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                resumeHook();
+            }
+        });
     }
 
     protected abstract void resumeHook();
 
-    public void disconnect(){
+    public void disconnect() {
         Log.d(TAG, "Disconnect Tango");
         // Synchronize against disconnecting while the service is being used
         // in OpenGL thread or in UI thread.
@@ -121,7 +125,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
             Log.d(TAG, "disconnect - mIsConnected = true");
             mRenderer.getCurrentScene().clearFrameCallbacks();
             mTango.disconnectCamera(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-            Log.d(TAG, "disconnect - remove renderer" );
+            Log.d(TAG, "disconnect - remove renderer");
 
             // We need to invalidate the connected texture ID,
             // this will cause re-connection in the OpenGL thread after resume
@@ -171,15 +175,15 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
         mIsLocalized = localization;
     }
 
-    public void addEventListener(EventListener listener){
+    public void addEventListener(EventListener listener) {
         mEventListeners.add(listener);
     }
 
-    public boolean removeEventListener(EventListener listener){
+    public boolean removeEventListener(EventListener listener) {
         return mEventListeners.remove(listener);
     }
 
-    public void setStateChangeListener(StateChangeListener listener){
+    public void setStateChangeListener(StateChangeListener listener) {
         mStateChangeListener = listener;
     }
 
@@ -199,13 +203,18 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
         return new TangoFactory.RunnableWithError() {
             @Override
             public void run() {
-                // Connect TangoUpdater and tango
-                mTango.connectListener(mTangoUpdater.getFramePairs(), mTangoUpdater);
-                // Get extrinsics (needs to be done after connecting Tango and listeners)
-                mExtrinsics = TangoUtils.getDeviceExtrinsics(mTango);
-                mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-                connectRenderer();
-                mIsConnected = true;
+                mExecutor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Connect TangoUpdater and tango
+                        mTango.connectListener(mTangoUpdater.getFramePairs(), mTangoUpdater);
+                        // Get extrinsics (needs to be done after connecting Tango and listeners)
+                        mExtrinsics = TangoUtils.getDeviceExtrinsics(mTango);
+                        mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
+                        connectRenderer();
+                        mIsConnected = true;
+                    }
+                });
             }
 
             @Override
@@ -216,12 +225,12 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
     }
 
 
-    protected void changeState(TangoState nextTango){
+    protected void changeState(TangoState nextTango) {
         mStateChangeListener.onStateChange(nextTango);
         resetTangoUpdaterListener(nextTango);
     }
 
-    private void resetTangoUpdaterListener(TangoUpdater.TangoUpdaterListener toAdd){
+    private void resetTangoUpdaterListener(TangoUpdater.TangoUpdaterListener toAdd) {
         mTangoUpdater.removeTangoUpdaterListener(this);
         mTangoUpdater.addTangoUpdaterListener(toAdd);
     }
@@ -342,8 +351,8 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
         });
     }
 
-    private void fireTangoOutOfDate(){
-        for (EventListener listener: mEventListeners){
+    private void fireTangoOutOfDate() {
+        for (EventListener listener : mEventListeners) {
             listener.onTangoOutOfDate();
         }
     }
@@ -356,7 +365,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener{
         throw new UnsupportedOperationException("State does not provide Adf");
     }
 
-    public interface StateChangeListener{
+    public interface StateChangeListener {
         void onStateChange(TangoState nextTangoState);
     }
 
