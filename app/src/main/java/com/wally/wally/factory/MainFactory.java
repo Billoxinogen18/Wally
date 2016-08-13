@@ -24,6 +24,7 @@ import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.EventListener;
 import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.ProgressAggregator;
+import com.wally.wally.tango.ProgressListener;
 import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
@@ -66,11 +67,12 @@ public class MainFactory {
     public MainFactory(TipView tipView,
                        TangoUxLayout tangoUxLayout,
                        CameraARTangoActivity activity,
-                       RajawaliSurfaceView surfaceView) {
+                       RajawaliSurfaceView surfaceView,
+                       ProgressListener progressListener) {
         set();
         mExecutor = createExecutor(activity);
         Context context = activity.getBaseContext();
-        mTangoUx = new WallyTangoUx(context);
+        mTangoUx = new WallyTangoUx(context, mConfig);
         mTangoUx.setLayout(tangoUxLayout);
 
         mTangoUpdater = new TangoUpdater(mTangoUx, surfaceView, mPointCloudManager);
@@ -90,6 +92,10 @@ public class MainFactory {
             }
         });
 
+        ProgressAggregator progressAggregator = new ProgressAggregator();
+        progressAggregator.addProgressReporter(mAdfScheduler, 0.3f);
+        progressAggregator.addProgressReporter(mLearningEvaluator, 0.7f);
+        progressAggregator.addProgressListener(progressListener);
 
         mTangoFactory = new TangoFactory(context);
 
@@ -119,10 +125,6 @@ public class MainFactory {
 
         mVisualContentManager = new VisualContentManager();
         mAdfScheduler = new AdfScheduler(App.getInstance().getAdfManager());
-
-        ProgressAggregator progressAggregator = new ProgressAggregator();
-        progressAggregator.addProgressReporter(mAdfScheduler, 0.3f);
-        progressAggregator.addProgressReporter(mLearningEvaluator, 0.7f);
     }
 
     private void createTangoManagers() {
