@@ -12,7 +12,9 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private TangoUx mTangoUx;
@@ -21,14 +23,20 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private TangoPointCloudManager mPointCloudManager;
     private List<ValidPoseListener> mValidPoseListeners;
     private ArrayList<TangoCoordinateFramePair> mFramePairs;
-    private List<TangoUpdaterListener> mTangoUpdaterListeners;
+    private PriorityQueue<TangoUpdaterListener> mTangoUpdaterListeners;
+
 
 
     public TangoUpdater(TangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager) {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
-        mTangoUpdaterListeners = new ArrayList<>();
+        mTangoUpdaterListeners = new PriorityQueue<>(5, new Comparator<TangoUpdaterListener>() {
+            @Override
+            public int compare(TangoUpdaterListener a, TangoUpdaterListener b) {
+                return a.priority() - b.priority();
+            }
+        });
         mValidPoseListeners = new ArrayList<>();
         mFramePairs = new ArrayList<>();
         mFramePairs.add(
@@ -129,5 +137,6 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     public interface TangoUpdaterListener{
         void onFrameAvailable();
         void onLocalization(boolean localization);
+        int priority();
     }
 }

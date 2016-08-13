@@ -381,6 +381,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
     public void onFrameAvailable() {
     }
 
+    @Override
+    public int priority() {
+        return 1;
+    }
+
     private void onLocalize() {
         runOnUiThread(new Runnable() {
             @Override

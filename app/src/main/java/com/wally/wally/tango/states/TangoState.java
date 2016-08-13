@@ -183,6 +183,11 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
         mIsLocalized = localization;
     }
 
+    @Override
+    public int priority() {
+        return 10;
+    }
+
     public void addEventListener(EventListener listener) {
         mEventListeners.add(listener);
     }
