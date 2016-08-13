@@ -88,32 +88,36 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     }
 
 
-    public final synchronized void pause() {
+    public final void pause() {
         Log.d(TAG, "pause. Thread = " + Thread.currentThread());
         mExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                disconnect();
-                pauseHook();
+                synchronized (TangoState.this) {
+                    disconnect();
+                    pauseHook();
+                }
             }
         });
     }
 
     protected abstract void pauseHook();
 
-    public final synchronized void resume() {
+    public final void resume() {
         Log.d(TAG, "resume Thread = " + Thread.currentThread());
         mExecutor.execute(new Runnable() {
             @Override
             public void run() {
-                resumeHook();
+                synchronized (TangoState.this) {
+                    resumeHook();
+                }
             }
         });
     }
 
     protected abstract void resumeHook();
 
-    public void disconnect() {
+    private void disconnect() {
         Log.d(TAG, "Disconnect Tango");
         // Synchronize against disconnecting while the service is being used
         // in OpenGL thread or in UI thread.
@@ -133,7 +137,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
             mIsConnected = false;
             Log.d(TAG, "disconnect - mIsConnected = false");
-
         }
         if (mTango != null) {
             mTango.disconnect();
