@@ -2,7 +2,6 @@ package com.wally.wally.factory;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -28,15 +27,15 @@ import com.wally.wally.tango.ProgressAggregator;
 import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
-import com.wally.wally.ux.WallyTangoUx;
-import com.wally.wally.tango.states.TangoState;
 import com.wally.wally.tango.states.TangoForCloudAdfs;
 import com.wally.wally.tango.states.TangoForLearnedAdf;
 import com.wally.wally.tango.states.TangoForLearning;
 import com.wally.wally.tango.states.TangoForReadyState;
 import com.wally.wally.tango.states.TangoForSavedAdf;
+import com.wally.wally.tango.states.TangoState;
 import com.wally.wally.tip.LocalTipService;
 import com.wally.wally.tip.TipService;
+import com.wally.wally.ux.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
@@ -48,6 +47,7 @@ import java.util.Map;
  * Main Factory responsible for creating Tango Managers
  */
 public class MainFactory {
+    private final ScaleGestureDetector mScaleDetector;
     private TangoUpdater mTangoUpdater;
     private VisualContentManager mVisualContentManager;
     private TangoFactory mTangoFactory;
@@ -57,7 +57,6 @@ public class MainFactory {
     private LearningEvaluator mLearningEvaluator;
     private TipManager mTipManager;
     private AdfScheduler mAdfScheduler;
-    private final ScaleGestureDetector mScaleDetector;
     private TangoDriver mTangoDriver;
 
     private Map<Class, TangoState> tangoManagers;
@@ -121,9 +120,9 @@ public class MainFactory {
         mVisualContentManager = new VisualContentManager();
         mAdfScheduler = new AdfScheduler(App.getInstance().getAdfManager());
 
-        ProgressAggregator mProgressAggregator = new ProgressAggregator();
-        mProgressAggregator.addProgressReporter(mAdfScheduler, 0.4);
-        mProgressAggregator.addProgressReporter(mLearningEvaluator, 0.6);
+        ProgressAggregator progressAggregator = new ProgressAggregator();
+        progressAggregator.addProgressReporter(mAdfScheduler, 0.3f);
+        progressAggregator.addProgressReporter(mLearningEvaluator, 0.7f);
     }
 
     private void createTangoManagers() {
