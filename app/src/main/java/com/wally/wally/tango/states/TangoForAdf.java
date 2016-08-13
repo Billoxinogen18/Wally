@@ -75,6 +75,7 @@ public abstract class TangoForAdf extends TangoState {
                     Log.d(TAG, "changeToCloudAdfState");
                     TangoState nextTango = mTangoStatePool.get(TangoForCloudAdfs.class);
                     changeState(nextTango);
+                    nextTango.resume();
                 }
             }
         });

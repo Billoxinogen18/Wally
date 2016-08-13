@@ -95,6 +95,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
             @Override
             public void run() {
                 synchronized (TangoState.this) {
+                    Log.d(TAG, "pause in run. Thread = " + Thread.currentThread());
                     disconnect();
                     pauseHook();
                 }
@@ -110,6 +111,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
             @Override
             public void run() {
                 synchronized (TangoState.this) {
+                    Log.d(TAG, "resume in run. Thread = " + Thread.currentThread());
                     resumeHook();
                 }
             }
@@ -318,8 +320,12 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
                     // If there is a new RGB camera frame available, update the texture with it
                     if (mIsFrameAvailableTangoThread) {
-                        mRgbTimestampGlThread =
-                                mTango.updateTexture(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
+                        try {
+                            mRgbTimestampGlThread =
+                                    mTango.updateTexture(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
+                        }catch (TangoException e){
+                            e.printStackTrace();
+                        }
                         mIsFrameAvailableTangoThread = false;
                     }
 
