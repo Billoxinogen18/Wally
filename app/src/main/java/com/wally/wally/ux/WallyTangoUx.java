@@ -15,6 +15,8 @@ import android.widget.TextView;
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.wally.wally.R;
+import com.wally.wally.config.Config;
+import com.wally.wally.config.TangoManagerConstants;
 import com.wally.wally.tango.EventListener;
 
 /**
@@ -25,12 +27,13 @@ public class WallyTangoUx extends TangoUx implements EventListener {
     private TextView mTextView;
     private RelativeLayout mContainer;
     private Context mContext;
-
+    private Config mConfig;
     private Runnable hideMessageRunnable;
 
-    public WallyTangoUx(Context context) {
+    public WallyTangoUx(Context context, Config config) {
         super(context);
         mContext = context;
+        mConfig = config;
         mMainThreadHandler = new Handler(Looper.getMainLooper());
         hideMessageRunnable = new Runnable() {
             @Override
@@ -40,55 +43,54 @@ public class WallyTangoUx extends TangoUx implements EventListener {
         };
     }
 
-    public void setVisible(boolean isVisible){
+    public void setVisible(boolean isVisible) {
         mContainer.setVisibility(isVisible ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public void onTangoReady() {
-
+        showMessage(mConfig.getString(TangoManagerConstants.LOCALIZED), 1000);
     }
 
     @Override
     public void onLearningStart() {
-        showMessage("Learning start", 5000);
+        showMessage(mConfig.getString(TangoManagerConstants.LEARNING_AREA));
     }
 
     @Override
     public void onLearningFinish() {
-        showMessage("Learning finish", 5000);
+        showMessage(mConfig.getString(TangoManagerConstants.NEW_ROOM_LEARNED), 500);
     }
 
     @Override
     public void onLocalizationStart() {
-
+        showMessage(mConfig.getString(TangoManagerConstants.LOCALIZING_IN_KNOWN_AREA));
     }
 
     @Override
     public void onLocalizationStartAfterLearning() {
-
+        showMessage(mConfig.getString(TangoManagerConstants.LOCALIZING_IN_NEW_AREA));
     }
 
     @Override
     public void onLocalizationFinishAfterLearning() {
-
+        showMessage(mConfig.getString(TangoManagerConstants.LOCALIZED), 500);
     }
 
     @Override
     public void onLocalizationFinishAfterSavedAdf() {
-
+        showMessage(mConfig.getString(TangoManagerConstants.LOCALIZED));
     }
 
     @Override
     public void onTangoOutOfDate() {
-
+        showTangoOutOfDate();
     }
 
     @Override
     public void setLayout(TangoUxLayout tangoUxLayout) {
         super.setLayout(tangoUxLayout);
         addTextView(tangoUxLayout);
-
     }
 
     private void addTextView(TangoUxLayout tangoUxLayout) {
@@ -96,7 +98,7 @@ public class WallyTangoUx extends TangoUx implements EventListener {
         mContainer.setGravity(Gravity.CENTER);
 
         mTextView = new TextView(mContext);
-        mTextView.setPadding(50,50,50,50);
+        mTextView.setPadding(50, 50, 50, 50);
         mTextView.setGravity(Gravity.CENTER);
         mTextView.setBackgroundResource(R.color.uxOverlayBackgroundColor);
         mTextView.setTextColor(Color.WHITE);
@@ -115,7 +117,7 @@ public class WallyTangoUx extends TangoUx implements EventListener {
         tangoUxLayout.addView(mContainer, params);
     }
 
-    private void showMessage(final String message, long time){
+    private void showMessage(final String message, long time) {
         mMainThreadHandler.removeCallbacks(hideMessageRunnable);
         mMainThreadHandler.post(new Runnable() {
             @Override
@@ -127,7 +129,7 @@ public class WallyTangoUx extends TangoUx implements EventListener {
         mMainThreadHandler.postDelayed(hideMessageRunnable, time);
     }
 
-    private void showMessage(final String message){
+    private void showMessage(final String message) {
         mMainThreadHandler.removeCallbacks(hideMessageRunnable);
         mMainThreadHandler.post(new Runnable() {
             @Override
@@ -138,8 +140,8 @@ public class WallyTangoUx extends TangoUx implements EventListener {
         });
     }
 
-    private void hideMessage(){
-        if(mTextView.getVisibility() != View.GONE)
+    private void hideMessage() {
+        if (mTextView.getVisibility() != View.GONE)
             mMainThreadHandler.post(new Runnable() {
                 @Override
                 public void run() {
