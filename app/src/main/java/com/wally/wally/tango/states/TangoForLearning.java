@@ -84,6 +84,11 @@ public class TangoForLearning extends TangoState {
         Log.d(TAG, "changeToLearnedAdfState with: adf = [" + info + "]");
         pause();
         Log.d(TAG, "changeToLearnedAdfState after pause");
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         TangoState nextTango = ((TangoForLearnedAdf)mTangoStatePool.get(TangoForLearnedAdf.class)).withAdf(info);
         changeState(nextTango);
         Log.d(TAG, "changeToLearnedAdfState after change");

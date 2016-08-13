@@ -1,5 +1,7 @@
 package com.wally.wally.tango;
 
+import android.opengl.GLSurfaceView;
+
 import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
@@ -75,9 +77,19 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         // Check if the frame available is for the camera we want and
         // update its frame on the view.
         if (cameraId == TangoCameraIntrinsics.TANGO_CAMERA_COLOR) {
-            // Mark a camera frame is available for rendering in the OpenGL thread
+            // Now that we are receiving onFrameAvailable callbacks, we can switch
+            // to RENDERMODE_WHEN_DIRTY to drive the render loop from this callback.
+            // This will result on a frame rate of  approximately 30FPS, in synchrony with
+            // the RGB camera driver.
+            // If you need to render at a higher rate (i.e.: if you want to render complex
+            // animations smoothly) you  can use RENDERMODE_CONTINUOUSLY throughout the
+            // application lifecycle.
+            if (mSurfaceView.getRenderMode() != GLSurfaceView.RENDERMODE_WHEN_DIRTY) {
+                mSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+            }
             fireFameAvailable();
-            mSurfaceView.requestRenderUpdate();
+            // Mark a camera frame is available for rendering in the OpenGL thread
+            mSurfaceView.requestRender();
         }
     }
 

@@ -3,6 +3,7 @@ package com.wally.wally.controllers.main;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.opengl.GLSurfaceView;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -73,6 +74,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private SerializableLatLng mLocalizationLocation;
     private MainFactory mMainFactory;
 
+    private RajawaliSurfaceView mSurfaceView;
+
 
     public static Intent newIntent(Context context) {
         return new Intent(context, CameraARTangoActivity.class);
@@ -86,8 +89,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         TangoUxLayout tangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
-        RajawaliSurfaceView surfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-        mMainFactory = new MainFactory(mTipView, tangoUxLayout, this, surfaceView);
+        mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+        mMainFactory = new MainFactory(mTipView, tangoUxLayout, this, mSurfaceView);
         mTangoDriver = mMainFactory.getTangoDriver();
         mVisualContentManager = mMainFactory.getVisualContentManager();
         mTangoUx = mMainFactory.getTangoUx();
@@ -240,6 +243,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     protected void onPause() {
         Log.d(TAG, "onPause() called with: Thread = " + Thread.currentThread());
         super.onPause();
+        mSurfaceView.onPause();
         if (mTangoDriver.isTangoConnected()) {
             mTangoDriver.pause();
         }
@@ -253,6 +257,11 @@ public class CameraARTangoActivity extends CameraARActivity implements
     protected void onResume() {
         Log.d(TAG, "onResume() called with: Thread = " + Thread.currentThread());
         super.onResume();
+        mSurfaceView.onResume();
+        // Set render mode to RENDERMODE_CONTINUOUSLY to force getting onDraw callbacks until the
+        // Tango service is properly set-up and we start getting onFrameAvailable callbacks.
+        mSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+
         if (mExplainAdfPermission) {
             mExplainAdfPermission = false;
             PersistentDialogFragment.newInstance(
@@ -383,7 +392,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public int priority() {
-        return 1;
+        return 100;
     }
 
     private void onLocalize() {

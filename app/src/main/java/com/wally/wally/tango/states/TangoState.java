@@ -132,25 +132,22 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
         // Tango.disconnect will block here until all Tango callback calls are finished.
         // If you lock against this object in a Tango callback thread it will cause a deadlock.
         if (mIsConnected) {
-            Log.d(TAG, "disconnect - mIsConnected = true");
             mRenderer.getCurrentScene().clearFrameCallbacks();
             mTango.disconnectCamera(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-            Log.d(TAG, "disconnect - remove renderer");
 
             // We need to invalidate the connected texture ID,
             // this will cause re-connection in the OpenGL thread after resume
             mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
 
             mIsConnected = false;
-            Log.d(TAG, "disconnect - mIsConnected = false");
 
             if (mTango != null) {
                 mTango.disconnect();
-                Log.d(TAG, "disconnect - disconnected");
+                mTango = null;
+                System.gc();
             }
         }
         mTangoUpdater.setTangoLocalization(false);
-        Log.d(TAG, "disconnect - localization false");
     }
 
     /**
@@ -173,7 +170,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     }
 
     @Override
-    public synchronized void onFrameAvailable() {
+    public void onFrameAvailable() {
         mIsFrameAvailableTangoThread.set(true);
     }
 
@@ -216,16 +213,17 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
         return new TangoFactory.RunnableWithError() {
             @Override
             public void run() {
+                // Connect TangoUpdater and tango
+                mTango.connectListener(mTangoUpdater.getFramePairs(), mTangoUpdater);
+                connectRenderer();
+                mIsConnected = true;
+
                 mExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        // Connect TangoUpdater and tango
-                        mTango.connectListener(mTangoUpdater.getFramePairs(), mTangoUpdater);
                         // Get extrinsics (needs to be done after connecting Tango and listeners)
                         mExtrinsics = TangoUtils.getDeviceExtrinsics(mTango);
                         mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-                        connectRenderer();
-                        mIsConnected = true;
                     }
                 });
             }
@@ -308,7 +306,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
                 try {
                     synchronized (TangoState.this) {
                         // Don't execute any tango API actions if we're not connected to the service
-                        if (!mIsConnected) {
+                        if (!mIsConnected || mIntrinsics == null) {
                             return;
                         }
 
