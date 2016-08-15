@@ -116,6 +116,10 @@ public class TipView extends LinearLayout implements View.OnTouchListener {
         }
     }
 
+    public void hide(){
+        reset();
+    }
+
 
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {

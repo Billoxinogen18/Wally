@@ -1,7 +1,6 @@
 package com.wally.wally.tip;
 
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,8 +31,6 @@ public class LocalTipService implements TipService {
             tipKeysForTags = new HashMap<>();
             setUpDisabled();
             setUpTags(tags);
-            Log.d(TAG, tipKeysForTags.toString());
-            Log.d(TAG, getRandom().toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -89,7 +86,6 @@ public class LocalTipService implements TipService {
                     .withTitle(tipObject.getString("title"))
                     .withMessage(tipObject.getString("message"));
         } catch (JSONException e) {
-            Log.d(TAG, "incorrectly formatted tips file");
             return null;
         }
     }

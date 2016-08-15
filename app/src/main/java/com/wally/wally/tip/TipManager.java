@@ -33,49 +33,50 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
 
     @Override
     public void onContentFittingFinished(Content content) {
-
+        mTipView.hide();
     }
+
+
 
     private void showTip(String type) {
         mTipView.show(mTipService.getRandom(type), 0);
     }
 
-//    @Override
-    public void onLearningStart() {
-        showTip(TipService.Tag.LEARNING);
-    }
-
-//    @Override
-    public void onLocalizationStart() {
-        showTip(TipService.Tag.LOCALIZATION);
-    }
-
-//    @Override
-    public void onTangoOutOfDate() {
-
+    @Override
+    public void onWallyEvent(WallyEvent event) {
+        switch (event.getId()) {
+            case WallyEvent.TANGO_READY:
+                //NOT NEEDED
+                break;
+            case WallyEvent.TANGO_OUT_OF_DATE:
+                //NOT NEEDED
+                break;
+            case WallyEvent.LEARNING_START:
+                showTip(TipService.Tag.LEARNING);
+                break;
+            case WallyEvent.LEARNING_FINISH:
+                mTipView.hide();
+                break;
+            case WallyEvent.LOCALIZATION_START:
+                showTip(TipService.Tag.LOCALIZATION);
+                break;
+            case WallyEvent.LOCALIZATION_START_AFTER_LEARNING:
+                showTip(TipService.Tag.LOCALIZATION);
+                break;
+            case WallyEvent.LOCALIZATION_FINISH_AFTER_LEARNING:
+                mTipView.hide();
+                break;
+            case WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF:
+                mTipView.hide();
+            default:
+                break;
+        }
     }
 
     ///////////////////////////////////// not needed methods ///////////////////////////////////////
     @Override
     public void onContentFit(TangoPoseData pose) {
         // Not needed
-    }
-
-    @Override
-    public void onWallyEvent(WallyEvent event) {
-        switch (event.getId()) {
-            case WallyEvent.LEARNING_START:
-                onLearningStart();
-                break;
-            case WallyEvent.TANGO_OUT_OF_DATE:
-                onTangoOutOfDate();
-                break;
-            case WallyEvent.LOCALIZATION_START:
-                onLocalizationStart();
-                break;
-            default:
-                break;
-        }
     }
 
 }
