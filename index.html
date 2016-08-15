@@ -44,23 +44,23 @@
     <script>
         $(document).ready(function() {
             //catch all clicks on a tags
-//            var $root = $('html, body');
-//            $('a').click(function() {
-//                var hash = this.hash;
-//
-//                $root.animate({
-//                    scrollTop: $('[name="' + hash.substr(1) + '"]').offset().top
-//                }, 500, function () {
-//                    window.location.hash = hash;
-//                });
-//                return false;
-//            });
-//            //do the same with urls with hash too (so on page load it will slide nicely)
-//            if(location.hash){
-//                var hash = location.hash;
-//                window.scroll(0,0);
-//                jQuery('a[href="'+hash+'"').click();
-//            }
+            var $root = $('html, body');
+            $('a').click(function() {
+                var hash = this.hash;
+
+                $root.animate({
+                    scrollTop: $('[name="' + hash.substr(1) + '"]').offset().top
+                }, 500, function () {
+                    window.location.hash = hash;
+                });
+                return false;
+            });
+            //do the same with urls with hash too (so on page load it will slide nicely)
+            if(location.hash){
+                var hash = location.hash;
+                window.scroll(0,0);
+                jQuery('a[href="'+hash+'"').click();
+            }
 
             $(window).stellar({
                 horizontalScrolling: false,
