@@ -1,5 +1,5 @@
 {
-  "tips":{
+  "tips": {
     "tip_1": {
       "title": "Tip",
       "message": "Avoid too dark/bright areas"
@@ -15,13 +15,86 @@
     "tip_4": {
       "title": "Tip",
       "message": "Message"
+    },
+    "tip_5": {
+      "title": "Tip",
+      "message": "Walk in the same area"
+    },
+    "tip_6": {
+      "title": "Tip",
+      "message": "You can scale post with pinching"
+    },
+    "tip_7": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_8": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_9": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_10": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_11": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_12": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_13": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_14": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_15": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_16": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_17": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_18": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_19": {
+      "title": "Tip",
+      "message": ""
+    },
+    "tip_20": {
+      "title": "Tip",
+      "message": ""
     }
   },
-
   "tags": {
-    "learning": ["tip_1", "tip_2", "tip_3"],
-    "localization": ["tip_4"],
-    "fitting": [],
-    "localization_after_learning": []
+    "learning": [
+      "tip_1",
+      "tip_2",
+      "tip_3"
+    ],
+    "localization": [
+      "tip_4"
+    ],
+    "fitting": [
+      "tip_6"
+    ],
+    "localization_after_learning": [
+      "tip_5"
+    ]
   }
 }
