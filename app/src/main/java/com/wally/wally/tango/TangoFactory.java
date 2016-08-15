@@ -8,10 +8,6 @@ import com.google.atap.tangoservice.TangoConfig;
 import com.google.atap.tangoservice.TangoErrorException;
 import com.projecttango.tangosupport.TangoSupport;
 
-
-/**
- * Created by shota on 5/28/16.
- */
 public class TangoFactory {
     public static final String TAG = TangoFactory.class.getSimpleName();
 
@@ -22,10 +18,6 @@ public class TangoFactory {
         mContext = context;
     }
 
-    public Tango getTango(Runnable r) {
-        return new Tango(mContext, r);
-    }
-
     public Tango getTangoForLearning(final RunnableWithError r) {
         mTango = new Tango(mContext, new Runnable() {
             @Override
@@ -34,13 +26,13 @@ public class TangoFactory {
                     TangoSupport.initialize();
                     connectTangoForLearning(mTango);
                     r.run();
+                    Log.d(TAG, "getTangoForLearning");
                 } catch (TangoErrorException e) {
-                    Log.e(TAG, "Cannot create tango! : " + e);
+                    Log.e(TAG, "Cannot create tangoForLearning: " + e);
                     r.onError(e);
                 }
             }
         });
-        Log.d(TAG, "getTangoForLearning = " + mTango);
         return mTango;
     }
 
@@ -52,13 +44,13 @@ public class TangoFactory {
                     TangoSupport.initialize();
                     connectTango(mTango);
                     r.run();
+                    Log.d(TAG, "getTango");
                 } catch (TangoErrorException e) {
-                    Log.e(TAG, "Cannot create tango! : " + e);
+                    Log.e(TAG, "Cannot create tango: " + e);
                     r.onError(e);
                 }
             }
         });
-        Log.d(TAG, "getTango = " + mTango);
         return mTango;
     }
 
@@ -70,13 +62,13 @@ public class TangoFactory {
                     TangoSupport.initialize();
                     connectTangoWithUuid(mTango, uuid);
                     r.run();
+                    Log.d(TAG, "getTangoWithUuid");
                 } catch (TangoErrorException e) {
-                    Log.e(TAG, "Cannot create tango! : " + e);
+                    Log.e(TAG, "Cannot create tangoWithUuid: " + e);
                     r.onError(e);
                 }
             }
         });
-        Log.d(TAG, "getTangoWithUuid = " + mTango);
         return mTango;
     }
 
