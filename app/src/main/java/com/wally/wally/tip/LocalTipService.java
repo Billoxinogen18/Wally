@@ -85,6 +85,7 @@ public class LocalTipService implements TipService {
         try {
             JSONObject tipObject = tips.getJSONObject(tipKey);
             return new Tip()
+                    .withId(tipKey)
                     .withTitle(tipObject.getString("title"))
                     .withMessage(tipObject.getString("message"));
         } catch (JSONException e) {
