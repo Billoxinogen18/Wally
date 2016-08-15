@@ -150,6 +150,33 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
 
     @Override
     public void onWallyEvent(WallyEvent event) {
-
+        switch (event.getId()) {
+            case WallyEvent.TANGO_READY:
+                onTangoReady();
+                break;
+            case WallyEvent.LEARNING_START:
+                onLearningStart();
+                break;
+            case WallyEvent.LEARNING_FINISH:
+                onLearningFinish();
+                break;
+            case WallyEvent.TANGO_OUT_OF_DATE:
+                onTangoOutOfDate();
+                break;
+            case WallyEvent.LOCALIZATION_START:
+                onLocalizationStart();
+                break;
+            case WallyEvent.LOCALIZATION_START_AFTER_LEARNING:
+                onLocalizationStartAfterLearning();
+                break;
+            case WallyEvent.LOCALIZATION_FINISH_AFTER_LEARNING:
+                onLocalizationFinishAfterLearning();
+                break;
+            case WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF:
+                onLocalizationFinishAfterSavedAdf();
+                break;
+            default:
+                break;
+        }
     }
 }
