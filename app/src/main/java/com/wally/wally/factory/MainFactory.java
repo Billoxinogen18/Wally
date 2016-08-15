@@ -1,5 +1,6 @@
 package com.wally.wally.factory;
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -67,7 +68,7 @@ public class MainFactory {
                        CameraARTangoActivity activity,
                        RajawaliSurfaceView surfaceView) {
         init();
-        mExecutor = createExecutor();
+        mExecutor = createExecutor(activity);
         Context context = activity.getBaseContext();
         mTangoUx = new WallyTangoUx(context, mConfig);
         mTangoUx.setLayout(tangoUxLayout);
@@ -176,11 +177,12 @@ public class MainFactory {
         }
     }
 
-    private TangoState.Executor createExecutor() {
+    private TangoState.Executor createExecutor(final Activity activity) {
         return new TangoState.Executor() {
             @Override
             public void execute(Runnable runnable) {
-                new Thread(runnable).start();
+                //new Thread(runnable).start();
+                activity.runOnUiThread(runnable);
             }
         };
     }
