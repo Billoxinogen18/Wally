@@ -5,8 +5,8 @@ import android.util.Log;
 import com.google.atap.tangoservice.Tango;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
+import com.wally.wally.events.WallyEvent;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.events.EventListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.TangoUtils;
@@ -74,10 +74,7 @@ public class TangoForSavedAdf extends TangoForAdf {
     }
 
     private void fireLocalizationStart() {
-        for (EventListener listener : mEventListeners) {
-            listener.onLocalizationStart();
-        }
-
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_START));
     }
 
     @Override
@@ -86,8 +83,6 @@ public class TangoForSavedAdf extends TangoForAdf {
     }
 
     private void fireLocalizationFinishAfterSavedAdf() {
-        for (EventListener listener : mEventListeners) {
-            listener.onLocalizationFinishAfterSavedAdf();
-        }
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF));
     }
 }

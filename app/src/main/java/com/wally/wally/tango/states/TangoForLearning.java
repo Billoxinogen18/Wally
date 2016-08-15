@@ -4,8 +4,8 @@ import android.util.Log;
 
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
+import com.wally.wally.events.WallyEvent;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.events.EventListener;
 import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
@@ -103,15 +103,11 @@ public class TangoForLearning extends TangoState {
     }
 
     private void fireStartLearning(){
-        for (EventListener eventListener : mEventListeners) {
-            eventListener.onLearningStart();
-        }
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.LEARNING_START));
     }
 
     private void fireFinishLearning(){
-        for (EventListener eventListener : mEventListeners) {
-            eventListener.onLearningFinish();
-        }
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.LEARNING_FINISH));
     }
 
 }

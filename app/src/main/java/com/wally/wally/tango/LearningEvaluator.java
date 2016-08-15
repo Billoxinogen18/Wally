@@ -56,28 +56,34 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
 
         int x = (int) (pose.translation[0] / Cell.CELL_SIZE_M);
         int y = (int) (pose.translation[1] / Cell.CELL_SIZE_M);
-        Cell c = new Cell();
-        c.x = x;
-        c.y = y;
+        Cell cell = new Cell();
+        cell.x = x;
+        cell.y = y;
+
+        // Add cell if new
+        int index = cells.indexOf(cell);
+        if (index == -1) {
+            cells.add(cell);
+            progress++;
+        } else {
+            cell = cells.get(index);
+        }
+
         Quaternion q = new Quaternion(pose.rotation[0], pose.rotation[1], pose.rotation[2], pose.rotation[3]);
         double yaw = Math.toDegrees(q.getYaw());
         if (yaw < 0) yaw += 360;
-        int angleIndex = ((int) (yaw / 360 * angleResolution)) % angleResolution;
-        if (!c.angleVisited[angleIndex]) {
-            c.angleVisited[angleIndex] = true;
-            progress++;
+        if (yaw < 0 || yaw > 360) {
+            throw new IllegalStateException("Yaw is illegal [yaw = " + yaw + "]");
         }
-        int index = cells.indexOf(c);
-        if (index == -1) {
-            cells.add(c);
+        int angleIndex = ((int) (yaw / 360 * angleResolution)) % angleResolution;
+        // Update angle
+        if (!cell.angleVisited[angleIndex]) {
+            cell.angleVisited[angleIndex] = true;
             progress++;
-        } else {
-            cells.get(index).angleVisited[angleIndex] = true;
         }
         //Log.d(TAG, "pose = " + pose + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
 
         progressListener.onProgressUpdate(this, getProgress());
-
 
         if (canFinish() && !isFinished) {
             isFinished = true;
@@ -87,6 +93,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
                 @Override
                 public void run() {
                     listener.onLearningFinish();
+                    progressListener.onProgressUpdate(LearningEvaluator.this, 1);
                 }
             }).start();
         }
@@ -103,6 +110,9 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
             gavlili += (1 - gavlili) * RATIO;
         }
         gavlili += (1 - gavlili) * RATIO * n;
+        if (gavlili > 1 || gavlili < 0) {
+            throw new IllegalStateException("Progress is valid! progress = [" + gavlili + "]");
+        }
         return gavlili;
     }
 
@@ -138,17 +148,12 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
     }
 
     @Override
-    public void forceReport() {
-        progressListener.onProgressUpdate(this, 1);
-    }
-
-    @Override
     public void addProgressListener(ProgressListener listener) {
         progressListener = listener;
     }
 
 
-    public interface LearningEvaluatorListener{
+    public interface LearningEvaluatorListener {
         void onLearningFinish();
 
         void onLearningFailed();
@@ -161,7 +166,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         public boolean[] angleVisited = new boolean[angleResolution];
 
         @Override
-        public boolean equals(Object o){
+        public boolean equals(Object o) {
             if (!(o instanceof Cell)) {
                 return false;
             }

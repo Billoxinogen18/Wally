@@ -16,6 +16,7 @@ public class TangoFactory {
 
     public TangoFactory(Context context) {
         mContext = context;
+        TangoSupport.initialize();
     }
 
     public Tango getTangoForLearning(final RunnableWithError r) {
@@ -23,7 +24,6 @@ public class TangoFactory {
             @Override
             public void run() {
                 try {
-                    TangoSupport.initialize();
                     connectTangoForLearning(mTango);
                     r.run();
                     Log.d(TAG, "getTangoForLearning");
@@ -41,7 +41,6 @@ public class TangoFactory {
             @Override
             public void run() {
                 try {
-                    TangoSupport.initialize();
                     connectTango(mTango);
                     r.run();
                     Log.d(TAG, "getTango");
@@ -59,7 +58,6 @@ public class TangoFactory {
             @Override
             public void run() {
                 try {
-                    TangoSupport.initialize();
                     connectTangoWithUuid(mTango, uuid);
                     r.run();
                     Log.d(TAG, "getTangoWithUuid");
