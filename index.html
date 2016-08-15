@@ -17,6 +17,13 @@
     <!-- Custom CSS -->
     <link href="css/landing-page.css" rel="stylesheet">
 
+    <style>
+        .logo{
+            position: relative;
+            z-index: -1;
+        }
+    </style>
+
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
@@ -24,11 +31,12 @@
     <!-- jQuery -->
     <script src="js/jquery.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="js/jquery.stellar.min.js"></script>
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
@@ -36,23 +44,28 @@
     <script>
         $(document).ready(function() {
             //catch all clicks on a tags
-            var $root = $('html, body');
-            $('a').click(function() {
-                var hash = this.hash;
+//            var $root = $('html, body');
+//            $('a').click(function() {
+//                var hash = this.hash;
+//
+//                $root.animate({
+//                    scrollTop: $('[name="' + hash.substr(1) + '"]').offset().top
+//                }, 500, function () {
+//                    window.location.hash = hash;
+//                });
+//                return false;
+//            });
+//            //do the same with urls with hash too (so on page load it will slide nicely)
+//            if(location.hash){
+//                var hash = location.hash;
+//                window.scroll(0,0);
+//                jQuery('a[href="'+hash+'"').click();
+//            }
 
-                $root.animate({
-                    scrollTop: $('[name="' + hash.substr(1) + '"]').offset().top
-                }, 500, function () {
-                    window.location.hash = hash;
-                });
-                return false;
+            $(window).stellar({
+                horizontalScrolling: false,
+                hideDistantElements: false
             });
-            //do the same with urls with hash too (so on page load it will slide nicely)
-            if(location.hash){
-                var hash = location.hash;
-                window.scroll(0,0);
-                jQuery('a[href="'+hash+'"').click();
-            }
         });
     </script>
 
@@ -91,7 +104,7 @@
 
 
     <!-- Header -->
-    <div class="intro-header">
+    <div class="intro-header logo" data-stellar-ratio="0.5">
         <div class="container">
 
             <div class="row">
