@@ -3,8 +3,8 @@ package com.wally.wally.tango.states;
 import android.util.Log;
 
 import com.projecttango.tangosupport.TangoPointCloudManager;
+import com.wally.wally.events.WallyEvent;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.events.EventListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 
@@ -48,14 +48,10 @@ public class TangoForLearnedAdf extends TangoForAdf {
     }
 
     private void fireLocalizationStartAfterLearning() {
-        for (EventListener listener : mEventListeners) {
-            listener.onLocalizationStartAfterLearning();
-        }
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_START_AFTER_LEARNING));
     }
 
     private void fireLocalizationFinishAfterLearning() {
-        for (EventListener listener : mEventListeners) {
-            listener.onLocalizationFinishAfterLearning();
-        }
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_FINISH_AFTER_LEARNING));
     }
 }

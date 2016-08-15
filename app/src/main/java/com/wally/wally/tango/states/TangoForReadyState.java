@@ -5,8 +5,8 @@ import android.util.Log;
 import com.google.atap.tangoservice.Tango;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
+import com.wally.wally.events.WallyEvent;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.events.EventListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 
@@ -56,8 +56,6 @@ public class TangoForReadyState extends TangoState {
     }
 
     private void fireOnTangoReady(){
-        for (EventListener listener: mEventListeners){
-            listener.onTangoReady();
-        }
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.TANGO_READY));
     }
 }

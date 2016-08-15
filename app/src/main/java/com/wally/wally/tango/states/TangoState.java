@@ -15,8 +15,9 @@ import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.adf.AdfInfo;
+import com.wally.wally.events.WallyEvent;
+import com.wally.wally.events.WallyEventListener;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.events.EventListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.TangoUtils;
@@ -55,7 +56,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     protected boolean mIsLocalized;
     protected TangoUpdater mTangoUpdater;
     protected TangoFactory mTangoFactory;
-    protected List<EventListener> mEventListeners;
+    protected List<WallyEventListener> mEventListeners;
     protected Map<Class, TangoState> mTangoStatePool;
 
     private TangoPointCloudManager mPointCloudManager;
@@ -184,11 +185,11 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
         return 10;
     }
 
-    public void addEventListener(EventListener listener) {
+    public void addEventListener(WallyEventListener listener) {
         mEventListeners.add(listener);
     }
 
-    public boolean removeEventListener(EventListener listener) {
+    public boolean removeEventListener(WallyEventListener listener) {
         return mEventListeners.remove(listener);
     }
 
@@ -369,8 +370,12 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     }
 
     private void fireTangoOutOfDate() {
-        for (EventListener listener : mEventListeners) {
-            listener.onTangoOutOfDate();
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.TANGO_OUT_OF_DATE));
+    }
+
+    protected void fireEvent(WallyEvent event) {
+        for (WallyEventListener listener : mEventListeners) {
+            listener.onWallyEvent(event);
         }
     }
 
