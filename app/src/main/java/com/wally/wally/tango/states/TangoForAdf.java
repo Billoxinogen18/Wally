@@ -8,8 +8,6 @@ import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 
-import java.util.Map;
-
 /**
  * Created by shota on 8/10/16.
  *
@@ -25,9 +23,8 @@ public abstract class TangoForAdf extends TangoState {
                        TangoUpdater tangoUpdater,
                        TangoFactory tangoFactory,
                        WallyRenderer wallyRenderer,
-                       Map<Class, TangoState> tangoStatePool,
                        TangoPointCloudManager pointCloudManager){
-        super(executor, tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
+        super(executor, tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
     }
 
     public TangoForAdf withAdf(AdfInfo adf){
@@ -49,15 +46,16 @@ public abstract class TangoForAdf extends TangoState {
             if (mLocalizationWatchdog != null) {
                 mLocalizationWatchdog.interrupt();
             }
-            changeToReadyState();
+//            changeToReadyState();
+            mSuccessStateConnector.toNextState();
             fireLocalizationFinish();
         }
     }
 
     protected void changeToReadyState(){
-        Log.d(TAG, "changeToReadyState");
-        TangoState nextTango = ((TangoForReadyState)mTangoStatePool.get(TangoForReadyState.class)).withTangoAndAdf(mTango, mAdfInfo);
-        changeState(nextTango);
+//        Log.d(TAG, "changeToReadyState");
+//        TangoState nextTango = ((TangoForReadyState)mTangoStatePool.get(TangoForReadyState.class)).withTangoAndAdf(mTango, mAdfInfo);
+//        changeState(nextTango);
     }
 
     protected void startLocalizationWatchDog() {
@@ -70,12 +68,11 @@ public abstract class TangoForAdf extends TangoState {
                     return;
                 }
                 if (!mIsLocalized) {
-                    Log.d(TAG, "startLocalizationWatchDog failed");
-                    pause();
-                    Log.d(TAG, "changeToCloudAdfState");
-                    TangoState nextTango = mTangoStatePool.get(TangoForCloudAdfs.class);
-                    changeState(nextTango);
-                    nextTango.resume();
+                    mFailStateConnector.toNextState();
+//                    pause();
+//                    TangoState nextTango = mTangoStatePool.get(TangoForCloudAdfs.class);
+//                    changeState(nextTango);
+//                    nextTango.resume();
                 }
             }
         });

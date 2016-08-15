@@ -8,8 +8,6 @@ import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 
-import java.util.Map;
-
 /**
  * Created by shota on 8/9/16.
  * Manages Tango for learned Adf
@@ -22,15 +20,14 @@ public class TangoForLearnedAdf extends TangoForAdf {
                               TangoUpdater tangoUpdater,
                               TangoFactory tangoFactory,
                               WallyRenderer wallyRenderer,
-                              Map<Class, TangoState> tangoStatePool,
                               TangoPointCloudManager pointCloudManager) {
 
-        super(executor, tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
+        super(executor, tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
     }
 
     @Override
     protected void pauseHook() {
-        Log.d(TAG, "pause Thread = " + Thread.currentThread());
+
     }
 
     @Override

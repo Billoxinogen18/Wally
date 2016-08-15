@@ -28,7 +28,6 @@ import org.rajawali3d.scene.ASceneFrameCallback;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -57,7 +56,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     protected TangoUpdater mTangoUpdater;
     protected TangoFactory mTangoFactory;
     protected List<WallyEventListener> mEventListeners;
-    protected Map<Class, TangoState> mTangoStatePool;
 
     private TangoPointCloudManager mPointCloudManager;
     private WallyRenderer mRenderer;
@@ -74,21 +72,31 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     //private boolean mIsFrameAvailableTangoThread;
     private AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
     private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
+    protected TangoStateConnector mFailStateConnector;
+    protected TangoStateConnector mSuccessStateConnector;
 
 
     public TangoState(Executor executor,
                       TangoUpdater tangoUpdater,
                       TangoFactory tangoFactory,
                       WallyRenderer wallyRenderer,
-                      Map<Class, TangoState> tangoStatePool,
                       TangoPointCloudManager pointCloudManager) {
         mRenderer = wallyRenderer;
         mTangoUpdater = tangoUpdater;
         mPointCloudManager = pointCloudManager;
         mTangoFactory = tangoFactory;
-        mTangoStatePool = tangoStatePool;
         mExecutor = executor;
         mEventListeners = new ArrayList<>();
+    }
+
+    public TangoState withFailStateConnector(TangoStateConnector connector) {
+        mFailStateConnector = connector;
+        return this;
+    }
+
+    public TangoState withSuccessStateConnector(TangoStateConnector connector) {
+        mSuccessStateConnector = connector;
+        return this;
     }
 
 
@@ -204,10 +212,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     public boolean isConnected() {
         return mIsConnected;
     }
-
-//    protected <T extends TangoBase> T getTangoState(Class<T> cl){
-//        return (T)mTangoStatePool.get(cl);
-//    }
 
     protected TangoFactory.RunnableWithError getTangoInitializer() {
         return new TangoFactory.RunnableWithError() {

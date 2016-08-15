@@ -120,25 +120,25 @@ public class MainFactory {
     private void createTangoManagers() {
         long localizationTimeout = mConfig.getInt(TangoManagerConstants.LOCALIZATION_TIMEOUT);
         TangoForLearnedAdf tangoForLearnedAdf =
-                new TangoForLearnedAdf(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager);
+                new TangoForLearnedAdf(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
         tangoForLearnedAdf.withLocalizationTimeout(localizationTimeout);
         tangoManagers.put(TangoForLearnedAdf.class, tangoForLearnedAdf);
 
         TangoForLearning tangoForLearning =
-                new TangoForLearning(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mLearningEvaluator, tangoManagers, mPointCloudManager);
+                new TangoForLearning(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mLearningEvaluator, mPointCloudManager);
         tangoManagers.put(TangoForLearning.class, tangoForLearning);
 
         TangoForReadyState tangoForReadyState =
-                new TangoForReadyState(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager);
+                new TangoForReadyState(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
         tangoManagers.put(TangoForReadyState.class, tangoForReadyState);
 
         TangoForCloudAdfs tangoForCloudAdfs =
-                new TangoForCloudAdfs(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager, mAdfScheduler);
+                new TangoForCloudAdfs(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager, mAdfScheduler);
         tangoForCloudAdfs.withLocalizationTimeout(localizationTimeout);
         tangoManagers.put(TangoForCloudAdfs.class, tangoForCloudAdfs);
 
         TangoForSavedAdf tangoForSavedAdf =
-                new TangoForSavedAdf(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, tangoManagers, mPointCloudManager);
+                new TangoForSavedAdf(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
         tangoForSavedAdf.withLocalizationTimeout(localizationTimeout);
         tangoManagers.put(TangoForSavedAdf.class, tangoForSavedAdf);
 

@@ -10,8 +10,6 @@ import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 
-import java.util.Map;
-
 /**
  * Created by shota on 8/9/16.
  * Manages Tango for Ready State
@@ -25,9 +23,8 @@ public class TangoForReadyState extends TangoState {
                               TangoUpdater tangoUpdater,
                               TangoFactory tangoFactory,
                               WallyRenderer wallyRenderer,
-                              Map<Class, TangoState> tangoStatePool,
                               TangoPointCloudManager pointCloudManager){
-        super(executor, tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
+        super(executor, tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
     }
 
     public TangoForReadyState withTangoAndAdf(Tango tango, AdfInfo adf) {
@@ -39,9 +36,16 @@ public class TangoForReadyState extends TangoState {
 
     @Override
     protected void pauseHook() {
-        Log.d(TAG, "changeToSavedAdfState Thread = " + Thread.currentThread());
-        TangoState nextTango = ((TangoForSavedAdf)mTangoStatePool.get(TangoForSavedAdf.class)).withAdf(mAdfInfo);
-        changeState(nextTango);
+        mFailStateConnector.toNextState();
+//        Log.d(TAG, "changeToSavedAdfState Thread = " + Thread.currentThread());
+//        TangoState nextTango = ((TangoForSavedAdf)mTangoStatePool.get(TangoForSavedAdf.class)).withAdf(mAdfInfo);
+//        changeState(nextTango);
+    }
+
+    @Override
+    public TangoState withSuccessStateConnector(TangoStateConnector connector) {
+        String msg = "TangoForReadyState does not support withSuccessStateConnector method";
+        throw new UnsupportedOperationException(msg);
     }
 
     @Override

@@ -9,8 +9,6 @@ import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 
-import java.util.Map;
-
 /**
  * Created by shota on 8/9/16.
  * Manages Tango which downloads Adfs and tries to localize
@@ -25,10 +23,9 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
                              TangoUpdater tangoUpdater,
                              TangoFactory tangoFactory,
                              WallyRenderer wallyRenderer,
-                             Map<Class, TangoState> tangoStatePool,
                              TangoPointCloudManager pointCloudManager,
                              AdfScheduler adfScheduler){
-        super(executor, tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
+        super(executor, tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
         mAdfScheduler = adfScheduler;
     }
 
@@ -59,7 +56,8 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
                     return;
                 }
                 if (info == null) {
-                    changeToLearningState();
+                    mFailStateConnector.toNextState();
+                    // changeToLearningState();
                 } else {
                     withAdf(info);
                     startLocalizing();
@@ -76,11 +74,11 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
 
 
     private void changeToLearningState(){
-        Log.d(TAG, "changeToLearningState");
-        pause();
-        TangoState nextTango = mTangoStatePool.get(TangoForLearning.class);
-        changeState(nextTango);
-        nextTango.resume();
+//        Log.d(TAG, "changeToLearningState");
+//        pause();
+//        TangoState nextTango = mTangoStatePool.get(TangoForLearning.class);
+//        changeState(nextTango);
+//        nextTango.resume();
     }
 
 
@@ -90,7 +88,7 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
         mIsLocalized = localization;
         if (localization) {
             mAdfScheduler.finish();
-            changeToReadyState();
+            mSuccessStateConnector.toNextState();
         }
     }
 }

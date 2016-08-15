@@ -11,8 +11,6 @@ import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.TangoUtils;
 
-import java.util.Map;
-
 /**
  * Created by shota on 8/10/16.
  * Manages Tango after resume with previously saved Adf
@@ -24,9 +22,8 @@ public class TangoForSavedAdf extends TangoForAdf {
                             TangoUpdater tangoUpdater,
                             TangoFactory tangoFactory,
                             WallyRenderer wallyRenderer,
-                            Map<Class, TangoState> tangoStatePool,
                             TangoPointCloudManager pointCloudManager){
-        super(executor, tangoUpdater, tangoFactory, wallyRenderer, tangoStatePool, pointCloudManager);
+        super(executor, tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
     }
 
     public TangoForAdf withAdf(AdfInfo adf){
