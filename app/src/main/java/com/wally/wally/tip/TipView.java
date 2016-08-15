@@ -90,9 +90,10 @@ public class TipView extends LinearLayout implements View.OnTouchListener {
         this.dismissListener = dismissListener;
     }
 
-    public void show(final String message, String id, int durationMs) {
+    public void show(Tip tip, int durationMs){
         reset();
-        this.id = id;
+        this.id = tip.getId();
+        final String message = tip.getMessage();
 
         mainThreadHandler.removeCallbacks(hideRunnable);
 
