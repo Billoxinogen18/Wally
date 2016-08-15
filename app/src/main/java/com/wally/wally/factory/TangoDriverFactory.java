@@ -136,10 +136,10 @@ public class TangoDriverFactory {
         tangoForLearnedAdf.withFailStateConnector(failConnector).withSuccessStateConnector(successConnector);
 
         TangoForLearning tangoForLearning  = (TangoForLearning) tangoStates.get(TangoForLearning.class);
-        failConnector = mConnectorFactory.getConnectorFromLearningToLearnedAdf(
-                tangoForLearning, (TangoForLearnedAdf) tangoStates.get(TangoForLearnedAdf.class));
-        successConnector = mConnectorFactory.getConnectorFromLearningToLearningState(
+        failConnector = mConnectorFactory.getConnectorFromLearningToLearningState(
                 tangoForLearning, (TangoForLearning) tangoStates.get(TangoForLearning.class));
+        successConnector = mConnectorFactory.getConnectorFromLearningToLearnedAdf(
+                tangoForLearning, (TangoForLearnedAdf) tangoStates.get(TangoForLearnedAdf.class));
         tangoForLearning.withFailStateConnector(failConnector).withSuccessStateConnector(successConnector);
 
         TangoForSavedAdf tangoForSavedAdf  = (TangoForSavedAdf) tangoStates.get(TangoForSavedAdf.class);
@@ -166,8 +166,8 @@ public class TangoDriverFactory {
         return new TangoState.Executor() {
             @Override
             public void execute(Runnable runnable) {
-                //new Thread(runnable).start();
-                activity.runOnUiThread(runnable);
+                new Thread(runnable).start();
+                //activity.runOnUiThread(runnable);
             }
         };
     }

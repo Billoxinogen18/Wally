@@ -91,4 +91,9 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
             mSuccessStateConnector.toNextState();
         }
     }
+
+    @Override
+    public AdfInfo getAdf() {
+        return mAdfInfo;
+    }
 }
