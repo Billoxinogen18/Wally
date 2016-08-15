@@ -6,6 +6,7 @@ import android.util.Log;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.states.TangoForCloudAdfs;
 import com.wally.wally.tango.states.TangoForLearnedAdf;
+import com.wally.wally.tango.states.TangoForLearning;
 import com.wally.wally.tango.states.TangoForReadyState;
 import com.wally.wally.tango.states.TangoForSavedAdf;
 import com.wally.wally.tango.states.TangoState;
@@ -34,7 +35,7 @@ public class TangoStateConnectorFactory {
         return getConnectorToReadyState(from, to);
     }
 
-    public TangoStateConnector getConnectorFromCloudAdfsToLearning(final TangoState from, final TangoState to){
+    public TangoStateConnector getConnectorFromCloudAdfsToLearning(final TangoForCloudAdfs from, final TangoForLearning to){
         return getConnectorWithPauseAndResume(from, to);
     }
 
@@ -42,11 +43,11 @@ public class TangoStateConnectorFactory {
         return getConnectorToReadyState(from, to);
     }
 
-    public TangoStateConnector getConnectorFromLearnedAdfToCloudAdf(final TangoForLearnedAdf from, final TangoState to){
+    public TangoStateConnector getConnectorFromLearnedAdfToCloudAdf(final TangoForLearnedAdf from, final TangoForCloudAdfs to){
         return getConnectorWithPauseAndResume(from, to);
     }
 
-    public TangoStateConnector getConnectorFromLearningToLearnedAdf(final TangoState from, final TangoForLearnedAdf to){
+    public TangoStateConnector getConnectorFromLearningToLearnedAdf(final TangoForLearning from, final TangoForLearnedAdf to){
         return new TangoStateConnector() {
             @Override
             public void toNextState() {
@@ -59,12 +60,12 @@ public class TangoStateConnectorFactory {
         };
     }
 
-    public TangoStateConnector getConnectorFromLearningToLearningState(final TangoState from, final TangoState to){
+    public TangoStateConnector getConnectorFromLearningToLearningState(final TangoForLearning from, final TangoForLearning to){
         return getConnectorToResetState(from, to);
     }
 
 
-    public TangoStateConnector getConnectorFromReadyToSavedAdfState(final TangoState from, final TangoForSavedAdf to){
+    public TangoStateConnector getConnectorFromReadyToSavedAdfState(final TangoForReadyState from, final TangoForSavedAdf to){
         return new TangoStateConnector() {
             @Override
             public void toNextState() {
@@ -75,11 +76,11 @@ public class TangoStateConnectorFactory {
         };
     }
 
-    public TangoStateConnector getConnectorFromSavedAdfToReadyState(final TangoState from, final TangoForReadyState to){
+    public TangoStateConnector getConnectorFromSavedAdfToReadyState(final TangoForSavedAdf from, final TangoForReadyState to){
         return getConnectorToReadyState(from, to);
     }
 
-    public TangoStateConnector getConnectorFromSavedAdfCloudAdfState(final TangoState from, final TangoState to){
+    public TangoStateConnector getConnectorFromSavedAdfCloudAdfState(final TangoForSavedAdf from, final TangoForCloudAdfs to){
         return getConnectorWithPauseAndResume(from, to);
     }
 

@@ -30,6 +30,7 @@ import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.factory.MainFactory;
+import com.wally.wally.factory.TangoDriverFactory;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.ProgressListener;
@@ -72,7 +73,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     private Content editableContent;
     private SerializableLatLng mLocalizationLocation;
-    private MainFactory mMainFactory;
+    private TangoDriverFactory mTangoDriverFactory;
 
     private RajawaliSurfaceView mSurfaceView;
 
@@ -90,8 +91,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         TangoUxLayout tangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
-        mMainFactory = new MainFactory(mTipView, tangoUxLayout, this, mSurfaceView);
-        mTangoDriver = mMainFactory.getTangoDriver();
+        MainFactory mMainFactory = new MainFactory(mTipView, tangoUxLayout, this, mSurfaceView);
+        mTangoDriverFactory  = new TangoDriverFactory(mMainFactory);
+        mTangoDriver = mTangoDriverFactory.getTangoDriver();
         mVisualContentManager = mMainFactory.getVisualContentManager();
         mTangoUx = mMainFactory.getTangoUx();
 
@@ -175,7 +177,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("FITTING_CONTENT")) {
                 Content c = (Content) savedInstanceState.getSerializable("FITTING_CONTENT");
-                mContentFitter = mMainFactory.getContentFitter(c, this);
+                mContentFitter = mTangoDriverFactory.getContentFitter(c, this);
             }
         }
     }
@@ -232,7 +234,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
             Log.e(TAG, "onContentCreated: called when content was already fitting");
             return;
         }
-        mContentFitter = mMainFactory.getContentFitter(contentCreated, this);
+        mContentFitter = mTangoDriverFactory.getContentFitter(contentCreated, this);
         mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         onFitStatusChange(true);
@@ -279,7 +281,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
             if (mContentFitter != null) {
                 if (mContentFitter.isCancelled()) {
-                    mContentFitter = mMainFactory.getContentFitter(mContentFitter.getContent(), this);
+                    mContentFitter = mTangoDriverFactory.getContentFitter(mContentFitter.getContent(), this);
                 }
                 mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 onFitStatusChange(true);
