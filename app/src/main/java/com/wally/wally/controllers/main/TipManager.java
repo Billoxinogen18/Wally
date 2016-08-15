@@ -61,11 +61,24 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
     ///////////////////////////////////// not needed methods ///////////////////////////////////////
     @Override
     public void onContentFit(TangoPoseData pose) {
-        //Not needed
+        // Not needed
     }
 
     @Override
     public void onWallyEvent(WallyEvent event) {
-
+        switch (event.getId()) {
+            case WallyEvent.LEARNING_START:
+                onLearningStart();
+                break;
+            case WallyEvent.TANGO_OUT_OF_DATE:
+                onTangoOutOfDate();
+                break;
+            case WallyEvent.LOCALIZATION_START:
+                onLocalizationStart();
+                break;
+            default:
+                break;
+        }
     }
+
 }
