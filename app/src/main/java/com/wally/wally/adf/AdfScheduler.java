@@ -45,6 +45,7 @@ public class AdfScheduler implements ProgressReporter {
         if (!scheduler.isInterrupted()) {
             scheduler.interrupt();
         }
+        listener.onProgressUpdate(this, 1);
     }
 
     private void fireSuccess(AdfInfo info) {
@@ -100,11 +101,6 @@ public class AdfScheduler implements ProgressReporter {
         adfsSoFar++;
         double progress = (double) adfsSoFar / mAdfManager.getAdfTotalCount();
         listener.onProgressUpdate(this, progress);
-    }
-
-    @Override
-    public void forceReport() {
-        listener.onProgressUpdate(this, 1);
     }
 
     @Override

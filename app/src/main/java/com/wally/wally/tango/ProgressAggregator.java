@@ -36,11 +36,6 @@ public class ProgressAggregator implements ProgressReporter, ProgressListener {
         weightSum += weight;
     }
 
-    @Override
-    public void forceReport() {
-        fireProgress(1);
-    }
-
     public void addProgressListener(ProgressListener listener) {
         listeners.add(listener);
     }
