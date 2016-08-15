@@ -16,11 +16,11 @@ import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.controllers.main.TipManager;
 import com.wally.wally.controllers.main.TipView;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.events.WallyEventListener;
 import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.ContentFitter;
-import com.wally.wally.events.EventListener;
 import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.ProgressAggregator;
 import com.wally.wally.tango.TangoDriver;
@@ -170,7 +170,7 @@ public class MainFactory {
         return fitter;
     }
 
-    private void setEventListener(EventListener eventListener) {
+    private void setEventListener(WallyEventListener eventListener) {
         for (TangoState tango : tangoManagers.values()) {
             tango.addEventListener(eventListener);
         }
