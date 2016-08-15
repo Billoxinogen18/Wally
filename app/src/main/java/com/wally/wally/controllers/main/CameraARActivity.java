@@ -24,6 +24,7 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.renderer.OnVisualContentSelectedListener;
 import com.wally.wally.renderer.VisualContent;
+import com.wally.wally.tip.TipView;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.SocialUserManager;
 

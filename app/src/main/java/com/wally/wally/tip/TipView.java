@@ -1,4 +1,4 @@
-package com.wally.wally.controllers.main;
+package com.wally.wally.tip;
 
 import android.animation.Animator;
 import android.content.Context;

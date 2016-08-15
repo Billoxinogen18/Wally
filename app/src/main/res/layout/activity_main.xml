@@ -109,7 +109,7 @@
         android:layout_height="match_parent"
         android:elevation="30dp" />
 
-    <com.wally.wally.controllers.main.TipView
+    <com.wally.wally.tip.TipView
         android:id="@+id/tip_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
