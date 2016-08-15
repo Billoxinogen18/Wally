@@ -171,6 +171,11 @@ public class MainFactory {
         return fitter;
     }
 
+    public TangoState getTangoState(Class cl){
+        return tangoManagers.get(cl);
+    }
+
+
     private void setEventListener(WallyEventListener eventListener) {
         for (TangoState tango : tangoManagers.values()) {
             tango.addEventListener(eventListener);

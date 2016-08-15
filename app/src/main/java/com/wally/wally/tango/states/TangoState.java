@@ -387,6 +387,10 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
         throw new UnsupportedOperationException("State does not provide Adf");
     }
 
+    public Tango getTango(){
+        return mTango;
+    }
+
     public interface StateChangeListener {
         void onStateChange(TangoState nextTangoState);
     }
