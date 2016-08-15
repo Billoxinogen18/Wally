@@ -1,6 +1,5 @@
 package com.wally.wally.factory;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -24,7 +23,6 @@ import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.EventListener;
 import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.ProgressAggregator;
-import com.wally.wally.tango.ProgressListener;
 import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
@@ -48,7 +46,7 @@ import java.util.Map;
  * Main Factory responsible for creating Tango Managers
  */
 public class MainFactory {
-    private final ScaleGestureDetector mScaleDetector;
+    private ScaleGestureDetector mScaleDetector;
     private TangoUpdater mTangoUpdater;
     private VisualContentManager mVisualContentManager;
     private TangoFactory mTangoFactory;
@@ -67,10 +65,9 @@ public class MainFactory {
     public MainFactory(TipView tipView,
                        TangoUxLayout tangoUxLayout,
                        CameraARTangoActivity activity,
-                       RajawaliSurfaceView surfaceView,
-                       ProgressListener progressListener) {
-        set();
-        mExecutor = createExecutor(activity);
+                       RajawaliSurfaceView surfaceView) {
+        init();
+        mExecutor = createExecutor();
         Context context = activity.getBaseContext();
         mTangoUx = new WallyTangoUx(context, mConfig);
         mTangoUx.setLayout(tangoUxLayout);
@@ -95,27 +92,19 @@ public class MainFactory {
         ProgressAggregator progressAggregator = new ProgressAggregator();
         progressAggregator.addProgressReporter(mAdfScheduler, 0.3f);
         progressAggregator.addProgressReporter(mLearningEvaluator, 0.7f);
-        progressAggregator.addProgressListener(progressListener);
+        progressAggregator.addProgressListener(activity);
 
         mTangoFactory = new TangoFactory(context);
 
-        TipService tipService = new LocalTipService(Utils.getAssetContentAsString(context, "tips.json"), context.getSharedPreferences("tips", Context.MODE_PRIVATE));
+        TipService tipService = new LocalTipService(
+                Utils.getAssetContentAsString(context, "tips.json"),
+                context.getSharedPreferences("tips", Context.MODE_PRIVATE));
         mTipManager = new TipManager(tipView, tipService);
 
         createTangoManagers();
     }
 
-    private TangoState.Executor createExecutor(final Activity activity) {
-        return new TangoState.Executor() {
-            @Override
-            public void execute(Runnable runnable) {
-                activity.runOnUiThread(runnable);
-            }
-        };
-    }
-
-
-    private void set() {
+    private void init() {
         tangoManagers = new HashMap<>();
 
         mConfig = Config.getInstance();
@@ -166,12 +155,6 @@ public class MainFactory {
         return mTangoDriver;
     }
 
-    public void setEventListener(EventListener eventListener) {
-        for (TangoState tango : tangoManagers.values()) {
-            tango.addEventListener(eventListener);
-        }
-    }
-
     public VisualContentManager getVisualContentManager() {
         return mVisualContentManager;
     }
@@ -185,5 +168,20 @@ public class MainFactory {
         fitter.addOnContentFitListener(listener);
         fitter.addOnContentFitListener(mTipManager);
         return fitter;
+    }
+
+    private void setEventListener(EventListener eventListener) {
+        for (TangoState tango : tangoManagers.values()) {
+            tango.addEventListener(eventListener);
+        }
+    }
+
+    private TangoState.Executor createExecutor() {
+        return new TangoState.Executor() {
+            @Override
+            public void execute(Runnable runnable) {
+                new Thread(runnable).start();
+            }
+        };
     }
 }
