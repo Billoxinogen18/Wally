@@ -21,6 +21,7 @@
   "tags": {
     "learning": ["tip_1", "tip_2", "tip_3"],
     "localization": ["tip_4"],
-    "fitting": []
+    "fitting": [],
+    "localization_after_learning": []
   }
 }

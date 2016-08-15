@@ -45,12 +45,6 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
     @Override
     public void onWallyEvent(WallyEvent event) {
         switch (event.getId()) {
-            case WallyEvent.TANGO_READY:
-                //NOT NEEDED
-                break;
-            case WallyEvent.TANGO_OUT_OF_DATE:
-                //NOT NEEDED
-                break;
             case WallyEvent.LEARNING_START:
                 showTip(TipService.Tag.LEARNING);
                 break;
@@ -61,13 +55,19 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
                 showTip(TipService.Tag.LOCALIZATION);
                 break;
             case WallyEvent.LOCALIZATION_START_AFTER_LEARNING:
-                showTip(TipService.Tag.LOCALIZATION);
+                showTip(TipService.Tag.LOCALIZATION_AFTER_LEARNING);
                 break;
             case WallyEvent.LOCALIZATION_FINISH_AFTER_LEARNING:
                 mTipView.hide();
                 break;
             case WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF:
                 mTipView.hide();
+            case WallyEvent.TANGO_READY:
+                //NOT NEEDED
+                break;
+            case WallyEvent.TANGO_OUT_OF_DATE:
+                //NOT NEEDED
+                break;
             default:
                 break;
         }
