@@ -166,8 +166,9 @@ public class TangoDriverFactory {
         return new TangoState.Executor() {
             @Override
             public void execute(Runnable runnable) {
-                new Thread(runnable).start();
+                //new Thread(runnable).start();
                 //activity.runOnUiThread(runnable);
+                runnable.run();
             }
         };
     }
