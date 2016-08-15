@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.wally.wally.tango.EventListener;
+import com.wally.wally.events.EventListener;
 
 public class WallyAnalytics implements EventListener {
     public static final String TAG = WallyAnalytics.class.getSimpleName();

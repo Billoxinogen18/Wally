@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.tango.EventListener;
+import com.wally.wally.events.EventListener;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 

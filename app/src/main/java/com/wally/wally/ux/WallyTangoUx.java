@@ -17,7 +17,7 @@ import com.google.atap.tango.ux.TangoUxLayout;
 import com.wally.wally.R;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
-import com.wally.wally.tango.EventListener;
+import com.wally.wally.events.EventListener;
 
 /**
  * Created by Meravici on 5/26/2016. yea

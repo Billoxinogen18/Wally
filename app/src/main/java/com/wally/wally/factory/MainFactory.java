@@ -20,7 +20,7 @@ import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.ContentFitter;
-import com.wally.wally.tango.EventListener;
+import com.wally.wally.events.EventListener;
 import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.ProgressAggregator;
 import com.wally.wally.tango.TangoDriver;

@@ -1,4 +1,4 @@
-package com.wally.wally.tango;
+package com.wally.wally.events;
 
 /**
  * Created by Meravici on 8/8/2016. yea
