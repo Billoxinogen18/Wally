@@ -6,6 +6,8 @@ import android.util.Log;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.LearningEvaluatorConstants;
+import com.wally.wally.progressReporter.ProgressListener;
+import com.wally.wally.progressReporter.ProgressReporter;
 
 import org.rajawali3d.math.Quaternion;
 

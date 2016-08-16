@@ -2,8 +2,8 @@ package com.wally.wally.adf;
 
 import android.util.Log;
 
-import com.wally.wally.tango.ProgressListener;
-import com.wally.wally.tango.ProgressReporter;
+import com.wally.wally.progressReporter.ProgressListener;
+import com.wally.wally.progressReporter.ProgressReporter;
 
 import java.util.ArrayList;
 import java.util.List;

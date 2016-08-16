@@ -1,4 +1,4 @@
-package com.wally.wally.tango;
+package com.wally.wally.progressReporter;
 
 /**
  * Created by shota on 8/7/16.
