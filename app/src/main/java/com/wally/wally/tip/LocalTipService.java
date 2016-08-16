@@ -1,6 +1,9 @@
 package com.wally.wally.tip;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.wally.wally.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +24,12 @@ public class LocalTipService implements TipService {
     private Set<String> disabled;
     private JSONObject tips;
     private Map<String, List<String>> tipKeysForTags;
+
+    public static LocalTipService getInstance(Context context){
+        return new LocalTipService(
+                Utils.getAssetContentAsString(context, "tips.json"),
+                context.getSharedPreferences("tips", Context.MODE_PRIVATE));
+    }
 
     public LocalTipService(String json, SharedPreferences preferences) {
         this.preferences = preferences;

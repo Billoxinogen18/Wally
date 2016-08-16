@@ -98,6 +98,14 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_my_location_black_24dp" />
         </RelativeLayout>
+        <com.wally.wally.tip.TipView
+            android:id="@+id/tip_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="60dp"
+            android:layout_marginRight="16dp"/>
 
     </RelativeLayout>
 

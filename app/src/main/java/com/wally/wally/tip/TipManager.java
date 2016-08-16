@@ -1,6 +1,8 @@
 package com.wally.wally.tip;
 
 import com.google.atap.tangoservice.TangoPoseData;
+import com.mapbox.mapboxsdk.maps.MapFragment;
+import com.wally.wally.controllers.map.MapsFragment;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.events.WallyEventListener;
@@ -9,7 +11,7 @@ import com.wally.wally.tango.ContentFitter;
 /**
  * Created by Meravici on 8/8/2016. yea
  */
-public class TipManager implements WallyEventListener, ContentFitter.OnContentFitListener {
+public class TipManager implements WallyEventListener, ContentFitter.OnContentFitListener, MapsFragment.MapEventListener {
     private TipView mTipView;
     private TipService mTipService;
 
@@ -36,11 +38,22 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
         mTipView.hide();
     }
 
+    @Override
+    public void onProfileInit() {
 
-
-    private void showTip(String type) {
-        mTipView.show(mTipService.getRandom(type), 0);
     }
+
+    @Override
+    public void onPeopleInit() {
+
+    }
+
+    @Override
+    public void onPublicFeedInit() {
+
+    }
+
+
 
     @Override
     public void onWallyEvent(WallyEvent event) {
@@ -73,10 +86,13 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
         }
     }
 
+    private void showTip(String type) {
+        mTipView.show(mTipService.getRandom(type), 5000);
+    }
+
     ///////////////////////////////////// not needed methods ///////////////////////////////////////
     @Override
     public void onContentFit(TangoPoseData pose) {
         // Not needed
     }
-
 }

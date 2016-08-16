@@ -82,9 +82,7 @@ public class MainFactory {
 
         mTangoFactory = new TangoFactory(context);
 
-        TipService tipService = new LocalTipService(
-                Utils.getAssetContentAsString(context, "tips.json"),
-                context.getSharedPreferences("tips", Context.MODE_PRIVATE));
+        TipService tipService = LocalTipService.getInstance(context);
         mTipManager = new TipManager(tipView, tipService);
 
     }

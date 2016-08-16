@@ -41,8 +41,12 @@ import com.wally.wally.controllers.map.contentList.View;
 import com.wally.wally.controllers.map.contentList.ViewItem;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.tip.LocalTipService;
+import com.wally.wally.tip.TipManager;
+import com.wally.wally.tip.TipView;
 import com.wally.wally.userManager.SocialUser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -90,6 +94,8 @@ public class MapsFragment extends BaseFragment implements
         }
     };
 
+    private List<MapEventListener> mapEventListeners;
+
     public MapsFragment() {
         // Required empty public constructor
     }
@@ -129,8 +135,12 @@ public class MapsFragment extends BaseFragment implements
         v.findViewById(R.id.back).setOnClickListener(this);
         v.findViewById(R.id.my_location).setOnClickListener(this);
         v.findViewById(R.id.update_area).setOnClickListener(this);
+        TipView tipView = (TipView) v.findViewById(R.id.tip_view);
 
-//        TipManager tipManager = new TipManager(mTipView, new LocalTipService())
+        TipManager tipManager = new TipManager(tipView, LocalTipService.getInstance(getContext()));
+
+        mapEventListeners = new ArrayList<>();
+        mapEventListeners.add(tipManager);
 
         mContentListView = (com.wally.wally.controllers.map.contentList.View) v.findViewById(R.id.content_list_view);
 
@@ -237,10 +247,23 @@ public class MapsFragment extends BaseFragment implements
         mContentListView.setOnScrollSettleListener(this);
 
 
-        if (mUserProfile == null)
+        if (mUserProfile == null) {
             centerMapOnMyLocation(defaultCenterMyLocationCallback);
-        else
+            for (MapEventListener mapEventListener : mapEventListeners) {
+                mapEventListener.onPublicFeedInit();
+            }
+        } else {
+            if(App.getInstance().getSocialUserManager().getUser().equals(mUserProfile)){
+                for (MapEventListener mapEventListener : mapEventListeners) {
+                    mapEventListener.onProfileInit();
+                }
+            }else{
+                for (MapEventListener mapEventListener : mapEventListeners) {
+                    mapEventListener.onPeopleInit();
+                }
+            }
             loadContentNearLocation(null);
+        }
     }
 
     @Override
@@ -460,5 +483,13 @@ public class MapsFragment extends BaseFragment implements
         void onMapOpen();
 
         void openMapFragment(SocialUser socialUser);
+    }
+
+    public interface MapEventListener {
+        void onProfileInit();
+
+        void onPeopleInit();
+
+        void onPublicFeedInit();
     }
 }
