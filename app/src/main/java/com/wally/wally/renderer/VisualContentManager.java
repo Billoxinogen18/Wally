@@ -438,8 +438,7 @@ public class VisualContentManager {
         synchronized (mStaticContentLock) {
             visualContent.setStatus(VisualContent.RenderStatus.PendingRemove);
             int index = mStaticContent.indexOf(visualContent);
-            if (index == -1) {
-            } else {
+            if (index != -1) {
                 mStaticContent.set(index, visualContent);
             }
         }

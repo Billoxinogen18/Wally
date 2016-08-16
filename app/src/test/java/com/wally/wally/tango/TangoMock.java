@@ -12,6 +12,7 @@ import org.objenesis.ObjenesisStd;
 
 /**
  * Created by shota on 5/24/16.
+ * Tango Mock for testing
  */
 
 public class TangoMock extends Tango{
@@ -24,9 +25,8 @@ public class TangoMock extends Tango{
 
     public static Tango getTango(){
         Objenesis objenesis = new ObjenesisStd(); // or ObjenesisSerializer
-        TangoMock res = objenesis.newInstance(TangoMock.class);
 
-        return res;
+        return objenesis.newInstance(TangoMock.class);
     }
 
     @Override
@@ -41,7 +41,6 @@ public class TangoMock extends Tango{
 
     @Override
     public TangoConfig getConfig(int x){
-        int y = 34/0;
         return config;
     }
 }

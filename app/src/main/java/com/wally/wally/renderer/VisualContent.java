@@ -98,8 +98,10 @@ public class VisualContent {
 
     @Override
     public boolean equals(Object o){
+        if (!(o instanceof VisualContent)) {
+            return false;
+        }
         VisualContent v = (VisualContent) o;
-
         return v.getContent().getId().equals(mContent.getId());
     }
 
