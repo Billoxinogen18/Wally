@@ -79,5 +79,10 @@ public abstract class TangoForAdf extends TangoState {
         mLocalizationWatchdog.start();
     }
 
+    @Override
+    public AdfInfo getAdf() {
+        return mAdfInfo;
+    }
+
     protected abstract void fireLocalizationFinish();
 }

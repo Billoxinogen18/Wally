@@ -12,35 +12,22 @@ import com.wally.wally.App;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.config.Config;
-import com.wally.wally.config.TangoManagerConstants;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.controllers.main.TipManager;
 import com.wally.wally.controllers.main.TipView;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.events.WallyEventListener;
 import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.LearningEvaluator;
 import com.wally.wally.tango.ProgressAggregator;
-import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
-import com.wally.wally.tango.states.TangoForCloudAdfs;
-import com.wally.wally.tango.states.TangoForLearnedAdf;
-import com.wally.wally.tango.states.TangoForLearning;
-import com.wally.wally.tango.states.TangoForReadyState;
-import com.wally.wally.tango.states.TangoForSavedAdf;
-import com.wally.wally.tango.states.TangoState;
 import com.wally.wally.tip.LocalTipService;
 import com.wally.wally.tip.TipService;
 import com.wally.wally.ux.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by shota on 8/9/16.
@@ -57,18 +44,16 @@ public class MainFactory {
     private LearningEvaluator mLearningEvaluator;
     private TipManager mTipManager;
     private AdfScheduler mAdfScheduler;
-    private TangoDriver mTangoDriver;
 
-    private Map<Class, TangoState> tangoManagers;
     private WallyTangoUx mTangoUx;
-    private TangoState.Executor mExecutor;
+    private Activity activity;
 
     public MainFactory(TipView tipView,
                        TangoUxLayout tangoUxLayout,
                        CameraARTangoActivity activity,
                        RajawaliSurfaceView surfaceView) {
         init();
-        mExecutor = createExecutor(activity);
+        this.activity = activity;
         Context context = activity.getBaseContext();
         mTangoUx = new WallyTangoUx(context, mConfig);
         mTangoUx.setLayout(tangoUxLayout);
@@ -102,12 +87,9 @@ public class MainFactory {
                 context.getSharedPreferences("tips", Context.MODE_PRIVATE));
         mTipManager = new TipManager(tipView, tipService);
 
-        createTangoManagers();
     }
 
     private void init() {
-        tangoManagers = new HashMap<>();
-
         mConfig = Config.getInstance();
         mLearningEvaluator = new LearningEvaluator(mConfig);
 
@@ -115,45 +97,6 @@ public class MainFactory {
 
         mVisualContentManager = new VisualContentManager();
         mAdfScheduler = new AdfScheduler(App.getInstance().getAdfManager());
-    }
-
-    private void createTangoManagers() {
-        long localizationTimeout = mConfig.getInt(TangoManagerConstants.LOCALIZATION_TIMEOUT);
-        TangoForLearnedAdf tangoForLearnedAdf =
-                new TangoForLearnedAdf(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
-        tangoForLearnedAdf.withLocalizationTimeout(localizationTimeout);
-        tangoManagers.put(TangoForLearnedAdf.class, tangoForLearnedAdf);
-
-        TangoForLearning tangoForLearning =
-                new TangoForLearning(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mLearningEvaluator, mPointCloudManager);
-        tangoManagers.put(TangoForLearning.class, tangoForLearning);
-
-        TangoForReadyState tangoForReadyState =
-                new TangoForReadyState(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
-        tangoManagers.put(TangoForReadyState.class, tangoForReadyState);
-
-        TangoForCloudAdfs tangoForCloudAdfs =
-                new TangoForCloudAdfs(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager, mAdfScheduler);
-        tangoForCloudAdfs.withLocalizationTimeout(localizationTimeout);
-        tangoManagers.put(TangoForCloudAdfs.class, tangoForCloudAdfs);
-
-        TangoForSavedAdf tangoForSavedAdf =
-                new TangoForSavedAdf(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
-        tangoForSavedAdf.withLocalizationTimeout(localizationTimeout);
-        tangoManagers.put(TangoForSavedAdf.class, tangoForSavedAdf);
-
-        setEventListener(mTipManager);
-        setEventListener(mTangoUx);
-
-        mTangoUpdater.addTangoUpdaterListener(tangoForCloudAdfs);
-        mTangoDriver = new TangoDriver(tangoForCloudAdfs);
-
-//        mTangoUpdater.addTangoUpdaterListener(tangoForLearning);
-//        mTangoDriver = new TangoDriver(tangoForLearning);
-    }
-
-    public TangoDriver getTangoDriver() {
-        return mTangoDriver;
     }
 
     public VisualContentManager getVisualContentManager() {
@@ -164,31 +107,39 @@ public class MainFactory {
         return mTangoUx;
     }
 
-    public ContentFitter getContentFitter(Content c, ContentFitter.OnContentFitListener listener) {
-        ContentFitter fitter = new ContentFitter(c, mTangoDriver, mVisualContentManager);
-        fitter.addOnContentFitListener(listener);
-        fitter.addOnContentFitListener(mTipManager);
-        return fitter;
+    public TangoUpdater getTangoUpdater() {
+        return mTangoUpdater;
     }
 
-    public TangoState getTangoState(Class cl){
-        return tangoManagers.get(cl);
+    public TangoFactory getTangoFactory() {
+        return mTangoFactory;
     }
 
-
-    private void setEventListener(WallyEventListener eventListener) {
-        for (TangoState tango : tangoManagers.values()) {
-            tango.addEventListener(eventListener);
-        }
+    public Config getConfig() {
+        return mConfig;
     }
 
-    private TangoState.Executor createExecutor(final Activity activity) {
-        return new TangoState.Executor() {
-            @Override
-            public void execute(Runnable runnable) {
-                //new Thread(runnable).start();
-                activity.runOnUiThread(runnable);
-            }
-        };
+    public TangoPointCloudManager getPointCloudManager() {
+        return mPointCloudManager;
+    }
+
+    public WallyRenderer getRenderer() {
+        return mRenderer;
+    }
+
+    public LearningEvaluator getLearningEvaluator() {
+        return mLearningEvaluator;
+    }
+
+    public TipManager getTipManager() {
+        return mTipManager;
+    }
+
+    public AdfScheduler getAdfScheduler(){
+        return mAdfScheduler;
+    }
+
+    public Activity getActivity() {
+        return activity;
     }
 }
