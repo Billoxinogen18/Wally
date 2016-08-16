@@ -1,4 +1,4 @@
-package com.wally.wally.factory;
+package com.wally.wally.controllers.main.factory;
 
 import android.app.Activity;
 

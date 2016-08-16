@@ -41,9 +41,6 @@ import com.wally.wally.controllers.map.contentList.View;
 import com.wally.wally.controllers.map.contentList.ViewItem;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.factory.MainFactory;
-import com.wally.wally.tip.LocalTipService;
-import com.wally.wally.tip.TipManager;
 import com.wally.wally.userManager.SocialUser;
 
 import java.util.List;
