@@ -59,8 +59,8 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     protected TangoFactory mTangoFactory;
     protected List<WallyEventListener> mEventListeners;
 
-    private TangoPointCloudManager mPointCloudManager;
-    private WallyRenderer mRenderer;
+    protected TangoPointCloudManager mPointCloudManager;
+    protected WallyRenderer mRenderer;
     private StateChangeListener mStateChangeListener;
 
     protected TangoCameraIntrinsics mIntrinsics;
