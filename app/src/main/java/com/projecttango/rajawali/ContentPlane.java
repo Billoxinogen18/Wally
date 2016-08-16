@@ -2,10 +2,7 @@ package com.projecttango.rajawali;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.primitives.Plane;
 
-import org.rajawali3d.Object3D;
-import org.rajawali3d.math.vector.Vector3.Axis;
 
 /**
  * Created by ioane5 on 4/25/16.

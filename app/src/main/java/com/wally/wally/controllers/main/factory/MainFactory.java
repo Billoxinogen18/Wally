@@ -9,7 +9,6 @@ import android.view.View;
 import com.google.atap.tango.ux.TangoUxLayout;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.App;
-import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.config.Config;
 import com.wally.wally.controllers.main.CameraARTangoActivity;

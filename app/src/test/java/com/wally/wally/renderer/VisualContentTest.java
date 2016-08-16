@@ -2,13 +2,10 @@ package com.wally.wally.renderer;
 
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
-import com.wally.wally.renderer.VisualContent;
 
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * Created by shota on 5/24/16.

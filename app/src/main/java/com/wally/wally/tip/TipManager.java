@@ -1,7 +1,6 @@
 package com.wally.wally.tip;
 
 import com.google.atap.tangoservice.TangoPoseData;
-import com.mapbox.mapboxsdk.maps.MapFragment;
 import com.wally.wally.controllers.map.MapsFragment;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.events.WallyEvent;

@@ -66,13 +66,12 @@ public class VisualContentManager {
     }
 
     private ActiveVisualContent getLocalizationNewActiveContent(ActiveVisualContent savedContent, ActiveVisualContent contentNow){
-        ActiveVisualContent res = savedContent;
         if ((savedContent.getStatus() == VisualContent.RenderStatus.Rendered || savedContent.getStatus() == VisualContent.RenderStatus.PendingRender)
                 && (contentNow == null || (contentNow.getStatus() != VisualContent.RenderStatus.Rendered && contentNow.getStatus() != VisualContent.RenderStatus.PendingRemove))) {
-            res.setStatus(VisualContent.RenderStatus.PendingRender);
+            savedContent.setStatus(VisualContent.RenderStatus.PendingRender);
         }
 
-        return res;
+        return savedContent;
     }
 
     /**

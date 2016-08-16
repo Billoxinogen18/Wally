@@ -18,7 +18,7 @@ import org.rajawali3d.scene.RajawaliScene;
  */
 public class ActiveVisualContent extends VisualContent {
     private static final String TAG = ActiveVisualContent.class.getSimpleName();
-    private static final int MOVE_ANUMATION_DURATION = 400;
+    private static final int MOVE_ANIMATION_DURATION = 400;
     private Animation3D mMoveAnim = null;
     private Pose mNewPose;
 
@@ -60,7 +60,7 @@ public class ActiveVisualContent extends VisualContent {
         }
         anim = new TranslateAnimation3D(mNewPose.getPosition());
         anim.setTransformable3D(mVisual);
-        anim.setDurationMilliseconds(MOVE_ANUMATION_DURATION);
+        anim.setDurationMilliseconds(MOVE_ANIMATION_DURATION);
         anim.setInterpolator(new AccelerateDecelerateInterpolator());
         scene.registerAnimation(anim);
         anim.play();

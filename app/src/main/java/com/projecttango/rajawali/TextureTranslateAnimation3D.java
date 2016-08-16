@@ -1,13 +1,10 @@
 package com.projecttango.rajawali;
 
-import android.util.Log;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation3D;
-import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.textures.ATexture;
-import org.rajawali3d.materials.textures.Texture;
-import org.rajawali3d.math.vector.Vector3;
+
 
 /**
  * Created by Xato on 4/27/2016.
