@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 import com.wally.wally.BaseActivity;
 
 /**
- * This BaseFragment helps you to manage base funcionality used in our fragments.
+ * This BaseFragment helps you to manage base functionality used in our fragments.
  * <p/>
  * For Now It gives you following features:
  * <ul>

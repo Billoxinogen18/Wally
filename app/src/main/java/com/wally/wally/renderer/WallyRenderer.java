@@ -205,7 +205,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
             if (removeIt.hasNext()) {
                 VisualContent vc = removeIt.next();
                 getCurrentScene().removeChild(vc.getVisual());
-                Log.d(TAG, "renderStaticContent() definetlly removed " + vc);
+                Log.d(TAG, "renderStaticContent() definitely removed " + vc);
                 mVisualContentManager.setStaticContentRemoved(vc);
                 mOnContentSelectedListener.onVisualContentSelected(null);
                 removeBorder();
