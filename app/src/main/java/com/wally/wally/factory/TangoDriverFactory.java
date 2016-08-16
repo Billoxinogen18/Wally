@@ -6,7 +6,6 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
-import com.wally.wally.controllers.main.TipManager;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.events.WallyEventListener;
 import com.wally.wally.renderer.VisualContentManager;
@@ -23,6 +22,7 @@ import com.wally.wally.tango.states.TangoForReadyState;
 import com.wally.wally.tango.states.TangoForSavedAdf;
 import com.wally.wally.tango.states.TangoState;
 import com.wally.wally.tango.states.TangoStateConnector;
+import com.wally.wally.tip.TipManager;
 import com.wally.wally.ux.WallyTangoUx;
 
 import java.util.HashMap;

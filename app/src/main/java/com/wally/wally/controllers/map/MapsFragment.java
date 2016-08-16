@@ -41,6 +41,9 @@ import com.wally.wally.controllers.map.contentList.View;
 import com.wally.wally.controllers.map.contentList.ViewItem;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.factory.MainFactory;
+import com.wally.wally.tip.LocalTipService;
+import com.wally.wally.tip.TipManager;
 import com.wally.wally.userManager.SocialUser;
 
 import java.util.List;
@@ -129,6 +132,8 @@ public class MapsFragment extends BaseFragment implements
         v.findViewById(R.id.back).setOnClickListener(this);
         v.findViewById(R.id.my_location).setOnClickListener(this);
         v.findViewById(R.id.update_area).setOnClickListener(this);
+
+//        TipManager tipManager = new TipManager(mTipView, new LocalTipService())
 
         mContentListView = (com.wally.wally.controllers.map.contentList.View) v.findViewById(R.id.content_list_view);
 

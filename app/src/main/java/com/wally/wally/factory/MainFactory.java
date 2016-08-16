@@ -13,8 +13,6 @@ import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.config.Config;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
-import com.wally.wally.controllers.main.TipManager;
-import com.wally.wally.controllers.main.TipView;
 import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
@@ -23,7 +21,9 @@ import com.wally.wally.tango.ProgressAggregator;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tip.LocalTipService;
+import com.wally.wally.tip.TipManager;
 import com.wally.wally.tip.TipService;
+import com.wally.wally.tip.TipView;
 import com.wally.wally.ux.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
