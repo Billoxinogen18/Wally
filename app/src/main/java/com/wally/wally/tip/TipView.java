@@ -86,37 +86,39 @@ public class TipView extends LinearLayout implements View.OnTouchListener {
         };
     }
 
-    public void setDismissListener(DismissListener dismissListener){
+    public void setDismissListener(DismissListener dismissListener) {
         this.dismissListener = dismissListener;
     }
 
-    public void show(Tip tip, int durationMs){
+    public void show(Tip tip, int durationMs) {
         reset();
-        this.id = tip.getId();
-        final String message = tip.getMessage();
+        if (tip != null) {
+            this.id = tip.getId();
+            final String message = tip.getMessage();
 
-        mainThreadHandler.removeCallbacks(hideRunnable);
+            mainThreadHandler.removeCallbacks(hideRunnable);
 
-        mainThreadHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (message != null && !message.isEmpty()) {
-                    messageTV.setText(message);
+            mainThreadHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (message != null && !message.isEmpty()) {
+                        messageTV.setText(message);
+                    }
+
+                    setScaleX(0);
+                    setScaleY(0);
+                    setVisibility(VISIBLE);
+                    animate().scaleX(1).scaleY(1).setInterpolator(new OvershootInterpolator());
                 }
+            });
 
-                setScaleX(0);
-                setScaleY(0);
-                setVisibility(VISIBLE);
-                animate().scaleX(1).scaleY(1).setInterpolator(new OvershootInterpolator());
+            if (durationMs > 0) {
+                mainThreadHandler.postDelayed(hideRunnable, durationMs);
             }
-        });
-
-        if (durationMs > 0) {
-            mainThreadHandler.postDelayed(hideRunnable, durationMs);
         }
     }
 
-    public void hide(){
+    public void hide() {
         reset();
     }
 

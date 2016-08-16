@@ -32,13 +32,14 @@ public class Tip {
         return title;
     }
 
-    public String getId(){
+    public String getId() {
         return id;
     }
 
     @Override
     public String toString() {
         return "Tip{" +
+                "id='" + id + '\'' +
                 "title='" + title + '\'' +
                 ", message='" + message + '\'' +
                 '}';

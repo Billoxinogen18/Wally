@@ -86,8 +86,8 @@
     "localization": ["tip_4"],
     "fitting": ["tip_6"],
     "localization_after_learning": ["tip_5"],
-    "map_public_feed": [],
-    "map_profile": [],
-    "map_person": []
+    "map_public_feed": ["tip_2"],
+    "map_profile": ["tip_1"],
+    "map_person": ["tip_3"]
   }
 }
