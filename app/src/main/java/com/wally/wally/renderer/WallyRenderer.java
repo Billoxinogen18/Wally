@@ -276,11 +276,16 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
      * Sets the projection matrix for the scen camera to match the parameters of the color camera,
      * provided by the {@code TangoCameraIntrinsics}.
      */
+    @Deprecated
     public void setProjectionMatrix(TangoCameraIntrinsics intrinsics) {
         Matrix4 projectionMatrix = ScenePoseCalculator.calculateProjectionMatrix(
                 intrinsics.width, intrinsics.height,
                 intrinsics.fx, intrinsics.fy, intrinsics.cx, intrinsics.cy);
         getCurrentCamera().setProjectionMatrix(projectionMatrix);
+    }
+
+    public void setProjectionMatrix(float[] matrixFloats) {
+        getCurrentCamera().setProjectionMatrix(new Matrix4(matrixFloats));
     }
 
     @Override

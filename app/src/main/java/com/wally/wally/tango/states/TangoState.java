@@ -1,5 +1,6 @@
 package com.wally.wally.tango.states;
 
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.google.atap.tangoservice.Tango;
@@ -316,7 +317,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
                         // Set-up scene camera projection to match RGB camera intrinsics
                         if (!mRenderer.isSceneCameraConfigured()) {
-                            mRenderer.setProjectionMatrix(mIntrinsics);
+                            mRenderer.setProjectionMatrix(projectionMatrixFromCameraIntrinsics(mIntrinsics));
                         }
 
                         // Connect the camera texture to the OpenGL Texture if necessary
@@ -372,6 +373,29 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
             }
         });
     }
+
+        private static float[] projectionMatrixFromCameraIntrinsics(TangoCameraIntrinsics intrinsics) {
+                // Uses frustumM to create a projection matrix taking into account calibrated camera
+                        // intrinsic parameter.
+                                // Reference: http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
+                                        float near = 0.1f;
+                float far = 100;
+        
+                        float xScale = near / (float) intrinsics.fx;
+                float yScale = near / (float) intrinsics.fy;
+                float xOffset = (float) (intrinsics.cx - (intrinsics.width / 2.0)) * xScale;
+                // Color camera's coordinates has y pointing downwards so we negate this term.
+                        float yOffset = (float) -(intrinsics.cy - (intrinsics.height / 2.0)) * yScale;
+        
+                        float m[] = new float[16];
+                Matrix.frustumM(m, 0,
+                                xScale * (float) -intrinsics.width / 2.0f - xOffset,
+                                xScale * (float) intrinsics.width / 2.0f - xOffset,
+                                yScale * (float) -intrinsics.height / 2.0f - yOffset,
+                                yScale * (float) intrinsics.height / 2.0f - yOffset,
+                                near, far);
+                return m;
+            }
 
     private void fireTangoOutOfDate() {
         fireEvent(WallyEvent.createEventWithId(WallyEvent.TANGO_OUT_OF_DATE));
