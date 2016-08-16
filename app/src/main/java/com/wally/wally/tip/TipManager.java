@@ -40,20 +40,18 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
 
     @Override
     public void onProfileInit() {
-
+        showTip(TipService.Tag.MAP_PROFILE);
     }
 
     @Override
-    public void onPeopleInit() {
-
+    public void onPersonInit() {
+        showTip(TipService.Tag.MAP_PERSON);
     }
 
     @Override
     public void onPublicFeedInit() {
-
+        showTip(TipService.Tag.MAP_PUBLIC_FEED);
     }
-
-
 
     @Override
     public void onWallyEvent(WallyEvent event) {

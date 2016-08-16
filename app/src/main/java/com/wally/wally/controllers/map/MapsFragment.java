@@ -259,7 +259,7 @@ public class MapsFragment extends BaseFragment implements
                 }
             }else{
                 for (MapEventListener mapEventListener : mapEventListeners) {
-                    mapEventListener.onPeopleInit();
+                    mapEventListener.onPersonInit();
                 }
             }
             loadContentNearLocation(null);
@@ -488,7 +488,7 @@ public class MapsFragment extends BaseFragment implements
     public interface MapEventListener {
         void onProfileInit();
 
-        void onPeopleInit();
+        void onPersonInit();
 
         void onPublicFeedInit();
     }
