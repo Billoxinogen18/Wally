@@ -27,6 +27,8 @@ public class TangoForReadyState extends TangoState {
         super(executor, tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
     }
 
+
+
     public TangoForReadyState withTangoAndAdf(Tango tango, AdfInfo adf) {
         Log.d(TAG, "withTangoAndAdf() called with: " + "tango = [" + tango + "], adf = [" + adf + "]");
         mTango = tango;
@@ -34,12 +36,28 @@ public class TangoForReadyState extends TangoState {
         return this;
     }
 
+    public TangoForReadyState withPreviousState(TangoState state, AdfInfo adf){
+        mTango = state.mTango;
+        mAdfInfo = adf;
+        mTangoUpdater = state.mTangoUpdater;
+        mIsLocalized = state.mIsLocalized;
+        mIsConnected = state.mIsConnected;
+        mEventListeners = state.mEventListeners;
+        mTangoFactory = state.mTangoFactory;
+        mExecutor = state.mExecutor;
+        mIntrinsics = state.mIntrinsics;
+        mExtrinsics = state.mExtrinsics;
+        mCameraPoseTimestamp = state.mCameraPoseTimestamp;
+        mConnectedTextureIdGlThread = state.mConnectedTextureIdGlThread;
+        mRgbTimestampGlThread = state.mRgbTimestampGlThread;
+        mConnectedTextureIdGlThread = state.mConnectedTextureIdGlThread;
+        mIsFrameAvailableTangoThread = state.mIsFrameAvailableTangoThread;
+        return this;
+    }
+
     @Override
     protected void pauseHook() {
         mFailStateConnector.toNextState();
-//        Log.d(TAG, "changeToSavedAdfState Thread = " + Thread.currentThread());
-//        TangoState nextTango = ((TangoForSavedAdf)mTangoStatePool.get(TangoForSavedAdf.class)).withAdf(mAdfInfo);
-//        changeState(nextTango);
     }
 
     @Override

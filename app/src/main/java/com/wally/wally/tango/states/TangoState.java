@@ -54,6 +54,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     protected Tango mTango;
     protected Executor mExecutor;
     protected boolean mIsLocalized;
+    protected boolean mIsConnected;
     protected TangoUpdater mTangoUpdater;
     protected TangoFactory mTangoFactory;
     protected List<WallyEventListener> mEventListeners;
@@ -62,17 +63,16 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     private WallyRenderer mRenderer;
     private StateChangeListener mStateChangeListener;
 
-    private boolean mIsConnected;
-    private TangoCameraIntrinsics mIntrinsics;
-    private DeviceExtrinsics mExtrinsics;
-    private double mCameraPoseTimestamp = 0;
+    protected TangoCameraIntrinsics mIntrinsics;
+    protected DeviceExtrinsics mExtrinsics;
+    protected double mCameraPoseTimestamp = 0;
 
 
     // NOTE: suffix indicates which thread is in charge of updating
-    private double mRgbTimestampGlThread;
+    protected double mRgbTimestampGlThread;
     //private boolean mIsFrameAvailableTangoThread;
-    private AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
-    private int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
+    protected AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
+    protected int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
     protected TangoStateConnector mFailStateConnector;
     protected TangoStateConnector mSuccessStateConnector;
 
@@ -153,7 +153,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
             if (mTango != null) {
                 mTango.disconnect();
                 mTango = null;
-                System.gc();
             }
         }
         mTangoUpdater.setTangoLocalization(false);
@@ -242,18 +241,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
             }
         };
     }
-
-
-    protected void changeState(TangoState nextTango) {
-        mStateChangeListener.onStateChange(nextTango);
-        resetTangoUpdaterListener(nextTango);
-    }
-
-    private void resetTangoUpdaterListener(TangoUpdater.TangoUpdaterListener toAdd) {
-        mTangoUpdater.removeTangoUpdaterListener(this);
-        mTangoUpdater.addTangoUpdaterListener(toAdd);
-    }
-
 
     /**
      * Use the TangoSupport library with point cloud data to calculate the plane
