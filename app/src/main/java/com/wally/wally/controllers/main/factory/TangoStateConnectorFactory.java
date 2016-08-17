@@ -116,10 +116,9 @@ public class TangoStateConnectorFactory {
             @Override
             public void toNextState() {
                 Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
-                //to.withTangoAndAdf(from.getTango(), from.getAdf());
                 to.withPreviousState(from, from.getAdf());
                 mStateChangeListener.onStateChange(to);
-                //changeState(from, to);
+                to.resume();
             }
         };
     }
