@@ -42,6 +42,7 @@ import com.wally.wally.controllers.map.contentList.ViewItem;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.tip.LocalTipService;
+import com.wally.wally.tip.MapEventListener;
 import com.wally.wally.tip.TipManager;
 import com.wally.wally.tip.TipView;
 import com.wally.wally.userManager.SocialUser;
@@ -137,7 +138,7 @@ public class MapsFragment extends BaseFragment implements
         v.findViewById(R.id.update_area).setOnClickListener(this);
         TipView tipView = (TipView) v.findViewById(R.id.tip_view);
 
-        TipManager tipManager = new TipManager(tipView, LocalTipService.getInstance(getContext()));
+        MapEventListener tipManager = new TipManager(tipView, LocalTipService.getInstance(getContext()));
 
         mapEventListeners = new ArrayList<>();
         mapEventListeners.add(tipManager);
@@ -485,11 +486,5 @@ public class MapsFragment extends BaseFragment implements
         void openMapFragment(SocialUser socialUser);
     }
 
-    public interface MapEventListener {
-        void onProfileInit();
 
-        void onPersonInit();
-
-        void onPublicFeedInit();
-    }
 }
