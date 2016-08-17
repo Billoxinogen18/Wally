@@ -57,7 +57,6 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
                 }
                 if (info == null) {
                     mFailStateConnector.toNextState();
-                    // changeToLearningState();
                 } else {
                     withAdf(info);
                     startLocalizing();
@@ -71,16 +70,6 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
             }
         };
     }
-
-
-    private void changeToLearningState(){
-//        Log.d(TAG, "changeToLearningState");
-//        pause();
-//        TangoState nextTango = mTangoStatePool.get(TangoForLearning.class);
-//        changeState(nextTango);
-//        nextTango.resume();
-    }
-
 
     @Override
     public void onLocalization(boolean localization) {//TODO refactor inheritance
