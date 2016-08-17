@@ -61,7 +61,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
     protected TangoPointCloudManager mPointCloudManager;
     protected WallyRenderer mRenderer;
-    private StateChangeListener mStateChangeListener;
 
     protected TangoCameraIntrinsics mIntrinsics;
     protected DeviceExtrinsics mExtrinsics;
@@ -195,14 +194,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
     public void addEventListener(WallyEventListener listener) {
         mEventListeners.add(listener);
-    }
-
-    public boolean removeEventListener(WallyEventListener listener) {
-        return mEventListeners.remove(listener);
-    }
-
-    public void setStateChangeListener(StateChangeListener listener) {
-        mStateChangeListener = listener;
     }
 
     public boolean isLearningState() {
@@ -361,28 +352,28 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
         });
     }
 
-        private static float[] projectionMatrixFromCameraIntrinsics(TangoCameraIntrinsics intrinsics) {
-                // Uses frustumM to create a projection matrix taking into account calibrated camera
-                        // intrinsic parameter.
-                                // Reference: http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
-                                        float near = 0.1f;
-                float far = 100;
-        
-                        float xScale = near / (float) intrinsics.fx;
-                float yScale = near / (float) intrinsics.fy;
-                float xOffset = (float) (intrinsics.cx - (intrinsics.width / 2.0)) * xScale;
-                // Color camera's coordinates has y pointing downwards so we negate this term.
-                        float yOffset = (float) -(intrinsics.cy - (intrinsics.height / 2.0)) * yScale;
-        
-                        float m[] = new float[16];
-                Matrix.frustumM(m, 0,
-                                xScale * (float) -intrinsics.width / 2.0f - xOffset,
-                                xScale * (float) intrinsics.width / 2.0f - xOffset,
-                                yScale * (float) -intrinsics.height / 2.0f - yOffset,
-                                yScale * (float) intrinsics.height / 2.0f - yOffset,
-                                near, far);
-                return m;
-            }
+    private static float[] projectionMatrixFromCameraIntrinsics(TangoCameraIntrinsics intrinsics) {
+        // Uses frustumM to create a projection matrix taking into account calibrated camera
+        // intrinsic parameter.
+        // Reference: http://ksimek.github.io/2013/06/03/calibrated_cameras_in_opengl/
+        float near = 0.1f;
+        float far = 100;
+
+        float xScale = near / (float) intrinsics.fx;
+        float yScale = near / (float) intrinsics.fy;
+        float xOffset = (float) (intrinsics.cx - (intrinsics.width / 2.0)) * xScale;
+        // Color camera's coordinates has y pointing downwards so we negate this term.
+        float yOffset = (float) -(intrinsics.cy - (intrinsics.height / 2.0)) * yScale;
+
+        float m[] = new float[16];
+        Matrix.frustumM(m, 0,
+                        xScale * (float) -intrinsics.width / 2.0f - xOffset,
+                        xScale * (float) intrinsics.width / 2.0f - xOffset,
+                        yScale * (float) -intrinsics.height / 2.0f - yOffset,
+                        yScale * (float) intrinsics.height / 2.0f - yOffset,
+                        near, far);
+        return m;
+    }
 
     private void fireTangoOutOfDate() {
         fireEvent(WallyEvent.createEventWithId(WallyEvent.TANGO_OUT_OF_DATE));

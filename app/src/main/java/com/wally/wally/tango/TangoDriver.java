@@ -19,7 +19,6 @@ public class TangoDriver implements TangoState.StateChangeListener {
 
     public TangoDriver(TangoState startTangoState) {
         tangoState = startTangoState;
-        tangoState.setStateChangeListener(this);
     }
 
     public synchronized void pause() {
@@ -34,7 +33,6 @@ public class TangoDriver implements TangoState.StateChangeListener {
     public synchronized void onStateChange(TangoState nextTangoState) {
         Log.d(TAG, "onStateChange from =" + tangoState + " -- To [" + nextTangoState + "]");
         tangoState = nextTangoState;
-        tangoState.setStateChangeListener(this);
     }
 
     public synchronized boolean isLearningState() {
