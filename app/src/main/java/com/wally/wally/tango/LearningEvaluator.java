@@ -16,7 +16,7 @@ import java.util.List;
 
 public class LearningEvaluator implements TangoUpdater.ValidPoseListener, ProgressReporter {
     public static final String TAG = LearningEvaluator.class.getSimpleName();
-    private static final double RATIO = 0.7;
+    private static final double RATIO = 0.6;
 
     private int minTimeMs;
     private int maxTimeMs;
@@ -29,7 +29,8 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
     private long latestUpdateTime;
     private LearningEvaluatorListener listener;
     private boolean isFinished;
-    private int progress;
+    // This is not actual progress
+    private int featureCounter;
     private int iteration;
 
     private ProgressListener progressListener;
@@ -66,7 +67,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         int index = cells.indexOf(cell);
         if (index == -1) {
             cells.add(cell);
-            progress++;
+            featureCounter++;
         } else {
             cell = cells.get(index);
         }
@@ -81,7 +82,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         // Update angle
         if (!cell.angleVisited[angleIndex]) {
             cell.angleVisited[angleIndex] = true;
-            progress++;
+            featureCounter++;
         }
         //Log.d(TAG, "pose = " + pose + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
 
@@ -104,18 +105,18 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
     private double getProgress() {
         long timePassed = System.currentTimeMillis() - startTime;
         double timePercent = (double) timePassed / minTimeMs;
-        double n = Math.min(((double) progress) / (minCellCount + minAngleCount), timePercent);
-        n = Math.min(n, 1);
+        double newProgress = Math.min(((double) featureCounter) / (minCellCount + minAngleCount), timePercent);
+        newProgress = Math.min(newProgress, 1);
 
-        double gavlili = 0;
-        for (int i = 0; i < iteration; i++) {
-            gavlili += (1 - gavlili) * RATIO;
+        double previousProgress = 0;
+        for (int i = 1; i < iteration; i++) {
+            previousProgress += (1 - previousProgress) * RATIO;
         }
-        gavlili += (1 - gavlili) * RATIO * n;
-        if (gavlili > 1 || gavlili < 0) {
-            throw new IllegalStateException("Progress is valid! progress = [" + gavlili + "]");
+        double currentProgress = previousProgress + (1 - previousProgress) * RATIO * newProgress;
+        if (currentProgress > 1 || currentProgress < 0) {
+            throw new IllegalStateException("Progress is valid! progress = [" + currentProgress + "]");
         }
-        return gavlili;
+        return currentProgress;
     }
 
     private boolean canFinish() {
@@ -139,7 +140,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         cells = new ArrayList<>();
         startTime = System.currentTimeMillis();
         latestUpdateTime = startTime;
-        progress = 0;
+        featureCounter = 0;
         return this;
     }
 
