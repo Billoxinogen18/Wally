@@ -210,9 +210,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
             public void run() {
                 // Connect TangoUpdater and tango
                 mTango.connectListener(mTangoUpdater.getFramePairs(), mTangoUpdater);
-                connectRenderer();
-                mIsConnected = true;
-
                 mExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
@@ -221,6 +218,8 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
                         mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
                     }
                 });
+                connectRenderer();
+                mIsConnected = true;
             }
 
             @Override
