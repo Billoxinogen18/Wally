@@ -85,6 +85,7 @@ public class AdfScheduler implements ProgressReporter {
                 @Override
                 public void onNoMoreAdfs() {
                     fireSuccess(null);
+                    listener.onProgressUpdate(AdfScheduler.this, 1);
                 }
             });
 
