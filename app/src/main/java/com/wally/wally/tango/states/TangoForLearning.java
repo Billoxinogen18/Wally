@@ -66,8 +66,6 @@ public class TangoForLearning extends TangoState {
             public void onLearningFailed() {
                 mTangoUpdater.removeValidPoseListener(mLearningEvaluator);
                 mFailStateConnector.toNextState();
-//                pause();
-//                resume();
             }
         };
     }
@@ -77,28 +75,11 @@ public class TangoForLearning extends TangoState {
         mAdfInfo = saveAdf();
         fireFinishLearning();
         mSuccessStateConnector.toNextState();
-//        changeToLearnedAdfState(info);
     }
 
     @Override
     public AdfInfo getAdf() {
         return mAdfInfo;
-    }
-
-    private void changeToLearnedAdfState(AdfInfo info){
-//        Log.d(TAG, "changeToLearnedAdfState with: adf = [" + info + "]");
-//        pause();
-//        Log.d(TAG, "changeToLearnedAdfState after pause");
-//        try {
-//            Thread.sleep(500);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        TangoState nextTango = ((TangoForLearnedAdf)mTangoStatePool.get(TangoForLearnedAdf.class)).withAdf(info);
-//        changeState(nextTango);
-//        Log.d(TAG, "changeToLearnedAdfState after change");
-//        nextTango.resume();
-//        Log.d(TAG, "changeToLearnedAdfState after resume");
     }
 
     private AdfInfo saveAdf() {

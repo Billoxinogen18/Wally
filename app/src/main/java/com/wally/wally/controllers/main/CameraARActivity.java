@@ -263,7 +263,7 @@ public abstract class CameraARActivity extends BaseActivity implements
 
             @Override
             public void onError(Exception e) {
-
+                Log.e(TAG, "getNewLocation onError: " + e);
             }
         });
     }

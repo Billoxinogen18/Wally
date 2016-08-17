@@ -46,16 +46,9 @@ public abstract class TangoForAdf extends TangoState {
             if (mLocalizationWatchdog != null) {
                 mLocalizationWatchdog.interrupt();
             }
-//            changeToReadyState();
             mSuccessStateConnector.toNextState();
             fireLocalizationFinish();
         }
-    }
-
-    protected void changeToReadyState(){
-//        Log.d(TAG, "changeToReadyState");
-//        TangoState nextTango = ((TangoForReadyState)mTangoStatePool.get(TangoForReadyState.class)).withTangoAndAdf(mTango, mAdfInfo);
-//        changeState(nextTango);
     }
 
     protected void startLocalizationWatchDog() {
@@ -69,10 +62,6 @@ public abstract class TangoForAdf extends TangoState {
                 }
                 if (!mIsLocalized) {
                     mFailStateConnector.toNextState();
-//                    pause();
-//                    TangoState nextTango = mTangoStatePool.get(TangoForCloudAdfs.class);
-//                    changeState(nextTango);
-//                    nextTango.resume();
                 }
             }
         });

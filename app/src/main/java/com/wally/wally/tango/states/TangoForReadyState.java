@@ -2,7 +2,6 @@ package com.wally.wally.tango.states;
 
 import android.util.Log;
 
-import com.google.atap.tangoservice.Tango;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.events.WallyEvent;
@@ -25,15 +24,6 @@ public class TangoForReadyState extends TangoState {
                               WallyRenderer wallyRenderer,
                               TangoPointCloudManager pointCloudManager){
         super(executor, tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
-    }
-
-
-
-    public TangoForReadyState withTangoAndAdf(Tango tango, AdfInfo adf) {
-        Log.d(TAG, "withTangoAndAdf() called with: " + "tango = [" + tango + "], adf = [" + adf + "]");
-        mTango = tango;
-        this.mAdfInfo = adf;
-        return this;
     }
 
     public TangoForReadyState withPreviousState(TangoState state, AdfInfo adf){
