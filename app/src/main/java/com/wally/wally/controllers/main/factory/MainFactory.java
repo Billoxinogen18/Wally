@@ -47,6 +47,7 @@ public class MainFactory {
     private LearningEvaluator mLearningEvaluator;
     private TipManager mTipManager;
     private AdfScheduler mAdfScheduler;
+    private ReadyStateReporter mReadyStateReporter;
 
     private WallyTangoUx mTangoUx;
     private Activity activity;
@@ -79,8 +80,8 @@ public class MainFactory {
         });
 
         ProgressAggregator progressAggregator = new ProgressAggregator();
-        ReadyStateReporter readyStateReporter = new ReadyStateReporter();
-        progressAggregator.addProgressReporter(readyStateReporter, 0.1f);
+        mReadyStateReporter = new ReadyStateReporter();
+        progressAggregator.addProgressReporter(mReadyStateReporter, 0.1f);
         progressAggregator.addProgressReporter(mAdfScheduler, 0.3f);
         progressAggregator.addProgressReporter(mLearningEvaluator, 0.6f);
         progressAggregator.addProgressListener(activity);
@@ -144,6 +145,10 @@ public class MainFactory {
 
     public Activity getActivity() {
         return activity;
+    }
+
+    public ReadyStateReporter getReadyStateReporter(){
+        return mReadyStateReporter;
     }
 
 

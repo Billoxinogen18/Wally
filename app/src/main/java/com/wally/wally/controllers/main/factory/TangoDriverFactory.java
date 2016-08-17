@@ -44,6 +44,7 @@ public class TangoDriverFactory {
     private WallyTangoUx mTangoUx;
     private AdfScheduler mAdfScheduler;
     private VisualContentManager mVisualContentManager;
+    private MainFactory.ReadyStateReporter mReadyStateReporter;
 
     private TangoDriver mTangoDriver;
     private Map<Class, TangoState> tangoStates;
@@ -63,6 +64,7 @@ public class TangoDriverFactory {
         mAdfScheduler = mainFactory.getAdfScheduler();
         Activity activity = mainFactory.getActivity();
         mVisualContentManager = mainFactory.getVisualContentManager();
+        mReadyStateReporter = mainFactory.getReadyStateReporter();
 
         mExecutor = createExecutor(activity);
 
@@ -111,6 +113,7 @@ public class TangoDriverFactory {
 
         setEventListener(mTipManager);
         setEventListener(mTangoUx);
+        setEventListener(mReadyStateReporter);
 
         mTangoUpdater.addTangoUpdaterListener(tangoForCloudAdfs);
         mTangoDriver = new TangoDriver(tangoForCloudAdfs);
