@@ -21,7 +21,6 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfService;
-import com.wally.wally.components.LoadingFab;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.config.CameraTangoActivityConstants;
 import com.wally.wally.config.Config;
@@ -31,6 +30,8 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.controllers.main.factory.MainFactory;
 import com.wally.wally.controllers.main.factory.TangoDriverFactory;
+import com.wally.wally.events.WallyEvent;
+import com.wally.wally.events.WallyEventListener;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.progressReporter.ProgressListener;
@@ -45,7 +46,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class CameraARTangoActivity extends CameraARActivity implements
+public class CameraARTangoActivity extends CameraARActivity implements WallyEventListener,
         ContentFitter.OnContentFitListener,
         TangoUpdater.TangoUpdaterListener,
         ImportExportPermissionDialogFragment.ImportExportPermissionListener, ProgressListener {
@@ -404,7 +405,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 if (!mTangoDriver.isLearningState()) {
                     if (!mVisualContentManager.getStaticVisualContentToAdd().hasNext()) {
                         fetchContentForAdf(mTangoDriver.getAdf().getUuid());
-                        mNewContentButton.setProgress(100);
                     }
                 }
                 setLocalizationLocation();
@@ -466,5 +466,12 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 mNewContentButton.setProgress((int) (progress * 100));
             }
         });
+    }
+
+    @Override
+    public void onWallyEvent(WallyEvent event) {
+        if (WallyEvent.TANGO_READY.equals(event.getId())) {
+            mNewContentButton.setProgress(100);
+        }
     }
 }
