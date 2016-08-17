@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.atap.tangoservice.Tango;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfInfo;
@@ -35,23 +36,19 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     private static final String INTENT_CLASSPACKAGE = "com.projecttango.tango";
     private static final String INTENT_IMPORTEXPORT_CLASSNAME = "com.google.atap.tango.RequestImportExportActivity";
     private static final String EXTRA_KEY_SOURCEFILE = "SOURCE_FILE";
-    private static final String EXTRA_KEY_SOURCEUUID = "SOURCE_UUID";
-    private static final String EXTRA_KEY_DESTINATIONFILE = "DESTINATION_FILE";
     private static final String ARG_MODE = "ARG_MODE";
-    private static final String ARG_REQ_CODE = "ARG_REQ_CODE";
 
     /**
      * Import or Export
      */
     private int mMode;
-    private int mReqCode;
     private ImportExportPermissionListener mListener;
 
     private AdfInfo mAdfInfo;
 
 
     /**
-     * @param adfInfo           adfInfo
+     * @param adfInfo        adfInfo
      * @param importOrExport public integer that represents IMPORT/EXPORT enumeration.
      * @return Fragment that should be shown
      */
@@ -102,21 +99,26 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
         Intent importIntent = new Intent();
         importIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
         importIntent.putExtra(EXTRA_KEY_SOURCEFILE, Utils.getAdfFilePath(mAdfInfo.getUuid()));
-        startActivityForResult(importIntent, mReqCode);
+        getActivity().startActivityForResult(importIntent, Tango.TANGO_INTENT_ACTIVITYCODE);
     }
 
+    // This code is from Tango Internals! Not mine
     private void requestExportPermission() {
         Intent exportIntent = new Intent();
-        exportIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
-        exportIntent.putExtra(EXTRA_KEY_SOURCEUUID, mAdfInfo.getUuid());
-        exportIntent.putExtra(EXTRA_KEY_DESTINATIONFILE, Utils.getAdfFilesFolder());
-        startActivityForResult(exportIntent, mReqCode);
+        exportIntent.setClassName("com.google.tango", "com.google.atap.tango.RequestImportExportActivity");
+        if(exportIntent.resolveActivity(getActivity().getPackageManager()) == null) {
+            exportIntent = new Intent();
+            exportIntent.setClassName("com.projecttango.tango", "com.google.atap.tango.RequestImportExportActivity");
+        }
+
+        exportIntent.putExtra("SOURCE_UUID", mAdfInfo.getUuid());
+        exportIntent.putExtra("DESTINATION_FILE",  Utils.getAdfFilesFolder());
+        getActivity().startActivityForResult(exportIntent, Tango.TANGO_INTENT_ACTIVITYCODE);
     }
 
     private void readArgs() {
         Bundle b = getArguments();
         mMode = b.getInt(ARG_MODE);
-        mReqCode = b.getInt(ARG_REQ_CODE);
         mAdfInfo = (AdfInfo) b.getSerializable(ARG_ADF_INFO);
     }
 
@@ -148,7 +150,7 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == mReqCode) {
+        if (requestCode == Tango.TANGO_INTENT_ACTIVITYCODE) {
             // Save deny status.
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor e = sp.edit();
