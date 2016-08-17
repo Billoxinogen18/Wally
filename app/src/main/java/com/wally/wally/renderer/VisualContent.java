@@ -23,12 +23,13 @@ public class VisualContent {
     protected ContentPlane mVisual;
     protected Content mContent;
     private RenderStatus mStatus;
+
     public VisualContent(@NonNull Content content) {
         mContent = content;
         mStatus = RenderStatus.None;
     }
 
-    public VisualContent cloneContent(){
+    public VisualContent cloneContent() {
         VisualContent res = new VisualContent(mContent);
         res.setStatus(mStatus);
         //res.setVisual(mVisual);
@@ -78,7 +79,7 @@ public class VisualContent {
         return mVisual;
     }
 
-    public void setVisual(ContentPlane visual){
+    public void setVisual(ContentPlane visual) {
         mVisual = visual;
     }
 
@@ -86,23 +87,23 @@ public class VisualContent {
         return mContent;
     }
 
-    public RenderStatus getStatus(){
+    public RenderStatus getStatus() {
         return mStatus;
     }
 
-    public void setStatus(RenderStatus status){
+    public void setStatus(RenderStatus status) {
         this.mStatus = status;
     }
 
     public enum RenderStatus {None, PendingRender, PendingRemove, Rendered}
 
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (!(o instanceof VisualContent)) {
             return false;
         }
         VisualContent v = (VisualContent) o;
-        return v.getContent().getId().equals(mContent.getId());
+        return v.getContent().equals(mContent);
     }
 
 }
