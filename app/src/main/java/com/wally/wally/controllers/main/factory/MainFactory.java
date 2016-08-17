@@ -12,6 +12,10 @@ import com.wally.wally.App;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.config.Config;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
+import com.wally.wally.events.WallyEvent;
+import com.wally.wally.events.WallyEventListener;
+import com.wally.wally.progressReporter.ProgressListener;
+import com.wally.wally.progressReporter.ProgressReporter;
 import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
@@ -75,8 +79,10 @@ public class MainFactory {
         });
 
         ProgressAggregator progressAggregator = new ProgressAggregator();
+        ReadyStateReporter readyStateReporter = new ReadyStateReporter();
+        progressAggregator.addProgressReporter(readyStateReporter, 0.1f);
         progressAggregator.addProgressReporter(mAdfScheduler, 0.3f);
-        progressAggregator.addProgressReporter(mLearningEvaluator, 0.7f);
+        progressAggregator.addProgressReporter(mLearningEvaluator, 0.6f);
         progressAggregator.addProgressListener(activity);
 
         mTangoFactory = new TangoFactory(context);
@@ -138,5 +144,22 @@ public class MainFactory {
 
     public Activity getActivity() {
         return activity;
+    }
+
+
+    public class ReadyStateReporter implements WallyEventListener, ProgressReporter {
+        private ProgressListener listener;
+
+        @Override
+        public void addProgressListener(ProgressListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void onWallyEvent(WallyEvent event) {
+            if (WallyEvent.TANGO_READY.equals(event.getId())) {
+                listener.onProgressUpdate(this, 1);
+            }
+        }
     }
 }
