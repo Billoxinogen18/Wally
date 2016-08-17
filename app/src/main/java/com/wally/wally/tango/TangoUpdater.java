@@ -12,6 +12,7 @@ import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
+import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,7 +22,7 @@ import java.util.PriorityQueue;
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private TangoUx mTangoUx;
     private boolean isLocalized;
-    private RajawaliSurfaceView mSurfaceView;
+    private RajawaliTextureView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
     private List<ValidPoseListener> mValidPoseListeners;
     private ArrayList<TangoCoordinateFramePair> mFramePairs;
@@ -29,7 +30,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
 
 
 
-    public TangoUpdater(TangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager) {
+    public TangoUpdater(TangoUx tangoUx, RajawaliTextureView surfaceView, TangoPointCloudManager pointCloudManager) {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
@@ -89,7 +90,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
             }
             fireFameAvailable();
             // Mark a camera frame is available for rendering in the OpenGL thread
-            mSurfaceView.requestRender();
+            mSurfaceView.requestRenderUpdate();
         }
     }
 

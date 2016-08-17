@@ -16,6 +16,7 @@ import com.wally.wally.BaseActivity;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.analytics.WallyAnalytics;
+import com.wally.wally.components.LoadingFab;
 import com.wally.wally.components.UserInfoView;
 import com.wally.wally.controllers.contentCreator.NewContentDialogFragment;
 import com.wally.wally.controllers.map.MapsFragment;
@@ -28,7 +29,7 @@ import com.wally.wally.tip.TipView;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.SocialUserManager;
 
-import org.rajawali3d.surface.RajawaliSurfaceView;
+import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.util.Date;
 import java.util.List;
@@ -53,8 +54,8 @@ public abstract class CameraARActivity extends BaseActivity implements
     private long mNewContentButtonLastClickTime;
     // Views
     private SelectedMenuView mSelectedMenuView;
-    private RajawaliSurfaceView mRajawaliView;
-    private View mNewContentButton;
+    private RajawaliTextureView mRajawaliView;
+    protected LoadingFab mNewContentButton;
     private View mMapButton;
     private View mProfileBar;
     private View mWaterMark;
@@ -77,14 +78,14 @@ public abstract class CameraARActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRajawaliView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+        mRajawaliView = (RajawaliTextureView) findViewById(R.id.rajawali_render_view);
         mSelectedMenuView = (SelectedMenuView) findViewById(R.id.selected_menu_view);
         mSelectedMenuView.setOnSelectedMenuActionListener(this);
         // Initialize managers
         mSocialUserManager = ((App) getApplicationContext()).getSocialUserManager(); //TODO get LoginManager from the Factory!
         mDataController = ((App) getApplicationContext()).getDataController();
 
-        mNewContentButton = findViewById(R.id.new_post);
+        mNewContentButton = (LoadingFab) findViewById(R.id.new_post);
         mMapButton = findViewById(R.id.btn_map);
         mProfileBar = findViewById(R.id.profile_bar);
         mWaterMark = findViewById(R.id.watermark);

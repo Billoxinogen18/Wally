@@ -39,7 +39,7 @@ import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.ux.WallyTangoUx;
 
-import org.rajawali3d.surface.RajawaliSurfaceView;
+import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -62,7 +62,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private TangoDriver mTangoDriver;
     private boolean mExplainAdfPermission;
 
-    private LoadingFab mCreateNewContent;
     private FloatingActionButton mFinishFitting;
     private FloatingActionButton mFinishFittingFab;
     private View mLayoutFitting;
@@ -75,7 +74,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private SerializableLatLng mLocalizationLocation;
     private TangoDriverFactory mTangoDriverFactory;
 
-    private RajawaliSurfaceView mSurfaceView;
+    private RajawaliTextureView mSurfaceView;
 
 
     public static Intent newIntent(Context context) {
@@ -86,11 +85,10 @@ public class CameraARTangoActivity extends CameraARActivity implements
         Context context = getBaseContext();
         mLayoutFitting = findViewById(R.id.layout_fitting);
         mFinishFittingFab = (FloatingActionButton) mLayoutFitting.findViewById(R.id.btn_finish_fitting);
-        mCreateNewContent = (LoadingFab) findViewById(R.id.new_post);
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         TangoUxLayout tangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
-        mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_surface);
+        mSurfaceView = (RajawaliTextureView) findViewById(R.id.rajawali_render_view);
         MainFactory mMainFactory = new MainFactory(mTipView, tangoUxLayout, this, mSurfaceView);
         mTangoDriverFactory  = new TangoDriverFactory(mMainFactory);
         mTangoDriver = mTangoDriverFactory.getTangoDriver();
@@ -406,7 +404,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 if (!mTangoDriver.isLearningState()) {
                     if (!mVisualContentManager.getStaticVisualContentToAdd().hasNext()) {
                         fetchContentForAdf(mTangoDriver.getAdf().getUuid());
-                        mCreateNewContent.setProgress(100);
+                        mNewContentButton.setProgress(100);
                     }
                 }
                 setLocalizationLocation();
@@ -464,8 +462,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mCreateNewContent.setVisibility(View.VISIBLE);
-                mCreateNewContent.setProgress((int) (progress * 100));
+                mNewContentButton.setVisibility(View.VISIBLE);
+                mNewContentButton.setProgress((int) (progress * 100));
             }
         });
     }

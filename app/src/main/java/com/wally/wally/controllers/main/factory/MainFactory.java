@@ -29,7 +29,7 @@ import com.wally.wally.tip.TipService;
 import com.wally.wally.tip.TipView;
 import com.wally.wally.ux.WallyTangoUx;
 
-import org.rajawali3d.surface.RajawaliSurfaceView;
+import org.rajawali3d.surface.RajawaliTextureView;
 
 
 /**
@@ -55,7 +55,7 @@ public class MainFactory {
     public MainFactory(TipView tipView,
                        TangoUxLayout tangoUxLayout,
                        CameraARTangoActivity activity,
-                       RajawaliSurfaceView surfaceView) {
+                       RajawaliTextureView surfaceView) {
         init();
         this.activity = activity;
         Context context = activity.getBaseContext();

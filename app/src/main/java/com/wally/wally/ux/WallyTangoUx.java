@@ -45,42 +45,42 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
         mContainer.setVisibility(isVisible ? View.VISIBLE : View.GONE);
     }
 
-//    @Override
+    //    @Override
     public void onTangoReady() {
         showMessage(mConfig.getString(TangoManagerConstants.LOCALIZED), 1000);
     }
 
-//    @Override
+    //    @Override
     public void onLearningStart() {
         showMessage(mConfig.getString(TangoManagerConstants.LEARNING_AREA));
     }
 
-//    @Override
+    //    @Override
     public void onLearningFinish() {
         showMessage(mConfig.getString(TangoManagerConstants.NEW_ROOM_LEARNED), 500);
     }
 
-//    @Override
+    //    @Override
     public void onLocalizationStart() {
         showMessage(mConfig.getString(TangoManagerConstants.LOCALIZING_IN_KNOWN_AREA));
     }
 
-//    @Override
+    //    @Override
     public void onLocalizationStartAfterLearning() {
         showMessage(mConfig.getString(TangoManagerConstants.LOCALIZING_IN_NEW_AREA));
     }
 
-//    @Override
+    //    @Override
     public void onLocalizationFinishAfterLearning() {
         showMessage(mConfig.getString(TangoManagerConstants.LOCALIZED), 500);
     }
 
-//    @Override
+    //    @Override
     public void onLocalizationFinishAfterSavedAdf() {
-        showMessage(mConfig.getString(TangoManagerConstants.LOCALIZED));
+        showMessage(mConfig.getString(TangoManagerConstants.LOCALIZED), 500);
     }
 
-//    @Override
+    //    @Override
     public void onTangoOutOfDate() {
         showTangoOutOfDate();
     }

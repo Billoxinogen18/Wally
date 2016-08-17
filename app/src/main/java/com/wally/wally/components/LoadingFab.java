@@ -17,6 +17,7 @@ import com.wally.wally.R;
 
 public class LoadingFab extends FrameLayout implements Runnable {
 
+    @SuppressWarnings("unused")
     private static final String TAG = LoadingFab.class.getSimpleName();
 
     private CircularProgressView mProgressBar;
@@ -73,7 +74,6 @@ public class LoadingFab extends FrameLayout implements Runnable {
 
     public void setProgress(int progress) {
         mProgressBar.setProgress(progress);
-        setVisibility(VISIBLE);
     }
 
     @Override
