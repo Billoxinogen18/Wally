@@ -90,7 +90,7 @@ public class VisualContentBorder extends ContentPlane {
 
     private void stopAnimation(RajawaliScene scene) {
         if (mBorderSet && mAnimationWorking) {
-            mBorderAnimation.pause(); //TODO check if this stops anumation
+            mBorderAnimation.pause(); //TODO check if this stops animation
             scene.unregisterAnimation(mBorderAnimation);
             mAnimationWorking = false;
         } else {

@@ -66,7 +66,7 @@ public class Points extends Object3D {
     public void updatePoints(int pointCount, FloatBuffer points, float[] colors) {
         if (pointCount > mMaxNumberOfVertices) {
             throw new RuntimeException(
-                    String.format("pointClount = %d exceeds maximum number of points = %d",
+                    String.format("pointCount = %d exceeds maximum number of points = %d",
                             pointCount, mMaxNumberOfVertices));
         }
         mGeometry.setNumIndices(pointCount);

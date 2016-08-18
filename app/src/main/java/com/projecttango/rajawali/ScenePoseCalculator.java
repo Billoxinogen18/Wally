@@ -177,7 +177,7 @@ public final class ScenePoseCalculator {
     }
 
     /**
-     * Given a pose in start of service or area description frame and a screen rotaion calculate
+     * Given a pose in start of service or area description frame and a screen rotation calculate
      * the corresponding position and orientation for a 3D object in the Rajawali world.
      *
      * @param tangoPose     The input Tango Pose in start service or area description frame.
@@ -342,8 +342,8 @@ public final class ScenePoseCalculator {
     }
 
     /**
-     * Converts a point, represented as a Vector3 from it's initial refrence frame to 
-     * the OpenGl world refrence frame. This allows various points to be depicted in
+     * Converts a point, represented as a Vector3 from it's initial reference frame to
+     * the OpenGl world reference frame. This allows various points to be depicted in
      * the OpenGl rendering.
      */
     public static Vector3 getPointInEngineFrame(
