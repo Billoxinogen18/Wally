@@ -41,12 +41,12 @@ public class GeoHashQuery {
     private final String startValue;
     private final String endValue;
 
-    public GeoHashQuery(String startValue, String endValue) {
+    private GeoHashQuery(String startValue, String endValue) {
         this.startValue = startValue;
         this.endValue = endValue;
     }
 
-    public static GeoHashQuery queryForGeoHash(GeoHash geohash, int bits) {
+    private static GeoHashQuery queryForGeoHash(GeoHash geohash, int bits) {
         String hash = geohash.getGeoHashString();
         int precision = (int)Math.ceil((double)bits/Base32Utils.BITS_PER_BASE32_CHAR);
         if (hash.length() < precision) {
@@ -145,11 +145,11 @@ public class GeoHashQuery {
         return startCompare <= 0 && other.endValue.compareTo(this.endValue) >= 0;
     }
 
-    public boolean canJoinWith(GeoHashQuery other) {
+    private boolean canJoinWith(GeoHashQuery other) {
         return this.isPrefix(other) || other.isPrefix(this) || this.isSuperQuery(other) || other.isSuperQuery(this);
     }
 
-    public GeoHashQuery joinWith(GeoHashQuery other) {
+    private GeoHashQuery joinWith(GeoHashQuery other) {
         if (other.isPrefix(this)) {
             return new GeoHashQuery(this.startValue, other.endValue);
         } else if (this.isPrefix(other)) {

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 class FirebaseAdfService implements AdfService {
-    public static final double SEARCH_RADIUS_M = 50;
+    private static final double SEARCH_RADIUS_M = 50;
     private final DatabaseReference db;
     private final StorageReference storage;
 
@@ -72,7 +72,7 @@ class FirebaseAdfService implements AdfService {
         }
     }
 
-    public ValueEventListener getMetaDataAggregatorCallback(
+    private ValueEventListener getMetaDataAggregatorCallback(
             final int n, final SearchResultListener listener) {
         return new ValueEventListener() {
             private int nUpdates = n;

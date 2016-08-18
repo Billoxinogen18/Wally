@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LearningEvaluator implements TangoUpdater.ValidPoseListener, ProgressReporter {
-    public static final String TAG = LearningEvaluator.class.getSimpleName();
+    private static final String TAG = LearningEvaluator.class.getSimpleName();
     private static final double RATIO = 0.6;
 
     private int minTimeMs;
@@ -136,7 +136,7 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         return res;
     }
 
-    public LearningEvaluator start() {
+    private LearningEvaluator start() {
         cells = new ArrayList<>();
         startTime = System.currentTimeMillis();
         latestUpdateTime = startTime;

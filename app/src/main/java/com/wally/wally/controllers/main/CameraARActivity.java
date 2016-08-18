@@ -43,7 +43,7 @@ public abstract class CameraARActivity extends BaseActivity implements
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int RC_SAVE_CONTENT = 22;
 
-    protected DataController mDataController;
+    private DataController mDataController;
     protected GoogleApiClient mGoogleApiClient;
     protected WallyAnalytics mAnalytics;
     protected TipView mTipView; //TODO getter maybe?
@@ -60,9 +60,9 @@ public abstract class CameraARActivity extends BaseActivity implements
     private View mProfileBar;
     private View mWaterMark;
 
-    public abstract void onDeleteContent(Content selectedContent);
+    protected abstract void onDeleteContent(Content selectedContent);
 
-    public abstract void onSaveContent(Content selectedContent);
+    protected abstract void onSaveContent(Content selectedContent);
 
     // Called When content object is created by user
     @Override
@@ -71,7 +71,7 @@ public abstract class CameraARActivity extends BaseActivity implements
     /**
      * @return true if new content can be added
      */
-    public abstract boolean isNewContentCreationEnabled();
+    protected abstract boolean isNewContentCreationEnabled();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,7 +140,7 @@ public abstract class CameraARActivity extends BaseActivity implements
         onContentSelected(mSelectedContent);
     }
 
-    public void onContentSelected(final Content content) {
+    private void onContentSelected(final Content content) {
         mSelectedContent = content;
         if (App.getInstance().getSocialUserManager().isLoggedIn()) {
             runOnUiThread(new Runnable() {
@@ -239,7 +239,7 @@ public abstract class CameraARActivity extends BaseActivity implements
 
     @CallSuper
     @Override
-    public void onLocationPermissionGranted(int locationRequestCode) {
+    protected void onLocationPermissionGranted(int locationRequestCode) {
         if (locationRequestCode == RC_SAVE_CONTENT) {
             saveActiveContent(mContentToSave);
         }
@@ -323,7 +323,7 @@ public abstract class CameraARActivity extends BaseActivity implements
         hideGUI(true);
     }
 
-    public boolean isMapsFragmentAttached() {
+    private boolean isMapsFragmentAttached() {
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         if (fragmentList == null) {
             return false;

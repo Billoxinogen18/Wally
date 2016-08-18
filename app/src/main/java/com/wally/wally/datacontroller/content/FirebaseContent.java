@@ -13,33 +13,33 @@ import java.util.List;
 public class FirebaseContent extends FirebaseObject {
 
     // NoteData
-    public static final String K_NOTE           = "note";
-    public static final String K_TITLE          = "title";
-    public static final String K_COLOR          = "color";
-    public static final String K_TEXT_COLOR          = "text_color";
-    public static final String K_IMGURI         = "image";
-    public static final String K_ROOM           = "roomId";
-    public static final String K_AUTHOR         = "authorId";
-    public static final String K_NOTE_DATA      = "NoteData";
+    private static final String K_NOTE           = "note";
+    private static final String K_TITLE          = "title";
+    private static final String K_COLOR          = "color";
+    private static final String K_TEXT_COLOR          = "text_color";
+    private static final String K_IMGURI         = "image";
+    private static final String K_ROOM           = "roomId";
+    private static final String K_AUTHOR         = "authorId";
+    private static final String K_NOTE_DATA      = "NoteData";
 
     // Location
-    public static final String K_HASH           = "hash";
-    public static final String K_LAT            = "latitude";
-    public static final String K_LNG            = "longitude";
-    public static final String K_LOCATION       = "Location";
+    private static final String K_HASH           = "hash";
+    private static final String K_LAT            = "latitude";
+    private static final String K_LNG            = "longitude";
+    private static final String K_LOCATION       = "Location";
 
     // TangoData
-    public static final String K_SCALE          = "scale";
-    public static final String K_ROTATION       = "rotation";
-    public static final String K_TRANSLATION    = "translation";
-    public static final String K_TANGO_DATA     = "TangoData";
+    private static final String K_SCALE          = "scale";
+    private static final String K_ROTATION       = "rotation";
+    private static final String K_TRANSLATION    = "translation";
+    private static final String K_TANGO_DATA     = "TangoData";
 
     // Visibility
-    public static final String K_PREVIEW        = "preview";
-    public static final String K_DURATION       = "duration";
-    public static final String K_PUBLICITY      = "publicity";
-    public static final String K_ANONYMOUS      = "anonymous";
-    public static final String K_SHARED         = "Shared";
+    private static final String K_PREVIEW        = "preview";
+    private static final String K_DURATION       = "duration";
+    private static final String K_PUBLICITY      = "publicity";
+    private static final String K_ANONYMOUS      = "anonymous";
+    private static final String K_SHARED         = "Shared";
 
     private static final String K_TIMESTAMP     = "timestamp";
 
@@ -58,7 +58,7 @@ public class FirebaseContent extends FirebaseObject {
     }
 
 
-    public String getRoom() {
+    private String getRoom() {
         return get(K_ROOM).toString();
     }
 
@@ -70,35 +70,35 @@ public class FirebaseContent extends FirebaseObject {
         return getChild(K_NOTE_DATA).get(K_TITLE).toString();
     }
 
-    public Integer getColor() {
+    private Integer getColor() {
         return getChild(K_NOTE_DATA).get(K_COLOR).toInteger();
     }
 
-    public Integer getTextColor() {
+    private Integer getTextColor() {
         return getChild(K_NOTE_DATA).get(K_TEXT_COLOR).toInteger();
     }
 
-    public String getImageUri() {
+    private String getImageUri() {
         return getChild(K_NOTE_DATA).get(K_IMGURI).toString();
     }
 
-    public String getAuthorId() {
+    private String getAuthorId() {
         return get(K_AUTHOR).toString();
     }
 
-    public Double getLatitude() {
+    private Double getLatitude() {
         return getChild(K_LOCATION).get(K_LAT).toDouble();
     }
 
-    public Double getLongitude() {
+    private Double getLongitude() {
         return getChild(K_LOCATION).get(K_LNG).toDouble();
     }
 
-    public SerializableLatLng getLocation() {
+    private SerializableLatLng getLocation() {
         return containsKey(K_LOCATION) ? new SerializableLatLng(getLatitude(), getLongitude()) : null;
     }
 
-    public Date getCreationDate() {
+    private Date getCreationDate() {
         long timestamp = get(K_TIMESTAMP).toLong();
         return new Date(timestamp);
     }
@@ -112,7 +112,7 @@ public class FirebaseContent extends FirebaseObject {
                 .put(K_LNG, loc.getLongitude());
     }
 
-    public TangoData getTangoData() {
+    private TangoData getTangoData() {
         if (!containsKey(K_TANGO_DATA)) return null;
         FirebaseObject tangoData = getChild(K_TANGO_DATA);
         return new TangoData()
@@ -129,7 +129,7 @@ public class FirebaseContent extends FirebaseObject {
                 .put(K_TRANSLATION, td.getTranslation());
     }
 
-    public Visibility getVisibility() {
+    private Visibility getVisibility() {
         return new Visibility()
                 .withSocialVisibility(getPublicity())
                 .withTimeVisibility(get(K_DURATION).toData())

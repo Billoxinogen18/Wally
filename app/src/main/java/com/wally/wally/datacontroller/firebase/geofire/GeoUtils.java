@@ -15,7 +15,7 @@ public class GeoUtils {
         return distance(location1.getLatitude(), location1.getLongitude(), location2.getLatitude(), location2.getLongitude());
     }
 
-    public static double distance(double lat1, double long1, double lat2, double long2) {
+    private static double distance(double lat1, double long1, double lat2, double long2) {
         // Earth's mean radius in meters
         final double radius = (Constants.EARTH_EQ_RADIUS + Constants.EARTH_POLAR_RADIUS)/2;
         double latDelta = Math.toRadians(lat1 - lat2);

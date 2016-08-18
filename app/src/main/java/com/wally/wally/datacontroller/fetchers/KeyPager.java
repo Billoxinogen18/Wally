@@ -24,7 +24,7 @@ public class KeyPager implements Fetcher {
         this(contents, null, null);
     }
 
-    public KeyPager(DatabaseReference contents, String startKey, String endKey) {
+    private KeyPager(DatabaseReference contents, String startKey, String endKey) {
         this.contents = contents;
         hasNext = true;
         nextKey = "";

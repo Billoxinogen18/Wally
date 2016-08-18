@@ -9,7 +9,7 @@ import java.util.List;
  * Created by Meravici on 5/12/2016. yea
  */
 public class CompoundUser implements SocialUser {
-    List<SocialUser> socialUsers;
+    private List<SocialUser> socialUsers;
 
     public CompoundUser() {
         socialUsers = new ArrayList<>();

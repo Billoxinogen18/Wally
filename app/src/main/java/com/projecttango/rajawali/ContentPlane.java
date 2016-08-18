@@ -9,11 +9,11 @@ import org.rajawali3d.math.vector.Vector3;
  */
 public class ContentPlane extends Object3D {
 
-    protected float mWidth;
-    protected float mHeight;
-    protected int mSegmentsW;
-    protected int mSegmentsH;
-    protected int mNumTextureTiles;
+    private float mWidth;
+    private float mHeight;
+    private int mSegmentsW;
+    private int mSegmentsH;
+    private int mNumTextureTiles;
     private boolean mCreateTextureCoords;
     private boolean mCreateVertexColorBuffer;
     private Vector3.Axis mUpAxis;

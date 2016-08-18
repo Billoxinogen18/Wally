@@ -65,7 +65,7 @@ public class ContentManager {
         contents.child(c.getAuthorId()).child(c.getId()).removeValue();
     }
 
-    public void fetchAt(String path, final FetchResultCallback callback) {
+    private void fetchAt(String path, final FetchResultCallback callback) {
         contents.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

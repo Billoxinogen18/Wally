@@ -12,7 +12,7 @@ public class ListPager implements Fetcher {
     private final List<Content> contents;
     private int nextIndex;
 
-    public ListPager(List<Content> contents) {
+    private ListPager(List<Content> contents) {
         this.contents = contents;
         this.nextIndex = 0;
     }

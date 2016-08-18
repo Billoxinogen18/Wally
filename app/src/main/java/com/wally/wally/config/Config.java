@@ -14,11 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Config implements LearningEvaluatorConstants, TangoManagerConstants, CameraTangoActivityConstants {
-    public static final String TAG = "WallyConfig";
+    private static final String TAG = "WallyConfig";
     private static Config instance;
     private FirebaseRemoteConfig config;
 
-    public Config() {
+    private Config() {
         config = FirebaseRemoteConfig.getInstance();
         setSettings();
         registerDefaultParams();
@@ -74,7 +74,7 @@ public class Config implements LearningEvaluatorConstants, TangoManagerConstants
         config.setDefaults(params);
     }
 
-    public void fetchServerParams() {
+    private void fetchServerParams() {
         Log.d(TAG, "Attach listener");
         config.fetch(0).addOnCompleteListener(
                 new OnCompleteListener<Void>() {

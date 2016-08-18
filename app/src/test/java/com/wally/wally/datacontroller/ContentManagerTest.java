@@ -90,28 +90,28 @@ public class ContentManagerTest {
         updateTest(c, "Shared");
     }
 
-    void updateTest(Content c, String node) {
+    private void updateTest(Content c, String node) {
         testSubject.save(c);
         verifyUpdate(node);
         validateSave(c);
     }
 
 
-    void saveTest(Content c, String node) {
+    private void saveTest(Content c, String node) {
         testSubject.save(c);
         verifySave(node);
         verifySaveInRoom(c);
         validateSave(c);
     }
 
-    void verifySave(String node) {
+    private void verifySave(String node) {
         verify(contents, never()).child(TEST_ID);
         InOrder inOrder = inOrder(contents);
         inOrder.verify(contents).child(node);
         inOrder.verify(contents).push();
     }
 
-    void validateSave(Content c) {
+    private void validateSave(Content c) {
         assertEquals(TEST_ID, c.getId());
         ArgumentCaptor<FirebaseObject> captor =
                 ArgumentCaptor.forClass(FirebaseObject.class);
@@ -121,14 +121,14 @@ public class ContentManagerTest {
         assertEquals(c.getNote(), object.getNote());
     }
 
-    void verifyUpdate(String node) {
+    private void verifyUpdate(String node) {
         verify(contents, never()).push();
         InOrder inOrder = inOrder(contents);
         inOrder.verify(contents).child(node);
         inOrder.verify(contents).child(TEST_ID);
     }
 
-    void verifySaveInRoom(Content c) {
+    private void verifySaveInRoom(Content c) {
         InOrder inOrder = inOrder(rooms);
         inOrder.verify(rooms).child(c.getUuid());
         inOrder.verify(rooms).child("Contents");

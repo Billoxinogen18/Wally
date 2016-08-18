@@ -13,7 +13,7 @@ public class GeoHash {
     private static final int DEFAULT_PRECISION = 10;
 
     // The maximal precision of a geohash
-    public static final int MAX_PRECISION = 22;
+    private static final int MAX_PRECISION = 22;
 
     // The maximal number of bits precision for a geohash
     public static final int MAX_PRECISION_BITS = MAX_PRECISION * Base32Utils.BITS_PER_BASE32_CHAR;

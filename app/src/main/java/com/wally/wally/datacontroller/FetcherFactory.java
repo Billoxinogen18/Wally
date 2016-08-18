@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.Set;
 
 class FetcherFactory {
-    public static final double RADIUS_MAX_KM = 1000.0;
+    private static final double RADIUS_MAX_KM = 1000.0;
     private DatabaseReference contents;
     private DatabaseReference publicContents;
     private DatabaseReference sharedContents;
@@ -69,7 +69,7 @@ class FetcherFactory {
         return new FilteredFetcher(sharedContentFetcher, hasAuthorPredicate);
     }
 
-    public Fetcher createForSharedWithMe(User current) {
+    private Fetcher createForSharedWithMe(User current) {
         FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
         ContentQuery query = new ContentQuery(sharedWithQuery, sharedContents);
         return new QueryContentFetcher(query);
@@ -93,7 +93,7 @@ class FetcherFactory {
         return new FilteredFetcher(chain, isLocationInRangePredicate(center, radiusKm));
     }
 
-    public Fetcher createTrivial() {
+    private Fetcher createTrivial() {
         return new Fetcher() {
             @Override
             public void fetchNext(int i, FetchResultCallback callback) {

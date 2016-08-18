@@ -30,7 +30,7 @@ import com.wally.wally.adf.AdfInfo;
 public class ImportExportPermissionDialogFragment extends DialogFragment implements View.OnClickListener {
 
     public static final String TAG = ImportExportPermissionDialogFragment.class.getSimpleName();
-    public static final int IMPORT = 0;
+    private static final int IMPORT = 0;
     public static final int EXPORT = 1;
     private static final String ARG_ADF_INFO = "ARG_ADF_INFO";
     private static final String INTENT_CLASSPACKAGE = "com.projecttango.tango";
