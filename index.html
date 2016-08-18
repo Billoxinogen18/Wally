@@ -38,7 +38,7 @@
         }
 
         .ghost{
-
+            visibility: hidden;
         }
     </style>
 
@@ -51,6 +51,7 @@
     <script src="js/jquery.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
     <script src="js/jquery.stellar.min.js"></script>
+    <script src="js/jquery.cycle.js"></script>
 
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -86,20 +87,7 @@
                 hideDistantElements: false
             });
 
-            function cycleImages(){
-                var $active = $('.cycle .active');
-                var $next = ($active.next('img').length > 0) ? $active.next('img') : $('.cycle img:first');
-                $next.css('z-index',2);//move the next image up the pile
-                $active.fadeOut(1500,function(){//fade out the top image
-                    $active.css('z-index',1).show().removeClass('active');//reset the z-index and unhide the image
-                    $next.css('z-index',3).addClass('active');//make the next image the top one
-                });
-            }
-
-            $(document).ready(function(){
-// run every 7s
-                setInterval(cycleImages, 2000);
-            })
+            $(".cycle").cycle("img");
         });
     </script>
     <script>
@@ -198,7 +186,7 @@
                     environment</p>
             </div>
             <div class="col-lg-5 col-lg-offset-2 col-sm-6 cycle">
-                <img class="img-responsive cycle" src="img/ipad2.png" alt="">
+                <img class="img-responsive active" src="img/ipad2.png" alt="">
                 <img class="img-responsive" src="img/ipad.png" alt="">
                 <div class="ghost">
                     <img class="img-responsive" src="img/ipad.png" alt="">
@@ -229,7 +217,7 @@
                 <img class="img-responsive active" src="img/dog.png" alt="">
                 <img class="img-responsive" src="img/dog2.png" alt="">
                 <div class="ghost">
-                    <img class="img-responsive" src="img/dog.png" alt="">
+                    <img class="img-responsive" src="img/dog2.png" alt="">
                 </div>
             </div>
         </div>
