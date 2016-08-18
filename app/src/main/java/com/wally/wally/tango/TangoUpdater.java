@@ -11,7 +11,6 @@ import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 
-import org.rajawali3d.surface.RajawaliSurfaceView;
 import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.util.ArrayList;

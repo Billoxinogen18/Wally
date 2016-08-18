@@ -6,7 +6,7 @@ package com.wally.wally.datacontroller.firebase.geofire;
  * To see original source files follow the link:
  * https://github.com/firebase/geofire-java
  */
-public class Base32Utils {
+class Base32Utils {
 
     /* number of bits per base 32 character */
     public static final int BITS_PER_BASE32_CHAR = 5;

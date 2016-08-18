@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 public class AdfScheduler implements ProgressReporter {
-    public static final String TAG = AdfScheduler.class.getSimpleName();
-    public static final int DEFAULT_TIMEOUT = 1000;
+    private static final String TAG = AdfScheduler.class.getSimpleName();
+    private static final int DEFAULT_TIMEOUT = 1000;
 
     private boolean done;
     private long timeout;

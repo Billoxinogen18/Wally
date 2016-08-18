@@ -36,7 +36,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
      *
      * @param locationRequestCode request code that was passed when {@link #requestLocationPermission(int)}
      */
-    public abstract void onLocationPermissionGranted(int locationRequestCode);
+    protected abstract void onLocationPermissionGranted(int locationRequestCode);
 
     private void onLocationPermissionGranted() {
         if (mLocationRequestCode < 0) {

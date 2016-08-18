@@ -33,7 +33,7 @@ public abstract class BaseFragment extends Fragment {
      *                            with same request code.
      * @see BaseActivity#requestLocationPermission(int)
      */
-    public final void requestLocationPermission(int locationRequestCode) {
+    final void requestLocationPermission(int locationRequestCode) {
         getParentActivity().requestLocationPermission(locationRequestCode);
     }
 
@@ -44,7 +44,7 @@ public abstract class BaseFragment extends Fragment {
      */
     public abstract void onLocationPermissionGranted(int locationRequestCode);
 
-    protected BaseActivity getParentActivity() {
+    private BaseActivity getParentActivity() {
         return (BaseActivity) getActivity();
     }
 }

@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 
 /**
  * Created by shota on 5/26/16.
+ * d
  */
 public class VisualContentManagerTest {
     private VisualContentManager mVisualContentManager;
@@ -164,7 +165,7 @@ public class VisualContentManagerTest {
     }
 
     private <T> ArrayList<T> getArrayListFromIterator(Iterator<T> a){
-        ArrayList<T> res = new ArrayList<a>();
+        ArrayList<T> res = new ArrayList<>();
         while(a.hasNext()){
             res.add(a.next());
         }

@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class AdfManager {
-    public static final String TAG = AdfManager.class.getSimpleName();
+    private static final String TAG = AdfManager.class.getSimpleName();
     private AdfService adfService;
     private List<AdfInfo> metadatas;
     private Iterator<AdfInfo> queue;
