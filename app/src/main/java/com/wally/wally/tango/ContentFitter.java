@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.atap.tangoservice.TangoPoseData;
+import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.renderer.VisualContentManager;
@@ -47,9 +48,13 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
 
     @Override
     protected Void doInBackground(Void... params) {
-        TangoPoseData tangoPoseData = null;
+        Pose tangoPoseData = null;
         while (tangoPoseData == null) {
-            tangoPoseData = getValidPose();
+            try {
+                tangoPoseData = mTangoDriver.getDevicePoseInFront();
+            }catch (Exception e){
+                tangoPoseData = null;
+            }
             for (OnContentFitListener onContentFitListener : mOnContentFitListeners) {
                 onContentFitListener.onContentFit(null);
             }
@@ -66,7 +71,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
         for (OnContentFitListener onContentFitListener : mOnContentFitListeners) {
             onContentFitListener.onContentFit(null);
         }
-        mVisualContentManager.addPendingActiveContent(ScenePoseCalculator.toOpenGLPose(tangoPoseData), getContent());
+        mVisualContentManager.addPendingActiveContent(tangoPoseData, getContent());
 
         // Update content timely, while we are cancelled.
         while (true) {
