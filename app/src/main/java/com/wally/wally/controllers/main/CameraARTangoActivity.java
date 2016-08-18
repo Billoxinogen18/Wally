@@ -24,18 +24,18 @@ import com.wally.wally.adf.AdfService;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.config.CameraTangoActivityConstants;
 import com.wally.wally.config.Config;
+import com.wally.wally.controllers.main.factory.MainFactory;
+import com.wally.wally.controllers.main.factory.TangoDriverFactory;
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
-import com.wally.wally.controllers.main.factory.MainFactory;
-import com.wally.wally.controllers.main.factory.TangoDriverFactory;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.events.WallyEventListener;
-import com.wally.wally.renderer.VisualContentManager;
-import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.progressReporter.ProgressListener;
 import com.wally.wally.progressReporter.ProgressReporter;
+import com.wally.wally.renderer.VisualContentManager;
+import com.wally.wally.tango.ContentFitter;
 import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.ux.WallyTangoUx;
@@ -46,10 +46,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class CameraARTangoActivity extends CameraARActivity implements WallyEventListener,
+public class CameraARTangoActivity extends CameraARActivity implements
+        WallyEventListener,
         ContentFitter.OnContentFitListener,
         TangoUpdater.TangoUpdaterListener,
-        ImportExportPermissionDialogFragment.ImportExportPermissionListener, ProgressListener {
+        ImportExportPermissionDialogFragment.ImportExportPermissionListener,
+        ProgressListener {
 
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
     // Permission Denied explain codes
@@ -91,7 +93,7 @@ public class CameraARTangoActivity extends CameraARActivity implements WallyEven
         TangoUxLayout tangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
         mSurfaceView = (RajawaliTextureView) findViewById(R.id.rajawali_render_view);
         MainFactory mMainFactory = new MainFactory(mTipView, tangoUxLayout, this, mSurfaceView);
-        mTangoDriverFactory  = new TangoDriverFactory(mMainFactory);
+        mTangoDriverFactory = new TangoDriverFactory(mMainFactory);
         mTangoDriver = mTangoDriverFactory.getTangoDriver();
         mVisualContentManager = mMainFactory.getVisualContentManager();
         mTangoUx = mMainFactory.getTangoUx();
@@ -380,7 +382,7 @@ public class CameraARTangoActivity extends CameraARActivity implements WallyEven
 
     @Override
     public void onLocalization(boolean localization) {
-        if (localization){
+        if (localization) {
             onLocalize();
         } else {
             onNotLocalize();
@@ -471,7 +473,12 @@ public class CameraARTangoActivity extends CameraARActivity implements WallyEven
     @Override
     public void onWallyEvent(WallyEvent event) {
         if (WallyEvent.TANGO_READY.equals(event.getId())) {
-            mNewContentButton.setProgress(100);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mNewContentButton.setProgress(100);
+                }
+            });
         }
     }
 }
