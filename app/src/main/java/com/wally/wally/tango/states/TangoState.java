@@ -52,7 +52,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
             );
 
     protected Tango mTango;
-    protected Executor mExecutor;
     protected boolean mIsLocalized;
     protected boolean mIsConnected;
     protected TangoUpdater mTangoUpdater;
@@ -76,8 +75,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     protected TangoStateConnector mSuccessStateConnector;
 
 
-    public TangoState(Executor executor,
-                      TangoUpdater tangoUpdater,
+    public TangoState(TangoUpdater tangoUpdater,
                       TangoFactory tangoFactory,
                       WallyRenderer wallyRenderer,
                       TangoPointCloudManager pointCloudManager) {
@@ -85,7 +83,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
         mTangoUpdater = tangoUpdater;
         mPointCloudManager = pointCloudManager;
         mTangoFactory = tangoFactory;
-        mExecutor = executor;
         mEventListeners = new ArrayList<>();
     }
 
@@ -100,33 +97,17 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     }
 
 
-    public final void pause() {
+    public synchronized final void pause() {
         Log.d(TAG, "pause. Thread = " + Thread.currentThread());
-        mExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (TangoState.this) {
-                    Log.d(TAG, "pause in run. Thread = " + Thread.currentThread());
-                    disconnect();
-                    pauseHook();
-                }
-            }
-        });
+        disconnect();
+        pauseHook();
     }
 
     protected abstract void pauseHook();
 
-    public final void resume() {
+    public synchronized final void resume() {
         Log.d(TAG, "resume Thread = " + Thread.currentThread());
-        mExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (TangoState.this) {
-                    Log.d(TAG, "resume in run. Thread = " + Thread.currentThread());
-                    resumeHook();
-                }
-            }
-        });
+        resumeHook();
     }
 
     protected abstract void resumeHook();
@@ -210,14 +191,9 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
             public void run() {
                 // Connect TangoUpdater and tango
                 mTango.connectListener(mTangoUpdater.getFramePairs(), mTangoUpdater);
-                mExecutor.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Get extrinsics (needs to be done after connecting Tango and listeners)
-                        mExtrinsics = TangoUtils.getDeviceExtrinsics(mTango);
-                        mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-                    }
-                });
+                // Get extrinsics (needs to be done after connecting Tango and listeners)
+                mExtrinsics = TangoUtils.getDeviceExtrinsics(mTango);
+                mIntrinsics = mTango.getCameraIntrinsics(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
                 connectRenderer();
                 mIsConnected = true;
             }
@@ -398,9 +374,5 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
     public interface StateChangeListener {
         void onStateChange(TangoState nextTangoState);
-    }
-
-    public interface Executor {
-        void execute(Runnable runnable);
     }
 }

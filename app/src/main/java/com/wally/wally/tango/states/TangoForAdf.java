@@ -19,12 +19,11 @@ public abstract class TangoForAdf extends TangoState {
     private Thread mLocalizationWatchdog;
     private long mLocalizationTimeout = 20000;
 
-    public TangoForAdf(Executor executor,
-                       TangoUpdater tangoUpdater,
+    public TangoForAdf(TangoUpdater tangoUpdater,
                        TangoFactory tangoFactory,
                        WallyRenderer wallyRenderer,
                        TangoPointCloudManager pointCloudManager){
-        super(executor, tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
+        super(tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
     }
 
     public TangoForAdf withAdf(AdfInfo adf){

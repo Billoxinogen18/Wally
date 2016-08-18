@@ -18,12 +18,11 @@ import com.wally.wally.tango.TangoUtils;
 public class TangoForSavedAdf extends TangoForAdf {
     private static final String TAG = TangoForSavedAdf.class.getSimpleName();
 
-    public TangoForSavedAdf(Executor executor,
-                            TangoUpdater tangoUpdater,
+    public TangoForSavedAdf(TangoUpdater tangoUpdater,
                             TangoFactory tangoFactory,
                             WallyRenderer wallyRenderer,
                             TangoPointCloudManager pointCloudManager){
-        super(executor, tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
+        super(tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
     }
 
     public TangoForAdf withAdf(AdfInfo adf){

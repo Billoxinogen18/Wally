@@ -1,7 +1,5 @@
 package com.wally.wally.controllers.main.factory;
 
-import android.app.Activity;
-
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.analytics.WallyAnalytics;
@@ -35,7 +33,6 @@ import java.util.Map;
  */
 public class TangoDriverFactory {
     private Config mConfig;
-    private TangoState.Executor mExecutor;
     private TangoUpdater mTangoUpdater;
     private TangoFactory mTangoFactory;
     private WallyRenderer mRenderer;
@@ -64,11 +61,8 @@ public class TangoDriverFactory {
         mTipManager = mainFactory.getTipManager();
         mTangoUx = mainFactory.getTangoUx();
         mAdfScheduler = mainFactory.getAdfScheduler();
-        Activity activity = mainFactory.getActivity();
         mVisualContentManager = mainFactory.getVisualContentManager();
         mReadyStateReporter = mainFactory.getReadyStateReporter();
-
-        mExecutor = createExecutor(activity);
 
         tangoStates = new HashMap<>();
 
@@ -91,25 +85,25 @@ public class TangoDriverFactory {
     private void createTangoStates() {
         long localizationTimeout = mConfig.getInt(TangoManagerConstants.LOCALIZATION_TIMEOUT);
         TangoForLearnedAdf tangoForLearnedAdf =
-                new TangoForLearnedAdf(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
+                new TangoForLearnedAdf(mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
         tangoForLearnedAdf.withLocalizationTimeout(localizationTimeout);
         tangoStates.put(TangoForLearnedAdf.class, tangoForLearnedAdf);
 
         TangoForLearning tangoForLearning =
-                new TangoForLearning(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mLearningEvaluator, mPointCloudManager);
+                new TangoForLearning(mTangoUpdater, mTangoFactory, mRenderer, mLearningEvaluator, mPointCloudManager);
         tangoStates.put(TangoForLearning.class, tangoForLearning);
 
         TangoForReadyState tangoForReadyState =
-                new TangoForReadyState(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
+                new TangoForReadyState(mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
         tangoStates.put(TangoForReadyState.class, tangoForReadyState);
 
         TangoForCloudAdfs tangoForCloudAdfs =
-                new TangoForCloudAdfs(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager, mAdfScheduler);
+                new TangoForCloudAdfs(mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager, mAdfScheduler);
         tangoForCloudAdfs.withLocalizationTimeout(localizationTimeout);
         tangoStates.put(TangoForCloudAdfs.class, tangoForCloudAdfs);
 
         TangoForSavedAdf tangoForSavedAdf =
-                new TangoForSavedAdf(mExecutor, mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
+                new TangoForSavedAdf(mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
         tangoForSavedAdf.withLocalizationTimeout(localizationTimeout);
         tangoStates.put(TangoForSavedAdf.class, tangoForSavedAdf);
 
@@ -167,18 +161,4 @@ public class TangoDriverFactory {
             tango.addEventListener(eventListener);
         }
     }
-
-    private TangoState.Executor createExecutor(final Activity activity) {
-        return new TangoState.Executor() {
-            @Override
-            public void execute(Runnable runnable) {
-                //new Thread(runnable).start();
-                //activity.runOnUiThread(runnable);
-                runnable.run();
-            }
-        };
-    }
-
-
-
 }
