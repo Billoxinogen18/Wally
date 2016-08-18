@@ -194,6 +194,12 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
                 break;
             case WallyEvent.ON_PAUSE:
                 super.stop();
+                mMainThreadHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mOverlay.setVisibility(View.VISIBLE);
+                    }
+                });
                 break;
             case WallyEvent.ON_RESUME:
                 StartParams startParams = new StartParams();
