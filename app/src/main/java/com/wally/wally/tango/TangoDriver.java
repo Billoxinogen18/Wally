@@ -35,6 +35,11 @@ public class TangoDriver implements TangoState.StateChangeListener {
         tangoState = nextTangoState;
     }
 
+    public synchronized AdfInfo getAdf() {
+        Log.d(TAG, "getAdf");
+        return tangoState.getAdf();
+    }
+
     public synchronized boolean isLearningState() {
         return tangoState.isLearningState();
     }
@@ -47,16 +52,8 @@ public class TangoDriver implements TangoState.StateChangeListener {
         return tangoState.isConnected();
     }
 
-    /**
-     * Finds plane pose in the middle of the screen.
-     */
     public synchronized TangoPoseData findPlaneInMiddle() {
         return tangoState.findPlaneInMiddle();
-    }
-
-    public synchronized AdfInfo getAdf() {
-        Log.d(TAG, "getAdf");
-        return tangoState.getAdf();
     }
 
     public synchronized Pose getDevicePoseInFront() {
