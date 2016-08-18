@@ -10,6 +10,7 @@ import com.google.atap.tango.ux.TangoUxLayout;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.App;
 import com.wally.wally.adf.AdfScheduler;
+import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.config.Config;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.events.WallyEvent;
@@ -37,6 +38,7 @@ import org.rajawali3d.surface.RajawaliTextureView;
  * Main Factory responsible for creating Tango Managers
  */
 public class MainFactory {
+    private WallyAnalytics mAnalytics;
     private ScaleGestureDetector mScaleDetector;
     private TangoUpdater mTangoUpdater;
     private VisualContentManager mVisualContentManager;
@@ -61,6 +63,7 @@ public class MainFactory {
         Context context = activity.getBaseContext();
         mTangoUx = new WallyTangoUx(context, mConfig);
         mTangoUx.setLayout(tangoUxLayout);
+        mAnalytics = WallyAnalytics.getInstance(context);
 
         mTangoUpdater = new TangoUpdater(mTangoUx, surfaceView, mPointCloudManager);
         mTangoUpdater.addTangoUpdaterListener(activity);
@@ -149,6 +152,10 @@ public class MainFactory {
 
     public ReadyStateReporter getReadyStateReporter(){
         return mReadyStateReporter;
+    }
+
+    public WallyAnalytics getAnalytics() {
+        return mAnalytics;
     }
 
 

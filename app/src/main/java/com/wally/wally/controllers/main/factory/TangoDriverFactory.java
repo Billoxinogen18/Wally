@@ -4,6 +4,7 @@ import android.app.Activity;
 
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfScheduler;
+import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
 import com.wally.wally.datacontroller.content.Content;
@@ -41,6 +42,7 @@ public class TangoDriverFactory {
     private TangoPointCloudManager mPointCloudManager;
     private LearningEvaluator mLearningEvaluator;
     private TipManager mTipManager;
+    private WallyAnalytics mAnalytics;
     private WallyTangoUx mTangoUx;
     private AdfScheduler mAdfScheduler;
     private VisualContentManager mVisualContentManager;
@@ -52,8 +54,8 @@ public class TangoDriverFactory {
 
 
     public TangoDriverFactory(MainFactory mainFactory){
-
         mConfig = mainFactory.getConfig();
+        mAnalytics = mainFactory.getAnalytics();
         mTangoUpdater = mainFactory.getTangoUpdater();
         mTangoFactory = mainFactory.getTangoFactory();
         mRenderer = mainFactory.getRenderer();
@@ -111,8 +113,9 @@ public class TangoDriverFactory {
         tangoForSavedAdf.withLocalizationTimeout(localizationTimeout);
         tangoStates.put(TangoForSavedAdf.class, tangoForSavedAdf);
 
-        setEventListener(mTipManager);
         setEventListener(mTangoUx);
+        setEventListener(mAnalytics);
+        setEventListener(mTipManager);
         setEventListener(mReadyStateReporter);
 
         mTangoUpdater.addTangoUpdaterListener(tangoForCloudAdfs);
