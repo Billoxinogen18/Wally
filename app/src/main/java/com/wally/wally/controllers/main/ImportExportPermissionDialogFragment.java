@@ -38,6 +38,7 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     private static final String EXTRA_KEY_SOURCEFILE = "SOURCE_FILE";
     private static final String ARG_MODE = "ARG_MODE";
 
+    private static final int REQ_CODE = 52;
     /**
      * Import or Export
      */
@@ -99,7 +100,7 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
         Intent importIntent = new Intent();
         importIntent.setClassName(INTENT_CLASSPACKAGE, INTENT_IMPORTEXPORT_CLASSNAME);
         importIntent.putExtra(EXTRA_KEY_SOURCEFILE, Utils.getAdfFilePath(mAdfInfo.getUuid()));
-        getActivity().startActivityForResult(importIntent, Tango.TANGO_INTENT_ACTIVITYCODE);
+        startActivityForResult(importIntent, REQ_CODE);
     }
 
     // This code is from Tango Internals! Not mine
@@ -113,7 +114,7 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
 
         exportIntent.putExtra("SOURCE_UUID", mAdfInfo.getUuid());
         exportIntent.putExtra("DESTINATION_FILE",  Utils.getAdfFilesFolder());
-        getActivity().startActivityForResult(exportIntent, Tango.TANGO_INTENT_ACTIVITYCODE);
+        startActivityForResult(exportIntent, REQ_CODE);
     }
 
     private void readArgs() {
@@ -150,7 +151,7 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Tango.TANGO_INTENT_ACTIVITYCODE) {
+        if (requestCode == REQ_CODE) {
             // Save deny status.
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor e = sp.edit();
