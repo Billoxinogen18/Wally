@@ -33,6 +33,7 @@ public class TangoForSavedAdf extends TangoForAdf {
     @Override
     protected void pauseHook() {
         Log.d(TAG, "pause Thread = " + Thread.currentThread());
+        mLocalizationWatchdog.interrupt();
     }
 
     @Override

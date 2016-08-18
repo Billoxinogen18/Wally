@@ -26,7 +26,7 @@ public class TangoForLearnedAdf extends TangoForAdf {
 
     @Override
     protected void pauseHook() {
-
+        mLocalizationWatchdog.interrupt();
     }
 
     @Override

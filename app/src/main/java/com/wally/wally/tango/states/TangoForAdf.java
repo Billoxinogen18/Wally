@@ -16,7 +16,7 @@ public abstract class TangoForAdf extends TangoState {
     private static final String TAG = TangoForAdf.class.getSimpleName();
 
     protected AdfInfo mAdfInfo;
-    private Thread mLocalizationWatchdog;
+    protected Thread mLocalizationWatchdog;
     private long mLocalizationTimeout = 20000;
 
     public TangoForAdf(TangoUpdater tangoUpdater,

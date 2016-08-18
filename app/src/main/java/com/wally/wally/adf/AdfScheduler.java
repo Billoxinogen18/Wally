@@ -8,6 +8,7 @@ import com.wally.wally.progressReporter.ProgressReporter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.logging.LogManager;
 
 public class AdfScheduler implements ProgressReporter {
     private static final String TAG = AdfScheduler.class.getSimpleName();
@@ -23,11 +24,12 @@ public class AdfScheduler implements ProgressReporter {
     private Thread scheduler;
 
     public AdfScheduler(AdfManager adfManager) {
+        //initial();
         done = false;
+        callbackList = new ArrayList<>();
         adfsSoFar = 0;
         timeout = DEFAULT_TIMEOUT;
         this.mAdfManager = adfManager;
-        callbackList = new ArrayList<>();
     }
 
     public AdfScheduler withTimeout(long timeoutMs) {
@@ -45,6 +47,7 @@ public class AdfScheduler implements ProgressReporter {
         if (!scheduler.isInterrupted()) {
             scheduler.interrupt();
         }
+        callbackList.clear();
         listener.onProgressUpdate(this, 1);
     }
 
@@ -61,6 +64,7 @@ public class AdfScheduler implements ProgressReporter {
     }
 
     public void start() {
+        initial();
         scheduler = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -70,7 +74,14 @@ public class AdfScheduler implements ProgressReporter {
         scheduler.start();
     }
 
+    private void initial(){
+        done = false;
+        callbackList = new ArrayList<>();
+    }
+
+
     private void schedulingLoop() {
+        Log.d(TAG, "schedulingLoop() called with: " + "");
         while (!done && !scheduler.isInterrupted()) {
             final CountDownLatch latch = new CountDownLatch(1);
             mAdfManager.getAdf(new AdfManager.AdfManagerStateListener() {
