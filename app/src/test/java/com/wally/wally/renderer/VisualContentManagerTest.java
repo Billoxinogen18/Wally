@@ -164,7 +164,7 @@ public class VisualContentManagerTest {
     }
 
     private <T> ArrayList<T> getArrayListFromIterator(Iterator<T> a){
-        ArrayList<T> res = new ArrayList<T>();
+        ArrayList<T> res = new ArrayList<a>();
         while(a.hasNext()){
             res.add(a.next());
         }

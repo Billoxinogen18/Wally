@@ -51,7 +51,7 @@ public class FrustumAxes extends Line3D {
         Vector3 y = new Vector3(0, 1, 0);
         Vector3 z = new Vector3(0, 0, 1);
 
-        Stack<Vector3> points = new Stack<Vector3>();
+        Stack<Vector3> points = new Stack<>();
         Collections.addAll(points, o, x, o, y, o, z, o, a, b, o, b, c, o, c, d, o, d, a);
 
         return points;

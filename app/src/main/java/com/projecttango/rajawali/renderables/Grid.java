@@ -37,7 +37,7 @@ public class Grid extends Line3D {
     }
 
     private static Stack<Vector3> calculatePoints(int size, int step) {
-        Stack<Vector3> points = new Stack<Vector3>();
+        Stack<Vector3> points = new Stack<>();
 
         // Rows
         for (float i = -size / 2f; i <= size / 2f; i += step) {
