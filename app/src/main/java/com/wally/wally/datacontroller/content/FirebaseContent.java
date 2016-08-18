@@ -13,35 +13,35 @@ import java.util.List;
 public class FirebaseContent extends FirebaseObject {
 
     // NoteData
-    private static final String K_NOTE           = "note";
-    private static final String K_TITLE          = "title";
-    private static final String K_COLOR          = "color";
-    private static final String K_TEXT_COLOR          = "text_color";
-    private static final String K_IMGURI         = "image";
-    private static final String K_ROOM           = "roomId";
-    private static final String K_AUTHOR         = "authorId";
-    private static final String K_NOTE_DATA      = "NoteData";
+    public static final String K_NOTE           = "note";
+    public static final String K_TITLE          = "title";
+    public static final String K_COLOR          = "color";
+    public static final String K_TEXT_COLOR          = "text_color";
+    public static final String K_IMGURI         = "image";
+    public static final String K_ROOM           = "roomId";
+    public static final String K_AUTHOR         = "authorId";
+    public static final String K_NOTE_DATA      = "NoteData";
 
     // Location
-    private static final String K_HASH           = "hash";
-    private static final String K_LAT            = "latitude";
-    private static final String K_LNG            = "longitude";
-    private static final String K_LOCATION       = "Location";
+    public static final String K_HASH           = "hash";
+    public static final String K_LAT            = "latitude";
+    public static final String K_LNG            = "longitude";
+    public static final String K_LOCATION       = "Location";
 
     // TangoData
-    private static final String K_SCALE          = "scale";
-    private static final String K_ROTATION       = "rotation";
-    private static final String K_TRANSLATION    = "translation";
-    private static final String K_TANGO_DATA     = "TangoData";
+    public static final String K_SCALE          = "scale";
+    public static final String K_ROTATION       = "rotation";
+    public static final String K_TRANSLATION    = "translation";
+    public static final String K_TANGO_DATA     = "TangoData";
 
     // Visibility
-    private static final String K_PREVIEW        = "preview";
-    private static final String K_DURATION       = "duration";
-    private static final String K_PUBLICITY      = "publicity";
-    private static final String K_ANONYMOUS      = "anonymous";
-    private static final String K_SHARED         = "Shared";
+    public static final String K_PREVIEW        = "preview";
+    public static final String K_DURATION       = "duration";
+    public static final String K_PUBLICITY      = "publicity";
+    public static final String K_ANONYMOUS      = "anonymous";
+    public static final String K_SHARED         = "Shared";
 
-    private static final String K_TIMESTAMP     = "timestamp";
+    public static final String K_TIMESTAMP     = "timestamp";
 
     public FirebaseContent() {}
 
