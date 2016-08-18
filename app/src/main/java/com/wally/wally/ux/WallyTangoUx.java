@@ -175,6 +175,14 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
             case WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF:
                 onLocalizationFinishAfterSavedAdf();
                 break;
+            case WallyEvent.ON_PAUSE:
+                super.stop();
+                break;
+            case WallyEvent.ON_RESUME:
+                StartParams startParams = new StartParams();
+                startParams.showConnectionScreen = false;
+                super.start(startParams);
+                break;
             default:
                 break;
         }

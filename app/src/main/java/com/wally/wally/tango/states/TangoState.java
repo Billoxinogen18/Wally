@@ -99,13 +99,16 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     public synchronized final void pause() {
         Log.d(TAG, "pause. Thread = " + Thread.currentThread());
         disconnect();
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.ON_PAUSE));
         pauseHook();
+
     }
 
     protected abstract void pauseHook();
 
     public synchronized final void resume() {
         Log.d(TAG, "resume Thread = " + Thread.currentThread());
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.ON_RESUME));
         resumeHook();
     }
 
