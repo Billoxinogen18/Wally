@@ -25,6 +25,12 @@ public class WallyEvent {
     public static final String
     LOCALIZATION_FINISH_AFTER_SAVED_ADF = "onLocalizationFinishAfterSavedAdf";
 
+    public static final String
+    ON_PAUSE = "onPause";
+
+    public static final String
+    ON_RESUME = "onResume";
+
     private final String id;
 
     private WallyEvent(String id) {
