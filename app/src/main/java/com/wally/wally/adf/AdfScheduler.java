@@ -64,7 +64,7 @@ public class AdfScheduler implements ProgressReporter {
     }
 
     public void start() {
-        initial();
+        done = false;
         scheduler = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -74,15 +74,10 @@ public class AdfScheduler implements ProgressReporter {
         scheduler.start();
     }
 
-    private void initial(){
-        done = false;
-        callbackList = new ArrayList<>();
-    }
-
 
     private void schedulingLoop() {
-        Log.d(TAG, "schedulingLoop() called with: " + "");
         while (!done && !scheduler.isInterrupted()) {
+            Log.d(TAG, "schedulingLoop() called with: " + "");
             final CountDownLatch latch = new CountDownLatch(1);
             mAdfManager.getAdf(new AdfManager.AdfManagerStateListener() {
                 @Override
