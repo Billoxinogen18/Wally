@@ -10,8 +10,8 @@ import com.wally.wally.datacontroller.user.User;
  * ReCreated by meravici on 5/21/16.
  */
 public class SocialUserManager {
-    SocialUserFactory mSocialUserFactory;
-    SocialUser mUser;
+    private SocialUserFactory mSocialUserFactory;
+    private SocialUser mUser;
 
 
     public SocialUserManager(SocialUserFactory socialUserFactory){

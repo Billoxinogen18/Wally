@@ -5,8 +5,11 @@ import android.support.v7.widget.RecyclerView;
 
 public abstract class OnScrollListener extends RecyclerView.OnScrollListener {
     public static String TAG = OnScrollListener.class.getSimpleName();
-    int firstVisibleItem, visibleItemCount, totalItemCount, lastVisibleItem;
-    int lastFirstVisibleItem = -1;
+    private int firstVisibleItem;
+    private int visibleItemCount;
+    private int totalItemCount;
+    private int lastVisibleItem;
+    private int lastFirstVisibleItem = -1;
     private boolean loading = true;
     private int visibleThreshold = 5; // The minimum amount of items to have below your current scroll position before loading more.
 

@@ -14,9 +14,9 @@ import java.util.List;
  * Created by Meravici on 6/15/2016. yea
  */
 public class PagingRetriever {
-    public static final String TAG = PagingRetriever.class.getSimpleName();
+    private static final String TAG = PagingRetriever.class.getSimpleName();
 
-    public int pageLength;
+    private int pageLength;
 
     private Fetcher contentFetcher;
 

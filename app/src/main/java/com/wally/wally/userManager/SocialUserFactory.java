@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SocialUserFactory {
-    public static final String TAG = SocialUserFactory.class.getSimpleName();
+    private static final String TAG = SocialUserFactory.class.getSimpleName();
     private Map<Id, SocialUser> userCache;
 
     public SocialUserFactory() {

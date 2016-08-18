@@ -272,7 +272,7 @@ public class MapsFragment extends BaseFragment implements
         mListener.openMapFragment(user);
     }
 
-    public void onMyLocationClick() {
+    private void onMyLocationClick() {
         if (!Utils.checkHasLocationPermission(getContext())) {
             requestLocationPermission(RC_MY_LOCATION_CLICK);
         } else {
@@ -298,7 +298,7 @@ public class MapsFragment extends BaseFragment implements
         mContentScrollListener.loadingNextFinished();
     }
 
-    public void onAreaUpdateClick() {
+    private void onAreaUpdateClick() {
         loadContentNearLocation(mMap.getCameraPosition());
         mContentListView.startLoading();
         Toast.makeText(getContext(), R.string.updating_area, Toast.LENGTH_SHORT).show();

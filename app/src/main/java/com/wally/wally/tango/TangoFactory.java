@@ -9,7 +9,7 @@ import com.google.atap.tangoservice.TangoErrorException;
 import com.projecttango.tangosupport.TangoSupport;
 
 public class TangoFactory {
-    public static final String TAG = TangoFactory.class.getSimpleName();
+    private static final String TAG = TangoFactory.class.getSimpleName();
 
     private Context mContext;
     private Tango mTango;

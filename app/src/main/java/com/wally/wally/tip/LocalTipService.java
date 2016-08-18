@@ -31,7 +31,7 @@ public class LocalTipService implements TipService {
                 context.getSharedPreferences("tips", Context.MODE_PRIVATE));
     }
 
-    public LocalTipService(String json, SharedPreferences preferences) {
+    private LocalTipService(String json, SharedPreferences preferences) {
         this.preferences = preferences;
         try {
             JSONObject obj = new JSONObject(json);

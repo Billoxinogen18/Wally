@@ -29,13 +29,13 @@ import com.projecttango.rajawali.renderables.primitives.Points;
  */
 public class PointCloud extends Points {
     // Maximum depth range used to calculate coloring (min = 0)
-    public static final float CLOUD_MAX_Z = 5;
+    private static final float CLOUD_MAX_Z = 5;
 
     private float[] mColorArray;
     private final int[] mPalette;
-    public static final int PALETTE_SIZE = 360;
-    public static final float HUE_BEGIN = 0;
-    public static final float HUE_END = 320;
+    private static final int PALETTE_SIZE = 360;
+    private static final float HUE_BEGIN = 0;
+    private static final float HUE_END = 320;
 
     public PointCloud(int maxPoints) {
         super(maxPoints, true);

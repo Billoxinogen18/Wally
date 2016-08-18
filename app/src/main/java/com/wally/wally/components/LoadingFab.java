@@ -31,7 +31,7 @@ public class LoadingFab extends FrameLayout implements Runnable {
         super(context, attrs);
     }
 
-    public static int dpToPx(int dp) {
+    private static int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 

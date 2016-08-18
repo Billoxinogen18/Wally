@@ -48,7 +48,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         TextChangeListenerAdapter.TextChangeListener {
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
-    public static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
+    private static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
     private static final int RC_PERMISSION_READ_EXTERNAL_STORAGE = 11;
 
 
@@ -289,7 +289,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
      * Called when user finally discarded post.
      * Now you should clear all caches and destroy self.
      */
-    public void onContentDiscarded() {
+    private void onContentDiscarded() {
         dismiss();
     }
 
@@ -343,7 +343,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
      *
      * @return true if everything is untouched by user.
      */
-    public boolean isPostEmpty() {
+    private boolean isPostEmpty() {
         return TextUtils.isEmpty(mContent.getImageUri())
                 && TextUtils.isEmpty(mNoteEt.getText())
                 && TextUtils.isEmpty(mTitleEt.getText());
@@ -399,7 +399,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         mSocialVisibilityBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null);
     }
 
-    public void showDialog(boolean show) {
+    private void showDialog(boolean show) {
         if (getDialog() != null) {
             if (!show) {
                 getDialog().hide();
@@ -418,7 +418,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     /**
      * This method is called whenever something is updated in the post.
      */
-    public void onPostContentChanged() {
+    private void onPostContentChanged() {
         boolean isPostEmpty = isPostEmpty();
         if (isPostEmpty == mPostCreateBtn.isEnabled()) {
             mPostCreateBtn.setEnabled(!isPostEmpty);

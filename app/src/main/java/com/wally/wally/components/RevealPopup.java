@@ -18,7 +18,7 @@ import com.wally.wally.Utils;
  */
 public abstract class RevealPopup {
 
-    protected PopupWindow mPopup;
+    private PopupWindow mPopup;
     protected View mContentLayout;
     private View mAnchor;
 

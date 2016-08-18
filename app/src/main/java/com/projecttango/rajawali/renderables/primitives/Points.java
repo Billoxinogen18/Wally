@@ -39,7 +39,7 @@ public class Points extends Object3D {
     // Initialize the buffers for Points primitive.
     // Since only vertex, index and color buffers are used,
     // we only initialize them using setData call.
-    protected void init(boolean createVBOs, boolean createColors) {
+    private void init(boolean createVBOs, boolean createColors) {
         float[] vertices = new float[mMaxNumberOfVertices * 3];
         int[] indices = new int[mMaxNumberOfVertices];
         for (int i = 0; i < indices.length; ++i) {

@@ -128,7 +128,7 @@ public class LoginActivity extends BaseActivity implements
         }
     }
 
-    public void signInWithGoogle() {
+    private void signInWithGoogle() {
         Auth.GoogleSignInApi.signOut(getGoogleApiClient());
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(getGoogleApiClient());
         startActivityForResult(signInIntent, RC_SIGN_IN);

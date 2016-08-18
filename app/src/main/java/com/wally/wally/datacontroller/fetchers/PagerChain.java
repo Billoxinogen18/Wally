@@ -12,7 +12,7 @@ public class PagerChain implements Fetcher {
     private List<Fetcher> pagerList;
     private Collection<Content> tail;
 
-    public PagerChain(List<Fetcher> pagerList) {
+    private PagerChain(List<Fetcher> pagerList) {
         this.pagerList = pagerList;
         this.currentPagerIndex = 0;
         tail = new ArrayList<>();
