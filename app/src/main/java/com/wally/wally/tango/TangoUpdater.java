@@ -10,6 +10,7 @@ import com.google.atap.tangoservice.TangoEvent;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
+import com.wally.wally.ux.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliTextureView;
 
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
-    private TangoUx mTangoUx;
+    private WallyTangoUx mTangoUx;
     private boolean isLocalized;
     private RajawaliTextureView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
@@ -29,7 +30,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
 
 
 
-    public TangoUpdater(TangoUx tangoUx, RajawaliTextureView surfaceView, TangoPointCloudManager pointCloudManager) {
+    public TangoUpdater(WallyTangoUx tangoUx, RajawaliTextureView surfaceView, TangoPointCloudManager pointCloudManager) {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
@@ -140,6 +141,9 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
         for (ValidPoseListener listener : mValidPoseListeners) {
             listener.onValidPose(poseData);
         }
+
+        mTangoUx.hideOverlay();
+
     }
 
     public interface ValidPoseListener {

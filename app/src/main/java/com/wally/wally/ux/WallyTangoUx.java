@@ -22,8 +22,11 @@ import com.wally.wally.events.WallyEventListener;
 
 public class WallyTangoUx extends TangoUx implements WallyEventListener {
     private Handler mMainThreadHandler;
+
     private TextView mTextView;
     private RelativeLayout mContainer;
+    private RelativeLayout mOverlay;
+
     private Context mContext;
     private Config mConfig;
     private Runnable hideMessageRunnable;
@@ -75,12 +78,14 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
         showMessage(mConfig.getString(TangoManagerConstants.LOCALIZED), 500);
     }
 
-    //    @Override
     public void onLocalizationFinishAfterSavedAdf() {
         showMessage(mConfig.getString(TangoManagerConstants.LOCALIZED), 500);
     }
 
-    //    @Override
+    public void onLocalizationLost() {
+        showMessage(mConfig.getString(TangoManagerConstants.LOCALIZATION_LOST), 500);
+    }
+
     public void onTangoOutOfDate() {
         showTangoOutOfDate();
     }
@@ -95,6 +100,13 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
         mContainer = new RelativeLayout(mContext);
         mContainer.setGravity(Gravity.CENTER);
 
+        mOverlay = new RelativeLayout(mContext);
+        mOverlay.setBackgroundColor(Color.WHITE);
+        mOverlay.setGravity(Gravity.CENTER);
+
+        RelativeLayout.LayoutParams overlayParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        mContainer.addView(mOverlay, overlayParams);
+
         mTextView = new TextView(mContext);
         mTextView.setPadding(50, 50, 50, 50);
         mTextView.setGravity(Gravity.CENTER);
@@ -105,12 +117,14 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
 
         RelativeLayout.LayoutParams containerParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         containerParams.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        containerParams.addRule(RelativeLayout.CENTER_VERTICAL);
 
         mContainer.addView(mTextView, containerParams);
 
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.CENTER;
+
 
         tangoUxLayout.addView(mContainer, params);
     }
@@ -175,6 +189,9 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
             case WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF:
                 onLocalizationFinishAfterSavedAdf();
                 break;
+            case WallyEvent.ON_LOCALIZATION_LOST:
+                onLocalizationLost();
+                break;
             case WallyEvent.ON_PAUSE:
                 super.stop();
                 break;
@@ -186,5 +203,14 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
             default:
                 break;
         }
+    }
+
+    public void hideOverlay() {
+        mMainThreadHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                mOverlay.setVisibility(View.GONE);
+            }
+        });
     }
 }
