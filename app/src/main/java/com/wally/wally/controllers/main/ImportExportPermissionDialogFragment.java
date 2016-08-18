@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.atap.tangoservice.Tango;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfInfo;
