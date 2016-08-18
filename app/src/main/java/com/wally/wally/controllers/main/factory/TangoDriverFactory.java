@@ -32,6 +32,7 @@ import java.util.Map;
  * Factory for Tango States and tango driver
  */
 public class TangoDriverFactory {
+
     private Config mConfig;
     private TangoUpdater mTangoUpdater;
     private TangoFactory mTangoFactory;
@@ -39,39 +40,32 @@ public class TangoDriverFactory {
     private TangoPointCloudManager mPointCloudManager;
     private LearningEvaluator mLearningEvaluator;
     private TipManager mTipManager;
-    private WallyAnalytics mAnalytics;
-    private WallyTangoUx mTangoUx;
     private AdfScheduler mAdfScheduler;
     private VisualContentManager mVisualContentManager;
-    private MainFactory.ReadyStateReporter mReadyStateReporter;
 
     private TangoDriver mTangoDriver;
     private Map<Class, TangoState> tangoStates;
     private TangoStateConnectorFactory mConnectorFactory;
 
 
-    public TangoDriverFactory(MainFactory mainFactory){
+    public TangoDriverFactory(MainFactory mainFactory) {
         mConfig = mainFactory.getConfig();
-        mAnalytics = mainFactory.getAnalytics();
         mTangoUpdater = mainFactory.getTangoUpdater();
         mTangoFactory = mainFactory.getTangoFactory();
         mRenderer = mainFactory.getRenderer();
         mPointCloudManager = mainFactory.getPointCloudManager();
         mLearningEvaluator = mainFactory.getLearningEvaluator();
         mTipManager = mainFactory.getTipManager();
-        mTangoUx = mainFactory.getTangoUx();
         mAdfScheduler = mainFactory.getAdfScheduler();
         mVisualContentManager = mainFactory.getVisualContentManager();
-        mReadyStateReporter = mainFactory.getReadyStateReporter();
-
         tangoStates = new HashMap<>();
 
-        createTangoStates();
+        createTangoStates(mainFactory);
         mConnectorFactory = new TangoStateConnectorFactory(mTangoUpdater, mTangoDriver);
         createTangoStateConnectors();
     }
 
-    public TangoDriver getTangoDriver(){
+    public TangoDriver getTangoDriver() {
         return mTangoDriver;
     }
 
@@ -82,7 +76,7 @@ public class TangoDriverFactory {
         return fitter;
     }
 
-    private void createTangoStates() {
+    private void createTangoStates(MainFactory mainFactory) {
         long localizationTimeout = mConfig.getInt(TangoManagerConstants.LOCALIZATION_TIMEOUT);
         TangoForLearnedAdf tangoForLearnedAdf =
                 new TangoForLearnedAdf(mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
@@ -107,10 +101,11 @@ public class TangoDriverFactory {
         tangoForSavedAdf.withLocalizationTimeout(localizationTimeout);
         tangoStates.put(TangoForSavedAdf.class, tangoForSavedAdf);
 
-        setEventListener(mTangoUx);
-        setEventListener(mAnalytics);
-        setEventListener(mTipManager);
-        setEventListener(mReadyStateReporter);
+        setEventListener(mainFactory.getTangoUx());
+        setEventListener(mainFactory.getAnalytics());
+        setEventListener(mainFactory.getTipManager());
+        setEventListener(mainFactory.getReadyStateReporter());
+        setEventListener((WallyEventListener) mainFactory.getActivity());
 
         mTangoUpdater.addTangoUpdaterListener(tangoForCloudAdfs);
         mTangoDriver = new TangoDriver(tangoForCloudAdfs);
@@ -119,7 +114,7 @@ public class TangoDriverFactory {
 //        mTangoDriver = new TangoDriver(tangoForLearning);
     }
 
-    private void createTangoStateConnectors(){
+    private void createTangoStateConnectors() {
         TangoForCloudAdfs tangoForCloudAdfs = (TangoForCloudAdfs) tangoStates.get(TangoForCloudAdfs.class);
         TangoStateConnector failConnector = mConnectorFactory.getConnectorFromCloudAdfsToLearning(
                 tangoForCloudAdfs, (TangoForLearning) tangoStates.get(TangoForLearning.class));
@@ -128,21 +123,21 @@ public class TangoDriverFactory {
         tangoForCloudAdfs.withFailStateConnector(failConnector).withSuccessStateConnector(successConnector);
 
 
-        TangoForLearnedAdf tangoForLearnedAdf  = (TangoForLearnedAdf) tangoStates.get(TangoForLearnedAdf.class);
+        TangoForLearnedAdf tangoForLearnedAdf = (TangoForLearnedAdf) tangoStates.get(TangoForLearnedAdf.class);
         failConnector = mConnectorFactory.getConnectorFromLearnedAdfToCloudAdf(
                 tangoForLearnedAdf, (TangoForCloudAdfs) tangoStates.get(TangoForCloudAdfs.class));
         successConnector = mConnectorFactory.getConnectorFromLearnedAdfToReadyState(
                 tangoForLearnedAdf, (TangoForReadyState) tangoStates.get(TangoForReadyState.class));
         tangoForLearnedAdf.withFailStateConnector(failConnector).withSuccessStateConnector(successConnector);
 
-        TangoForLearning tangoForLearning  = (TangoForLearning) tangoStates.get(TangoForLearning.class);
+        TangoForLearning tangoForLearning = (TangoForLearning) tangoStates.get(TangoForLearning.class);
         failConnector = mConnectorFactory.getConnectorFromLearningToLearningState(
                 tangoForLearning, (TangoForLearning) tangoStates.get(TangoForLearning.class));
         successConnector = mConnectorFactory.getConnectorFromLearningToLearnedAdf(
                 tangoForLearning, (TangoForLearnedAdf) tangoStates.get(TangoForLearnedAdf.class));
         tangoForLearning.withFailStateConnector(failConnector).withSuccessStateConnector(successConnector);
 
-        TangoForSavedAdf tangoForSavedAdf  = (TangoForSavedAdf) tangoStates.get(TangoForSavedAdf.class);
+        TangoForSavedAdf tangoForSavedAdf = (TangoForSavedAdf) tangoStates.get(TangoForSavedAdf.class);
         failConnector = mConnectorFactory.getConnectorFromSavedAdfCloudAdfState(
                 tangoForSavedAdf, (TangoForCloudAdfs) tangoStates.get(TangoForCloudAdfs.class));
         successConnector = mConnectorFactory.getConnectorFromSavedAdfToReadyState(
@@ -150,7 +145,7 @@ public class TangoDriverFactory {
         tangoForSavedAdf.withFailStateConnector(failConnector).withSuccessStateConnector(successConnector);
 
 
-        TangoForReadyState tangoForReadyState  = (TangoForReadyState) tangoStates.get(TangoForReadyState.class);
+        TangoForReadyState tangoForReadyState = (TangoForReadyState) tangoStates.get(TangoForReadyState.class);
         failConnector = mConnectorFactory.getConnectorFromReadyToSavedAdfState(
                 tangoForReadyState, (TangoForSavedAdf) tangoStates.get(TangoForSavedAdf.class));
         tangoForReadyState.withFailStateConnector(failConnector);
