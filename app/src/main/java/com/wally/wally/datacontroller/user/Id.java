@@ -40,8 +40,7 @@ public class Id implements Serializable{
 
         Id id1 = (Id) o;
 
-        if (provider != null ? !provider.equals(id1.provider) : id1.provider != null) return false;
-        return id != null ? id.equals(id1.id) : id1.id == null;
+        return provider != null ? provider.equals(id1.provider) : id1.provider == null && (id != null ? id.equals(id1.id) : id1.id == null);
 
     }
 
