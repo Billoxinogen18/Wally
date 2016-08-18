@@ -1,6 +1,13 @@
 package com.wally.wally.events;
 
 public class WallyEvent {
+
+    public static final String
+    ON_PAUSE = "onPause";
+
+    public static final String
+    ON_RESUME = "onResume";
+
     public static final String
     TANGO_READY = "onTangoReady";
 
@@ -26,10 +33,7 @@ public class WallyEvent {
     LOCALIZATION_FINISH_AFTER_SAVED_ADF = "onLocalizationFinishAfterSavedAdf";
 
     public static final String
-    ON_PAUSE = "onPause";
-
-    public static final String
-    ON_RESUME = "onResume";
+    ON_LOCALIZATION_LOST = "onLocalizationLost";
 
     private final String id;
 

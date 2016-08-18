@@ -62,6 +62,14 @@ public class TangoForReadyState extends TangoState {
     }
 
     @Override
+    public void onLocalization(boolean localization) {
+        super.onLocalization(localization);
+        if (!localization) {
+            fireEvent(WallyEvent.createEventWithId(WallyEvent.ON_LOCALIZATION_LOST));
+        }
+    }
+
+    @Override
     public AdfInfo getAdf() {
         return mAdfInfo;
     }
