@@ -5,6 +5,8 @@ package com.wally.wally.analytics;
  * Created by shota on 8/9/16.
  * Class is responsible for logging Localization data in Analytics
  */
+@SuppressWarnings("ALL")
+@Deprecated
 public class LocalizationAnalytics {
     private WallyAnalytics mAnalytics;
     private LocalizationState mLocalizationState = LocalizationState.NONE;
