@@ -24,6 +24,7 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
             }
         });
     }
+
     @Override
     public void onFitStatusChange(boolean fittingStarted) {
         if (fittingStarted) {
@@ -71,6 +72,10 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
                 break;
             case WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF:
                 mTipView.hide();
+                break;
+            case WallyEvent.ON_NEW_CONTENT_DIALOG_SHOW:
+                showTip(TipService.Tag.NEW_CONTENT);
+                break;
             case WallyEvent.TANGO_READY:
                 //NOT NEEDED
                 break;

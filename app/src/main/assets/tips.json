@@ -14,23 +14,23 @@
     },
     "tip_4": {
       "title": "Tip",
-      "message": "Message"
+      "message": "Walk in the same area"
     },
     "tip_5": {
       "title": "Tip",
-      "message": "Walk in the same area"
+      "message": "Pinch to scale"
     },
     "tip_6": {
       "title": "Tip",
-      "message": "You can scale post with pinching"
+      "message": "You can change color of the note"
     },
     "tip_7": {
       "title": "Tip",
-      "message": ""
+      "message": "You can add image to the note"
     },
     "tip_8": {
       "title": "Tip",
-      "message": ""
+      "message": "you can share note with friends"
     },
     "tip_9": {
       "title": "Tip",
@@ -83,11 +83,12 @@
   },
   "tags": {
     "learning": ["tip_1", "tip_2", "tip_3"],
-    "localization": ["tip_4"],
-    "fitting": ["tip_6"],
-    "localization_after_learning": ["tip_5"],
-    "map_public_feed": ["tip_2"],
-    "map_profile": ["tip_1"],
-    "map_person": ["tip_3"]
+    "localization": [],
+    "localization_after_learning": ["tip_4"],
+    "fitting": ["tip_5"],
+    "map_public_feed": [],
+    "map_profile": [],
+    "map_person": [],
+    "new_content": ["tip_6", "tip_7", "tip_8"]
   }
 }
