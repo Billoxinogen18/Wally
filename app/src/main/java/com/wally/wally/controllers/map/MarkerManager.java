@@ -23,7 +23,7 @@ public class MarkerManager {
     private MarkerIconGenerator mMarkerIconGenerator;
     private MapboxMap mMap;
 
-    private int mSelectedMarker = 0;
+//    private int mSelectedMarker = 0;
 
     public MarkerManager(Context context, MapboxMap map) {
         mMarkerIconGenerator = new MarkerIconGenerator(context);
@@ -32,7 +32,7 @@ public class MarkerManager {
     }
 
     public void reset() {
-        mSelectedMarker = 0;
+//        mSelectedMarker = 0;
         for (MarkerNameVisibility markerNameVisibility : mMarkerList) {
             markerNameVisibility.remove();
         }
@@ -63,7 +63,7 @@ public class MarkerManager {
 //
 //                newSelect.markerBase.setIcon(icon);
 
-        mSelectedMarker = position;
+//        mSelectedMarker = position;
 
 //                mMap.getMarkerViewManager().select(newSelect.markerBase);
 
@@ -98,7 +98,7 @@ public class MarkerManager {
     public List<MarkerView> getVisibleMarkers() {
         List<MarkerView> res = new ArrayList<>();
         for (MarkerNameVisibility markerNameVisibility : mMarkerList) {
-            res.add(markerNameVisibility.markerBase);
+            res.add(markerNameVisibility.markerNumber);
         }
         return res;
 
@@ -110,7 +110,7 @@ public class MarkerManager {
 
     private class MarkerNameVisibility {
 
-        public MarkerView markerBase;
+//        public MarkerView markerBase;
         public MarkerView markerNumber;
 
         public String name;
@@ -131,14 +131,14 @@ public class MarkerManager {
                     new MarkerIconGenerator.MarkerIconGenerateListener() {
                         @Override
                         public void onMarkerIconGenerate(final Icon icon) {
-                            MarkerViewOptions baseMarkerOptions = new MarkerViewOptions()
-                                    .position(Utils.serializableLatLngToLatLng(content.getLocation()))
-                                    .icon(icon)
-                                    .anchor(0.5f, 0.5f);
+//                            MarkerViewOptions baseMarkerOptions = new MarkerViewOptions()
+//                                    .position(Utils.serializableLatLngToLatLng(content.getLocation()))
+//                                    .icon(icon)
+//                                    .anchor(0.5f, 0.5f);
+//
+//                            mMap.getMarkerViewManager().update();
 
-                            mMap.getMarkerViewManager().update();
-
-                            markerBase = mMap.addMarker(baseMarkerOptions);
+//                            markerBase = mMap.addMarker(baseMarkerOptions);
 
                             int contentColor = content.getColor() == null ? Color.WHITE : content.getColor();
                             mMarkerIconGenerator.getEnumeratedMarkerIcon(name, contentColor,
@@ -161,21 +161,21 @@ public class MarkerManager {
 
 
         public void hide() {
-            if (markerBase != null)
-                markerBase.setVisible(false);
+//            if (markerBase != null)
+//                markerBase.setVisible(false);
             if (markerNumber != null)
                 markerNumber.setVisible(false);
         }
 
         public void show() {
-            if (markerBase != null)
-                markerBase.setVisible(true);
+//            if (markerBase != null)
+//                markerBase.setVisible(true);
             if (markerNumber != null)
                 markerNumber.setVisible(true);
         }
 
         public void remove() {
-            mMap.removeMarker(markerBase);
+//            mMap.removeMarker(markerBase);
             mMap.removeMarker(markerNumber);
         }
     }
