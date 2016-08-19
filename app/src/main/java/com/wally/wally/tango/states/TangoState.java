@@ -353,5 +353,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
     public interface StateChangeListener {
         void onStateChange(TangoState nextTangoState);
+        boolean canChangeState();
     }
 }

@@ -14,6 +14,7 @@ import com.wally.wally.tango.states.TangoState;
  */
 public class TangoDriver implements TangoState.StateChangeListener {
     private static final String TAG = TangoDriver.class.getSimpleName();
+    private boolean mIsPaused = false;
 
     private TangoState tangoState;
 
@@ -22,10 +23,12 @@ public class TangoDriver implements TangoState.StateChangeListener {
     }
 
     public synchronized void pause() {
+        mIsPaused = true;
         tangoState.pause();
     }
 
     public synchronized void resume() {
+        mIsPaused = false;
         tangoState.resume();
     }
 
@@ -33,6 +36,11 @@ public class TangoDriver implements TangoState.StateChangeListener {
     public synchronized void onStateChange(TangoState nextTangoState) {
         Log.d(TAG, "onStateChange from =" + tangoState + " -- To [" + nextTangoState + "]");
         tangoState = nextTangoState;
+    }
+
+    @Override
+    public synchronized boolean canChangeState() {
+        return false;
     }
 
     public synchronized AdfInfo getAdf() {

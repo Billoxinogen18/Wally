@@ -51,11 +51,15 @@ public class TangoStateConnectorFactory {
         return new TangoStateConnector() {
             @Override
             public void toNextState() {
-                Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
-                from.pause();
-                to.withAdf(from.getAdf());
-                changeState(from, to);
-                to.resume();
+                synchronized (mStateChangeListener) {
+                    if (mStateChangeListener.canChangeState()) {
+                        Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
+                        from.pause();
+                        to.withAdf(from.getAdf());
+                        changeState(from, to);
+                        to.resume();
+                    }
+                }
             }
         };
     }
@@ -69,9 +73,13 @@ public class TangoStateConnectorFactory {
         return new TangoStateConnector() {
             @Override
             public void toNextState() {
-                Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
-                to.withAdf(from.getAdf());
-                changeState(from, to);
+                synchronized (mStateChangeListener) {
+                    if (mStateChangeListener.canChangeState()) {
+                        Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
+                        to.withAdf(from.getAdf());
+                        changeState(from, to);
+                    }
+                }
             }
         };
     }
@@ -90,9 +98,13 @@ public class TangoStateConnectorFactory {
         return new TangoStateConnector() {
             @Override
             public void toNextState() {
-                Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
-                from.pause();
-                to.resume();
+                synchronized (mStateChangeListener) {
+                    if (mStateChangeListener.canChangeState()) {
+                        Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
+                        from.pause();
+                        to.resume();
+                    }
+                }
             }
         };
     }
@@ -103,10 +115,14 @@ public class TangoStateConnectorFactory {
         return new TangoStateConnector() {
             @Override
             public void toNextState() {
-                Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
-                from.pause();
-                changeState(from, to);
-                to.resume();
+                synchronized (mStateChangeListener) {
+                    if (mStateChangeListener.canChangeState()) {
+                        Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
+                        from.pause();
+                        changeState(from, to);
+                        to.resume();
+                    }
+                }
             }
         };
     }
@@ -115,10 +131,14 @@ public class TangoStateConnectorFactory {
         return new TangoStateConnector() {
             @Override
             public void toNextState() {
-                Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
-                to.withPreviousState(from, from.getAdf());
-                mStateChangeListener.onStateChange(to);
-                to.resume();
+                synchronized (mStateChangeListener) {
+                    if (mStateChangeListener.canChangeState()) {
+                        Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
+                        to.withPreviousState(from, from.getAdf());
+                        mStateChangeListener.onStateChange(to);
+                        to.resume();
+                    }
+                }
             }
         };
     }
