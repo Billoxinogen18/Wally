@@ -354,4 +354,9 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     public interface StateChangeListener {
         void onStateChange(TangoState nextTangoState);
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }
