@@ -477,6 +477,14 @@ public class CameraARTangoActivity extends CameraARActivity implements
                 @Override
                 public void run() {
                     mNewContentButton.setProgress(100);
+                    mNewContentButton.setVisibility(View.VISIBLE);
+                }
+            });
+        } else if (WallyEvent.LOCALIZATION_START.equals(event.getId())) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mNewContentButton.setVisibility(View.GONE);
                 }
             });
         }
