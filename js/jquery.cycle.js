@@ -1,7 +1,6 @@
 (function ($) {
 
     $.fn.cycle = function (selector) {
-        console.log("bla");
         var $container = $(this);
 
         function cycleImages(){
