@@ -326,6 +326,15 @@ public final class Utils {
         return getAdfFilesFolder() + "/" + uuid;
     }
 
+    @SuppressWarnings("MissingPermission")
+    public static void getLocation(final GoogleApiClient googleApiClient, final Callback<SerializableLatLng> callback) {
+        Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+        if (location != null) {
+            callback.onResult(Utils.extractLatLng(location));
+        } else {
+            getNewLocation(googleApiClient, callback);
+        }
+    }
 
     @SuppressWarnings("MissingPermission")
     public static void getNewLocation(final GoogleApiClient googleApiClient, final Callback<SerializableLatLng> callback) {

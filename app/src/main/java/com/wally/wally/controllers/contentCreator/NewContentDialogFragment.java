@@ -31,6 +31,12 @@ import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Visibility;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
+import com.wally.wally.events.WallyEvent;
+import com.wally.wally.tip.LocalTipService;
+import com.wally.wally.tip.MapEventListener;
+import com.wally.wally.tip.Tip;
+import com.wally.wally.tip.TipManager;
+import com.wally.wally.tip.TipView;
 import com.wally.wally.userManager.SocialUser;
 
 import java.util.ArrayList;
@@ -116,6 +122,11 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         v.findViewById(R.id.btn_more_settings).setOnClickListener(this);
         v.findViewById(R.id.root).setOnClickListener(this);
         v.findViewById(R.id.space).setOnClickListener(this);
+
+        TipView tipView = (TipView)v.findViewById(R.id.tip_view);
+        TipManager tipManager = new TipManager(tipView, LocalTipService.getInstance(getContext()));
+        tipManager.onWallyEvent(WallyEvent.createEventWithId(WallyEvent.ON_NEW_CONTENT_DIALOG_SHOW));
+
 
         mNoteView = v.findViewById(R.id.note_view);
         mRootView = v.findViewById(R.id.root);

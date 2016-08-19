@@ -35,6 +35,9 @@ public class WallyEvent {
     public static final String
     ON_LOCALIZATION_LOST = "onLocalizationLost";
 
+    public static final String
+    ON_NEW_CONTENT_DIALOG_SHOW = "onNewContentDialogShow";
+
     private final String id;
 
     private WallyEvent(String id) {

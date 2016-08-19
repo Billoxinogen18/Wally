@@ -9,6 +9,7 @@ public interface TipService {
         public static final String MAP_PUBLIC_FEED = "map_public_feed";
         public static final String MAP_PROFILE = "map_profile";
         public static final String MAP_PERSON = "map_person";
+        public static final String NEW_CONTENT = "new_content";
     }
 
     Tip getRandom();

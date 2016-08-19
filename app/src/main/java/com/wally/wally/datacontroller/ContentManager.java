@@ -110,6 +110,8 @@ public class ContentManager {
         if (imagePath != null && imagePath.startsWith(Content.UPLOAD_URI_PREFIX)) {
             String imgUriString = imagePath.substring(Content.UPLOAD_URI_PREFIX.length());
             FirebaseDAL.uploadFile(storage.child(folder), imgUriString, listener);
+        } else {
+            listener.onUploadSuccess(imagePath);
         }
     }
 

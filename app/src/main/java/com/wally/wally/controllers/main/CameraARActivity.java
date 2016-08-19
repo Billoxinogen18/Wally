@@ -251,9 +251,10 @@ public abstract class CameraARActivity extends BaseActivity implements
             requestLocationPermission(RC_SAVE_CONTENT);
             return;
         }
-        Utils.getNewLocation(mGoogleApiClient, new Utils.Callback<SerializableLatLng>() {
+        Utils.getLocation(mGoogleApiClient, new Utils.Callback<SerializableLatLng>() {
             @Override
             public void onResult(SerializableLatLng result) {
+                Log.d(TAG, "onResult() called with: " + "result = [" + result + "]");
                 content.withLocation(result);
                 if (content.getCreationDate() == null) {
                     content.withCreationDate(new Date(System.currentTimeMillis()));
