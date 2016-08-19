@@ -40,7 +40,7 @@ public class TangoDriver implements TangoState.StateChangeListener {
 
     @Override
     public synchronized boolean canChangeState() {
-        return false;
+        return !mIsPaused;
     }
 
     public synchronized AdfInfo getAdf() {
