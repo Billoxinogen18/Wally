@@ -8,6 +8,7 @@ import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
+import com.wally.wally.tango.TangoUtils;
 
 /**
  * Created by shota on 8/9/16.
@@ -59,7 +60,11 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
                     mFailStateConnector.toNextState();
                 } else {
                     withAdf(info);
-                    startLocalizing();
+                    if (mTango == null) {
+                        startLocalizing();
+                    } else {
+                        TangoUtils.loadAdf(mTango, mAdfInfo.getUuid(), mAdfInfo.getPath());
+                    }
                 }
             }
 
