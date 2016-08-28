@@ -26,9 +26,9 @@ public class TangoFactory {
                 try {
                     connectTangoForLearning(mTango);
                     r.run();
-                    Log.d(TAG, "getTangoForLearning");
+                    Log.d(TAG + "Success", "for learning");
                 } catch (TangoErrorException e) {
-                    Log.e(TAG, "Cannot create tangoForLearning: " + e);
+                    Log.e(TAG + "Fail", "for learning");
                     r.onError(e);
                 }
             }
@@ -44,10 +44,9 @@ public class TangoFactory {
                     connectTango(mTango);
                     r.run();
                     mTango.experimentalLoadAreaDescription(uuid);
-                    Log.d(TAG, "get tango for cloud adf");
+                    Log.d(TAG + "Success", "for cloud adf");
                 } catch (TangoErrorException e) {
-                    e.printStackTrace();
-                    Log.e(TAG, "Cannot create tango for cloud adf");
+                    Log.e(TAG + "Fail", "for cloud adf");
                     r.onError(e);
                 }
             }
@@ -63,26 +62,9 @@ public class TangoFactory {
                     connectTango(mTango);
                     r.run();
                     mTango.experimentalLoadAreaDescriptionFromFile(path);
-                    Log.d(TAG, "getTango");
+                    Log.d(TAG + "Success", "for local adf");
                 } catch (TangoErrorException e) {
-                    Log.e(TAG, "Cannot create tango: " + e);
-                    r.onError(e);
-                }
-            }
-        });
-        return mTango;
-    }
-
-    public Tango getTango(final RunnableWithError r) {
-        mTango = new Tango(mContext, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    connectTango(mTango);
-                    r.run();
-                    Log.d(TAG, "getTango");
-                } catch (TangoErrorException e) {
-                    Log.e(TAG, "Cannot create tango: " + e);
+                    Log.e(TAG + "Fail", "for local adf");
                     r.onError(e);
                 }
             }
@@ -97,9 +79,9 @@ public class TangoFactory {
                 try {
                     connectTangoWithUuid(mTango, uuid);
                     r.run();
-                    Log.d(TAG, "getTangoWithUuid");
+                    Log.d(TAG + "Success", "with uuid");
                 } catch (TangoErrorException e) {
-                    Log.e(TAG, "Cannot create tangoWithUuid: " + e);
+                    Log.e(TAG + "Fail", "with uuid");
                     r.onError(e);
                 }
             }
