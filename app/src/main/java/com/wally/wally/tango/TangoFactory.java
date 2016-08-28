@@ -36,6 +36,43 @@ public class TangoFactory {
         return mTango;
     }
 
+    public Tango getTangoForCloudAdf(final RunnableWithError r, final String uuid) {
+        mTango = new Tango(mContext, new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    connectTango(mTango);
+                    r.run();
+                    mTango.experimentalLoadAreaDescription(uuid);
+                    Log.d(TAG, "get tango for cloud adf");
+                } catch (TangoErrorException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "Cannot create tango for cloud adf");
+                    r.onError(e);
+                }
+            }
+        });
+        return mTango;
+    }
+
+    public Tango getTangoForLocalAdf(final RunnableWithError r, final String path) {
+        mTango = new Tango(mContext, new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    connectTango(mTango);
+                    r.run();
+                    mTango.experimentalLoadAreaDescriptionFromFile(path);
+                    Log.d(TAG, "getTango");
+                } catch (TangoErrorException e) {
+                    Log.e(TAG, "Cannot create tango: " + e);
+                    r.onError(e);
+                }
+            }
+        });
+        return mTango;
+    }
+
     public Tango getTango(final RunnableWithError r) {
         mTango = new Tango(mContext, new Runnable() {
             @Override

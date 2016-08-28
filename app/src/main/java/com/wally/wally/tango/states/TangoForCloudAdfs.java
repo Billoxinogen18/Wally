@@ -5,6 +5,7 @@ import android.util.Log;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfScheduler;
+import com.wally.wally.events.WallyEvent;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
@@ -14,7 +15,7 @@ import com.wally.wally.tango.TangoUtils;
  * Created by shota on 8/9/16.
  * Manages Tango which downloads Adfs and tries to localize
  */
-public class TangoForCloudAdfs extends TangoForSavedAdf{
+public class TangoForCloudAdfs extends TangoForAdf {
     private static final String TAG = TangoForCloudAdfs.class.getSimpleName();
 
     private long mLocalizationTimeout = 20000;
@@ -65,6 +66,7 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
                     } else {
                         TangoUtils.loadAdf(mTango, mAdfInfo.getUuid(), mAdfInfo.getPath());
                     }
+                    fireLocalizationStart();
                 }
             }
 
@@ -74,6 +76,13 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
                 this.onNewAdfSchedule(null);
             }
         };
+    }
+
+    protected void startLocalizing(){
+        Log.d(TAG, "startLocalizing with: adf = [" + mAdfInfo + "]");
+        final TangoFactory.RunnableWithError r = getTangoInitializer();
+        mTango = mTangoFactory.getTangoForCloudAdf(r, mAdfInfo.getUuid());
+        Log.d(TAG, "startLocalizing() mTango = " + mTango);
     }
 
     @Override
@@ -89,5 +98,16 @@ public class TangoForCloudAdfs extends TangoForSavedAdf{
     @Override
     public AdfInfo getAdf() {
         return mAdfInfo;
+    }
+
+    @Override
+    protected void fireLocalizationFinish() {
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF));
+        // TODO change constant
+    }
+
+    private void fireLocalizationStart() {
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_START));
+        // TODO change constant
     }
 }

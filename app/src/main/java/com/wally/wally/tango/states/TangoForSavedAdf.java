@@ -8,7 +8,6 @@ import com.wally.wally.events.WallyEvent;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
-import com.wally.wally.tango.TangoUtils;
 
 /**
  * Created by shota on 8/10/16.
@@ -40,25 +39,14 @@ public class TangoForSavedAdf extends TangoForAdf {
         Log.d(TAG, "resume Thread = " + Thread.currentThread());
         startLocalizing();
         startLocalizationWatchDog();
+        fireLocalizationStart();
     }
 
     protected void startLocalizing(){
         Log.d(TAG, "startLocalizing with: adf = [" + mAdfInfo + "]");
         final TangoFactory.RunnableWithError r = getTangoInitializer();
-        mTango = mTangoFactory.getTango(new TangoFactory.RunnableWithError() {
-            @Override
-            public void run() {
-                r.run();
-                TangoUtils.loadAdf(mTango, mAdfInfo.getUuid(), mAdfInfo.getPath());
-            }
-
-            @Override
-            public void onError(Exception e) {
-                r.onError(e);
-            }
-        });
+        mTango = mTangoFactory.getTangoForLocalAdf(r, mAdfInfo.getPath());
         Log.d(TAG, "startLocalizing() mTango = " + mTango);
-        fireLocalizationStart();
     }
 
     private void fireLocalizationStart() {
