@@ -12,6 +12,7 @@ import com.wally.wally.App;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.config.Config;
+import com.wally.wally.config.WallyConfig;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.events.WallyEventListener;
@@ -97,7 +98,7 @@ public class MainFactory {
     }
 
     private void init() {
-        mConfig = Config.getInstance();
+        mConfig = WallyConfig.getInstance();
         mLearningEvaluator = new LearningEvaluator(mConfig);
 
         mPointCloudManager = new TangoPointCloudManager();

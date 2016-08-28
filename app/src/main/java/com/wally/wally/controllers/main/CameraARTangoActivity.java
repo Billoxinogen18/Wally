@@ -24,6 +24,7 @@ import com.wally.wally.adf.AdfService;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.config.CameraTangoActivityConstants;
 import com.wally.wally.config.Config;
+import com.wally.wally.config.WallyConfig;
 import com.wally.wally.controllers.main.factory.MainFactory;
 import com.wally.wally.controllers.main.factory.TangoDriverFactory;
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
@@ -212,7 +213,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
     @Override
     public void onPermissionDenied(AdfInfo adfInfo) {
-        Config config = Config.getInstance();
+        Config config = WallyConfig.getInstance();
         String message = config.getString(CameraTangoActivityConstants.ADF_EXPORT_EXPLAIN_MSG);
         String positiveText = config.getString(CameraTangoActivityConstants.ADF_EXPORT_EXPLAIN_PST_BTN);
         String negativeText = config.getString(CameraTangoActivityConstants.ADF_EXPORT_EXPLAIN_NGT_BTN);
