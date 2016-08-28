@@ -53,26 +53,20 @@ public class TangoForCloudAdfs extends TangoForAdf {
         return new AdfScheduler.AdfSchedulerListener() {
             @Override
             public void onNewAdfSchedule(AdfInfo info) {
-                if (mIsLocalized) {
-                    return;
-                }
-                if (info == null) {
-                    mFailStateConnector.toNextState();
+                if (mIsLocalized) { return; }
+                withAdf(info);
+                if (mTango == null) {
+                    startLocalizing();
                 } else {
-                    withAdf(info);
-                    if (mTango == null) {
-                        startLocalizing();
-                    } else {
-                        mTango.experimentalLoadAreaDescriptionFromFile(mAdfInfo.getPath());
-                    }
-                    fireLocalizationStart();
+                    mTango.experimentalLoadAreaDescriptionFromFile(mAdfInfo.getPath());
                 }
+                fireLocalizationStart();
             }
 
             @Override
             public void onScheduleFinish() {
-                // TODO rethink this shit!
-                this.onNewAdfSchedule(null);
+                if (mIsLocalized) { return; }
+                mFailStateConnector.toNextState();
             }
         };
     }

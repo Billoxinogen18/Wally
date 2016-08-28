@@ -34,7 +34,7 @@ public class TangoDriver implements TangoState.StateChangeListener {
 
     @Override
     public synchronized void onStateChange(TangoState nextTangoState) {
-        Log.d(TAG, "onStateChange from =" + tangoState + " -- To [" + nextTangoState + "]");
+        Log.d(TAG, "onStateChange(" + tangoState + " ===> " + nextTangoState + ")");
         tangoState = nextTangoState;
     }
 
