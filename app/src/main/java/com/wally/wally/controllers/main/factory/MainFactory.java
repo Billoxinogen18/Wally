@@ -21,7 +21,7 @@ import com.wally.wally.progressReporter.ProgressReporter;
 import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.tango.LearningEvaluator;
+import com.wally.wally.progressReporter.LearningEvaluator;
 import com.wally.wally.progressReporter.ProgressAggregator;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;

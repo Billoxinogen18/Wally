@@ -1,9 +1,7 @@
-package com.wally.wally.tango;
+package com.wally.wally.progressReporter;
 
 import com.wally.wally.config.Config;
 import com.wally.wally.config.LearningEvaluatorConstants;
-import com.wally.wally.progressReporter.ProgressListener;
-import com.wally.wally.progressReporter.ProgressReporter;
 
 import org.rajawali3d.math.Quaternion;
 
