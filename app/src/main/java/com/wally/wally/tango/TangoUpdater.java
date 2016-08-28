@@ -2,7 +2,6 @@ package com.wally.wally.tango;
 
 import android.opengl.GLSurfaceView;
 
-import com.google.atap.tango.ux.TangoUx;
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;

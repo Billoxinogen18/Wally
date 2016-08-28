@@ -2,6 +2,7 @@ package com.wally.wally.tango.states;
 
 import android.util.Log;
 
+import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.events.WallyEvent;
@@ -14,7 +15,7 @@ import com.wally.wally.tango.TangoUpdater;
  * Created by shota on 8/9/16.
  * Tango state for learning
  */
-public class TangoForLearning extends TangoState {
+public class TangoForLearning extends TangoState implements TangoUpdater.ValidPoseListener {
     private static final String TAG = TangoForLearning.class.getSimpleName();
 
     private AdfInfo mAdfInfo;
@@ -38,7 +39,7 @@ public class TangoForLearning extends TangoState {
     protected void resumeHook() {
         Log.d(TAG, "startLearning Thread = " + Thread.currentThread());
         mLearningEvaluator.addLearningEvaluatorListener(getLearningEvaluatorListener());
-        mTangoUpdater.addValidPoseListener(mLearningEvaluator);
+        mTangoUpdater.addValidPoseListener(this);
         mTango = mTangoFactory.getTangoForLearning(getTangoInitializer());
         Log.d(TAG, "resume() mTango = " + mTango);
         fireStartLearning();
@@ -54,7 +55,7 @@ public class TangoForLearning extends TangoState {
             @Override
             public void onLearningFinish() {
                 if (mIsLocalized) {
-                    mTangoUpdater.removeValidPoseListener(mLearningEvaluator);
+                    mTangoUpdater.removeValidPoseListener(TangoForLearning.this);
                     finishLearning();
                 } else {
                     onLearningFailed();
@@ -63,7 +64,7 @@ public class TangoForLearning extends TangoState {
 
             @Override
             public void onLearningFailed() {
-                mTangoUpdater.removeValidPoseListener(mLearningEvaluator);
+                mTangoUpdater.removeValidPoseListener(TangoForLearning.this);
                 mFailStateConnector.toNextState();
             }
         };
@@ -95,4 +96,8 @@ public class TangoForLearning extends TangoState {
         fireEvent(WallyEvent.createEventWithId(WallyEvent.LEARNING_FINISH));
     }
 
+    @Override
+    public void onValidPose(TangoPoseData pose) {
+        mLearningEvaluator.onValidPose(pose.translation, pose.rotation);
+    }
 }

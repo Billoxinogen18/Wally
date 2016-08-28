@@ -1,9 +1,5 @@
 package com.wally.wally.tango;
 
-
-import android.util.Log;
-
-import com.google.atap.tangoservice.TangoPoseData;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.LearningEvaluatorConstants;
 import com.wally.wally.progressReporter.ProgressListener;
@@ -14,8 +10,7 @@ import org.rajawali3d.math.Quaternion;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LearningEvaluator implements TangoUpdater.ValidPoseListener, ProgressReporter {
-    private static final String TAG = LearningEvaluator.class.getSimpleName();
+public class LearningEvaluator implements ProgressReporter {
     private static final double RATIO = 0.6;
 
     private int minTimeMs;
@@ -50,15 +45,14 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         start();
     }
 
-    @Override
-    public synchronized void onValidPose(TangoPoseData pose) {
+    public synchronized void onValidPose(double[] translation, double[] rotation) {
         if (System.currentTimeMillis() - latestUpdateTime < 100 || isFinished) {
             return;
         }
         latestUpdateTime = System.currentTimeMillis();
 
-        int x = (int) (pose.translation[0] / Cell.CELL_SIZE_M);
-        int y = (int) (pose.translation[1] / Cell.CELL_SIZE_M);
+        int x = (int) (translation[0] / Cell.CELL_SIZE_M);
+        int y = (int) (translation[1] / Cell.CELL_SIZE_M);
         Cell cell = new Cell();
         cell.x = x;
         cell.y = y;
@@ -72,26 +66,25 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
             cell = cells.get(index);
         }
 
-        Quaternion q = new Quaternion(pose.rotation[0], pose.rotation[1], pose.rotation[2], pose.rotation[3]);
+        Quaternion q = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
         double yaw = Math.toDegrees(q.getYaw());
         if (yaw < 0) yaw += 360;
         if (yaw < 0 || yaw > 360) {
             throw new IllegalStateException("Yaw is illegal [yaw = " + yaw + "]");
         }
-        int angleIndex = ((int) (yaw / 360 * angleResolution)) % angleResolution;
+
         // Update angle
+        int angleIndex = ((int) (yaw / 360 * angleResolution)) % angleResolution;
         if (!cell.angleVisited[angleIndex]) {
             cell.angleVisited[angleIndex] = true;
             featureCounter++;
         }
-        //Log.d(TAG, "pose = " + pose + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " +cells);
 
         progressListener.onProgressUpdate(this, getProgress());
 
         if (canFinish() && !isFinished) {
             isFinished = true;
             progressListener.onProgressUpdate(this, 1);
-            Log.d(TAG, "pose = " + pose + " yaw = " + yaw + ". getAngleCount = " + getAngleCount() + " size = " + cells.size() + "cells : " + cells);
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -141,12 +134,6 @@ public class LearningEvaluator implements TangoUpdater.ValidPoseListener, Progre
         startTime = System.currentTimeMillis();
         latestUpdateTime = startTime;
         featureCounter = 0;
-        return this;
-    }
-
-    public LearningEvaluator stop() {
-        Log.d(TAG, "stop() called");
-        listener.onLearningFailed();
         return this;
     }
 
