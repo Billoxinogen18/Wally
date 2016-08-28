@@ -18,6 +18,14 @@ public class TangoUtils {
         return false;
     }
 
+    public static void loadAdf(Tango tango, String  uuid, String path) {
+        if (TangoUtils.isAdfImported(tango, uuid)) {
+            tango.experimentalLoadAreaDescription(uuid);
+        } else {
+            tango.experimentalLoadAreaDescriptionFromFile(path);
+        }
+    }
+
     /**
      * Calculates and stores the fixed transformations between the device and
      * the various sensors to be used later for transformations between frames.

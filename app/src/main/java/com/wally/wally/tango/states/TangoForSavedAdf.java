@@ -2,7 +2,6 @@ package com.wally.wally.tango.states;
 
 import android.util.Log;
 
-import com.google.atap.tangoservice.Tango;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.events.WallyEvent;
@@ -50,7 +49,7 @@ public class TangoForSavedAdf extends TangoForAdf {
             @Override
             public void run() {
                 r.run();
-                loadAdf(mTango, mAdfInfo);
+                TangoUtils.loadAdf(mTango, mAdfInfo.getUuid(), mAdfInfo.getPath());
             }
 
             @Override
@@ -60,14 +59,6 @@ public class TangoForSavedAdf extends TangoForAdf {
         });
         Log.d(TAG, "startLocalizing() mTango = " + mTango);
         fireLocalizationStart();
-    }
-
-    private void loadAdf(Tango tango, AdfInfo adf) {
-        if (TangoUtils.isAdfImported(tango, adf.getUuid())) {
-            tango.experimentalLoadAreaDescription(adf.getUuid());
-        } else {
-            tango.experimentalLoadAreaDescriptionFromFile(adf.getPath());
-        }
     }
 
     private void fireLocalizationStart() {
