@@ -64,7 +64,7 @@ public class TangoForCloudAdfs extends TangoForAdf {
                     if (mTango == null) {
                         startLocalizing();
                     } else {
-                        TangoUtils.loadAdf(mTango, mAdfInfo.getUuid(), mAdfInfo.getPath());
+                        mTango.experimentalLoadAreaDescriptionFromFile(mAdfInfo.getPath());
                     }
                     fireLocalizationStart();
                 }
@@ -81,7 +81,7 @@ public class TangoForCloudAdfs extends TangoForAdf {
     protected void startLocalizing(){
         Log.d(TAG, "startLocalizing with: adf = [" + mAdfInfo + "]");
         final TangoFactory.RunnableWithError r = getTangoInitializer();
-        mTango = mTangoFactory.getTangoForCloudAdf(r, mAdfInfo.getUuid());
+        mTango = mTangoFactory.getTangoForCloudAdf(r, mAdfInfo.getPath());
         Log.d(TAG, "startLocalizing() mTango = " + mTango);
     }
 

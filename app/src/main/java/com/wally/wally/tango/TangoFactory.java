@@ -36,14 +36,14 @@ public class TangoFactory {
         return mTango;
     }
 
-    public Tango getTangoForCloudAdf(final RunnableWithError r, final String uuid) {
+    public Tango getTangoForCloudAdf(final RunnableWithError r, final String path) {
         mTango = new Tango(mContext, new Runnable() {
             @Override
             public void run() {
                 try {
                     connectTango(mTango);
                     r.run();
-                    mTango.experimentalLoadAreaDescription(uuid);
+                    mTango.experimentalLoadAreaDescriptionFromFile(path);
                     Log.d(TAG + "Success", "for cloud adf");
                 } catch (TangoErrorException e) {
                     Log.e(TAG + "Fail", "for cloud adf");
@@ -54,14 +54,14 @@ public class TangoFactory {
         return mTango;
     }
 
-    public Tango getTangoForLocalAdf(final RunnableWithError r, final String path) {
+    public Tango getTangoForLocalAdf(final RunnableWithError r, final String uuid) {
         mTango = new Tango(mContext, new Runnable() {
             @Override
             public void run() {
                 try {
                     connectTango(mTango);
                     r.run();
-                    mTango.experimentalLoadAreaDescriptionFromFile(path);
+                    mTango.experimentalLoadAreaDescription(uuid);
                     Log.d(TAG + "Success", "for local adf");
                 } catch (TangoErrorException e) {
                     Log.e(TAG + "Fail", "for local adf");

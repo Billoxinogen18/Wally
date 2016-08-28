@@ -45,7 +45,7 @@ public class TangoForSavedAdf extends TangoForAdf {
     protected void startLocalizing(){
         Log.d(TAG, "startLocalizing with: adf = [" + mAdfInfo + "]");
         final TangoFactory.RunnableWithError r = getTangoInitializer();
-        mTango = mTangoFactory.getTangoForLocalAdf(r, mAdfInfo.getPath());
+        mTango = mTangoFactory.getTangoForLocalAdf(r, mAdfInfo.getUuid());
         Log.d(TAG, "startLocalizing() mTango = " + mTango);
     }
 
