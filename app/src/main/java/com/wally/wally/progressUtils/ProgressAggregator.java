@@ -1,4 +1,4 @@
-package com.wally.wally.progressReporter;
+package com.wally.wally.progressUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

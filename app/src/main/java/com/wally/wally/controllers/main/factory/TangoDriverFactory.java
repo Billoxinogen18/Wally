@@ -9,7 +9,7 @@ import com.wally.wally.events.WallyEventListener;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.ContentFitter;
-import com.wally.wally.progressReporter.LearningEvaluator;
+import com.wally.wally.progressUtils.LearningEvaluator;
 import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;

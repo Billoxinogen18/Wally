@@ -7,7 +7,7 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.progressReporter.LearningEvaluator;
+import com.wally.wally.progressUtils.LearningEvaluator;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 

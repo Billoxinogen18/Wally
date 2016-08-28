@@ -1,4 +1,4 @@
-package com.wally.wally.progressReporter;
+package com.wally.wally.progressUtils;
 
 /**
  * Created by shota on 8/7/16.

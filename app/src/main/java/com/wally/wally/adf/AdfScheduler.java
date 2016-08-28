@@ -2,13 +2,12 @@ package com.wally.wally.adf;
 
 import android.util.Log;
 
-import com.wally.wally.progressReporter.ProgressListener;
-import com.wally.wally.progressReporter.ProgressReporter;
+import com.wally.wally.progressUtils.ProgressListener;
+import com.wally.wally.progressUtils.ProgressReporter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.LogManager;
 
 public class AdfScheduler implements ProgressReporter {
     private static final String TAG = AdfScheduler.class.getSimpleName();

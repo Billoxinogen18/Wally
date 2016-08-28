@@ -1,4 +1,4 @@
-package com.wally.wally.progressReporter;
+package com.wally.wally.progressUtils;
 
 import com.wally.wally.config.Config;
 import com.wally.wally.config.LearningEvaluatorConstants;
