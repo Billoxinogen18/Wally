@@ -86,8 +86,8 @@ public class TangoForCloudAdfs extends TangoForAdf {
     }
 
     @Override
-    public void onLocalization(boolean localization) {//TODO refactor inheritance
-        Log.d(TAG, "onLocalization() called with: " + "localization = [" + localization + "]");
+    public void onLocalization(boolean localization) {
+        Log.d(TAG, "onLocalization " + localization);
         mIsLocalized = localization;
         if (localization) {
             mAdfScheduler.finish();
@@ -102,12 +102,10 @@ public class TangoForCloudAdfs extends TangoForAdf {
 
     @Override
     protected void fireLocalizationFinish() {
-        fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF));
-        // TODO change constant
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_FINISH_AFTER_CLOUD_ADF));
     }
 
     private void fireLocalizationStart() {
-        fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_START));
-        // TODO change constant
+        fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_START_ON_CLOUD_ADF));
     }
 }

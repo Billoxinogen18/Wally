@@ -55,34 +55,25 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
     @Override
     public void onWallyEvent(WallyEvent event) {
         switch (event.getId()) {
-            case WallyEvent.LEARNING_START:
-                showTip(TipService.Tag.LEARNING);
-                break;
-            case WallyEvent.LEARNING_FINISH:
-                mTipView.hide();
-                break;
+            case WallyEvent.LOCALIZATION_START_ON_CLOUD_ADF:
             case WallyEvent.LOCALIZATION_START:
                 showTip(TipService.Tag.LOCALIZATION);
+                break;
+            case WallyEvent.LEARNING_START:
+                showTip(TipService.Tag.LEARNING);
                 break;
             case WallyEvent.LOCALIZATION_START_AFTER_LEARNING:
                 showTip(TipService.Tag.LOCALIZATION_AFTER_LEARNING);
                 break;
-            case WallyEvent.LOCALIZATION_FINISH_AFTER_LEARNING:
-                mTipView.hide();
-                break;
-            case WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF:
-                mTipView.hide();
-                break;
             case WallyEvent.ON_NEW_CONTENT_DIALOG_SHOW:
                 showTip(TipService.Tag.NEW_CONTENT);
                 break;
-            case WallyEvent.TANGO_READY:
-                //NOT NEEDED
-                break;
-            case WallyEvent.TANGO_OUT_OF_DATE:
-                //NOT NEEDED
-                break;
+            case WallyEvent.LEARNING_FINISH:
+            case WallyEvent.LOCALIZATION_FINISH_AFTER_LEARNING:
+            case WallyEvent.LOCALIZATION_FINISH_AFTER_CLOUD_ADF:
+            case WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF:
             default:
+                mTipView.hide();
                 break;
         }
     }

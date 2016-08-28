@@ -177,6 +177,7 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
             case WallyEvent.TANGO_OUT_OF_DATE:
                 onTangoOutOfDate();
                 break;
+            case WallyEvent.LOCALIZATION_START_ON_CLOUD_ADF:
             case WallyEvent.LOCALIZATION_START:
                 onLocalizationStart();
                 break;
@@ -186,6 +187,7 @@ public class WallyTangoUx extends TangoUx implements WallyEventListener {
             case WallyEvent.LOCALIZATION_FINISH_AFTER_LEARNING:
                 onLocalizationFinishAfterLearning();
                 break;
+            case WallyEvent.LOCALIZATION_FINISH_AFTER_CLOUD_ADF:
             case WallyEvent.LOCALIZATION_FINISH_AFTER_SAVED_ADF:
                 onLocalizationFinishAfterSavedAdf();
                 break;

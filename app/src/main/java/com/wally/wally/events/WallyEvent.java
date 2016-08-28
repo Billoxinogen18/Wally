@@ -38,6 +38,11 @@ public class WallyEvent {
     public static final String
     ON_NEW_CONTENT_DIALOG_SHOW = "onNewContentDialogShow";
 
+    public static final String
+    LOCALIZATION_FINISH_AFTER_CLOUD_ADF = "onLocalizationFinishAfterCloudAdf";
+    public static final String
+    LOCALIZATION_START_ON_CLOUD_ADF = "onLocalizationStartOnCloudAdf";
+
     private final String id;
 
     private WallyEvent(String id) {
