@@ -40,9 +40,10 @@ public class WallyConfig implements Config, LearningEvaluatorConstants, TangoMan
     }
 
     private void setSettings() {
-        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-                .setDeveloperModeEnabled(true)
-                .build();
+        FirebaseRemoteConfigSettings configSettings =
+                new FirebaseRemoteConfigSettings.Builder()
+//                        .setDeveloperModeEnabled(true)
+                        .build();
         config.setConfigSettings(configSettings);
     }
 
@@ -68,25 +69,25 @@ public class WallyConfig implements Config, LearningEvaluatorConstants, TangoMan
         params.put(LOCALIZATION_LOST_IN_LEARNING, "I'm lost. Restarting learning...");
         params.put(LOCALIZATION_LOST, "I'm lost. Walk Around");
 
-        params.put(ADF_EXPORT_EXPLAIN_MSG, "If you don't give permission, you won't be able to see created content again, Would you like to give permission?");
-        params.put(ADF_EXPORT_EXPLAIN_PST_BTN, "Give Permission");
         params.put(ADF_EXPORT_EXPLAIN_NGT_BTN, "Deny");
+        params.put(ADF_EXPORT_EXPLAIN_PST_BTN, "Give Permission");
+        params.put(ADF_EXPORT_EXPLAIN_MSG,
+                "If you don't give permission, " +
+                        "you won't be able to see created content again, " +
+                        "Would you like to give permission?");
         config.setDefaults(params);
     }
 
     private void fetchServerParams() {
-        Log.d(TAG, "Attach listener");
         config.fetch(0).addOnCompleteListener(
                 new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, "fetch success");
-                            Log.d(TAG, "activate " + config.activateFetched());
-                            Log.d(TAG, MIN_TIME_S + ": " + getString(MIN_TIME_S));
-                            Log.d(TAG, LOCALIZED + ": " + getString(LOCALIZED));
+                            Log.d(TAG, "fetch server params successfully");
+                            config.activateFetched();
                         } else {
-                            Log.d(TAG, "fetch failed");
+                            Log.d(TAG, "fetch server params failed");
                         }
                     }
                 }
