@@ -9,7 +9,6 @@ import com.wally.wally.events.WallyEvent;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
-import com.wally.wally.tango.TangoUtils;
 
 /**
  * Created by shota on 8/9/16.

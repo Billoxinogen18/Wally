@@ -10,20 +10,14 @@ import com.projecttango.rajawali.DeviceExtrinsics;
 
 
 public class TangoUtils {
+
+    @SuppressWarnings("unused")
     public static boolean isAdfImported(Tango tango, String uuid) {
         if (uuid == null) return false;
         for (String id : tango.listAreaDescriptions()) {
             if (id.equals(uuid)) return true;
         }
         return false;
-    }
-
-    public static void loadAdf(Tango tango, String  uuid, String path) {
-        if (TangoUtils.isAdfImported(tango, uuid)) {
-            tango.experimentalLoadAreaDescription(uuid);
-        } else {
-            tango.experimentalLoadAreaDescriptionFromFile(path);
-        }
     }
 
     /**
