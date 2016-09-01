@@ -13,10 +13,12 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.plus.Plus;
 import com.wally.wally.App;
 import com.wally.wally.BaseActivity;
+import com.wally.wally.BuildConfig;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.components.LoadingFab;
+import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.components.UserInfoView;
 import com.wally.wally.controllers.contentCreator.NewContentDialogFragment;
 import com.wally.wally.controllers.map.MapsFragment;
@@ -38,10 +40,12 @@ public abstract class CameraARActivity extends BaseActivity implements
         OnVisualContentSelectedListener,
         NewContentDialogFragment.NewContentDialogListener,
         SelectedMenuView.OnSelectedMenuActionListener,
-        MapsFragment.MapOpenCloseListener {
+        MapsFragment.MapOpenCloseListener,
+        PersistentDialogFragment.PersistentDialogListener {
 
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int RC_SAVE_CONTENT = 22;
+    private static final int RC_CHOOSE_PUZZLE_OR_NOTE = 921;
 
     private DataController mDataController;
     protected GoogleApiClient mGoogleApiClient;
@@ -192,8 +196,37 @@ public abstract class CameraARActivity extends BaseActivity implements
         }
         mNewContentButtonLastClickTime = SystemClock.elapsedRealtime();
 
-        NewContentDialogFragment.newInstance()
-                .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
+        // If one can create puzzle, let's them decide if they want puzzle or note content.
+        if (BuildConfig.CAN_CREATE_PUZZLE) {
+            PersistentDialogFragment.newInstance(this,
+                    RC_CHOOSE_PUZZLE_OR_NOTE,
+                    R.string.select_puzzle_or_note_msg,
+                    R.string.puzzle,
+                    R.string.note).show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
+        } else {
+            NewContentDialogFragment.newInstance()
+                    .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
+        }
+    }
+
+    @CallSuper
+    @Override
+    public void onDialogPositiveClicked(int requestCode) {
+        super.onDialogPositiveClicked(requestCode);
+        if (RC_CHOOSE_PUZZLE_OR_NOTE == requestCode) {
+            NewContentDialogFragment.newInstance(true)
+                    .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
+        }
+    }
+
+    @CallSuper
+    @Override
+    public void onDialogNegativeClicked(int requestCode) {
+        super.onDialogNegativeClicked(requestCode);
+        if (RC_CHOOSE_PUZZLE_OR_NOTE == requestCode) {
+            NewContentDialogFragment.newInstance()
+                    .show(getSupportFragmentManager(), NewContentDialogFragment.TAG);
+        }
     }
 
     public void onBtnMapClick(View v) {

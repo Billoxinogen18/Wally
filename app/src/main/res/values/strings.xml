@@ -65,4 +65,7 @@
     <string name="profile">Profile</string>
     <string name="explain_location_permission">Wally needs location permission to show or share content with other users</string>
     <string name="go_to_settings">Go to Settings</string>
+    <string name="select_puzzle_or_note_msg">Do you want to add Puzzle or Note?</string>
+    <string name="puzzle">Puzzle</string>
+    <string name="note">Note</string>
 </resources>

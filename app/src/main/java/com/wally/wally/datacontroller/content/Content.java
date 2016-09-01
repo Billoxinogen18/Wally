@@ -25,7 +25,7 @@ public class Content implements Serializable {
     private Date creationDate;
     private Puzzle puzzle;
 
-    public Content(Content content){
+    public Content(Content content) {
         this.id = content.id;
         this.title = content.title;
         this.note = content.note;
@@ -205,5 +205,9 @@ public class Content implements Serializable {
     public Content withPuzzle(Puzzle puzzle) {
         this.puzzle = puzzle;
         return this;
+    }
+
+    public boolean isPuzzle() {
+        return puzzle != null;
     }
 }

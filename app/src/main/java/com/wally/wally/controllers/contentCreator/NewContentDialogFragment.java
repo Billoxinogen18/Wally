@@ -28,18 +28,18 @@ import com.wally.wally.components.TextChangeListenerAdapter;
 import com.wally.wally.components.TiltDialogFragment;
 import com.wally.wally.controllers.contentCreator.peopleChooser.PeopleChooserPopup;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.Puzzle;
 import com.wally.wally.datacontroller.content.Visibility;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.tip.LocalTipService;
-import com.wally.wally.tip.MapEventListener;
-import com.wally.wally.tip.Tip;
 import com.wally.wally.tip.TipManager;
 import com.wally.wally.tip.TipView;
 import com.wally.wally.userManager.SocialUser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -55,6 +55,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
 
     public static final String TAG = NewContentDialogFragment.class.getSimpleName();
     private static final String ARG_EDIT_CONTENT = "ARG_EDIT_CONTENT";
+    private static final String ARG_IS_PUZZLE = "ARG_IS_PUZZLE";
     private static final int RC_PERMISSION_READ_EXTERNAL_STORAGE = 11;
 
 
@@ -72,7 +73,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
 
     private User mAuthor;
     private Content mContent;
-    private boolean isEditMode;
+    private boolean mIsEditMode;
     private boolean mIsDialogShown = true;
     private Button mPostCreateBtn;
 
@@ -89,7 +90,15 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     }
 
     public static NewContentDialogFragment newInstance() {
-        return new NewContentDialogFragment();
+        return NewContentDialogFragment.newInstance(false);
+    }
+
+    public static NewContentDialogFragment newInstance(boolean isPuzzle) {
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_IS_PUZZLE, isPuzzle);
+        NewContentDialogFragment fragment = new NewContentDialogFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @SuppressLint("InflateParams")
@@ -123,7 +132,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         v.findViewById(R.id.root).setOnClickListener(this);
         v.findViewById(R.id.space).setOnClickListener(this);
 
-        TipView tipView = (TipView)v.findViewById(R.id.tip_view);
+        TipView tipView = (TipView) v.findViewById(R.id.tip_view);
         TipManager tipManager = new TipManager(tipView, LocalTipService.getInstance(getContext()));
         tipManager.onWallyEvent(WallyEvent.createEventWithId(WallyEvent.ON_NEW_CONTENT_DIALOG_SHOW));
 
@@ -138,13 +147,16 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         mSocialVisibilityBtn = (Button) v.findViewById(R.id.btn_social_visibility);
         mPostCreateBtn = (Button) v.findViewById(R.id.btn_create_post);
 
+        if (mContent.isPuzzle()) {
+            mSocialVisibilityBtn.setVisibility(View.GONE);
+        }
         // Listen to text changes
         TextChangeListenerAdapter textChangeAdapter = new TextChangeListenerAdapter(this);
         mTitleEt.addTextChangedListener(textChangeAdapter);
         mNoteEt.addTextChangedListener(textChangeAdapter);
 
         mRootView.getBackground().setDither(true);
-        if (isEditMode) {
+        if (mIsEditMode) {
             mPostCreateBtn.setText(R.string.post_update);
             Button b = (Button) v.findViewById(R.id.btn_discard_post);
             b.setText(R.string.post_cancel_edit);
@@ -152,11 +164,13 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     }
 
     private void initContent(Bundle savedInstanceState) {
+        boolean isPuzzle = false;
         if (getArguments() != null) {
             mContent = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
-            isEditMode = true;
+            mIsEditMode = getArguments().getBoolean(ARG_EDIT_CONTENT, false);
+            isPuzzle = getArguments().getBoolean(ARG_IS_PUZZLE, false);
         } else {
-            isEditMode = false;
+            mIsEditMode = false;
         }
 
         if (savedInstanceState != null) {
@@ -166,9 +180,17 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
 
         if (mContent == null) {
             mContent = new Content();
+            if (isPuzzle) {
+                mContent.withNote("This is Puzzle Note");
+                mContent.withPuzzle(new Puzzle().withAnswers(Arrays.asList("Empty Answer")));
+            }
         }
         if (mContent.getVisibility() == null) {
             mContent.withVisibility(new Visibility());
+            // If it's newly created object and is puzzle, it must be private
+            if (isPuzzle) {
+                mContent.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PRIVATE));
+            }
         }
         if (mContent.getVisibility().getSocialVisibility() == null) {
             mContent.getVisibility().withSocialVisibility(
@@ -231,7 +253,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
                 });
                 break;
             case R.id.btn_discard_post:
-                if (!isPostEmpty() && !isEditMode) {
+                if (!isPostEmpty() && !mIsEditMode) {
                     DiscardDoubleCheckDialogFragment dialog = new DiscardDoubleCheckDialogFragment();
                     dialog.show(getChildFragmentManager(), DiscardDoubleCheckDialogFragment.TAG);
                 } else {
@@ -240,7 +262,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
                 break;
             case R.id.btn_create_post:
                 dismiss();
-                mListener.onContentCreated(mContent, isEditMode);
+                mListener.onContentCreated(mContent, mIsEditMode);
                 break;
             case R.id.btn_add_image:
                 if (Utils.checkExternalStorageReadPermission(getContext())) {

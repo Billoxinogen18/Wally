@@ -29,6 +29,11 @@ android {
     }
 
     buildTypes {
+
+        buildTypes.each {
+            it.buildConfigField "boolean", "CAN_CREATE_PUZZLE", "true"
+        }
+
         release {
             shrinkResources false
             minifyEnabled false

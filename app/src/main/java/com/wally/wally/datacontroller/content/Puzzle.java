@@ -1,12 +1,14 @@
 package com.wally.wally.datacontroller.content;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Puzzle {
-    private Set<String> answers;
+public class Puzzle implements Serializable{
+    // Something serializable here
+    private HashSet<String> answers;
 
     public Puzzle() {
         answers = new HashSet<>();
