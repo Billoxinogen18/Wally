@@ -16,6 +16,7 @@ import org.rajawali3d.materials.textures.Texture;
 
 /**
  * Created by shota on 4/29/16.
+ *
  */
 public class VisualContent {
     private static final String TAG = VisualContent.class.getSimpleName();

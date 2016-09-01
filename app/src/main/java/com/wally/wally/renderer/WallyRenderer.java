@@ -19,7 +19,6 @@ import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
 
-import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
@@ -47,7 +46,6 @@ import javax.microedition.khronos.opengles.GL10;
 public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedListener {
 
     private static final String TAG = WallyRenderer.class.getSimpleName();
-    private static final int CONTENT_CHANGE_COUNT_ON_RENDER = 1;
     private long timeForARender;
 
     private VisualContentManager mVisualContentManager;
@@ -97,8 +95,6 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
     @Override
     public void onObjectPicked(Object3D object) {
         VisualContent vc = mVisualContentManager.findContentByObject3D(object);
-        Log.d(TAG, "onObjectPicked() called with: " + "object = [" + object + "]");
-
         if (vc != null) {
             if (mVisualContentManager.isSelectedContent(vc)) {
                 addBorder();
@@ -119,20 +115,19 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
         mPicker.getObjectAt(x, y);
     }
 
-
     private void renderActiveContent() {
         ActiveVisualContent activeVisualContent = mVisualContentManager.getActiveContent();
-        if (activeVisualContent == null) return;
-        if (mVisualContentManager.shouldActiveContentRenderOnScreen()) {
+        //noinspection StatementWithEmptyBody
+        if (activeVisualContent == null) {
+
+        } else if (mVisualContentManager.shouldActiveContentRenderOnScreen()) {
             Log.d(TAG, "renderActiveContent() added");
             addActiveContent(activeVisualContent);
         } else if (mVisualContentManager.shouldActiveContentRemoveFromScreen()){
             Log.d(TAG, "renderActiveContent() removed");
             removeActiveContent(activeVisualContent);
-        } else {
-            if (activeVisualContent.shouldAnimate()) {
-                activeVisualContent.animate(getCurrentScene());
-            }
+        } else if (activeVisualContent.shouldAnimate()) {
+            activeVisualContent.animate(getCurrentScene());
         }
     }
 
@@ -147,52 +142,6 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
         getCurrentScene().removeChild(activeVisualContent.getVisual());
         mVisualContentManager.setActiveContentRemoved();
         mOnContentSelectedListener.onVisualContentSelected(null);
-    }
-
-    private void renderStaticContent3(){
-        Iterator<VisualContent> removeIt = mVisualContentManager.getStaticVisualContentToRemove();
-        while(removeIt.hasNext()){
-            VisualContent vc = removeIt.next();
-            getCurrentScene().removeChild(vc.getVisual());
-            mVisualContentManager.setStaticContentRemoved(vc);
-            mOnContentSelectedListener.onVisualContentSelected(null);
-            removeBorder();
-        }
-
-        Iterator<VisualContent> addIt = mVisualContentManager.getStaticVisualContentToAdd();
-        while(addIt.hasNext()){
-            VisualContent vc = addIt.next();
-            getCurrentScene().addChild(vc.getVisual());
-            mVisualContentManager.setStaticContentAdded(vc);
-            mPicker.registerObject(vc.getVisual());
-        }
-    }
-
-    private void renderStaticContent2(){
-        Iterator<VisualContent> removeIt = mVisualContentManager.getStaticVisualContentToRemove();
-        for (int i=0; i<CONTENT_CHANGE_COUNT_ON_RENDER; i++){
-            if (removeIt.hasNext()){
-                VisualContent vc = removeIt.next();
-                getCurrentScene().removeChild(vc.getVisual());
-                mVisualContentManager.setStaticContentRemoved(vc);
-                mOnContentSelectedListener.onVisualContentSelected(null);
-                removeBorder();
-            } else {
-                break;
-            }
-        }
-
-        Iterator<VisualContent> addIt = mVisualContentManager.getStaticVisualContentToAdd();
-        for (int i=0; i<CONTENT_CHANGE_COUNT_ON_RENDER; i++){
-            if (addIt.hasNext()){
-                VisualContent vc = addIt.next();
-                getCurrentScene().addChild(vc.getVisual());
-                mVisualContentManager.setStaticContentAdded(vc);
-                mPicker.registerObject(vc.getVisual());
-            } else {
-                break;
-            }
-        }
     }
 
     private void renderStaticContent(){
@@ -220,11 +169,12 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
                 mPicker.registerObject(vc.getVisual());
                 next = true;
             }
-            long iterTime = System.currentTimeMillis();
-            if (iterTime - startTime > timeForARender) return;
+
+            if (System.currentTimeMillis() - startTime > timeForARender) {
+                return;
+            }
         }
     }
-
 
     @Override
     protected void onRender(long elapsedRealTime, double deltaTime) {
@@ -234,7 +184,6 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
         }
         super.onRender(elapsedRealTime, deltaTime);
     }
-
 
     /**
      * Update the scene camera based on the provided pose in Tango start of service frame.
@@ -270,18 +219,6 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
 
     public boolean isSceneCameraConfigured() {
         return mSceneCameraConfigured;
-    }
-
-    /**
-     * Sets the projection matrix for the scene camera to match the parameters of the color camera,
-     * provided by the {@code TangoCameraIntrinsics}.
-     */
-    @Deprecated
-    public void setProjectionMatrix(TangoCameraIntrinsics intrinsics) {
-        Matrix4 projectionMatrix = ScenePoseCalculator.calculateProjectionMatrix(
-                intrinsics.width, intrinsics.height,
-                intrinsics.fx, intrinsics.fy, intrinsics.cx, intrinsics.cy);
-        getCurrentCamera().setProjectionMatrix(projectionMatrix);
     }
 
     public void setProjectionMatrix(float[] matrixFloats) {
