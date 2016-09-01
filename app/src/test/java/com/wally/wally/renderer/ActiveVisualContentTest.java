@@ -3,7 +3,6 @@ package com.wally.wally.renderer;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.TangoData;
-import com.wally.wally.renderer.ActiveVisualContent;
 
 import org.junit.Test;
 import org.rajawali3d.math.vector.Vector3;
@@ -16,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Created by shota on 5/25/16.
+ *
  */
 public class ActiveVisualContentTest {
     private ActiveVisualContent mActiveVisualContent;
@@ -63,7 +63,7 @@ public class ActiveVisualContentTest {
     public void scaleContentByFactorTest3(){
         Content c = mock(Content.class);
         TangoData td = new TangoData();
-        td.setScale(3);
+        td.withScale(3d);
         when(c.getTangoData()).thenReturn(td);
         mActiveVisualContent = new ActiveVisualContent(c);
         mActiveVisualContent.scaleContent(5);

@@ -155,10 +155,6 @@ public class Content implements Serializable {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
-
     public Content withCreationDate(Date date) {
         creationDate = date;
         return this;
@@ -172,13 +168,8 @@ public class Content implements Serializable {
                 ", note='" + note + '\'' +
                 ", imageUri='" + imageUri + '\'' +
                 ", uuid='" + uuid + '\'' +
-                ", color=" + color +
-                ", textColor=" + textColor +
-                ", tangoData=" + tangoData +
                 ", location=" + location +
-                ", visibility=" + visibility +
                 ", authorId='" + authorId + '\'' +
-                ", creationDate=" + creationDate +
                 '}';
     }
 

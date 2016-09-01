@@ -36,14 +36,6 @@ public class TangoData implements Serializable {
         return scale;
     }
 
-    @Deprecated
-    /**
-     * @deprecated use {@link #withScale(double)}()} instead.
-     */
-    public void setScale(double scale) {
-        withScale(scale);
-    }
-
     public TangoData withScale(Double scale) {
         this.scale = scale;
         return this;
@@ -73,10 +65,5 @@ public class TangoData implements Serializable {
         Quaternion q = new Quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
         result = new Pose(v, q);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "{...}";
     }
 }
