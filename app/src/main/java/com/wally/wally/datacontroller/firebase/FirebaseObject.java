@@ -31,12 +31,8 @@ public class FirebaseObject extends HashMap<String, Object> {
     }
 
     public String save(DatabaseReference ref) {
-        id = FirebaseDAL.save(ref, this);
+        ref.setValue(this);
+        id = ref.getKey();
         return id;
     }
-
-    public void delete(DatabaseReference ref) {
-        id = FirebaseDAL.delete(ref, this);
-    }
-
 }
