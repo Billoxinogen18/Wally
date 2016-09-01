@@ -23,6 +23,7 @@ public class Content implements Serializable {
     private Visibility visibility;
     private String authorId;
     private Date creationDate;
+    private Puzzle puzzle;
 
     public Content(Content content){
         this.id = content.id;
@@ -195,5 +196,14 @@ public class Content implements Serializable {
 
     public boolean isPrivate() {
         return visibility.getSocialVisibility().getMode() == Visibility.SocialVisibility.PRIVATE;
+    }
+
+    public Puzzle getPuzzle() {
+        return puzzle;
+    }
+
+    public Content withPuzzle(Puzzle puzzle) {
+        this.puzzle = puzzle;
+        return this;
     }
 }

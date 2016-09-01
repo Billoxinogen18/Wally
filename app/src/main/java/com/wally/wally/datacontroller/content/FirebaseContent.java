@@ -43,6 +43,9 @@ public class FirebaseContent extends FirebaseObject {
 
     public static final String K_TIMESTAMP     = "timestamp";
 
+    private static final String K_PUZZLE_DATA = "PuzzleData";
+    private static final String K_ANSWERS = "Answers";
+
     public FirebaseContent() {}
 
     public FirebaseContent(Content c) {
@@ -51,6 +54,7 @@ public class FirebaseContent extends FirebaseObject {
         put(K_AUTHOR, c.getAuthorId());
         put(K_TIMESTAMP, ServerValue.TIMESTAMP);
         setNoteData(c);
+        setPuzzle(c.getPuzzle());
         setLocation(c.getLocation());
         setTangoData(c.getTangoData());
         setVisibility(c.getVisibility());
@@ -129,6 +133,19 @@ public class FirebaseContent extends FirebaseObject {
                 .put(K_TRANSLATION, td.getTranslation());
     }
 
+    private Puzzle getPuzzle() {
+        if (!containsKey(K_PUZZLE_DATA)) return null;
+        FirebaseObject puzzleData = getChild(K_PUZZLE_DATA);
+        return new Puzzle()
+                .withAnswers(puzzleData.get(K_ANSWERS).toStringList());
+    }
+
+    private void setPuzzle(Puzzle puzzle) {
+        if (puzzle == null) return;
+        getChild(K_PUZZLE_DATA)
+                .put(K_ANSWERS, puzzle.getAnswers());
+    }
+
     private Visibility getVisibility() {
         return new Visibility()
                 .withSocialVisibility(getPublicity())
@@ -184,6 +201,7 @@ public class FirebaseContent extends FirebaseObject {
                 .withNote(getNote())
                 .withTitle(getTitle())
                 .withColor(getColor())
+                .withPuzzle(getPuzzle())
                 .withTextColor(getTextColor())
                 .withImageUri(getImageUri())
                 .withAuthorId(getAuthorId())

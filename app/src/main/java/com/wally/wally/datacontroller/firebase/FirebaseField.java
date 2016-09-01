@@ -81,4 +81,9 @@ public class FirebaseField {
     public long toLong() {
         return (long)(Long) value;
     }
+
+    @SuppressWarnings("unchecked")
+    public List<String> toStringList() {
+        return value == null ? null : (List<String>) value;
+    }
 }
