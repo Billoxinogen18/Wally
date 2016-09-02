@@ -32,9 +32,4 @@ public class AggregatorCallback implements FetchResultCallback {
             callback.onResult(aggregatedContent);
         }
     }
-
-    @Override
-    public void onError(Exception e) {
-        callback.onError(e);
-    }
 }

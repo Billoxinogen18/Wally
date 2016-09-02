@@ -101,14 +101,6 @@ public class PagingRetriever {
                     }
                 }
             }
-
-            @Override
-            public void onError(Exception e) {
-                hasNext = false;
-                for (ContentPageRetrieveListener observer : observers) {
-                    observer.onNextPageFail();
-                }
-            }
         });
     }
 

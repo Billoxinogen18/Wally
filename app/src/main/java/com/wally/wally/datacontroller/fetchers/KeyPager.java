@@ -66,11 +66,6 @@ public class KeyPager implements Fetcher {
                         }
                         callback.onResult(contents);
                     }
-
-                    @Override
-                    public void onError(Exception e) {
-                        callback.onError(e);
-                    }
                 })
         );
     }

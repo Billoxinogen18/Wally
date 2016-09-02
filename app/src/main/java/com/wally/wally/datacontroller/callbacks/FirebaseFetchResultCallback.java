@@ -1,5 +1,7 @@
 package com.wally.wally.datacontroller.callbacks;
 
+import android.util.Log;
+
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
@@ -10,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class FirebaseFetchResultCallback {
+    private static final String TAG = "FbFetchResultCallback";
     private FetchResultCallback callback;
     private Predicate<Content> predicate;
 
@@ -40,7 +43,7 @@ public class FirebaseFetchResultCallback {
 
 
     public void onError(Exception e) {
-        callback.onError(e);
+        Log.d(TAG, e.toString());
     }
 
 }

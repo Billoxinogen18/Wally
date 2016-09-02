@@ -161,15 +161,9 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private void fetchContentForAdf(String adfUuid) {
         DataControllerFactory.getDataControllerInstance()
                 .fetchForUuid(adfUuid, new FetchResultCallback() {
-
                     @Override
                     public void onResult(final Collection<Content> result) {
                         mVisualContentManager.createStaticContent(result);
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-                        // TODO write error
                     }
                 });
     }

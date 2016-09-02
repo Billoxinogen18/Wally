@@ -62,8 +62,6 @@ public class DataController {
 
     public interface FetchResultCallback {
         void onResult(Collection<Content> result);
-
-        void onError(Exception e);
     }
 
     public interface Fetcher {

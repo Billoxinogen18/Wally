@@ -1,5 +1,7 @@
 package com.wally.wally.datacontroller;
 
+import android.util.Log;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,6 +19,7 @@ import java.util.Collections;
 import java.util.Map;
 
 public class ContentManager {
+    private static final String TAG = "ContentManager";
     private StorageReference storage;
     private DatabaseReference contents, rooms;
 
@@ -75,7 +78,7 @@ public class ContentManager {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.onError(databaseError.toException());
+                Log.d(TAG, databaseError.toString());
             }
         });
     }
@@ -101,7 +104,7 @@ public class ContentManager {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        callback.onError(databaseError.toException());
+                        Log.d(TAG, databaseError.toString());
                     }
                 });
     }

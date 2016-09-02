@@ -53,11 +53,6 @@ public class PagerChain implements Fetcher {
                     fetchNext(count, callback);
                 }
             }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
-            }
         });
     }
 

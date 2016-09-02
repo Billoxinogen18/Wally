@@ -47,11 +47,6 @@ public class FilteredFetcher implements Fetcher {
                     fetchNext(count, callback);
                 }
             }
-
-            @Override
-            public void onError(Exception e) {
-                callback.onError(e);
-            }
         });
     }
 

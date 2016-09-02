@@ -1,6 +1,7 @@
 package com.wally.wally.datacontroller.fetchers;
 
-import com.wally.wally.datacontroller.DataController.*;
+import com.wally.wally.datacontroller.DataController.FetchResultCallback;
+import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.queries.ContentQuery;
 
@@ -22,11 +23,6 @@ public class QueryContentFetcher implements Fetcher {
                 public void onResult(Collection<Content> result) {
                     fetcher = new ListPager(result);
                     fetcher.fetchNext(i, callback);
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    callback.onError(e);
                 }
             });
         } else {
