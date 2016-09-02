@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -20,10 +21,12 @@ import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.components.LoadingFab;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.components.UserInfoView;
+import com.wally.wally.controllers.PuzzleAnswerDialogFragment;
 import com.wally.wally.controllers.contentCreator.NewContentDialogFragment;
 import com.wally.wally.controllers.map.MapsFragment;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.Puzzle;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.renderer.OnVisualContentSelectedListener;
 import com.wally.wally.renderer.VisualContent;
@@ -33,6 +36,7 @@ import com.wally.wally.userManager.SocialUserManager;
 
 import org.rajawali3d.surface.RajawaliTextureView;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -41,7 +45,8 @@ public abstract class CameraARActivity extends BaseActivity implements
         NewContentDialogFragment.NewContentDialogListener,
         SelectedMenuView.OnSelectedMenuActionListener,
         MapsFragment.MapOpenCloseListener,
-        PersistentDialogFragment.PersistentDialogListener {
+        PersistentDialogFragment.PersistentDialogListener,
+        PuzzleAnswerDialogFragment.PuzzleAnswerListener {
 
     private static final String TAG = CameraARActivity.class.getSimpleName();
     private static final int RC_SAVE_CONTENT = 22;
@@ -151,23 +156,47 @@ public abstract class CameraARActivity extends BaseActivity implements
                 @SuppressWarnings("ConstantConditions")
                 @Override
                 public void run() {
-                    mSelectedMenuView.setVisibility(content == null ? View.GONE : View.VISIBLE);
-                    mSelectedMenuView.setContent(content, mGoogleApiClient);
-                    mLastSelectTime = System.currentTimeMillis();
-
-                    mSelectedMenuView.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Hide iff user didn't click after
-                            if (mLastSelectTime + 3000 <= System.currentTimeMillis()) {
-                                mSelectedMenuView.setVisibility(View.GONE);
-                                mSelectedContent = null;
-                            }
-                        }
-                    }, 3000);
+                    if (mSelectedContent != content || mSelectedContent == null) {
+                        return;
+                    }
+                    if (mSelectedContent.isPuzzle()) {
+                        onPuzzleSelected();
+                    } else {
+                        onVirtualNoteSelected();
+                    }
                 }
             });
         }
+    }
+
+    private void onPuzzleSelected() {
+        Date penaltyDate = App.getInstance().penaltyForPuzzle(mSelectedContent);
+        if (penaltyDate == null) {
+            // User has no penalty, let's make him answer the question
+            PuzzleAnswerDialogFragment.newInstance().show(getSupportFragmentManager(), PuzzleAnswerDialogFragment.TAG);
+        } else {
+            SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+            String dateString = df.format(penaltyDate);
+            String message = getString(R.string.puzzle_penalty_until_message) + " " + dateString;
+            Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void onVirtualNoteSelected() {
+        mSelectedMenuView.setVisibility(mSelectedContent == null ? View.GONE : View.VISIBLE);
+        mSelectedMenuView.setContent(mSelectedContent, mGoogleApiClient);
+        mLastSelectTime = System.currentTimeMillis();
+
+        mSelectedMenuView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // Hide iff user didn't click after
+                if (mLastSelectTime + 3000 <= System.currentTimeMillis()) {
+                    mSelectedMenuView.setVisibility(View.GONE);
+                    mSelectedContent = null;
+                }
+            }
+        }, 3000);
     }
 
     @Override
@@ -185,6 +214,21 @@ public abstract class CameraARActivity extends BaseActivity implements
         onContentSelected(content);
     }
 
+    @Override
+    public void onPuzzleAnswer(String answer) {
+        if (mSelectedContent == null || !mSelectedContent.isPuzzle()) {
+            Log.e(TAG, "onPuzzleAnswer: called when Content wasn't selected or content wasn't puzzle");
+            return;
+        }
+        Puzzle puzzle = mSelectedContent.getPuzzle();
+        if (puzzle.checkAnswer(answer)) {
+            // TODO here network call to tell server correct answer
+            Toast.makeText(CameraARActivity.this, "User Answered Correctly", Toast.LENGTH_SHORT).show();
+        } else {
+            App.getInstance().incorrectPenaltyTrial(mSelectedContent);
+            Toast.makeText(CameraARActivity.this, "Wrong Answer", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     public void onNewContentClick(View v) {
         if (!isNewContentCreationEnabled()) {

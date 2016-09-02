@@ -24,6 +24,6 @@ public class Puzzle implements Serializable{
     }
 
     public boolean checkAnswer(String answer) {
-        return this.answers.contains(answer);
+        return this.answers.contains(answer.toLowerCase());
     }
 }
