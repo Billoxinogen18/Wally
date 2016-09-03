@@ -55,7 +55,9 @@ public class Content implements Serializable {
 
     public Content withId(String id) {
         this.id = id;
-        puzzle.withId(id);
+        if (puzzle != null) {
+            puzzle.withId(id);
+        }
         return this;
     }
 
@@ -204,7 +206,10 @@ public class Content implements Serializable {
     }
 
     public Content withPuzzle(Puzzle puzzle) {
-        this.puzzle = puzzle.withId(id);
+        this.puzzle = puzzle;
+        if (puzzle != null){
+            this.puzzle.withId(id);
+        }
         return this;
     }
 
