@@ -1,14 +1,17 @@
 package com.wally.wally.datacontroller;
 
-import static com.wally.wally.datacontroller.DataControllerFactory.getUserManagerInstance;
-
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Puzzle;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
+import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+
+import static com.wally.wally.datacontroller.DataControllerFactory.getUserManagerInstance;
 
 public class DataController {
     private ContentManager contentManager;
@@ -32,8 +35,27 @@ public class DataController {
         contentManager.delete(c);
     }
 
-    public void fetchForUuid(String uuid, FetchResultCallback callback) {
-        contentManager.fetchForUuid(uuid, callback);
+    public void fetchForUuid(String uuid, final FetchResultCallback callback) {
+        contentManager.fetchForUuid(uuid, new FetchResultCallback() {
+            @Override
+            public void onResult(Collection<Content> result) {
+                Collection<Content> contents = new HashSet<>();
+                for (Content c : result) {
+                    if (isContentVisibleForUser(c, getUserManagerInstance().getCurrentUser())) {
+                        contents.add(c);
+                    }
+                }
+                callback.onResult(contents);
+            }
+        });
+    }
+
+    private boolean isContentVisibleForUser(Content c, User user) {
+        List<Id> sharedWith = c.getVisibility().getSocialVisibility().getSharedWith();
+        return c.isPublic() || (c.isPrivate() && c.getAuthorId().equals(user.getId().getId())) ||
+                sharedWith.contains(user.getId()) ||
+                sharedWith.contains(user.getFbId()) ||
+                sharedWith.contains(user.getGgId());
     }
 
     public Fetcher createFetcherForPuzzleSuccessors(Puzzle puzzle) {
