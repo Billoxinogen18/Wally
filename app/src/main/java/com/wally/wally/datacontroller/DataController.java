@@ -3,6 +3,7 @@ package com.wally.wally.datacontroller;
 import static com.wally.wally.datacontroller.DataControllerFactory.getUserManagerInstance;
 
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.Puzzle;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
@@ -33,6 +34,20 @@ public class DataController {
 
     public void fetchForUuid(String uuid, FetchResultCallback callback) {
         contentManager.fetchForUuid(uuid, callback);
+    }
+
+    public Fetcher createFetcherForPuzzleSuccessors(Puzzle puzzle) {
+        return null;
+    }
+
+    public boolean checkAnswer(Puzzle puzzle, String answer) {
+        answer = answer.toLowerCase();
+        for (String s : puzzle.getAnswers()) {
+            if (s.toLowerCase().equals(answer)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Fetcher createFetcherForMyContent() {

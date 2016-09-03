@@ -7,6 +7,7 @@ import java.util.List;
 
 public class Puzzle implements Serializable {
     // Something serializable here
+    private String id;
     private HashSet<String> answers;
 
     public Puzzle() {
@@ -18,17 +19,16 @@ public class Puzzle implements Serializable {
         return this;
     }
 
-    public List<String> getAnswers() {
-        return new ArrayList<>(answers);
+    public Puzzle withId(String id) {
+        this.id = id;
+        return this;
     }
 
-    public boolean checkAnswer(String answer) {
-        answer = answer.toLowerCase();
-        for (String s : this.answers) {
-            if (s.toLowerCase().equals(answer)) {
-                return true;
-            }
-        }
-        return false;
+    public String getId() {
+        return this.id;
+    }
+
+    public List<String> getAnswers() {
+        return new ArrayList<>(answers);
     }
 }

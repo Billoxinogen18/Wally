@@ -25,6 +25,7 @@ import com.wally.wally.controllers.PuzzleAnswerDialogFragment;
 import com.wally.wally.controllers.contentCreator.NewContentDialogFragment;
 import com.wally.wally.controllers.map.MapsFragment;
 import com.wally.wally.datacontroller.DataController;
+import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Puzzle;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
@@ -221,7 +222,7 @@ public abstract class CameraARActivity extends BaseActivity implements
             return;
         }
         Puzzle puzzle = mSelectedContent.getPuzzle();
-        if (puzzle.checkAnswer(answer)) {
+        if (DataControllerFactory.getDataControllerInstance().checkAnswer(puzzle, answer)) {
             // TODO here network call to tell server correct answer
             Toast.makeText(CameraARActivity.this, "User Answered Correctly", Toast.LENGTH_SHORT).show();
         } else {

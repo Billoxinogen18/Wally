@@ -55,6 +55,7 @@ public class Content implements Serializable {
 
     public Content withId(String id) {
         this.id = id;
+        puzzle.withId(id);
         return this;
     }
 
@@ -203,7 +204,7 @@ public class Content implements Serializable {
     }
 
     public Content withPuzzle(Puzzle puzzle) {
-        this.puzzle = puzzle;
+        this.puzzle = puzzle.withId(id);
         return this;
     }
 
