@@ -6,21 +6,20 @@ import java.util.HashSet;
 import java.util.List;
 
 public class Puzzle implements Serializable {
-    // Something serializable here
     private String id;
-    private HashSet<String> answers;
     private boolean isSolved;
     private String markerURL;
     private String unsolvedMarkerURL;
-    private HashSet<String> games;
+    private HashSet<String> answers;
+    private HashSet<String> successors;
 
     public Puzzle() {
         answers = new HashSet<>();
-        games = new HashSet<>();
+        successors = new HashSet<>();
     }
 
     public Puzzle withGames(List<String> games) {
-        this.games.addAll(games);
+        this.successors.addAll(games);
         return this;
     }
 
@@ -47,16 +46,6 @@ public class Puzzle implements Serializable {
         return isSolved;
     }
 
-    public boolean checkAnswer(String answer) {
-        answer = answer.toLowerCase();
-        for (String s : this.answers) {
-            if (s.toLowerCase().equals(answer)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public String getMarkerURL() {
         return markerURL;
     }
@@ -79,7 +68,7 @@ public class Puzzle implements Serializable {
         return new ArrayList<>(answers);
     }
 
-    public List<String> getGames() {
-        return new ArrayList<>(games);
+    public List<String> getSuccessors() {
+        return new ArrayList<>(successors);
     }
 }

@@ -138,15 +138,17 @@ public class FirebaseContent extends FirebaseObject {
         if (!containsKey(K_PUZZLE_DATA)) return null;
         FirebaseObject puzzleData = getChild(K_PUZZLE_DATA);
         return new Puzzle()
-                .withAnswers(puzzleData.get(K_ANSWERS).toStringList())
-                .withGames(puzzleData.get(K_GAMES).toStringList());
+                .withMarkerURL(null) // TODO
+                .withUnsolvedMarkerURL(null) // TODO
+                .withGames(puzzleData.get(K_GAMES).toStringList())
+                .withAnswers(puzzleData.get(K_ANSWERS).toStringList());
     }
 
     private void setPuzzle(Puzzle puzzle) {
         if (puzzle == null) return;
         getChild(K_PUZZLE_DATA)
                 .put(K_ANSWERS, puzzle.getAnswers())
-                .put(K_GAMES, puzzle.getGames());
+                .put(K_GAMES, puzzle.getSuccessors());
     }
 
     private Visibility getVisibility() {
