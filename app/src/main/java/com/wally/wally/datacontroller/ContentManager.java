@@ -47,6 +47,9 @@ public class ContentManager {
                         if (c.getUuid() != null) {
                             String extendedId = ref.getParent().getKey() + ":" + ref.getKey();
                             addInRoom(c.getUuid(), extendedId);
+                            if (c.isPuzzle()) {
+                                contents.getRef().child("Puzzles").setValue(extendedId);
+                            }
                         }
                     }
                 }
