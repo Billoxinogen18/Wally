@@ -47,10 +47,6 @@ public class Puzzle implements Serializable {
         return isSolved;
     }
 
-    public List<String> getAnswers() {
-        return new ArrayList<>(answers);
-    }
-
     public boolean checkAnswer(String answer) {
         answer = answer.toLowerCase();
         for (String s : this.answers) {
@@ -78,7 +74,12 @@ public class Puzzle implements Serializable {
         this.unsolvedMarkerURL = unsolvedMarkerURL;
         return this;
     }
-    public List<String> getAnswers() { return new ArrayList<>(answers); }
 
-    public List<String> getGames() { return new ArrayList<>(games); }
+    public List<String> getAnswers() {
+        return new ArrayList<>(answers);
+    }
+
+    public List<String> getGames() {
+        return new ArrayList<>(games);
+    }
 }
