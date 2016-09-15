@@ -73,4 +73,6 @@
     <string name="answer">Answer</string>
     <string name="cancel">Cancel</string>
     <string name="puzzle_is_already_solved">Puzzle is already solved</string>
+    <string name="puzzle_correct_answer">Correct Answer!</string>
+    <string name="puzzle_wrong_answer">Wrong Answer</string>
 </resources>

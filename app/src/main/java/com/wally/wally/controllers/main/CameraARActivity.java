@@ -173,7 +173,7 @@ public abstract class CameraARActivity extends BaseActivity implements
 
     /**
      * Callback for content selection.
-     * <p>
+     * <p/>
      * Note that we might have many content types [VirtualNote, PuzzleNote ...]
      *
      * @param content user selected content
@@ -248,11 +248,12 @@ public abstract class CameraARActivity extends BaseActivity implements
         Puzzle puzzle = mSelectedContent.getPuzzle();
         if (DataControllerFactory.getDataControllerInstance().checkAnswer(puzzle, answer)) {
             // TODO here network call to tell server correct answer
-            mSelectedContent.getPuzzle().withIsSolved(true);
-            Toast.makeText(CameraARActivity.this, "User Answered Correctly", Toast.LENGTH_SHORT).show();
+            puzzle.withIsSolved(true);
+            openMapFragment(MapsFragment.newInstance(puzzle));
+            Toast.makeText(CameraARActivity.this, R.string.puzzle_correct_answer, Toast.LENGTH_SHORT).show();
         } else {
             App.getInstance().incorrectPenaltyTrial(mSelectedContent);
-            Toast.makeText(CameraARActivity.this, "Wrong Answer", Toast.LENGTH_SHORT).show();
+            Toast.makeText(CameraARActivity.this, R.string.puzzle_wrong_answer, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -301,7 +302,7 @@ public abstract class CameraARActivity extends BaseActivity implements
 
     public void onBtnMapClick(View v) {
         mAnalytics.onButtonClick("Map");
-        openMapFragment(null);
+        openMapFragment(MapsFragment.newInstance());
     }
 
     public void onShowProfileClick(View v) {
@@ -381,9 +382,11 @@ public abstract class CameraARActivity extends BaseActivity implements
         infoView.setUser(user);
     }
 
-    public void openMapFragment(SocialUser user) {
-        MapsFragment mf = MapsFragment.newInstance(user);
+    public void openMapFragment(SocialUser socialUser) {
+        openMapFragment(MapsFragment.newInstance(socialUser));
+    }
 
+    public void openMapFragment(MapsFragment mf) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.setCustomAnimations(
                 android.R.anim.fade_in,

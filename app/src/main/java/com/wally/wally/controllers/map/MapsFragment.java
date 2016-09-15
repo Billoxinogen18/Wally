@@ -41,6 +41,7 @@ import com.wally.wally.controllers.map.contentList.View;
 import com.wally.wally.controllers.map.contentList.ViewItem;
 import com.wally.wally.datacontroller.DataController;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.Puzzle;
 import com.wally.wally.tip.LocalTipService;
 import com.wally.wally.tip.MapEventListener;
 import com.wally.wally.tip.TipManager;
@@ -64,9 +65,10 @@ public class MapsFragment extends BaseFragment implements
         android.view.View.OnClickListener, OnMapReadyCallback {
 
     private static final String TAG = MapsFragment.class.getSimpleName();
-    private static final String KEY_USER = "USER";
+    private static final String KEY_USER = "KEY_USER";
     private static final int PAGE_LENGTH = 5;
     private static final int RC_MY_LOCATION_CLICK = 921;
+    private static final String KEY_PUZZLE = "KEY_PUZZLE";
 
     private MapOpenCloseListener mListener;
 
@@ -102,10 +104,22 @@ public class MapsFragment extends BaseFragment implements
     }
 
 
+    public static MapsFragment newInstance() {
+        return new MapsFragment();
+    }
+
     public static MapsFragment newInstance(SocialUser user) {
         MapsFragment fragment = new MapsFragment();
         Bundle args = new Bundle();
         args.putSerializable(KEY_USER, user);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static MapsFragment newInstance(Puzzle puzzle) {
+        MapsFragment fragment = new MapsFragment();
+        Bundle args = new Bundle();
+        args.putSerializable(KEY_PUZZLE, puzzle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -435,7 +449,10 @@ public class MapsFragment extends BaseFragment implements
         double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
         DataController.Fetcher contentFetcher;
 
-        if (mUserProfile != null && App.getInstance().getSocialUserManager().getUser().equals(mUserProfile)) {
+        Puzzle puzzle = (Puzzle) getArguments().get(KEY_PUZZLE);
+        if (puzzle != null) {
+            contentFetcher = App.getInstance().getDataController().createFetcherForPuzzleSuccessors(puzzle);
+        } else if (mUserProfile != null && App.getInstance().getSocialUserManager().getUser().equals(mUserProfile)) {
             contentFetcher = App.getInstance().getDataController()
                     .createFetcherForMyContent();
         } else if (mUserProfile != null) {
