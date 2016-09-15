@@ -19,12 +19,16 @@ public class Puzzle implements Serializable {
     }
 
     public Puzzle withGames(List<String> games) {
-        this.successors.addAll(games);
+        if (games != null) {
+            this.successors.addAll(games);
+        }
         return this;
     }
 
     public Puzzle withAnswers(List<String> answers) {
-        this.answers.addAll(answers);
+        if (answers != null) {
+            this.answers.addAll(answers);
+        }
         return this;
     }
 
