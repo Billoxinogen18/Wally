@@ -254,11 +254,11 @@ public class MapsFragment extends BaseFragment implements
                 mapEventListener.onPublicFeedInit();
             }
         } else {
-            if(App.getInstance().getSocialUserManager().getUser().equals(mUserProfile)){
+            if (App.getInstance().getSocialUserManager().getUser().equals(mUserProfile)) {
                 for (MapEventListener mapEventListener : mapEventListeners) {
                     mapEventListener.onProfileInit();
                 }
-            }else{
+            } else {
                 for (MapEventListener mapEventListener : mapEventListeners) {
                     mapEventListener.onPersonInit();
                 }

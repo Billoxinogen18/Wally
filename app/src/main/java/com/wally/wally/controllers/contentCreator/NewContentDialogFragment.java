@@ -183,14 +183,12 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
             if (isPuzzle) {
                 mContent.withNote("This is Puzzle Note");
                 mContent.withPuzzle(new Puzzle().withAnswers(Arrays.asList("Empty Answer")));
+                mContent.withVisibility(new Visibility());
+                mContent.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PEOPLE));
             }
         }
         if (mContent.getVisibility() == null) {
             mContent.withVisibility(new Visibility());
-            // If it's newly created object and is puzzle, it must be private
-            if (isPuzzle) {
-                mContent.getVisibility().withSocialVisibility(new Visibility.SocialVisibility(Visibility.SocialVisibility.PRIVATE));
-            }
         }
         if (mContent.getVisibility().getSocialVisibility() == null) {
             mContent.getVisibility().withSocialVisibility(

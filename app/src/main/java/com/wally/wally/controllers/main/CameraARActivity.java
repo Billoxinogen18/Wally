@@ -150,6 +150,34 @@ public abstract class CameraARActivity extends BaseActivity implements
         onContentSelected(mSelectedContent);
     }
 
+    /**
+     * Callback from Visual Manager
+     *
+     * @param visualContent selected Visual content
+     */
+    @Override
+    public void onVisualContentSelected(VisualContent visualContent) {
+        if (visualContent != null) {
+            mAnalytics.onButtonClick("Content_Selected");
+        } else {
+            mAnalytics.onButtonClick("Click_On_Camera");
+        }
+
+        Content content = null;
+        if (visualContent != null) {
+            content = visualContent.getContent();
+        }
+        // Now call method for content
+        onContentSelected(content);
+    }
+
+    /**
+     * Callback for content selection.
+     * <p>
+     * Note that we might have many content types [VirtualNote, PuzzleNote ...]
+     *
+     * @param content user selected content
+     */
     private void onContentSelected(final Content content) {
         mSelectedContent = content;
         if (App.getInstance().getSocialUserManager().isLoggedIn()) {
@@ -171,6 +199,11 @@ public abstract class CameraARActivity extends BaseActivity implements
     }
 
     private void onPuzzleSelected() {
+        if (mSelectedContent.getPuzzle().isSolved()) {
+            Toast.makeText(CameraARActivity.this, R.string.puzzle_is_already_solved, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         Date penaltyDate = App.getInstance().penaltyForPuzzle(mSelectedContent);
         if (penaltyDate == null) {
             // User has no penalty, let's make him answer the question
@@ -200,21 +233,12 @@ public abstract class CameraARActivity extends BaseActivity implements
         }, 3000);
     }
 
-    @Override
-    public void onVisualContentSelected(VisualContent visualContent) {
-        if (visualContent != null) {
-            mAnalytics.onButtonClick("Content_Selected");
-        } else {
-            mAnalytics.onButtonClick("Click_On_Camera");
-        }
-
-        Content content = null;
-        if (visualContent != null) {
-            content = visualContent.getContent();
-        }
-        onContentSelected(content);
-    }
-
+    /**
+     * Called whenever user answers for selected puzzle.
+     * Note that answer might be correct or incorrect.
+     *
+     * @param answer user typed answer.
+     */
     @Override
     public void onPuzzleAnswer(String answer) {
         if (mSelectedContent == null || !mSelectedContent.isPuzzle()) {
@@ -224,6 +248,7 @@ public abstract class CameraARActivity extends BaseActivity implements
         Puzzle puzzle = mSelectedContent.getPuzzle();
         if (DataControllerFactory.getDataControllerInstance().checkAnswer(puzzle, answer)) {
             // TODO here network call to tell server correct answer
+            mSelectedContent.getPuzzle().withIsSolved(true);
             Toast.makeText(CameraARActivity.this, "User Answered Correctly", Toast.LENGTH_SHORT).show();
         } else {
             App.getInstance().incorrectPenaltyTrial(mSelectedContent);

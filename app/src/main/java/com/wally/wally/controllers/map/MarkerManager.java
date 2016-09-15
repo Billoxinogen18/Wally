@@ -9,6 +9,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.datacontroller.content.Puzzle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,7 +111,7 @@ public class MarkerManager {
 
     private class MarkerNameVisibility {
 
-//        public MarkerView markerBase;
+        //        public MarkerView markerBase;
         public MarkerView markerNumber;
 
         public String name;
@@ -140,23 +141,36 @@ public class MarkerManager {
 
 //                            markerBase = mMap.addMarker(baseMarkerOptions);
 
-                            int contentColor = content.getColor() == null ? Color.WHITE : content.getColor();
-                            mMarkerIconGenerator.getEnumeratedMarkerIcon(name, contentColor,
-                                    new MarkerIconGenerator.MarkerIconGenerateListener() {
-                                        @Override
-                                        public void onMarkerIconGenerate(Icon icon) {
-                                            MarkerViewOptions markerOptions = new MarkerViewOptions()
-                                                    .position(Utils.serializableLatLngToLatLng(content.getLocation()))
-                                                    .icon(icon)
-                                                    .anchor(0.5f, 1f);
-
-                                            markerNumber = mMap.addMarker(markerOptions);
-                                            mMarkerList.add(MarkerNameVisibility.this);
-                                            callback.onMarkerAdd();
-                                        }
-                                    });
+                            MarkerIconGenerator.MarkerIconGenerateListener markerCallback = getMarkerCallback(callback);
+                            if (content.isPuzzle()) {
+                                Puzzle puzzle = content.getPuzzle();
+                                if (puzzle.isSolved()) {
+                                    mMarkerIconGenerator.getSolvedPuzzleMarker(puzzle.getMarkerURL(), name, markerCallback);
+                                } else {
+                                    mMarkerIconGenerator.getUnsolvedPuzzleMarker(puzzle.getUnsolvedMarkerURL(), name, markerCallback);
+                                }
+                            } else {
+                                int contentColor = content.getColor() == null ? Color.WHITE : content.getColor();
+                                mMarkerIconGenerator.getEnumeratedMarkerIcon(name, contentColor, markerCallback);
+                            }
                         }
                     });
+        }
+
+        private MarkerIconGenerator.MarkerIconGenerateListener getMarkerCallback(final OnMarkerAddListener callback) {
+            return new MarkerIconGenerator.MarkerIconGenerateListener() {
+                @Override
+                public void onMarkerIconGenerate(Icon icon) {
+                    MarkerViewOptions markerOptions = new MarkerViewOptions()
+                            .position(Utils.serializableLatLngToLatLng(content.getLocation()))
+                            .icon(icon)
+                            .anchor(0.5f, 1f);
+
+                    markerNumber = mMap.addMarker(markerOptions);
+                    mMarkerList.add(MarkerNameVisibility.this);
+                    callback.onMarkerAdd();
+                }
+            };
         }
 
 
