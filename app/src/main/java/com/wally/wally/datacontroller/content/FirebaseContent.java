@@ -45,6 +45,7 @@ public class FirebaseContent extends FirebaseObject {
 
     private static final String K_PUZZLE_DATA = "PuzzleData";
     private static final String K_ANSWERS = "Answers";
+    private static final java.lang.String K_GAMES = "Games";
 
     public FirebaseContent() {}
 
@@ -137,13 +138,15 @@ public class FirebaseContent extends FirebaseObject {
         if (!containsKey(K_PUZZLE_DATA)) return null;
         FirebaseObject puzzleData = getChild(K_PUZZLE_DATA);
         return new Puzzle()
-                .withAnswers(puzzleData.get(K_ANSWERS).toStringList());
+                .withAnswers(puzzleData.get(K_ANSWERS).toStringList())
+                .withGames(puzzleData.get(K_GAMES).toStringList());
     }
 
     private void setPuzzle(Puzzle puzzle) {
         if (puzzle == null) return;
         getChild(K_PUZZLE_DATA)
-                .put(K_ANSWERS, puzzle.getAnswers());
+                .put(K_ANSWERS, puzzle.getAnswers())
+                .put(K_GAMES, puzzle.getGames());
     }
 
     private Visibility getVisibility() {

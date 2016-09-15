@@ -9,9 +9,16 @@ public class Puzzle implements Serializable {
     // Something serializable here
     private String id;
     private HashSet<String> answers;
+    private HashSet<String> games;
 
     public Puzzle() {
         answers = new HashSet<>();
+        games = new HashSet<>();
+    }
+
+    public Puzzle withGames(List<String> games) {
+        this.games.addAll(games);
+        return this;
     }
 
     public Puzzle withAnswers(List<String> answers) {
@@ -28,7 +35,7 @@ public class Puzzle implements Serializable {
         return this.id;
     }
 
-    public List<String> getAnswers() {
-        return new ArrayList<>(answers);
-    }
+    public List<String> getAnswers() { return new ArrayList<>(answers); }
+
+    public List<String> getGames() { return new ArrayList<>(games); }
 }
