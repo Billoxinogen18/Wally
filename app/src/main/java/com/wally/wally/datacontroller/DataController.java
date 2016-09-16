@@ -1,5 +1,6 @@
 package com.wally.wally.datacontroller;
 
+import com.wally.wally.datacontroller.callbacks.PuzzleSharerCallback;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Puzzle;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
@@ -65,7 +66,8 @@ public class DataController {
             chain.addPager(new Fetcher() {
                 @Override
                 public void fetchNext(int i, FetchResultCallback callback) {
-                    contentManager.fetchAt(puzzleId.replace(":", "/"), callback);
+                    FetchResultCallback sharerCallback = new PuzzleSharerCallback(callback);
+                    contentManager.fetchAt(puzzleId.replace(":", "/"), sharerCallback);
                 }
             });
         }
