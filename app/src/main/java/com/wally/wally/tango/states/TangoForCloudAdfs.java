@@ -14,11 +14,12 @@ import com.wally.wally.tango.TangoUpdater;
  * Created by shota on 8/9/16.
  * Manages Tango which downloads Adfs and tries to localize
  */
-public class TangoForCloudAdfs extends TangoForAdf {
+public class TangoForCloudAdfs extends TangoState {
     private static final String TAG = TangoForCloudAdfs.class.getSimpleName();
 
     private long mLocalizationTimeout = 20000;
     private AdfScheduler mAdfScheduler;
+    private AdfInfo mAdfInfo;
 
     public TangoForCloudAdfs(TangoUpdater tangoUpdater,
                              TangoFactory tangoFactory,
@@ -36,13 +37,11 @@ public class TangoForCloudAdfs extends TangoForAdf {
 
     @Override
     protected void pauseHook() {
-        Log.d(TAG, "pause Thread = " + Thread.currentThread());
         mAdfScheduler.finish();
     }
 
     @Override
     protected void resumeHook() {
-        Log.d(TAG, "resume Thread = " + Thread.currentThread());
         mAdfScheduler = mAdfScheduler
                 .withTimeout(mLocalizationTimeout)
                 .addListener(createAdfSchedulerListener());
@@ -54,11 +53,12 @@ public class TangoForCloudAdfs extends TangoForAdf {
             @Override
             public void onNewAdfSchedule(AdfInfo info) {
                 if (mIsLocalized) { return; }
-                withAdf(info);
+                mAdfInfo = info;
+                String path = mAdfInfo.getPath();
                 if (mTango == null) {
-                    startLocalizing();
+                    mTango = mTangoFactory.getTangoForCloudAdf(getTangoInitializer(), path);
                 } else {
-                    mTango.experimentalLoadAreaDescriptionFromFile(mAdfInfo.getPath());
+                    mTango.experimentalLoadAreaDescriptionFromFile(path);
                 }
                 fireLocalizationStart();
             }
@@ -71,19 +71,13 @@ public class TangoForCloudAdfs extends TangoForAdf {
         };
     }
 
-    protected void startLocalizing(){
-        Log.d(TAG, "startLocalizing with: adf = [" + mAdfInfo + "]");
-        final TangoFactory.RunnableWithError r = getTangoInitializer();
-        mTango = mTangoFactory.getTangoForCloudAdf(r, mAdfInfo.getPath());
-        Log.d(TAG, "startLocalizing() mTango = " + mTango);
-    }
-
     @Override
     public void onLocalization(boolean localization) {
         Log.d(TAG, "onLocalization " + localization);
         mIsLocalized = localization;
         if (localization) {
             mAdfScheduler.finish();
+            fireLocalizationFinish();
             mSuccessStateConnector.toNextState();
         }
     }
@@ -93,8 +87,7 @@ public class TangoForCloudAdfs extends TangoForAdf {
         return mAdfInfo;
     }
 
-    @Override
-    protected void fireLocalizationFinish() {
+    private void fireLocalizationFinish() {
         fireEvent(WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_FINISH_AFTER_CLOUD_ADF));
     }
 
