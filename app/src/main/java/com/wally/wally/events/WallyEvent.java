@@ -3,45 +3,46 @@ package com.wally.wally.events;
 public class WallyEvent {
 
     public static final String
-    ON_PAUSE = "onPause";
+    ON_PAUSE = "Pause";
 
     public static final String
-    ON_RESUME = "onResume";
+    ON_RESUME = "Resume";
 
     public static final String
-    TANGO_READY = "onTangoReady";
+    TANGO_READY = "TangoReady";
 
     public static final String
-    TANGO_OUT_OF_DATE = "onTangoOutOfDate";
+    TANGO_OUT_OF_DATE = "TangoOutOfDate";
 
     public static final String
-    LEARNING_START = "onLearningStart";
+    LEARNING_START = "LearningStart";
 
     public static final String
-    LEARNING_FINISH = "onLearningFinish";
+    LEARNING_FINISH = "LearningFinish";
 
     public static final String
-    LOCALIZATION_START = "onLocalizationStart";
+    LOCALIZATION_START = "LocStart";
 
     public static final String
-    LOCALIZATION_START_AFTER_LEARNING = "onLocalizationStartAfterLearning";
+    LOCALIZATION_START_AFTER_LEARNING = "LocStartAfterLearning";
 
     public static final String
-    LOCALIZATION_FINISH_AFTER_LEARNING = "onLocalizationFinishAfterLearning";
+    LOCALIZATION_FINISH_AFTER_LEARNING = "LocFinishAfterLearning";
 
     public static final String
-    LOCALIZATION_FINISH_AFTER_SAVED_ADF = "onLocalizationFinishAfterSavedAdf";
+    LOCALIZATION_FINISH_AFTER_SAVED_ADF = "LocFinishAfterSavedAdf";
 
     public static final String
-    ON_LOCALIZATION_LOST = "onLocalizationLost";
+    LOCALIZATION_FINISH_AFTER_CLOUD_ADF = "LocFinishAfterCloudAdf";
 
     public static final String
-    ON_NEW_CONTENT_DIALOG_SHOW = "onNewContentDialogShow";
+    LOCALIZATION_START_ON_CLOUD_ADF = "LocStartOnCloudAdf";
 
     public static final String
-    LOCALIZATION_FINISH_AFTER_CLOUD_ADF = "onLocalizationFinishAfterCloudAdf";
+    ON_LOCALIZATION_LOST = "LocLost";
+
     public static final String
-    LOCALIZATION_START_ON_CLOUD_ADF = "onLocalizationStartOnCloudAdf";
+    ON_NEW_CONTENT_DIALOG_SHOW = "NewContentDialogShow";
 
     private final String id;
 
