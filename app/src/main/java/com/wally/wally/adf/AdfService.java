@@ -9,6 +9,8 @@ public interface AdfService {
 
     void download(AdfInfo info, AdfDownloadListener listener);
 
+    void delete(AdfInfo info);
+
     void searchNearLocation(SerializableLatLng location, SearchResultListener listener);
 
     interface SearchResultListener {

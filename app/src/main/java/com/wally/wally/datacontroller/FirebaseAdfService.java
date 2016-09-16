@@ -111,6 +111,12 @@ class FirebaseAdfService implements AdfService {
         });
     }
 
+    @Override
+    public void delete(AdfInfo info) {
+        storage.child(info.getUuid()).delete();
+        db.child(info.getUuid());
+    }
+
     private void saveMetaData(AdfInfo obj) {
         SerializableLatLng l = obj.getCreationLocation();
         String hash = new GeoHash(l.getLatitude(), l.getLongitude()).getGeoHashString();
