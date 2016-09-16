@@ -1,7 +1,5 @@
 package com.wally.wally.tango.states;
 
-import android.util.Log;
-
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfScheduler;
@@ -15,7 +13,6 @@ import com.wally.wally.tango.TangoUpdater;
  * Manages Tango which downloads Adfs and tries to localize
  */
 public class TangoForCloudAdfs extends TangoState {
-    private static final String TAG = TangoForCloudAdfs.class.getSimpleName();
 
     private long mLocalizationTimeout = 20000;
     private AdfScheduler mAdfScheduler;
@@ -73,8 +70,7 @@ public class TangoForCloudAdfs extends TangoState {
 
     @Override
     public void onLocalization(boolean localization) {
-        Log.d(TAG, "onLocalization " + localization);
-        mIsLocalized = localization;
+        super.onLocalization(localization);
         if (localization) {
             mAdfScheduler.finish();
             fireLocalizationFinish();
