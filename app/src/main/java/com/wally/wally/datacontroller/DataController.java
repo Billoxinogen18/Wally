@@ -60,7 +60,16 @@ public class DataController {
     }
 
     public Fetcher createFetcherForPuzzleSuccessors(Puzzle puzzle) {
-        return null;
+        PagerChain chain = new PagerChain();
+        for (final String puzzleId : puzzle.getSuccessors()) {
+            chain.addPager(new Fetcher() {
+                @Override
+                public void fetchNext(int i, FetchResultCallback callback) {
+                    contentManager.fetchAt(puzzleId.replace(":", "/"), callback);
+                }
+            });
+        }
+        return chain;
     }
 
     public boolean checkAnswer(Puzzle puzzle, String answer) {
