@@ -52,7 +52,8 @@ public class DataController {
 
     private boolean isContentVisibleForUser(Content c, User user) {
         List<Id> sharedWith = c.getVisibility().getSocialVisibility().getSharedWith();
-        return c.isPublic() || (c.isPrivate() && c.getAuthorId().equals(user.getId().getId())) ||
+        return c.getAuthorId().equals(user.getId().getId()) ||
+                c.isPublic() || (c.isPrivate() && c.getAuthorId().equals(user.getId().getId())) ||
                 sharedWith.contains(user.getId()) ||
                 sharedWith.contains(user.getFbId()) ||
                 sharedWith.contains(user.getGgId());
