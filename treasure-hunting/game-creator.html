@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <meta charset="UTF-8">
+
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" charset="utf-8"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+            integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+            crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+    <script src="js/firebase-controller.js"></script>
+    <script src="js/bootstrap-listview.js"></script>
+    <script src="js/set.js"></script>
+    <script src="js/wizard.js"></script>
+    <script src="./js/game-creator.js"></script>
+    <style>
+        #notes-page, #connections-page, #start-notes-page, #save-page{
+            display: none;
+        }
+    </style>
+    <title>New Game</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 form-group">
+            <label for="name">Game Name:</label>
+            <input type="text" class="form-control" id="name" placeholder="name">
+        </div>
+    </div>
+    <div class="row" id="notes-page">
+        <div class="col-xs-12">
+            <div class="row panel panel-default">
+                <div class="panel-heading">
+                    Select Notes For this Game
+                </div>
+                <div class="panel-body" id="notes-placeholder">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="connections-page">
+        <div class="col-xs-12">
+            <div class="row panel panel-default">
+                <div class="panel-heading">
+                    Select Connections
+                </div>
+                <div class="panel-body" id="selected-notes-placeholder">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="start-notes-page">
+        <div class="col-xs-12">
+            <div class="row panel panel-default">
+                <div class="panel-heading">
+                    Select Start Notes For This Game
+                </div>
+                <div class="panel-body" id="start-notes-placeholder">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="save-page">
+        <div class="col-xs-12">
+            <div class="row panel panel-default">
+                <div class="panel-heading">
+                    Saving
+                </div>
+                <div class="panel-body">
+                    Are you sure you want to save this game?
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 form-group ">
+            <button class="btn btn-success invisible"></button>
+            <button disabled id="next" class="btn btn-success pull-right">Next</button>
+            <button disabled id="back" class="btn btn-success pull-left">Back</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="inner-list"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-connections">Save</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Treasure-Hunting</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Javascript -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" charset="utf-8"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
+            integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
+            crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+    <script src="js/firebase-controller.js"></script>
+    <script src="js/treasure-hunting.js"></script>
+    <script src="js/bootstrap-listview.js"></script>
+    <style type="text/css">
+        html, body, .full-height {
+            height: 100%;
+        }
+
+        #details-view {
+            padding: 20px;
+            height: 100%;
+            width: 100%;
+            overflow: auto;
+        }
+
+        .separator {
+            cursor: default;
+            text-align: right;
+            background: #ddd;
+        }
+
+        .nav {
+            height: 41px;
+        }
+
+        .tab-content {
+            height: calc(100% - 41px);
+            overflow: auto;
+        }
+
+        .col-xs-5, .col-xs-7 {
+            padding: 0
+        }
+
+        .list-group {
+            border-right: 1px solid #ddd;
+        }
+
+        .list-group li {
+            cursor: pointer;
+        }
+
+        .list-group-item {
+            border: none;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .img-placeholder {
+            width: 32px;
+            margin-right: 10px;
+        }
+
+        .list-group-item {
+            position: relative;
+        }
+
+        .img-circle {
+            position: absolute;
+            top: 50%;
+            margin-top: -16px;
+        }
+
+        .material-icons {
+            font-size: 16px;
+            line-height: 15px;
+            vertical-align: middle;
+        }
+
+        .table-cell {
+            display: table-cell;
+        }
+
+        .list-group-item:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid full-height">
+    <div class="row full-height">
+        <div class="col-xs-12 full-height">
+            <ul class="nav nav-justified" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#notes" role="tab" data-toggle="tab">
+                        Notes
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="#games" role="tab" data-toggle="tab">
+                        Games
+                    </a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="notes">
+                    <ul id="notes-list" class="list-group">
+                        <p style="text-align: center">No Notes :( </p>
+                    </ul>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="games">
+                    <div style="text-align: right">
+                        <a href="game-creator.html" class="btn btn-success">New Game</a>
+                    </div>
+                    <ul id="games-list" class="list-group">
+                        <p style="text-align: center">No Games :( </p>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
