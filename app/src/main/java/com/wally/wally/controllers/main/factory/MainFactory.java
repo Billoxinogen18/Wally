@@ -10,6 +10,7 @@ import com.google.atap.tango.ux.TangoUxLayout;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.App;
 import com.wally.wally.adf.AdfScheduler;
+import com.wally.wally.adf.AdfService;
 import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.WallyConfig;
@@ -146,6 +147,8 @@ public class MainFactory {
     public AdfScheduler getAdfScheduler(){
         return mAdfScheduler;
     }
+
+    public AdfService getAdfService() { return App.getInstance().getAdfService(); }
 
     public Activity getActivity() {
         return activity;

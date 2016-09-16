@@ -1,6 +1,7 @@
 package com.wally.wally.datacontroller;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -114,7 +115,7 @@ class FirebaseAdfService implements AdfService {
     @Override
     public void delete(AdfInfo info) {
         storage.child(info.getUuid()).delete();
-        db.child(info.getUuid());
+        db.child(info.getUuid()).removeValue();
     }
 
     private void saveMetaData(AdfInfo obj) {

@@ -2,6 +2,7 @@ package com.wally.wally.controllers.main.factory;
 
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfScheduler;
+import com.wally.wally.adf.AdfService;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
 import com.wally.wally.datacontroller.content.Content;
@@ -39,6 +40,7 @@ public class TangoDriverFactory {
     private LearningEvaluator mLearningEvaluator;
     private TipManager mTipManager;
     private AdfScheduler mAdfScheduler;
+    private AdfService mAdfService;
     private VisualContentManager mVisualContentManager;
 
     private TangoDriver mTangoDriver;
@@ -55,6 +57,7 @@ public class TangoDriverFactory {
         mLearningEvaluator = mainFactory.getLearningEvaluator();
         mTipManager = mainFactory.getTipManager();
         mAdfScheduler = mainFactory.getAdfScheduler();
+        mAdfService = mainFactory.getAdfService();
         mVisualContentManager = mainFactory.getVisualContentManager();
         tangoStates = new HashMap<>();
 
@@ -95,7 +98,7 @@ public class TangoDriverFactory {
         tangoStates.put(TangoForCloudAdfs.class, tangoForCloudAdfs);
 
         TangoForSavedAdf tangoForSavedAdf =
-                new TangoForSavedAdf(mTangoUpdater, mTangoFactory, mRenderer, mPointCloudManager);
+                new TangoForSavedAdf(mTangoUpdater, mTangoFactory, mRenderer, mAdfService, mPointCloudManager);
         tangoForSavedAdf.withLocalizationTimeout(localizationTimeout);
         tangoStates.put(TangoForSavedAdf.class, tangoForSavedAdf);
 

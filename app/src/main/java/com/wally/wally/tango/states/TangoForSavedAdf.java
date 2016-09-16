@@ -1,9 +1,8 @@
 package com.wally.wally.tango.states;
 
-import android.util.Log;
-
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
+import com.wally.wally.adf.AdfService;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.renderer.WallyRenderer;
 import com.wally.wally.tango.TangoFactory;
@@ -15,20 +14,19 @@ import com.wally.wally.tango.WatchDog;
  * Manages Tango after resume with previously saved Adf
  */
 public class TangoForSavedAdf extends TangoState {
-    private static final String TAG = TangoForSavedAdf.class.getSimpleName();
-
     private AdfInfo mAdfInfo;
     private WatchDog mLocalizationWatchdog;
 
     public TangoForSavedAdf(TangoUpdater tangoUpdater,
                             TangoFactory tangoFactory,
                             WallyRenderer wallyRenderer,
+                            final AdfService adfService,
                             TangoPointCloudManager pointCloudManager){
         super(tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
         mLocalizationWatchdog = new WatchDog() {
             @Override
             protected void onTimeout() {
-                // TODO delete bad ADF from cloud
+                adfService.delete(mAdfInfo);
                 mFailStateConnector.toNextState();
             }
 
@@ -51,7 +49,7 @@ public class TangoForSavedAdf extends TangoState {
 
     @Override
     protected void resumeHook() {
-        startLocalizing();
+        mTango = mTangoFactory.getTangoForLocalAdf(getTangoInitializer(), mAdfInfo.getUuid());
         fireLocalizationStart();
         mLocalizationWatchdog.arm();
     }
@@ -59,13 +57,6 @@ public class TangoForSavedAdf extends TangoState {
     public TangoForSavedAdf withLocalizationTimeout(long timeout){
         mLocalizationWatchdog = mLocalizationWatchdog.withTimeout(timeout);
         return this;
-    }
-
-    protected void startLocalizing(){
-        Log.d(TAG, "startLocalizing with: adf = [" + mAdfInfo + "]");
-        final TangoFactory.RunnableWithError r = getTangoInitializer();
-        mTango = mTangoFactory.getTangoForLocalAdf(r, mAdfInfo.getUuid());
-        Log.d(TAG, "startLocalizing() mTango = " + mTango);
     }
 
     @Override
