@@ -16,7 +16,7 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_NOTE           = "note";
     public static final String K_TITLE          = "title";
     public static final String K_COLOR          = "color";
-    public static final String K_TEXT_COLOR          = "text_color";
+    public static final String K_TEXT_COLOR     = "text_color";
     public static final String K_IMGURI         = "image";
     public static final String K_ROOM           = "roomId";
     public static final String K_AUTHOR         = "authorId";
@@ -41,11 +41,11 @@ public class FirebaseContent extends FirebaseObject {
     public static final String K_ANONYMOUS      = "anonymous";
     public static final String K_SHARED         = "Shared";
 
-    public static final String K_TIMESTAMP     = "timestamp";
+    public static final String K_TIMESTAMP      = "timestamp";
 
-    private static final String K_PUZZLE_DATA = "PuzzleData";
-    private static final String K_ANSWERS = "Answers";
-    private static final java.lang.String K_GAMES = "Games";
+    private static final String K_PUZZLE_DATA   = "PuzzleData";
+    private static final String K_ANSWERS       = "Answers";
+    private static final String K_SUCCESSORS    = "Connections";
 
     public FirebaseContent() {}
 
@@ -140,15 +140,15 @@ public class FirebaseContent extends FirebaseObject {
         return new Puzzle()
                 .withMarkerURL(null) // TODO
                 .withUnsolvedMarkerURL(null) // TODO
-                .withGames(puzzleData.get(K_GAMES).toStringList())
-                .withAnswers(puzzleData.get(K_ANSWERS).toStringList());
+                .withAnswers(puzzleData.get(K_ANSWERS).toStringList())
+                .withSuccessors(puzzleData.get(K_SUCCESSORS).toStringList());
     }
 
     private void setPuzzle(Puzzle puzzle) {
         if (puzzle == null) return;
         getChild(K_PUZZLE_DATA)
                 .put(K_ANSWERS, puzzle.getAnswers())
-                .put(K_GAMES, puzzle.getSuccessors());
+                .put(K_SUCCESSORS, puzzle.getSuccessors());
     }
 
     private Visibility getVisibility() {

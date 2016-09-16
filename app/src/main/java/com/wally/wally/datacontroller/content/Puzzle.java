@@ -18,7 +18,7 @@ public class Puzzle implements Serializable {
         successors = new HashSet<>();
     }
 
-    public Puzzle withGames(List<String> games) {
+    public Puzzle withSuccessors(List<String> games) {
         if (games != null) {
             this.successors.addAll(games);
         }
