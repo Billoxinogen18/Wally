@@ -1,5 +1,7 @@
 package com.wally.wally.userManager;
 
+import android.text.TextUtils;
+
 import com.wally.wally.datacontroller.user.User;
 
 import java.util.List;
@@ -102,8 +104,7 @@ public class GoogleUser extends AbstractSocialUser {
 
         GoogleUser that = (GoogleUser) o;
 
-        return getBaseUser().getGgId() != null ? getBaseUser().getGgId().equals(that.getBaseUser().getGgId()) : that.getBaseUser().getGgId() == null;
-
+        return (getBaseUser().getGgId() != null && that.getBaseUser().getGgId() != null) && TextUtils.equals(getBaseUser().getGgId().getId(), that.getBaseUser().getGgId().getId());
     }
 
     @Override

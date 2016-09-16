@@ -2,6 +2,7 @@ package com.wally.wally.controllers.contentCreator.peopleChooser;
 
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,16 +11,17 @@ import java.util.List;
  * Created by Meravici on 6/1/2016. yea
  */
 public abstract class FilterRecyclerViewAdapter<ViewHolderT extends RecyclerView.ViewHolder, DataT> extends RecyclerView.Adapter<ViewHolderT> {
+    private static final String TAG = FilterRecyclerViewAdapter.class.getSimpleName();
     private List<DataT> mFilteredData;
     private List<DataT> mData;
 
     protected abstract List<DataT> filterData(String query);
 
-    public List<DataT> getFilteredData(){
+    public List<DataT> getFilteredData() {
         return mFilteredData;
     }
 
-    public List<DataT> getFullData(){
+    public List<DataT> getFullData() {
         return mData;
     }
 
@@ -65,10 +67,11 @@ public abstract class FilterRecyclerViewAdapter<ViewHolderT extends RecyclerView
      * Filter Logic
      **/
     private void animateTo(List<DataT> data) {
+        Log.d(TAG, "animateTo() called with: " + "data = [" + data + "]");
         applyAndAnimateRemovals(data);
         applyAndAnimateAdditions(data);
+        Log.d(TAG, "animateTo: " + mFilteredData);
         applyAndAnimateMovedItems(data);
-
     }
 
     private void applyAndAnimateRemovals(List<DataT> newData) {
@@ -81,7 +84,7 @@ public abstract class FilterRecyclerViewAdapter<ViewHolderT extends RecyclerView
     }
 
     private void applyAndAnimateAdditions(List<DataT> newData) {
-        for (int i = 0, count = newData.size(); i < count; i++) {
+        for (int i = 0; i < newData.size(); i++) {
             DataT model = newData.get(i);
             if (!mFilteredData.contains(model)) {
                 addItem(i, model);
