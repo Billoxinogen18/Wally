@@ -1,7 +1,5 @@
 package com.wally.wally.tango.states;
 
-import android.util.Log;
-
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.events.WallyEvent;
@@ -14,8 +12,6 @@ import com.wally.wally.tango.TangoUpdater;
  * Manages Tango for Ready State
  */
 public class TangoForReadyState extends TangoState {
-    private static final String TAG = TangoForReadyState.class.getSimpleName();
-
     private AdfInfo mAdfInfo;
 
     public TangoForReadyState(TangoUpdater tangoUpdater,
@@ -57,7 +53,6 @@ public class TangoForReadyState extends TangoState {
 
     @Override
     protected void resumeHook() {
-        Log.d(TAG, "resume Thread = " + Thread.currentThread());
         fireOnTangoReady();
     }
 
