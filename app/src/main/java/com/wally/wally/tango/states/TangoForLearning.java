@@ -1,7 +1,5 @@
 package com.wally.wally.tango.states;
 
-import android.util.Log;
-
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
@@ -16,8 +14,6 @@ import com.wally.wally.tango.TangoUpdater;
  * Tango state for learning
  */
 public class TangoForLearning extends TangoState implements TangoUpdater.ValidPoseListener {
-    private static final String TAG = TangoForLearning.class.getSimpleName();
-
     private AdfInfo mAdfInfo;
     private LearningEvaluator mLearningEvaluator;
 
@@ -31,18 +27,14 @@ public class TangoForLearning extends TangoState implements TangoUpdater.ValidPo
     }
 
     @Override
-    protected void pauseHook() {
-        Log.d(TAG, "pause Thread = " + Thread.currentThread());
-    }
+    protected void pauseHook() { }
 
     @Override
     protected void resumeHook() {
-        Log.d(TAG, "startLearning Thread = " + Thread.currentThread());
         mLearningEvaluator.addLearningEvaluatorListener(getLearningEvaluatorListener());
-        mTangoUpdater.addValidPoseListener(this);
         mTango = mTangoFactory.getTangoForLearning(getTangoInitializer());
-        Log.d(TAG, "resume() mTango = " + mTango);
-        fireStartLearning();
+        mTangoUpdater.addValidPoseListener(this);
+        fireEvent(WallyEvent.LEARNING_START_EVENT);
     }
 
     @Override
@@ -71,29 +63,15 @@ public class TangoForLearning extends TangoState implements TangoUpdater.ValidPo
     }
 
     private synchronized void finishLearning() {
-        Log.d(TAG, "finishLearning");
-        mAdfInfo = saveAdf();
-        fireFinishLearning();
+        mAdfInfo = new AdfInfo()
+                .withUuid(mTango.saveAreaDescription());
+        fireEvent(WallyEvent.LEARNING_FINISH_EVENT);
         mSuccessStateConnector.toNextState();
     }
 
     @Override
     public AdfInfo getAdf() {
         return mAdfInfo;
-    }
-
-    private AdfInfo saveAdf() {
-        Log.d(TAG, "saveAdf");
-        String uuid = mTango.saveAreaDescription();
-        return new AdfInfo().withUuid(uuid);
-    }
-
-    private void fireStartLearning(){
-        fireEvent(WallyEvent.createEventWithId(WallyEvent.LEARNING_START));
-    }
-
-    private void fireFinishLearning(){
-        fireEvent(WallyEvent.createEventWithId(WallyEvent.LEARNING_FINISH));
     }
 
     @Override
