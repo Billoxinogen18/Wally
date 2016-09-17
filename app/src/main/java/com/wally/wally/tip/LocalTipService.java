@@ -2,6 +2,7 @@ package com.wally.wally.tip;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.wally.wally.Utils;
 
@@ -25,7 +26,7 @@ public class LocalTipService implements TipService {
     private JSONObject tips;
     private Map<String, List<String>> tipKeysForTags;
 
-    public static LocalTipService getInstance(Context context){
+    public static LocalTipService getInstance(Context context) {
         return new LocalTipService(
                 Utils.getAssetContentAsString(context, "tips.json"),
                 context.getSharedPreferences("tips", Context.MODE_PRIVATE));
@@ -53,7 +54,7 @@ public class LocalTipService implements TipService {
         }
     }
 
-    private void setUpDisabled(){
+    private void setUpDisabled() {
         disabled = new HashSet<>(preferences.getStringSet("disabled_tips", new HashSet<String>()));
     }
 
@@ -61,7 +62,7 @@ public class LocalTipService implements TipService {
         List<String> keys = new ArrayList<>();
         for (int i = 0; i < keyArray.length(); i++) {
             String key = keyArray.getString(i);
-            if(!disabled.contains(key))
+            if (!disabled.contains(key))
                 keys.add(key);
         }
         return keys;
@@ -79,12 +80,16 @@ public class LocalTipService implements TipService {
     public void disableTip(String id) {
         disabled.add(id);
 
-        for(String key : tipKeysForTags.keySet()){
+        for (String key : tipKeysForTags.keySet()) {
             tipKeysForTags.get(key).remove(id);
         }
 
         preferences.edit().putStringSet("disabled_tips", disabled).apply();
+    }
 
+    @Override
+    public boolean isDisabled(String id) {
+        return disabled.contains(id);
     }
 
     private Tip getTip(String tipKey) {

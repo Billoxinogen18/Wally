@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Wally</string>
+    <string name="app_name" translatable="false">Wally</string>
     <!--<string name="google_app_id">unified-cortex-126421</string>-->
     <string name="post_create">Create</string>
     <string name="discard">Discard</string>

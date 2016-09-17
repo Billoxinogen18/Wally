@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -22,6 +23,8 @@ import com.wally.wally.R;
  * Created by Meravici on 8/4/2016. yea
  */
 public class TipView extends LinearLayout implements View.OnTouchListener {
+    private static final String TAG = TipView.class.getSimpleName();
+
     private View toolbar;
     private TextView messageTV;
     private CheckBox neverShowAgain;
@@ -93,7 +96,7 @@ public class TipView extends LinearLayout implements View.OnTouchListener {
     public void show(Tip tip, int durationMs) {
         reset();
         if (tip != null) {
-            this.id = tip.getId();
+            id = tip.getId();
             final String message = tip.getMessage();
 
             mainThreadHandler.removeCallbacks(hideRunnable);
@@ -148,10 +151,10 @@ public class TipView extends LinearLayout implements View.OnTouchListener {
     }
 
     private void reset() {
+        id = null;
         mainThreadHandler.post(new Runnable() {
             @Override
             public void run() {
-                id = null;
                 messageTV.setText("");
                 neverShowAgain.setChecked(false);
                 toolbar.setVisibility(INVISIBLE);

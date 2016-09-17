@@ -1,6 +1,7 @@
 package com.wally.wally.tip;
 
 public interface TipService {
+
     class Tag {
         public static final String LEARNING = "learning";
         public static final String LOCALIZATION = "localization";
@@ -13,6 +14,10 @@ public interface TipService {
     }
 
     Tip getRandom();
+
+    boolean isDisabled(String type);
+
     Tip getRandom(String tag);
+
     void disableTip(String id);
 }

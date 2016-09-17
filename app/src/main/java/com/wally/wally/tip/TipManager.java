@@ -79,7 +79,10 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
     }
 
     private void showTip(String type) {
-        mTipView.show(mTipService.getRandom(type), 5000);
+        Tip tip = mTipService.getRandom(type);
+        if (tip != null && !mTipService.isDisabled(tip.getId())) {
+            mTipView.show(tip, 4000);
+        }
     }
 
     ///////////////////////////////////// not needed methods ///////////////////////////////////////
