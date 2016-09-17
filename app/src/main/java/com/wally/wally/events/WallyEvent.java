@@ -1,7 +1,6 @@
 package com.wally.wally.events;
 
 public class WallyEvent {
-
     public static final String
     ON_PAUSE = "Pause";
 
@@ -43,6 +42,12 @@ public class WallyEvent {
 
     public static final String
     ON_NEW_CONTENT_DIALOG_SHOW = "NewContentDialogShow";
+
+    public static final WallyEvent LEARNING_START_EVENT = createEventWithId(LEARNING_START);
+    public static final WallyEvent LEARNING_FINISH_EVENT = createEventWithId(LEARNING_FINISH);
+    public static final WallyEvent LOC_START_EVENT = createEventWithId(LOCALIZATION_START_AFTER_LEARNING);
+    public static final WallyEvent LOC_FINISH_EVENT = createEventWithId(LOCALIZATION_FINISH_AFTER_LEARNING);
+
 
     private final String id;
 
