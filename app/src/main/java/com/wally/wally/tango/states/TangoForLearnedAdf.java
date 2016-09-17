@@ -25,7 +25,7 @@ public class TangoForLearnedAdf extends TangoState {
         mLocalizationWatchdog = new WatchDog() {
             @Override
             protected void onTimeout() {
-                // TODO delete bad ADF
+                mTango.deleteAreaDescription(mAdfInfo.getUuid());
                 mFailStateConnector.toNextState();
             }
 

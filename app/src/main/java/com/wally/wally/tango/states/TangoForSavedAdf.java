@@ -1,5 +1,6 @@
 package com.wally.wally.tango.states;
 
+import com.google.atap.tangoservice.TangoErrorException;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.adf.AdfService;
@@ -27,6 +28,10 @@ public class TangoForSavedAdf extends TangoState {
             @Override
             protected void onTimeout() {
                 adfService.delete(mAdfInfo);
+                //noinspection EmptyCatchBlock
+                try {
+                    mTango.deleteAreaDescription(mAdfInfo.getUuid());
+                } catch (TangoErrorException e) { }
                 mFailStateConnector.toNextState();
             }
 
@@ -42,6 +47,12 @@ public class TangoForSavedAdf extends TangoState {
         return this;
     }
 
+    public TangoForSavedAdf withLocalizationTimeout(long timeout){
+        mLocalizationWatchdog = mLocalizationWatchdog.withTimeout(timeout);
+        return this;
+    }
+
+
     @Override
     protected void pauseHook() {
         mLocalizationWatchdog.disarm();
@@ -52,11 +63,6 @@ public class TangoForSavedAdf extends TangoState {
         mTango = mTangoFactory.getTangoForLocalAdf(getTangoInitializer(), mAdfInfo.getUuid());
         fireLocalizationStart();
         mLocalizationWatchdog.arm();
-    }
-
-    public TangoForSavedAdf withLocalizationTimeout(long timeout){
-        mLocalizationWatchdog = mLocalizationWatchdog.withTimeout(timeout);
-        return this;
     }
 
     @Override
