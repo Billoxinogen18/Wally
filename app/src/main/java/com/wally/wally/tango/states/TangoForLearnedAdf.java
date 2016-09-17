@@ -13,11 +13,6 @@ import com.wally.wally.tango.WatchDog;
  * Manages Tango for learned Adf
  */
 public class TangoForLearnedAdf extends TangoState {
-    private static final WallyEvent LOC_FINISH_EVENT =
-            WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_FINISH_AFTER_LEARNING);
-    private static final WallyEvent LOC_START_EVENT =
-            WallyEvent.createEventWithId(WallyEvent.LOCALIZATION_START_AFTER_LEARNING);
-
     private AdfInfo mAdfInfo;
     private WatchDog mLocalizationWatchdog;
 
@@ -60,7 +55,7 @@ public class TangoForLearnedAdf extends TangoState {
     protected void resumeHook() {
         mTango = mTangoFactory.getTangoWithUuid(getTangoInitializer(), mAdfInfo.getUuid());
         mLocalizationWatchdog.arm();
-        fireEvent(LOC_START_EVENT);
+        fireEvent(WallyEvent.LOC_START_EVENT);
     }
 
     @Override
@@ -68,7 +63,7 @@ public class TangoForLearnedAdf extends TangoState {
         super.onLocalization(localization);
         if (localization){
             mLocalizationWatchdog.disarm();
-            fireEvent(LOC_FINISH_EVENT);
+            fireEvent(WallyEvent.LOC_FINISH_EVENT);
             mSuccessStateConnector.toNextState();
         }
     }
