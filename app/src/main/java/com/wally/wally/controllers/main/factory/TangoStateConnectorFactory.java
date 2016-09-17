@@ -20,7 +20,7 @@ public class TangoStateConnectorFactory {
     private static final String TAG = TangoStateConnector.class.getSimpleName();
 
 
-    private TangoState.StateChangeListener mStateChangeListener;
+    private final TangoState.StateChangeListener mStateChangeListener;
     protected TangoUpdater mTangoUpdater;
 
 
@@ -53,7 +53,7 @@ public class TangoStateConnectorFactory {
             public void toNextState() {
                 synchronized (mStateChangeListener) {
                     if (mStateChangeListener.canChangeState()) {
-                        Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
+                        Log.d(TAG, "toNextState(" + from + " ===> " + to + ")");
                         from.pause();
                         to.withAdf(from.getAdf());
                         changeState(from, to);
@@ -74,7 +74,7 @@ public class TangoStateConnectorFactory {
             @Override
             public void toNextState() {
                 synchronized (mStateChangeListener) {
-                    Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
+                    Log.d(TAG, "toNextState(" + from + " ===> " + to + ")");
                     to.withAdf(from.getAdf());
                     changeState(from, to);
                 }
@@ -99,7 +99,7 @@ public class TangoStateConnectorFactory {
             public void toNextState() {
                 synchronized (mStateChangeListener) {
                     if (mStateChangeListener.canChangeState()) {
-                        Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
+                        Log.d(TAG, "toNextState(" + from + " ===> " + to + ")");
                         from.pause();
                         to.resume();
                     }
@@ -116,7 +116,7 @@ public class TangoStateConnectorFactory {
             public void toNextState() {
                 synchronized (mStateChangeListener) {
                     if (mStateChangeListener.canChangeState()) {
-                        Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
+                        Log.d(TAG, "toNextState(" + from + " ===> " + to + ")");
                         from.pause();
                         changeState(from, to);
                         to.resume();
@@ -132,7 +132,7 @@ public class TangoStateConnectorFactory {
             public void toNextState() {
                 synchronized (mStateChangeListener) {
                     if (mStateChangeListener.canChangeState()) {
-                        Log.d(TAG, "toNextState: from = " + from + " - to = " + to);
+                        Log.d(TAG, "toNextState(" + from + " ===> " + to + ")");
                         to.withPreviousState(from, from.getAdf());
                         mStateChangeListener.onStateChange(to);
                         to.resume();
