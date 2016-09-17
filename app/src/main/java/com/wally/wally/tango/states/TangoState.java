@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * 7. Connected: area identified : localization lost
  */
 public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
-    private static final String TAG = TangoState.class.getSimpleName();
+    private final String TAG = this.getClass().getSimpleName();
     private static final int INVALID_TEXTURE_ID = -1;
     private static final TangoCoordinateFramePair FRAME_PAIR =
             new TangoCoordinateFramePair(
@@ -101,7 +101,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
         disconnect();
         fireEvent(WallyEvent.createEventWithId(WallyEvent.ON_PAUSE));
         pauseHook();
-
     }
 
     protected abstract void pauseHook();
