@@ -106,14 +106,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
             Log.i(TAG, "Request adf permission");
             requestADFPermission();
         }
-
-        WindowManager mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-        Display mDisplay = mWindowManager.getDefaultDisplay();
-        mCurrentDisplayOrientation = mDisplay.getOrientation();
-        Log.d(TAG, "start() called with mCurrentDisplayOrientation: " + mCurrentDisplayOrientation);
     }
-
-    public static int mCurrentDisplayOrientation = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
