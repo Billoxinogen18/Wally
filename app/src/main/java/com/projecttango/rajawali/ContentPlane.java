@@ -164,9 +164,9 @@ public class ContentPlane extends Object3D {
 
                 if (mCreateTextureCoords) {
                     float u = (float) i / (float) mSegmentsW;
-                    textureCoords[texCoordCount++] = (1f - u) * mNumTextureTiles;
+                    textureCoords[texCoordCount++] = (u) * mNumTextureTiles;
                     float v = (float) j / (float) mSegmentsH;
-                    textureCoords[texCoordCount++] = v * mNumTextureTiles;
+                    textureCoords[texCoordCount++] = (1f - v) * mNumTextureTiles;
                 }
 
                 normals[vertexCount] = mUpAxis == Vector3.Axis.X ? 1 : 0;

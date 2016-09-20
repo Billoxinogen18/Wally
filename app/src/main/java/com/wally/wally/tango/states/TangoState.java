@@ -8,6 +8,7 @@ import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoErrorException;
+import com.google.atap.tangoservice.TangoException;
 import com.google.atap.tangoservice.TangoOutOfDateException;
 //import com.google.atap.tangoservice.TangoPointCloudData;
 import com.google.atap.tangoservice.TangoPointCloudData;
@@ -169,7 +170,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
                 TangoSupport.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR.baseFrame,
                         FRAME_PAIR.targetFrame, TangoSupport.TANGO_SUPPORT_ENGINE_OPENGL, 0);
 
-
         Pose p = ScenePoseCalculator.toOpenGlCameraPose(devicePose, mExtrinsics);
 
         Vector3 addTo = p.getOrientation().multiply(new Vector3(0, 0, -1));
@@ -250,33 +250,37 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
                 rgbTimestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR,
                 tangoPointCloudData.timestamp, TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH);
 
+        try{
+            // Perform plane fitting with the latest available point cloud data.
+            TangoSupport.IntersectionPointPlaneModelPair intersectionPointPlaneModelPair =
+                    TangoSupport.fitPlaneModelNearPoint(tangoPointCloudData,
+                            depthPose, u, v);
 
-        // Perform plane fitting with the latest available point cloud data.
-        TangoSupport.IntersectionPointPlaneModelPair intersectionPointPlaneModelPair =
-                TangoSupport.fitPlaneModelNearPoint(tangoPointCloudData,
-                        depthPose, u, v);
+            // Get the device pose at the time the plane data was acquired.
+            //TangoPoseData devicePose = mTango.getPoseAtTime(tangoPointCloudData.timestamp, FRAME_PAIR);
+            TangoSupport.TangoMatrixTransformData transform =
+                    TangoSupport.getMatrixTransformAtTime(tangoPointCloudData.timestamp,
+                            TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
+                            TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH,
+                            TangoSupport.TANGO_SUPPORT_ENGINE_OPENGL,
+                            TangoSupport.TANGO_SUPPORT_ENGINE_TANGO);
 
-        // Get the device pose at the time the plane data was acquired.
-        //TangoPoseData devicePose = mTango.getPoseAtTime(tangoPointCloudData.timestamp, FRAME_PAIR);
-        TangoSupport.TangoMatrixTransformData transform =
-                TangoSupport.getMatrixTransformAtTime(tangoPointCloudData.timestamp,
-                        TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
-                        TangoPoseData.COORDINATE_FRAME_CAMERA_DEPTH,
-                        TangoSupport.TANGO_SUPPORT_ENGINE_OPENGL,
-                        TangoSupport.TANGO_SUPPORT_ENGINE_TANGO);
+            if (transform.statusCode == TangoPoseData.POSE_VALID) {
+                float[] openGlTPlane = calculatePlaneTransform(
+                        intersectionPointPlaneModelPair.intersectionPoint,
+                        intersectionPointPlaneModelPair.planeModel, transform.matrix);
+                //Matrix4 m = new Matrix4(openGlTPlane);
+                //return ScenePoseCalculator.matrixToTangoPose(m);
 
-        if (transform.statusCode == TangoPoseData.POSE_VALID) {
-            float[] openGlTPlane = calculatePlaneTransform(
-                    intersectionPointPlaneModelPair.intersectionPoint,
-                    intersectionPointPlaneModelPair.planeModel, transform.matrix);
-            //Matrix4 m = new Matrix4(openGlTPlane);
-            //return ScenePoseCalculator.matrixToTangoPose(m);
-            return openGlTPlane;
-        } else {
-            Log.w(TAG, "Can't get depth camera transform at time " + tangoPointCloudData.timestamp);
-            return null;
+                return openGlTPlane;
+            } else {
+                Log.w(TAG, "Can't get depth camera transform at time " + tangoPointCloudData.timestamp);
+                return null;
+            }
+        } catch (TangoException e) {
+            Log.d(TAG, "Failed to fit plane");
         }
-
+        return null;
 
         // Update the AR object location.
 
@@ -420,7 +424,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
                             if (lastFramePose.statusCode == TangoPoseData.POSE_VALID) {
                                 // Update the camera pose from the renderer
-                                mRenderer.updateRenderCameraPose(lastFramePose, mExtrinsics);
+                                mRenderer.updateRenderCameraPose(lastFramePose);
                                 mCameraPoseTimestamp = lastFramePose.timestamp;
                             } else {
                                 // When the pose status is not valid, it indicates the tracking has

@@ -275,7 +275,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
      * <p/>
      * NOTE: This must be called from the OpenGL render thread - it is not thread safe.
      */
-    public void updateRenderCameraPose(TangoPoseData devicePose, DeviceExtrinsics extrinsics) {
+    public void updateRenderCameraPose(TangoPoseData devicePose) {
 //        Pose cameraPose = ScenePoseCalculator.toOpenGlCameraPose(devicePose, extrinsics);
 //        getCurrentCamera().setRotation(cameraPose.getOrientation());
 //        getCurrentCamera().setPosition(cameraPose.getPosition());
