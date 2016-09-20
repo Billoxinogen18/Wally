@@ -6,12 +6,13 @@ import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoEvent;
+import com.google.atap.tangoservice.TangoPointCloudData;
 import com.google.atap.tangoservice.TangoPoseData;
 import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.ux.WallyTangoUx;
 
-import org.rajawali3d.surface.RajawaliTextureView;
+import org.rajawali3d.surface.RajawaliSurfaceView;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,7 +22,7 @@ import java.util.PriorityQueue;
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private WallyTangoUx mTangoUx;
     private boolean isLocalized;
-    private RajawaliTextureView mSurfaceView;
+    private RajawaliSurfaceView mSurfaceView;
     private TangoPointCloudManager mPointCloudManager;
     private List<ValidPoseListener> mValidPoseListeners;
     private ArrayList<TangoCoordinateFramePair> mFramePairs;
@@ -29,7 +30,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
 
 
 
-    public TangoUpdater(WallyTangoUx tangoUx, RajawaliTextureView surfaceView, TangoPointCloudManager pointCloudManager) {
+    public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager) {
         mTangoUx = tangoUx;
         mSurfaceView = surfaceView;
         mPointCloudManager = pointCloudManager;
@@ -89,7 +90,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
             }
             fireFameAvailable();
             // Mark a camera frame is available for rendering in the OpenGL thread
-            mSurfaceView.requestRenderUpdate();
+            mSurfaceView.requestRender();
         }
     }
 
@@ -103,12 +104,21 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     public void onXyzIjAvailable(TangoXyzIjData xyzIj) {
         mTangoUx.updateXyzCount(xyzIj.xyzCount);
         // Save the cloud and point data for later use.
-        mPointCloudManager.updateXyzIj(xyzIj);
+       // mPointCloudManager.updateXyzIj(xyzIj);
     }
 
     @Override
     public void onTangoEvent(TangoEvent event) {
         mTangoUx.updateTangoEvent(event);
+    }
+
+    @Override
+    public void onPointCloudAvailable(TangoPointCloudData tangoPointCloudData) {
+        mTangoUx.updateXyzCount(tangoPointCloudData.numPoints);
+        mPointCloudManager.updatePointCloud(tangoPointCloudData);
+//        tangoPointCloudData.points;
+//        TangoXyzIjData xyzIjData = new TangoXyzIjData();
+//        mPointCloudManager.updateXyzIj(tangoPointCloudData.);
     }
 
     public synchronized void setTangoLocalization(boolean localization) {

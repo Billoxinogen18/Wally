@@ -9,6 +9,9 @@ import com.projecttango.rajawali.ScenePoseCalculator;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.renderer.VisualContentManager;
 
+import org.rajawali3d.math.Matrix4;
+import org.rajawali3d.math.Quaternion;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,13 +24,13 @@ import java.util.List;
  * <p/>
  * Created by ioane5 on 4/26/16.
  */
-public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
+public class ContentFitter extends AsyncTask<Void, float[], Void> {
     private static final String TAG = ContentFitter.class.getSimpleName();
 
     private TangoDriver mTangoDriver;
     private Content mContent;
     private List<OnContentFitListener> mOnContentFitListeners = new ArrayList<>();
-    private TangoPoseData lastPose;
+    private float[] lastPose;
     private VisualContentManager mVisualContentManager;
 
     public ContentFitter(Content content, TangoDriver tangoManager, VisualContentManager visualContentManager) {
@@ -89,19 +92,21 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     }
 
     @Override
-    protected void onProgressUpdate(TangoPoseData... newPoses) {
+    protected void onProgressUpdate(float[]... newPoses) {
         super.onProgressUpdate(newPoses);
-        TangoPoseData newPose = (newPoses != null && newPoses.length > 0) ? newPoses[0] : null;
-        if (newPose != null && newPose.statusCode == TangoPoseData.POSE_INVALID) {
-            newPose = null;
-        }
+        float[] newPose = (newPoses != null && newPoses.length > 0) ? newPoses[0] : null;
+//        if (newPose != null && newPose.statusCode == TangoPoseData.POSE_INVALID) {
+//            newPose = null;
+//        }
         for (OnContentFitListener onContentFitListener : mOnContentFitListeners) {
             onContentFitListener.onContentFit(newPose);
         }
         lastPose = newPose;
         if (mVisualContentManager.isActiveContent()) { //TODO cancel content fitter when not localized
             if (newPose != null) {
-                mVisualContentManager.updateActiveContent(ScenePoseCalculator.toOpenGLPose(newPose));
+                Matrix4 m = new Matrix4(newPose);
+                Pose p = new Pose(m.getTranslation(), new Quaternion().fromMatrix(m).conjugate());
+                mVisualContentManager.updateActiveContent(p);
             } else {
                 mVisualContentManager.updateActiveContent(mTangoDriver.getDevicePoseInFront());
             }
@@ -109,7 +114,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
 
     }
 
-    public TangoPoseData getPose() {
+    public float[] getPose() {
         return lastPose;
     }
 
@@ -147,9 +152,9 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     /**
      * Tries to get valid plane pose, null if interrupted.
      */
-    private TangoPoseData getValidPose() {
+    private float[] getValidPose() {
         if (mTangoDriver.isTangoConnected()) {
-            TangoPoseData tangoPose;
+            float[] tangoPose;
             try {
                 tangoPose = mTangoDriver.findPlaneInMiddle();
                 if (tangoPose != null) {
@@ -163,7 +168,7 @@ public class ContentFitter extends AsyncTask<Void, TangoPoseData, Void> {
     }
 
     public interface OnContentFitListener {
-        void onContentFit(TangoPoseData pose);
+        void onContentFit(float[] pose);
 
         void onFitStatusChange(boolean fittingStarted);
 

@@ -13,7 +13,7 @@
         android:layout_gravity="center"
         android:text="@string/error_msg_no_tango_device" />
 
-    <org.rajawali3d.surface.RajawaliTextureView
+    <org.rajawali3d.surface.RajawaliSurfaceView
         android:id="@+id/rajawali_render_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

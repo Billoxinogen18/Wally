@@ -35,6 +35,7 @@ import com.wally.wally.tip.TipView;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.SocialUserManager;
 
+import org.rajawali3d.surface.RajawaliSurfaceView;
 import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.text.SimpleDateFormat;
@@ -64,7 +65,7 @@ public abstract class CameraARActivity extends BaseActivity implements
     private long mNewContentButtonLastClickTime;
     // Views
     private SelectedMenuView mSelectedMenuView;
-    private RajawaliTextureView mRajawaliView;
+    private RajawaliSurfaceView mRajawaliView;
     protected LoadingFab mNewContentButton;
     private View mMapButton;
     private View mProfileBar;
@@ -88,7 +89,7 @@ public abstract class CameraARActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mRajawaliView = (RajawaliTextureView) findViewById(R.id.rajawali_render_view);
+        mRajawaliView = (RajawaliSurfaceView) findViewById(R.id.rajawali_render_view);
         mSelectedMenuView = (SelectedMenuView) findViewById(R.id.selected_menu_view);
         mSelectedMenuView.setOnSelectedMenuActionListener(this);
         // Initialize managers

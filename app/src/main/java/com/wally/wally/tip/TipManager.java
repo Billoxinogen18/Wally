@@ -87,7 +87,7 @@ public class TipManager implements WallyEventListener, ContentFitter.OnContentFi
 
     ///////////////////////////////////// not needed methods ///////////////////////////////////////
     @Override
-    public void onContentFit(TangoPoseData pose) {
+    public void onContentFit(float[] pose) {
         // Not needed
     }
 }

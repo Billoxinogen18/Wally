@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
@@ -41,6 +43,7 @@ import com.wally.wally.tango.TangoDriver;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.ux.WallyTangoUx;
 
+import org.rajawali3d.surface.RajawaliSurfaceView;
 import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.util.Arrays;
@@ -78,7 +81,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
     private SerializableLatLng mLocalizationLocation;
     private TangoDriverFactory mTangoDriverFactory;
 
-    private RajawaliTextureView mSurfaceView;
+    private RajawaliSurfaceView mSurfaceView;
 
 
     public static Intent newIntent(Context context) {
@@ -92,7 +95,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.new_post));
         mFinishFitting = (FloatingActionButton) findViewById(R.id.btn_finish_fitting);
         TangoUxLayout tangoUxLayout = (TangoUxLayout) findViewById(R.id.layout_tango_ux);
-        mSurfaceView = (RajawaliTextureView) findViewById(R.id.rajawali_render_view);
+        mSurfaceView = (RajawaliSurfaceView) findViewById(R.id.rajawali_render_view);
         MainFactory mMainFactory = new MainFactory(mTipView, tangoUxLayout, this, mSurfaceView);
         mTangoDriverFactory = new TangoDriverFactory(mMainFactory);
         mTangoDriver = mTangoDriverFactory.getTangoDriver();
@@ -103,7 +106,14 @@ public class CameraARTangoActivity extends CameraARActivity implements
             Log.i(TAG, "Request adf permission");
             requestADFPermission();
         }
+
+        WindowManager mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        Display mDisplay = mWindowManager.getDefaultDisplay();
+        mCurrentDisplayOrientation = mDisplay.getOrientation();
+        Log.d(TAG, "start() called with mCurrentDisplayOrientation: " + mCurrentDisplayOrientation);
     }
+
+    public static int mCurrentDisplayOrientation = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -296,7 +306,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
 
 
     @Override
-    public void onContentFit(final TangoPoseData pose) {
+    public void onContentFit(final float[] pose) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

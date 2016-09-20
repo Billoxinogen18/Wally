@@ -60,7 +60,7 @@ public class TangoDriver implements TangoState.StateChangeListener {
         return tangoState.isConnected();
     }
 
-    public synchronized TangoPoseData findPlaneInMiddle() {
+    public synchronized float[] findPlaneInMiddle() {
         return tangoState.findPlaneInMiddle();
     }
 

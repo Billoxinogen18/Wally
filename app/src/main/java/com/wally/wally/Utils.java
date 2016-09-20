@@ -29,6 +29,7 @@ import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -211,13 +212,18 @@ public final class Utils {
 
 
     public static boolean isTangoDevice(Context context) {
-        try {
-            PackageManager pm = context.getPackageManager();
-            pm.getPackageInfo("com.projecttango.tango", PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
-        }
+        Log.d(TAG, "isTangoDevice()1 called with: " + "context = [" + context + "]");
+        return true;
+//        try {
+//            PackageManager pm = context.getPackageManager();
+//            Log.d(TAG, "isTangoDevice()2 called with: " + "context = [" + context + "]");
+//            pm.getPackageInfo("com.projecttango.tango", PackageManager.GET_ACTIVITIES);
+//            Log.d(TAG, "isTangoDevice()3 called with: " + "context = [" + context + "]");
+//            return true;
+//        } catch (PackageManager.NameNotFoundException e) {
+//            Log.d(TAG, "isTangoDevice()4!!+" + e);
+//            return false;
+//        }
     }
 
     public static
