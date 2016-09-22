@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -193,6 +194,10 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         if (mContent.getVisibility().getSocialVisibility() == null) {
             mContent.getVisibility().withSocialVisibility(
                     new Visibility.SocialVisibility(Visibility.SocialVisibility.PUBLIC));
+        }
+        if (mContent.getColor() == null) {
+            mContent.withColor(Color.WHITE);
+            mContent.withTextColor(Color.BLACK);
         }
     }
 
