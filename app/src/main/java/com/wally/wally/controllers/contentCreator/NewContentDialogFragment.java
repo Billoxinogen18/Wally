@@ -168,7 +168,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         boolean isPuzzle = false;
         if (getArguments() != null) {
             mContent = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
-            mIsEditMode = getArguments().getBoolean(ARG_EDIT_CONTENT, false);
+            mIsEditMode = true;
             isPuzzle = getArguments().getBoolean(ARG_IS_PUZZLE, false);
         } else {
             mIsEditMode = false;
