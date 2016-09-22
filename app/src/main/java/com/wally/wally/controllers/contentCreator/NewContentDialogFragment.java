@@ -134,8 +134,8 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         v.findViewById(R.id.space).setOnClickListener(this);
 
         TipView tipView = (TipView) v.findViewById(R.id.tip_view);
-        TipManager tipManager = new TipManager(tipView, LocalTipService.getInstance(getContext()));
-        tipManager.onWallyEvent(WallyEvent.createEventWithId(WallyEvent.ON_NEW_CONTENT_DIALOG_SHOW));
+//        TipManager tipManager = new TipManager(tipView, LocalTipService.getInstance(getContext()));
+//        tipManager.onWallyEvent(WallyEvent.createEventWithId(WallyEvent.ON_NEW_CONTENT_DIALOG_SHOW));
 
 
         mNoteView = v.findViewById(R.id.note_view);
