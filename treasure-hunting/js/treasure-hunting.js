@@ -13,11 +13,9 @@ if (!String.prototype.format) {
 var $gamesList;
 var $notesList;
 
+var firebaseController = new FirebaseController();
+
 $(document).ready(function () {
-
-
-    var firebaseController = new FirebaseController();
-
 
     initGamesList("#games-list");
     initNotesList("#notes-list");
@@ -45,6 +43,14 @@ function initGamesList(gameListSelector) {
 }
 
 function initNotesList(notesListSelector) {
+    var $editModal = $("#editNoteModal");
+
+    var $form = $editModal.find("#editForm");
+    var $idField = $form.find("#note-id");
+    var $answerField = $form.find("#answer-field");
+    var $noteField = $form.find("#note-field");
+    var $titleField = $form.find("#title-field");
+
     var adapter = createAdapter(
         function (note) {
             console.log(note);
@@ -52,9 +58,21 @@ function initNotesList(notesListSelector) {
         }, null);
 
     var onClick = function (note) {
-        var $detailView = $("#details-view");
-        $detailView.html("");
+        $editModal.modal('show');
+        $idField.val(note.id);
+        $answerField.val(note['PuzzleData']['Answers'].join(";"));
+        $noteField.val(note['NoteData']['note']);
+        $titleField.val(note['NoteData']['title']);
     };
 
     $notesList = $(notesListSelector).bslistview(adapter, onClick);
+
+    $("#ok-btn").click((e)=>{
+        var note = $notesList.get($idField.val());
+        note['NoteData']['title'] = $titleField.val();
+        note['NoteData']['note'] = $noteField.val();
+        note['PuzzleData']['Answers'] = $answerField.val().split(";").filter((i)=>{return i.length > 0});
+        $notesList.update($idField.val(), note);
+        firebaseController.updateNote(note);
+    });
 }

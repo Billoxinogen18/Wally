@@ -28,7 +28,7 @@
 
             var html = $(listView.adapter.getHtml(data));
 
-            html.appendTo($li.find(".element").addBack('.element').removeClass("element"));
+            html.appendTo($li.find(".element").addBack('.element'));
 
             $li.click(function(e){
                 // var id = $(e.delegateTarget).data('id');
@@ -68,6 +68,20 @@
             var index = listView.orderedData.indexOf(id);
             listView.orderedData.splice(index, 1);
             delete listView.listData[id];
+        };
+
+        listView.get = function (id){
+            return listView.listData[id];
+        };
+
+        listView.update = function(id, data){
+            listView.listData[id] = data;
+            var $li = listView.views[id];
+
+            var html = $(listView.adapter.getHtml(data));
+            var $element = $li.find(".element").addBack('.element').html("");
+            html.appendTo($element);
+
         };
 
         listView.getCount = function () {

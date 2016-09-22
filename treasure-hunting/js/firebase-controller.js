@@ -28,6 +28,12 @@ FirebaseController = function () {
         });
     };
 
+    this.updateNote = function(note){
+        var content = dbref.child("Contents/" + note.id.replace(":", "/"));
+        content.child("NoteData").set(note['NoteData']);
+        content.child("PuzzleData/Answers").set(note['PuzzleData']['Answers']);
+    };
+
     this.getGames = function (onLoad) {
 
     };
