@@ -36,6 +36,8 @@ import org.rajawali3d.scene.ASceneFrameCallback;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by shota on 8/9/16.
@@ -71,11 +73,12 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     protected DeviceExtrinsics mExtrinsics;
     protected double mCameraPoseTimestamp = 0;
 
+    protected Lock mLockForSavingAdf = new ReentrantLock();
 
     // NOTE: suffix indicates which thread is in charge of updating
     protected double mRgbTimestampGlThread;
     //private boolean mIsFrameAvailableTangoThread;
-    protected AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
+    private AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
     protected int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
     protected TangoStateConnector mFailStateConnector;
     protected TangoStateConnector mSuccessStateConnector;
@@ -135,7 +138,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
             // We need to invalidate the connected texture ID,
             // this will cause re-connection in the OpenGL thread after resume
             mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
-
+            mIsFrameAvailableTangoThread.set(false);
             mIsConnected = false;
 
             if (mTango != null) {
@@ -409,8 +412,8 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
                         if (mIsFrameAvailableTangoThread.compareAndSet(true, false)) {
                             mRgbTimestampGlThread =
                                     mTango.updateTexture(TangoCameraIntrinsics.TANGO_CAMERA_COLOR);
-
                         }
+
 
                         // If a new RGB frame has been rendered, update the camera pose to match.
                         if (mRgbTimestampGlThread > mCameraPoseTimestamp) {
@@ -421,6 +424,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
                                     TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
                                     TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR,
                                     TangoSupport.TANGO_SUPPORT_ENGINE_OPENGL, Surface.ROTATION_0);
+                            Log.d(TAG, "onPreFrame() lastFramePose = " +lastFramePose.statusCode);
 
                             if (lastFramePose.statusCode == TangoPoseData.POSE_VALID) {
                                 // Update the camera pose from the renderer
@@ -506,10 +510,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
     public AdfInfo getAdf() {
         throw new UnsupportedOperationException("State does not provide Adf");
-    }
-
-    public Tango getTango(){
-        return mTango;
     }
 
     public interface StateChangeListener {

@@ -1,5 +1,7 @@
 package com.wally.wally.progressUtils;
 
+import android.util.Log;
+
 import com.wally.wally.config.Config;
 import com.wally.wally.config.LearningEvaluatorConstants;
 
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LearningEvaluator implements ProgressReporter {
+    private static final String TAG = LearningEvaluator.class.getSimpleName();
     private static final double RATIO = 0.6;
 
     private int minTimeMs;

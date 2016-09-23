@@ -400,14 +400,22 @@ public class CameraARTangoActivity extends CameraARActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "onLocalize1");
                 mVisualContentManager.visualContentRestoreAndShow();
+                Log.d(TAG, "onLocalize2");
                 mFinishFittingFab.setEnabled(true);
+                Log.d(TAG, "onLocalize3");
                 if (!mTangoDriver.isLearningState()) {
+                    Log.d(TAG, "onLocalize4");
                     if (!mVisualContentManager.getStaticVisualContentToAdd().hasNext()) {
+                        Log.d(TAG, "onLocalize5");
                         fetchContentForAdf(mTangoDriver.getAdf().getUuid());
+                        Log.d(TAG, "onLocalize6");
                     }
                 }
+                Log.d(TAG, "onLocalize7");
                 setLocalizationLocation();
+                Log.d(TAG, "onLocalize8");
             }
         });
     }
@@ -462,8 +470,12 @@ public class CameraARTangoActivity extends CameraARActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "onProgressUpdate fab1");
                 mNewContentButton.setVisibility(View.VISIBLE);
+                Log.d(TAG, "onProgressUpdate fab2");
                 mNewContentButton.setProgress((int) (progress * 100));
+                Log.d(TAG, "onProgressUpdate fab3");
+
             }
         });
     }

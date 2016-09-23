@@ -51,8 +51,8 @@ public class WallyConfig implements Config, LearningEvaluatorConstants, TangoMan
         Map<String, Object> params = new HashMap<>();
 
         // LearningEvaluator constants
-        params.put(MAX_TIME_S, 25);
-        params.put(MIN_TIME_S, 20);
+        params.put(MAX_TIME_S, 15);
+        params.put(MIN_TIME_S, 10);
         params.put(MIN_CELL_COUNT, 4);
         params.put(MIN_ANGLE_COUNT, 10);
         params.put(ANGLE_RESOLUTION, 8);

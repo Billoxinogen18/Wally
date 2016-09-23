@@ -1,5 +1,7 @@
 package com.wally.wally.tango.states;
 
+import android.util.Log;
+
 import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfInfo;
@@ -14,6 +16,8 @@ import com.wally.wally.tango.TangoUpdater;
  * Tango state for learning
  */
 public class TangoForLearning extends TangoState implements TangoUpdater.ValidPoseListener {
+    private static final String TAG = TangoForLearning.class.getSimpleName();
+
     private AdfInfo mAdfInfo;
     private LearningEvaluator mLearningEvaluator;
 
@@ -47,7 +51,7 @@ public class TangoForLearning extends TangoState implements TangoUpdater.ValidPo
             @Override
             public void onLearningFinish() {
                 if (mIsLocalized) {
-                    mTangoUpdater.removeValidPoseListener(TangoForLearning.this);
+                    //mTangoUpdater.removeValidPoseListener(TangoForLearning.this);
                     finishLearning();
                 } else {
                     onLearningFailed();
@@ -62,11 +66,20 @@ public class TangoForLearning extends TangoState implements TangoUpdater.ValidPo
         };
     }
 
-    private synchronized void finishLearning() {
-        mAdfInfo = new AdfInfo()
-                .withUuid(mTango.saveAreaDescription());
-        fireEvent(WallyEvent.LEARNING_FINISH_EVENT);
-        mSuccessStateConnector.toNextState();
+    private void finishLearning() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (TangoForLearning.this) {
+                    mAdfInfo = new AdfInfo()
+                            .withUuid(mTango.saveAreaDescription());
+                }
+            }
+        }).start();
+
+
+//        fireEvent(WallyEvent.LEARNING_FINISH_EVENT);
+//        mSuccessStateConnector.toNextState();
     }
 
     @Override
@@ -77,5 +90,20 @@ public class TangoForLearning extends TangoState implements TangoUpdater.ValidPo
     @Override
     public void onValidPose(TangoPoseData pose) {
         mLearningEvaluator.onValidPose(pose.translation, pose.rotation);
+    }
+
+    @Override
+    public void onSaveAdfProgress(double progress){
+        Log.d(TAG, "onSaveAdfProgress() called with: " + "progress = [" + progress + "]");
+        if (progress >= 0.99){
+            mTangoUpdater.removeValidPoseListener(TangoForLearning.this);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    fireEvent(WallyEvent.LEARNING_FINISH_EVENT);
+                    mSuccessStateConnector.toNextState();
+                }
+            }).start();
+        }
     }
 }

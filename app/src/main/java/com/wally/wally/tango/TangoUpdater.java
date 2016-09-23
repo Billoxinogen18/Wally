@@ -1,9 +1,11 @@
 package com.wally.wally.tango;
 
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
+import com.google.atap.tangoservice.TangoConfig;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoEvent;
 import com.google.atap.tangoservice.TangoPointCloudData;
@@ -20,6 +22,8 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
+    private static final String TAG = TangoUpdater.class.getSimpleName();
+
     private WallyTangoUx mTangoUx;
     private boolean isLocalized;
     private RajawaliSurfaceView mSurfaceView;
@@ -109,7 +113,16 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
 
     @Override
     public void onTangoEvent(TangoEvent event) {
-        mTangoUx.updateTangoEvent(event);
+//        Log.d(TAG, "event = [" + event.eventKey + "]" + "[" + event.eventValue + "]");
+        if (event == null) return;
+        if (event.eventKey.equals(TangoEvent.KEY_AREA_DESCRIPTION_SAVE_PROGRESS)){
+            fireOnSaveAdfProgress(event.eventValue);
+        } else if (event.eventKey.equals(TangoEvent.DESCRIPTION_COLOR_OVER_EXPOSED) ||
+                event.eventKey.equals(TangoEvent.DESCRIPTION_COLOR_OVER_EXPOSED)){
+            //Do nothing for now. TODO proper handling
+        } else {
+            mTangoUx.updateTangoEvent(event);
+        }
     }
 
     @Override
@@ -155,8 +168,21 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
 
     }
 
+    private void fireOnSaveAdfProgress(String progress){
+        for (ValidPoseListener listener: mValidPoseListeners) {
+            Double res = .0;
+            try {
+                res = Double.parseDouble(progress);
+            }catch(NumberFormatException e){
+                Log.e(TAG, "Can't cast AdfProgress in Double : " + progress);
+            }
+            listener.onSaveAdfProgress(res);
+        }
+    }
+
     public interface ValidPoseListener {
         void onValidPose(TangoPoseData data);
+        void onSaveAdfProgress(double progress);
     }
 
     public interface TangoUpdaterListener{
