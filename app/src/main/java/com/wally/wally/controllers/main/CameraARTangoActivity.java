@@ -222,7 +222,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
     public void onContentCreated(Content contentCreated, boolean isEditMode) {
         if (isEditMode) {
             // remove content and start new fitting.
-
             mVisualContentManager.removePendingStaticContent(contentCreated);
             Log.d(TAG, "onContentCreated() deleted " + contentCreated);
             editableContent = new Content(contentCreated);
@@ -237,7 +236,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mContentFitter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         onFitStatusChange(true);
-
     }
 
     @Override

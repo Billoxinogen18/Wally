@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -133,8 +134,8 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         v.findViewById(R.id.space).setOnClickListener(this);
 
         TipView tipView = (TipView) v.findViewById(R.id.tip_view);
-        TipManager tipManager = new TipManager(tipView, LocalTipService.getInstance(getContext()));
-        tipManager.onWallyEvent(WallyEvent.createEventWithId(WallyEvent.ON_NEW_CONTENT_DIALOG_SHOW));
+//        TipManager tipManager = new TipManager(tipView, LocalTipService.getInstance(getContext()));
+//        tipManager.onWallyEvent(WallyEvent.createEventWithId(WallyEvent.ON_NEW_CONTENT_DIALOG_SHOW));
 
 
         mNoteView = v.findViewById(R.id.note_view);
@@ -167,7 +168,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         boolean isPuzzle = false;
         if (getArguments() != null) {
             mContent = (Content) getArguments().getSerializable(ARG_EDIT_CONTENT);
-            mIsEditMode = getArguments().getBoolean(ARG_EDIT_CONTENT, false);
+            mIsEditMode = getArguments().containsKey(ARG_EDIT_CONTENT);
             isPuzzle = getArguments().getBoolean(ARG_IS_PUZZLE, false);
         } else {
             mIsEditMode = false;
@@ -193,6 +194,10 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
         if (mContent.getVisibility().getSocialVisibility() == null) {
             mContent.getVisibility().withSocialVisibility(
                     new Visibility.SocialVisibility(Visibility.SocialVisibility.PUBLIC));
+        }
+        if (mContent.getColor() == null) {
+            mContent.withColor(Color.WHITE);
+            mContent.withTextColor(Color.BLACK);
         }
     }
 

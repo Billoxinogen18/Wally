@@ -449,7 +449,7 @@ public class MapsFragment extends BaseFragment implements
         double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
         DataController.Fetcher contentFetcher;
 
-        Puzzle puzzle = (Puzzle) getArguments().get(KEY_PUZZLE);
+        Puzzle puzzle = getArguments()!= null? (Puzzle) getArguments().get(KEY_PUZZLE) : null;
         if (puzzle != null) {
             contentFetcher = App.getInstance().getDataController().createFetcherForPuzzleSuccessors(puzzle);
         } else if (mUserProfile != null && App.getInstance().getSocialUserManager().getUser().equals(mUserProfile)) {
