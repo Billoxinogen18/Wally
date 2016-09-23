@@ -27,10 +27,8 @@ public class ProgressAggregator implements ProgressReporter, ProgressListener {
 
     @Override
     public void onProgressUpdate(ProgressReporter reporter, double progress) {
-        Log.d(TAG, "onProgressUpdate() start " + "reporter = [" + reporter + "], progress = [" + progress + "]");
         progresses.put(reporter, progress);
         fireProgress(getProgress());
-        Log.d(TAG, "onProgressUpdate() finish " + "reporter = [" + reporter + "], progress = [" + progress + "]");
     }
 
     public void addProgressReporter(ProgressReporter reporter, double weight) {

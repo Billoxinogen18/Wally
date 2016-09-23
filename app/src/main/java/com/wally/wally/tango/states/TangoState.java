@@ -424,7 +424,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
                                     TangoPoseData.COORDINATE_FRAME_AREA_DESCRIPTION,
                                     TangoPoseData.COORDINATE_FRAME_CAMERA_COLOR,
                                     TangoSupport.TANGO_SUPPORT_ENGINE_OPENGL, Surface.ROTATION_0);
-                            Log.d(TAG, "onPreFrame() lastFramePose = " +lastFramePose.statusCode);
 
                             if (lastFramePose.statusCode == TangoPoseData.POSE_VALID) {
                                 // Update the camera pose from the renderer
