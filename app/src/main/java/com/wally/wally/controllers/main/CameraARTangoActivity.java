@@ -106,6 +106,7 @@ public class CameraARTangoActivity extends CameraARActivity implements
             Log.i(TAG, "Request adf permission");
             requestADFPermission();
         }
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
