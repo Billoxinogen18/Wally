@@ -53,7 +53,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -212,18 +211,18 @@ public final class Utils {
 
 
     public static boolean isTangoDevice(Context context) {
-        Log.d(TAG, "isTangoDevice()1 called with: " + "context = [" + context + "]");
-        return true;
-//        try {
-//            PackageManager pm = context.getPackageManager();
-//            Log.d(TAG, "isTangoDevice()2 called with: " + "context = [" + context + "]");
-//            pm.getPackageInfo("com.projecttango.tango", PackageManager.GET_ACTIVITIES);
-//            Log.d(TAG, "isTangoDevice()3 called with: " + "context = [" + context + "]");
-//            return true;
-//        } catch (PackageManager.NameNotFoundException e) {
-//            Log.d(TAG, "isTangoDevice()4!!+" + e);
-//            return false;
-//        }
+        PackageManager pm = context.getPackageManager();
+        return hasPackageInstalled("com.google.tango", pm) || hasPackageInstalled("com.projecttango.tango", pm);
+    }
+
+    public static boolean hasPackageInstalled(String packageName, PackageManager pm) {
+        try {
+            pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.d(TAG, "isTangoDevice()" + e);
+            return false;
+        }
     }
 
     public static
