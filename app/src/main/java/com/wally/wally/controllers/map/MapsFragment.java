@@ -225,8 +225,8 @@ public class MapsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onMapReady(GoogleMap mapboxMap) {
-        mMap = mapboxMap;
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
 
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         if (Utils.checkHasLocationPermission(getContext())) {

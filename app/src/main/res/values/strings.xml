@@ -45,9 +45,6 @@
     <string name="adf_export_explain_message">Wally needs ADF Export permission to share your notes with other users.\n Our cloud service will share your room with other wally users</string>
     <string name="got_it">Got It</string>
 
-    <!-- TODO remove strings -->
-    <string name="mapbox_api_key">pk.eyJ1Ijoid2FsbHlub3RlcyIsImEiOiJjaXFyc2xlbmcwMDlraTRubWU3NXJheXEwIn0.qPK5k2VO_36p8HnoC9d4EA</string>
-
     <string name="note_color_white">White</string>
     <string name="note_color_red">Red</string>
     <string name="note_color_orange">Orange</string>
@@ -61,7 +58,6 @@
     <string name="select_color">Select Color</string>
     <string name="select_share_visibility">Share Visibility</string>
     <string name="done">Done</string>
-    <string name="map_style_url">mapbox://styles/wallynotes/ciqrsooto000dc7nic64jfgfn</string>
     <string name="profile">Profile</string>
     <string name="explain_location_permission">Wally needs location permission to show or share content with other users</string>
     <string name="go_to_settings">Go to Settings</string>
