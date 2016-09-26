@@ -105,7 +105,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-auth:9.4.0'
 
     // 3rd parties
-    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:4.1.1@aar'){
+    compile ('com.mapbox.mapboxsdk:mapbox-android-sdk:4.2.0-beta.3@aar'){
         transitive=true
     }
     compile(name: 'android-material-chips-1.1.0-release', ext: 'aar')
