@@ -31,12 +31,13 @@ public class TangoForReadyState extends TangoState {
         mTangoFactory = state.mTangoFactory;
         mIntrinsics = state.mIntrinsics;
         mExtrinsics = state.mExtrinsics;
-//        mCameraPoseTimestamp = state.mCameraPoseTimestamp;
-//        mRgbTimestampGlThread = state.mRgbTimestampGlThread;
-//        mConnectedTextureIdGlThread = state.mConnectedTextureIdGlThread;
-//        mIsFrameAvailableTangoThread = state.mIsFrameAvailableTangoThread;
-//        mRenderer = state.mRenderer;
-//        mPointCloudManager = state.mPointCloudManager;
+        mCameraPoseTimestamp = state.mCameraPoseTimestamp;
+        mRgbTimestampGlThread = state.mRgbTimestampGlThread;
+        mConnectedTextureIdGlThread = state.mConnectedTextureIdGlThread;
+        mIsFrameAvailableTangoThread = state.mIsFrameAvailableTangoThread;
+
+        mRenderer = state.mRenderer;
+        mPointCloudManager = state.mPointCloudManager;
         return this;
     }
 

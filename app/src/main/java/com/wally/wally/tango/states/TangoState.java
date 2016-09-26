@@ -10,17 +10,14 @@ import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoErrorException;
 import com.google.atap.tangoservice.TangoException;
 import com.google.atap.tangoservice.TangoOutOfDateException;
-//import com.google.atap.tangoservice.TangoPointCloudData;
 import com.google.atap.tangoservice.TangoPointCloudData;
 import com.google.atap.tangoservice.TangoPoseData;
-import com.google.atap.tangoservice.TangoXyzIjData;
 import com.projecttango.rajawali.DeviceExtrinsics;
 import com.projecttango.rajawali.Pose;
 import com.projecttango.rajawali.ScenePoseCalculator;
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.projecttango.tangosupport.TangoSupport;
 import com.wally.wally.adf.AdfInfo;
-import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.events.WallyEventListener;
 import com.wally.wally.renderer.WallyRenderer;
@@ -28,7 +25,6 @@ import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tango.TangoUtils;
 
-import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.scene.ASceneFrameCallback;
@@ -36,8 +32,6 @@ import org.rajawali3d.scene.ASceneFrameCallback;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by shota on 8/9/16.
@@ -73,12 +67,10 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     protected DeviceExtrinsics mExtrinsics;
     protected double mCameraPoseTimestamp = 0;
 
-    protected Lock mLockForSavingAdf = new ReentrantLock();
-
     // NOTE: suffix indicates which thread is in charge of updating
     protected double mRgbTimestampGlThread;
     //private boolean mIsFrameAvailableTangoThread;
-    private AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
+    protected AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
     protected int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
     protected TangoStateConnector mFailStateConnector;
     protected TangoStateConnector mSuccessStateConnector;
@@ -435,8 +427,8 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
                                 //
                                 // This is also the place to display UI to suggest the user walk
                                 // to recover tracking.
-//                                Log.w(TAG, "Can't get device pose at time: " +
-//                                        mRgbTimestampGlThread);
+                                Log.w(TAG, "Can't get device pose at time: " +
+                                        mRgbTimestampGlThread);
                             }
 
                         }

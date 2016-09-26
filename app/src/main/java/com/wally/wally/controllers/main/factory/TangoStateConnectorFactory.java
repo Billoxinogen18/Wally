@@ -133,6 +133,8 @@ public class TangoStateConnectorFactory {
                 synchronized (mStateChangeListener) {
                     if (mStateChangeListener.canChangeState()) {
                         Log.d(TAG, "toNextState(" + from + " ===> " + to + ")");
+                        mTangoUpdater.removeTangoUpdaterListener(from);
+                        mTangoUpdater.addTangoUpdaterListener(to);
                         to.withPreviousState(from, from.getAdf());
                         mStateChangeListener.onStateChange(to);
                         to.resume();

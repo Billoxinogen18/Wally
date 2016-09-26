@@ -143,11 +143,25 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     }
 
     public synchronized void addTangoUpdaterListener(TangoUpdaterListener listener){
+        Log.d(TAG, "addTangoUpdaterListener() called with: listener = [" + listener + "]");
+        logTangoUpdaters();
         mTangoUpdaterListeners.add(listener);
+        logTangoUpdaters();
     }
 
     public synchronized void removeTangoUpdaterListener(TangoUpdaterListener listener){
+        Log.d(TAG, "removeTangoUpdaterListener() called with: listener = [" + listener + "]");
+        logTangoUpdaters();
         mTangoUpdaterListeners.remove(listener);
+        logTangoUpdaters();
+    }
+
+    private void logTangoUpdaters(){
+        Log.d(TAG, "TangoUpdaters: start");
+        for (TangoUpdaterListener l : mTangoUpdaterListeners){
+            Log.d(TAG, l.toString());
+        }
+        Log.d(TAG, "TangoUpdaters: finish =================");
     }
 
     public synchronized void addValidPoseListener(ValidPoseListener listener) {
