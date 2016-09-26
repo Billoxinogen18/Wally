@@ -26,6 +26,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.plus.Plus;
@@ -233,6 +234,12 @@ public class MapsFragment extends BaseFragment implements
             mMap.setMyLocationEnabled(true);
         } else {
             requestLocationPermission(0);
+        }
+
+        boolean success = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.style_json));
+
+        if (!success) {
+            Log.e("MapsActivityRaw", "Style parsing failed.");
         }
 
         mMarkerManager = new MarkerManager(getContext(), mMap);
@@ -447,7 +454,7 @@ public class MapsFragment extends BaseFragment implements
         double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
         DataController.Fetcher contentFetcher;
 
-        Puzzle puzzle = getArguments()!= null? (Puzzle) getArguments().get(KEY_PUZZLE) : null;
+        Puzzle puzzle = getArguments() != null ? (Puzzle) getArguments().get(KEY_PUZZLE) : null;
         if (puzzle != null) {
             contentFetcher = App.getInstance().getDataController().createFetcherForPuzzleSuccessors(puzzle);
         } else if (mUserProfile != null && App.getInstance().getSocialUserManager().getUser().equals(mUserProfile)) {
