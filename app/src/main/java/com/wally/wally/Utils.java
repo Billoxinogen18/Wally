@@ -42,8 +42,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.atap.tangoservice.Tango;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
@@ -290,10 +290,10 @@ public final class Utils {
         double r = 3963.0;
 
         // Convert lat or lng from decimal degrees into radians (divide by 57.2958)
-        double lat1 = center.getLatitude() / 57.2958;
-        double lon1 = center.getLongitude() / 57.2958;
-        double lat2 = northEast.getLatitude() / 57.2958;
-        double lon2 = northEast.getLongitude() / 57.2958;
+        double lat1 = center.latitude / 57.2958;
+        double lon1 = center.longitude / 57.2958;
+        double lat2 = northEast.latitude / 57.2958;
+        double lon2 = northEast.longitude / 57.2958;
 
         // distance = circle radius from center to Northeast corner of bounds
         return r * Math.acos(Math.sin(lat1) * Math.sin(lat2) + Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1));
@@ -370,7 +370,7 @@ public final class Utils {
     }
 
     public static SerializableLatLng latLngToSerializableLatLng(LatLng location) {
-        return new SerializableLatLng(location.getLatitude(), location.getLongitude());
+        return new SerializableLatLng(location.latitude, location.longitude);
     }
 
 

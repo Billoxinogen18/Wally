@@ -14,13 +14,11 @@
         android:elevation="10dp"
         tools:targetApi="lollipop">
 
-        <com.mapbox.mapboxsdk.maps.MapView
+        <com.google.android.gms.maps.MapView
             android:id="@+id/map"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:alpha="@dimen/map_alpha"
-            app:style_url="@string/map_style_url"
-            app:tilt_enabled="false" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
         <!-- Just invisible for now, redesign later-->
         <TextView

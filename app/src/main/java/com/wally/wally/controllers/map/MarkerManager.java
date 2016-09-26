@@ -1,12 +1,13 @@
 package com.wally.wally.controllers.map;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 
-import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.wally.wally.Utils;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Puzzle;
@@ -22,11 +23,11 @@ public class MarkerManager {
     private List<MarkerNameVisibility> mMarkerList;
 
     private MarkerIconGenerator mMarkerIconGenerator;
-    private MapboxMap mMap;
+    private GoogleMap mMap;
 
 //    private int mSelectedMarker = 0;
 
-    public MarkerManager(Context context, MapboxMap map) {
+    public MarkerManager(Context context, GoogleMap map) {
         mMarkerIconGenerator = new MarkerIconGenerator(context);
         mMap = map;
         mMarkerList = new ArrayList<>();
@@ -96,8 +97,8 @@ public class MarkerManager {
         markerNameVisibility.createMarker(callback);
     }
 
-    public List<MarkerView> getVisibleMarkers() {
-        List<MarkerView> res = new ArrayList<>();
+    public List<Marker> getVisibleMarkers() {
+        List<Marker> res = new ArrayList<>();
         for (MarkerNameVisibility markerNameVisibility : mMarkerList) {
             res.add(markerNameVisibility.markerNumber);
         }
@@ -112,7 +113,7 @@ public class MarkerManager {
     private class MarkerNameVisibility {
 
         //        public MarkerView markerBase;
-        public MarkerView markerNumber;
+        public Marker markerNumber;
 
         public String name;
         public Content content;
@@ -131,7 +132,7 @@ public class MarkerManager {
                     !content.getVisibility().isPreviewVisible(),
                     new MarkerIconGenerator.MarkerIconGenerateListener() {
                         @Override
-                        public void onMarkerIconGenerate(final Icon icon) {
+                        public void onMarkerIconGenerate(final BitmapDescriptor icon) {
 //                            MarkerViewOptions baseMarkerOptions = new MarkerViewOptions()
 //                                    .position(Utils.serializableLatLngToLatLng(content.getLocation()))
 //                                    .icon(icon)
@@ -160,8 +161,8 @@ public class MarkerManager {
         private MarkerIconGenerator.MarkerIconGenerateListener getMarkerCallback(final OnMarkerAddListener callback) {
             return new MarkerIconGenerator.MarkerIconGenerateListener() {
                 @Override
-                public void onMarkerIconGenerate(Icon icon) {
-                    MarkerViewOptions markerOptions = new MarkerViewOptions()
+                public void onMarkerIconGenerate(BitmapDescriptor icon) {
+                    MarkerOptions markerOptions = new MarkerOptions()
                             .position(Utils.serializableLatLngToLatLng(content.getLocation()))
                             .icon(icon)
                             .anchor(0.5f, 1f);
@@ -190,7 +191,7 @@ public class MarkerManager {
 
         public void remove() {
 //            mMap.removeMarker(markerBase);
-            mMap.removeMarker(markerNumber);
+            markerNumber.remove();
         }
     }
 }

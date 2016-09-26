@@ -4,14 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.mapbox.mapboxsdk.maps.MapView
+    <com.google.android.gms.maps.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_toRightOf="@+id/list"
-        android:alpha="@dimen/map_alpha"
-        app:style_url="@string/map_style_url"
-        tools:context=".controllers.map.MapsFragment" />
+        android:alpha="@dimen/map_alpha" />
 
     <LinearLayout
         android:id="@+id/owner_profile_info"

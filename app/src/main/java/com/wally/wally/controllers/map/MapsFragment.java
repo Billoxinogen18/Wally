@@ -18,19 +18,17 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.VisibleRegion;
 import com.google.android.gms.plus.Plus;
-import com.mapbox.mapboxsdk.MapboxAccountManager;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdate;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.geometry.VisibleRegion;
-import com.mapbox.mapboxsdk.maps.MapView;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
@@ -75,7 +73,7 @@ public class MapsFragment extends BaseFragment implements
     private SocialUser mUserProfile;
 
     private MapView mMapView;
-    private MapboxMap mMap;
+    private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
 
     private com.wally.wally.controllers.map.contentList.View mContentListView;
@@ -85,7 +83,7 @@ public class MapsFragment extends BaseFragment implements
 
     private Handler mainThreadHandler;
     private MarkerManager mMarkerManager;
-    private MapboxMap.CancelableCallback defaultCenterMyLocationCallback = new MapboxMap.CancelableCallback() {
+    private GoogleMap.CancelableCallback defaultCenterMyLocationCallback = new GoogleMap.CancelableCallback() {
         @Override
         public void onFinish() {
             loadContentNearLocation(mMap.getCameraPosition());
@@ -137,7 +135,6 @@ public class MapsFragment extends BaseFragment implements
     @Override
     public android.view.View onCreateView(LayoutInflater inflater, ViewGroup container,
                                           Bundle savedInstanceState) {
-        MapboxAccountManager.start(getContext(), getString(R.string.mapbox_api_key));
         android.view.View v = inflater.inflate(R.layout.fragment_maps, container, false);
 
         initFeedTitle(v);
@@ -228,9 +225,10 @@ public class MapsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onMapReady(MapboxMap mapboxMap) {
+    public void onMapReady(GoogleMap mapboxMap) {
         mMap = mapboxMap;
 
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
         if (Utils.checkHasLocationPermission(getContext())) {
             mMap.setMyLocationEnabled(true);
         } else {
@@ -467,7 +465,7 @@ public class MapsFragment extends BaseFragment implements
         return contentFetcher;
     }
 
-    private void centerMapOnMyLocation(MapboxMap.CancelableCallback callback) {
+    private void centerMapOnMyLocation(GoogleMap.CancelableCallback callback) {
         if (Utils.checkHasLocationPermission(getContext())) {
             Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
@@ -481,7 +479,7 @@ public class MapsFragment extends BaseFragment implements
     }
 
     private void centerMapOnVisibleMarkers() {
-        List<MarkerView> markers = mMarkerManager.getVisibleMarkers();
+        List<Marker> markers = mMarkerManager.getVisibleMarkers();
         if (markers.size() > 1) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (Marker marker : markers) {
