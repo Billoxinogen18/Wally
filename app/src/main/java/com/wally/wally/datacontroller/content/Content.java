@@ -43,6 +43,7 @@ public class Content implements Serializable {
     public Content() {
         withTextColor(Color.BLACK);
         withColor(Color.WHITE);
+        withVisibility(new Visibility());
     }
 
     public Content(String id) {
