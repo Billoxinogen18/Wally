@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.google.atap.tangoservice.Tango;
 import com.google.atap.tangoservice.TangoCameraIntrinsics;
-import com.google.atap.tangoservice.TangoConfig;
 import com.google.atap.tangoservice.TangoCoordinateFramePair;
 import com.google.atap.tangoservice.TangoEvent;
 import com.google.atap.tangoservice.TangoPointCloudData;
@@ -113,15 +112,18 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
 
     @Override
     public void onTangoEvent(TangoEvent event) {
-//        Log.d(TAG, "event = [" + event.eventKey + "]" + "[" + event.eventValue + "]");
         if (event == null) return;
-        if (event.eventKey.equals(TangoEvent.KEY_AREA_DESCRIPTION_SAVE_PROGRESS)){
-            fireOnSaveAdfProgress(event.eventValue);
-        } else if (event.eventKey.equals(TangoEvent.DESCRIPTION_COLOR_OVER_EXPOSED) ||
-                event.eventKey.equals(TangoEvent.DESCRIPTION_COLOR_OVER_EXPOSED)){
-            //Do nothing for now. TODO proper handling
-        } else {
-            mTangoUx.updateTangoEvent(event);
+        switch (event.eventKey) {
+            case TangoEvent.KEY_AREA_DESCRIPTION_SAVE_PROGRESS:
+                fireOnSaveAdfProgress(event.eventValue);
+                break;
+            case TangoEvent.DESCRIPTION_COLOR_OVER_EXPOSED:
+                // Does nothing for now
+                // TODO: Add proper handling
+                break;
+            default:
+                mTangoUx.updateTangoEvent(event);
+                break;
         }
     }
 
