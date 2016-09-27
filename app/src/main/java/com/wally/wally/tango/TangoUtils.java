@@ -42,6 +42,7 @@ public class TangoUtils {
         return new DeviceExtrinsics(devicePose, rgbPose, depthPose);
     }
 
+    @SuppressWarnings("unused")
     public static float[] projectionMatrixFromCameraIntrinsics(TangoCameraIntrinsics intrinsics) {
         // Uses frustumM to create a projection matrix taking into account calibrated camera
         // intrinsic parameter.

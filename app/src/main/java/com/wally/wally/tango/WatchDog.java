@@ -5,16 +5,8 @@ package com.wally.wally.tango;
  *
  */
 public abstract class WatchDog {
-    private long timeoutMs;
+    private long timeoutMs = 15000;
     private Thread watchDog;
-
-    public WatchDog(long timeoutMs) {
-        this.timeoutMs = timeoutMs;
-    }
-
-    public WatchDog() {
-        this(15000);
-    }
 
     public WatchDog withTimeout(long timeoutMs) {
         this.timeoutMs = timeoutMs;

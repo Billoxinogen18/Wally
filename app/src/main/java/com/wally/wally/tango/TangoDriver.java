@@ -2,7 +2,6 @@ package com.wally.wally.tango;
 
 import android.util.Log;
 
-import com.google.atap.tangoservice.TangoPoseData;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.adf.AdfInfo;
 import com.wally.wally.tango.states.TangoState;
@@ -60,11 +59,11 @@ public class TangoDriver implements TangoState.StateChangeListener {
         return tangoState.isConnected();
     }
 
-    public synchronized float[] findPlaneInMiddle() {
+    synchronized float[] findPlaneInMiddle() {
         return tangoState.findPlaneInMiddle();
     }
 
-    public synchronized Pose getDevicePoseInFront() {
+    synchronized Pose getDevicePoseInFront() {
         return tangoState.getDevicePoseInFront();
     }
 

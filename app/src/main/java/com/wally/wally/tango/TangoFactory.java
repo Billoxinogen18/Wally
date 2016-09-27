@@ -92,6 +92,7 @@ public class TangoFactory {
         return mTango;
     }
 
+    @SuppressWarnings("unused")
     public Tango getTangoForDriftCorrection(final RunnableWithError r){
         mTango = new Tango(mContext, new Runnable() {
             @Override

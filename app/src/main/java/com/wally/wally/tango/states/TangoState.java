@@ -53,33 +53,33 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
                     TangoPoseData.COORDINATE_FRAME_DEVICE
             );
 
-    protected Tango mTango;
-    protected boolean mIsLocalized;
-    protected boolean mIsConnected;
-    protected TangoUpdater mTangoUpdater;
-    protected TangoFactory mTangoFactory;
-    protected List<WallyEventListener> mEventListeners;
+    Tango mTango;
+    boolean mIsLocalized;
+    boolean mIsConnected;
+    TangoUpdater mTangoUpdater;
+    TangoFactory mTangoFactory;
+    List<WallyEventListener> mEventListeners;
 
-    protected TangoPointCloudManager mPointCloudManager;
-    protected WallyRenderer mRenderer;
+    TangoPointCloudManager mPointCloudManager;
+    WallyRenderer mRenderer;
 
-    protected TangoCameraIntrinsics mIntrinsics;
-    protected DeviceExtrinsics mExtrinsics;
-    protected double mCameraPoseTimestamp = 0;
+    TangoCameraIntrinsics mIntrinsics;
+    DeviceExtrinsics mExtrinsics;
+    double mCameraPoseTimestamp = 0;
 
     // NOTE: suffix indicates which thread is in charge of updating
-    protected double mRgbTimestampGlThread;
+    double mRgbTimestampGlThread;
     //private boolean mIsFrameAvailableTangoThread;
-    protected AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
-    protected int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
-    protected TangoStateConnector mFailStateConnector;
-    protected TangoStateConnector mSuccessStateConnector;
+    AtomicBoolean mIsFrameAvailableTangoThread = new AtomicBoolean(false);
+    int mConnectedTextureIdGlThread = INVALID_TEXTURE_ID;
+    TangoStateConnector mFailStateConnector;
+    TangoStateConnector mSuccessStateConnector;
 
 
-    public TangoState(TangoUpdater tangoUpdater,
-                      TangoFactory tangoFactory,
-                      WallyRenderer wallyRenderer,
-                      TangoPointCloudManager pointCloudManager) {
+    TangoState(TangoUpdater tangoUpdater,
+               TangoFactory tangoFactory,
+               WallyRenderer wallyRenderer,
+               TangoPointCloudManager pointCloudManager) {
         mRenderer = wallyRenderer;
         mTangoUpdater = tangoUpdater;
         mPointCloudManager = pointCloudManager;
@@ -202,7 +202,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
         return mIsConnected;
     }
 
-    protected TangoFactory.RunnableWithError getTangoInitializer() {
+    TangoFactory.RunnableWithError getTangoInitializer() {
         return new TangoFactory.RunnableWithError() {
             @Override
             public void run() {
@@ -261,13 +261,12 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
                             TangoSupport.TANGO_SUPPORT_ENGINE_TANGO);
 
             if (transform.statusCode == TangoPoseData.POSE_VALID) {
-                float[] openGlTPlane = calculatePlaneTransform(
-                        intersectionPointPlaneModelPair.intersectionPoint,
-                        intersectionPointPlaneModelPair.planeModel, transform.matrix);
                 //Matrix4 m = new Matrix4(openGlTPlane);
                 //return ScenePoseCalculator.matrixToTangoPose(m);
 
-                return openGlTPlane;
+                return calculatePlaneTransform(
+                        intersectionPointPlaneModelPair.intersectionPoint,
+                        intersectionPointPlaneModelPair.planeModel, transform.matrix);
             } else {
                 Log.w(TAG, "Can't get depth camera transform at time " + tangoPointCloudData.timestamp);
                 return null;
@@ -489,7 +488,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
         fireEvent(WallyEvent.createEventWithId(WallyEvent.TANGO_OUT_OF_DATE));
     }
 
-    protected void fireEvent(WallyEvent event) {
+    void fireEvent(WallyEvent event) {
         for (WallyEventListener listener : mEventListeners) {
             listener.onWallyEvent(event);
         }
