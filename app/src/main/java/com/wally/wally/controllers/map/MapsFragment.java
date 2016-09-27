@@ -51,6 +51,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import static com.wally.wally.R.id.map;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MapsFragment#newInstance} factory method to
@@ -165,7 +167,7 @@ public class MapsFragment extends BaseFragment implements
                 .build();
 
 
-        mMapView = (MapView) v.findViewById(R.id.map);
+        mMapView = (MapView) v.findViewById(map);
         mMapView.onCreate(savedInstanceState);
         mMapView.getMapAsync(this);
         return v;
@@ -229,6 +231,8 @@ public class MapsFragment extends BaseFragment implements
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        mMap.getUiSettings().setRotateGesturesEnabled(false);
+        mMap.getUiSettings().setTiltGesturesEnabled(false);
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         if (Utils.checkHasLocationPermission(getContext())) {
             mMap.setMyLocationEnabled(true);
