@@ -359,7 +359,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     /**
      * Connects the view and renderer to the color camera and callbacks.
      */
-    private void connectRenderer() {
+    protected void connectRenderer() {
         // Register a Rajawali Scene Frame Callback to update the scene camera pose whenever a new
         // RGB frame is rendered.
         // (@see https://github.com/Rajawali/Rajawali/wiki/Scene-Frame-Callbacks)

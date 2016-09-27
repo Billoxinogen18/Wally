@@ -35,9 +35,11 @@ public class TangoForReadyState extends TangoState {
         mRgbTimestampGlThread = state.mRgbTimestampGlThread;
         mConnectedTextureIdGlThread = state.mConnectedTextureIdGlThread;
         mIsFrameAvailableTangoThread = state.mIsFrameAvailableTangoThread;
+      //  mIsFrameAvailableTangoThread.set(state.mIsFrameAvailableTangoThread.get());
 
         mRenderer = state.mRenderer;
         mPointCloudManager = state.mPointCloudManager;
+        connectRenderer();
         return this;
     }
 

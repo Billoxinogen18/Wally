@@ -19,6 +19,7 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.PriorityQueue;
 
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
@@ -31,6 +32,8 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private List<ValidPoseListener> mValidPoseListeners;
     private ArrayList<TangoCoordinateFramePair> mFramePairs;
     private PriorityQueue<TangoUpdaterListener> mTangoUpdaterListeners;
+
+    private Object mValidPoseListenersLock = new Object();
 
 
 
@@ -165,6 +168,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     }
 
     public synchronized void addValidPoseListener(ValidPoseListener listener) {
+
         mValidPoseListeners.add(listener);
     }
 
