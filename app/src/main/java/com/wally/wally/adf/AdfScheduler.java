@@ -36,12 +36,12 @@ public class AdfScheduler implements ProgressReporter {
         return this;
     }
 
-    public AdfScheduler addListener(AdfSchedulerListener listener) {
+    public synchronized AdfScheduler addListener(AdfSchedulerListener listener) {
         callbackList.add(listener);
         return this;
     }
 
-    public void finish() {
+    public synchronized void finish() {
         this.done = true;
         if (!scheduler.isInterrupted()) {
             scheduler.interrupt();
@@ -50,7 +50,7 @@ public class AdfScheduler implements ProgressReporter {
         listener.onProgressUpdate(this, 1);
     }
 
-    private void fireSuccess(AdfInfo info) {
+    private synchronized void fireSuccess(AdfInfo info) {
         for (AdfSchedulerListener c : callbackList) {
             if (info != null) {
                 Log.d(TAG, info.getUuid());
