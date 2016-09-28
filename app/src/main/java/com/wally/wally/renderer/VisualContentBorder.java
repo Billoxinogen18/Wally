@@ -100,8 +100,8 @@ public class VisualContentBorder extends ContentPlane {
 
     public void updateBorderForContent(RajawaliScene scene, VisualContent content) {
         mContentForABorder = content.getVisual();
-        setWidth((float) (mContentForABorder.getWidth() * mContentForABorder.getScale().x + .05f)); //TODO must check if multiplication on scale is redundant or not
-        setHeight((float) (mContentForABorder.getHeight() * mContentForABorder.getScale().x + .05f));
+        setWidth((float) (mContentForABorder.getWidth() * mContentForABorder.getScale().x + .015f)); //TODO must check if multiplication on scale is redundant or not
+        setHeight((float) (mContentForABorder.getHeight() * mContentForABorder.getScale().x + .015f));
         setPosition(mContentForABorder.getPosition());
         setOrientation(mContentForABorder.getOrientation());
         mBorderSet = true;
