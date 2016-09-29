@@ -2,10 +2,12 @@ package com.wally.wally.controllers.map;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -91,12 +93,14 @@ public class MarkerIconGenerator {
         if (defaultCache.containsKey(visibility)) {
             markerIconGenerateListener.onMarkerIconGenerate(defaultCache.get(visibility));
         } else {
-            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(DRAWABLES[visibility]);
+            Bitmap bitmap = Utils.getBitmap(context, DRAWABLES[visibility]);
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmap);
             defaultCache.put(visibility, icon);
 
             markerIconGenerateListener.onMarkerIconGenerate(icon);
         }
     }
+
 
     public void getSolvedPuzzleMarker(String solvedMarkerURL, final String name, final MarkerIconGenerateListener markerCallback) {
         getPuzzleMarker(solvedMarkerURL, R.drawable.ic_marker_puzzle_solved, name, markerCallback);
