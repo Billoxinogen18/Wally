@@ -331,7 +331,9 @@ public class VisualContentManager {
     public void removePendingStaticContent(Content content) {
         synchronized (mStaticContentLock) {
             VisualContent vc = findVisualContentByContent(content);
-            removePendingStaticContent(vc);
+            if (vc != null) {
+                removePendingStaticContent(vc);
+            }
         }
     }
 
