@@ -1,9 +1,11 @@
 package com.wally.wally.controllers;
 
+import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -29,6 +31,7 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.AdfService;
+import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.controllers.main.CameraARStandardActivity;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.datacontroller.DataControllerFactory;
@@ -38,12 +41,16 @@ import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.SocialUserManager;
 
 public class LoginActivity extends BaseActivity implements
-        SocialUserManager.UserLoadListener, GoogleApiClient.ConnectionCallbacks {
+        SocialUserManager.UserLoadListener,
+        GoogleApiClient.ConnectionCallbacks,
+        PersistentDialogFragment.PersistentDialogListener {
 
     @SuppressWarnings("unused")
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 100;
     private static final int RC_CREATE_ADF = 129;
+    private static final int RC_CAMERA = 102;
+    private static final int RC_EXPLAIN_CAMERA = 111;
     /**
      * Tango
      */
@@ -51,6 +58,7 @@ public class LoginActivity extends BaseActivity implements
     private View mLoadingView;
 
     private boolean mFirst = true;
+    private boolean mContinueToNextActivity = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +83,14 @@ public class LoginActivity extends BaseActivity implements
         if (mFirst) {
             mFirst = false;
             silentSignInWithGoogle();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mContinueToNextActivity) {
+            continueToNextActivity();
         }
     }
 
@@ -209,8 +225,43 @@ public class LoginActivity extends BaseActivity implements
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == RC_CAMERA) {
+            mContinueToNextActivity = true;
+        }
+    }
+
+    private void requestCameraPermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.CAMERA)) {
+            PersistentDialogFragment.newInstance(this,
+                    RC_EXPLAIN_CAMERA,
+                    R.string.explain_camera_permission, R.string.go_to_settings)
+                    .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
+        } else {
+            // No explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    RC_CAMERA);
+        }
+    }
+
+    @Override
+    public void onDialogPositiveClicked(int requestCode) {
+        super.onDialogPositiveClicked(requestCode);
+        if (requestCode == RC_EXPLAIN_CAMERA) {
+            mContinueToNextActivity = true;
+            startActivity(Utils.getAppSettingsIntent(this));
+        }
+    }
 
     private void continueToNextActivity() {
+        if (!Utils.checkHasCameraPermission(this)) {
+            requestCameraPermission();
+            return;
+        }
         Intent intent;
         if (!Utils.isTangoDevice(this)) {
             // Start standard activity
@@ -248,11 +299,13 @@ public class LoginActivity extends BaseActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putBoolean("mFirst", mFirst);
+        outState.putBoolean("mContinueToNextActivity", mContinueToNextActivity);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mFirst = savedInstanceState.getBoolean("mFirst", false);
+        mContinueToNextActivity = savedInstanceState.getBoolean("mContinueToNextActivity", false);
     }
 }

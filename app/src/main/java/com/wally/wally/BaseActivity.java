@@ -142,15 +142,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private void startInstalledAppDetailsActivity() {
         mStartedAppSettingsScreen = true;
-
-        Intent i = new Intent();
-        i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        i.addCategory(Intent.CATEGORY_DEFAULT);
-        i.setData(Uri.parse("package:" + getPackageName()));
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-        startActivity(i);
+        startActivity(Utils.getAppSettingsIntent(this));
     }
 
     @CallSuper
