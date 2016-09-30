@@ -9,7 +9,7 @@ import com.wally.wally.adf.AdfService;
 import com.wally.wally.datacontroller.user.UserManager;
 
 public class DataControllerFactory {
-    private static final String DATABASE_ROOT = "Release";
+    private static final String DATABASE_ROOT = "RELEASE_0_3_0";
     private static final String STORAGE_ROOT = DATABASE_ROOT;
     private static final String ROOMS_NODE = "Rooms";
     private static final String USERS_NODE = DATABASE_ROOT + "/Users";
