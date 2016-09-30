@@ -1,9 +1,7 @@
 package com.wally.wally.controllers.map;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -101,7 +99,9 @@ public class MarkerManager {
     public List<Marker> getVisibleMarkers() {
         List<Marker> res = new ArrayList<>();
         for (MarkerNameVisibility markerNameVisibility : mMarkerList) {
-            res.add(markerNameVisibility.markerBase);
+            if (markerNameVisibility.markerBase != null) {
+                res.add(markerNameVisibility.markerBase);
+            }
             res.add(markerNameVisibility.markerNumber);
         }
         return res;
@@ -128,36 +128,33 @@ public class MarkerManager {
 
 
         public void createMarker(final OnMarkerAddListener callback) {
-            mMarkerIconGenerator.getDefaultMarkerIcon(
-                    content.getVisibility().getSocialVisibility().getMode(),
-                    content.getVisibility().isAuthorAnonymous(),
-                    !content.getVisibility().isPreviewVisible(),
-                    new MarkerIconGenerator.MarkerIconGenerateListener() {
-                        @Override
-                        public void onMarkerIconGenerate(BitmapDescriptor icon) {
-                            MarkerOptions baseMarkerOptions = new MarkerOptions()
-                                    .position(Utils.serializableLatLngToLatLng(content.getLocation()))
-                                    .icon(icon)
-                                    .anchor(0.5f, 0.5f);
-
+            final MarkerIconGenerator.MarkerIconGenerateListener markerCallback = getMarkerCallback(callback);
+            if (content.isPuzzle()) {
+                Puzzle puzzle = content.getPuzzle();
+                if (puzzle.isSolved()) {
+                    mMarkerIconGenerator.getSolvedPuzzleMarker(puzzle.getMarkerURL(), name, markerCallback);
+                } else {
+                    mMarkerIconGenerator.getUnsolvedPuzzleMarker(puzzle.getUnsolvedMarkerURL(), name, markerCallback);
+                }
+            } else {
+                mMarkerIconGenerator.getDefaultMarkerIcon(
+                        content.getVisibility().getSocialVisibility().getMode(),
+                        content.getVisibility().isAuthorAnonymous(),
+                        !content.getVisibility().isPreviewVisible(),
+                        new MarkerIconGenerator.MarkerIconGenerateListener() {
+                            @Override
+                            public void onMarkerIconGenerate(BitmapDescriptor icon) {
+                                MarkerOptions baseMarkerOptions = new MarkerOptions()
+                                        .position(Utils.serializableLatLngToLatLng(content.getLocation()))
+                                        .icon(icon)
+                                        .anchor(0.5f, 0.5f);
 //                            mMap.getMarkerViewManager().update();
-
-                            markerBase = mMap.addMarker(baseMarkerOptions);
-
-                            MarkerIconGenerator.MarkerIconGenerateListener markerCallback = getMarkerCallback(callback);
-                            if (content.isPuzzle()) {
-                                Puzzle puzzle = content.getPuzzle();
-                                if (puzzle.isSolved()) {
-                                    mMarkerIconGenerator.getSolvedPuzzleMarker(puzzle.getMarkerURL(), name, markerCallback);
-                                } else {
-                                    mMarkerIconGenerator.getUnsolvedPuzzleMarker(puzzle.getUnsolvedMarkerURL(), name, markerCallback);
-                                }
-                            } else {
+                                markerBase = mMap.addMarker(baseMarkerOptions);
                                 int contentColor = content.getColor() == null ? Color.WHITE : content.getColor();
                                 mMarkerIconGenerator.getEnumeratedMarkerIcon(name, contentColor, markerCallback);
                             }
-                        }
-                    });
+                        });
+            }
         }
 
         private MarkerIconGenerator.MarkerIconGenerateListener getMarkerCallback(final OnMarkerAddListener callback) {
