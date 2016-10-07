@@ -219,11 +219,11 @@ public class LoginActivity extends BaseActivity implements
     }
 
     private void continueToNextActivity() {
-        if (checkAllBasicPermissions()) {
+        if (!checkAllBasicPermissions()) {
             requestPermissions(RC_CONTINUE_TO_NEXT_ACTIVITY);
             return;
         }
-        if (!Utils.hasADFPermissions(this)) {
+        if (Utils.isTangoDevice(this) && !Utils.hasADFPermissions(this)) {
             requestADFPermission();
             return;
         }
