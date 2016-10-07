@@ -58,16 +58,12 @@ public class CameraARTangoActivity extends CameraARActivity implements
         ProgressListener {
 
     private static final String TAG = CameraARTangoActivity.class.getSimpleName();
-    // Permission Denied explain codes
-    private static final int RC_EXPLAIN_ADF = 14;
     private static final int RC_EXPLAIN_ADF_EXPORT = 19;
     // Permission Request codes
-    private static final int RC_REQ_AREA_LEARNING = 17;
     private static final int RC_SET_LOCALIZATION_LOCATION = 102;
 
     private WallyTangoUx mTangoUx;
     private TangoDriver mTangoDriver;
-    private boolean mExplainAdfPermission;
 
     private FloatingActionButton mFinishFitting;
     private FloatingActionButton mFinishFittingFab;
@@ -102,10 +98,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         mVisualContentManager = mMainFactory.getVisualContentManager();
         mTangoUx = mMainFactory.getTangoUx();
 
-        if (!Utils.hasADFPermissions(context)) {
-            Log.i(TAG, "Request adf permission");
-            requestADFPermission();
-        }
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
@@ -121,28 +113,10 @@ public class CameraARTangoActivity extends CameraARActivity implements
         return mTangoDriver.isTangoLocalized() && !mTangoDriver.isLearningState();
     }
 
-    private void requestADFPermission() {
-        startActivityForResult(
-                Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE), RC_REQ_AREA_LEARNING);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_REQ_AREA_LEARNING) {
-            if (resultCode != RESULT_OK) {
-                mExplainAdfPermission = true;
-            }
-        }
-    }
-
     @Override
     public void onDialogPositiveClicked(int requestCode) {
         super.onDialogPositiveClicked(requestCode);
         switch (requestCode) {
-            case RC_EXPLAIN_ADF:
-                requestADFPermission();
-                break;
             case RC_EXPLAIN_ADF_EXPORT:
                 requestExportPermission(mTangoDriver.getAdf());
                 break;
@@ -153,10 +127,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
     public void onDialogNegativeClicked(int requestCode) {
         super.onDialogNegativeClicked(requestCode);
         switch (requestCode) {
-            case RC_EXPLAIN_ADF:
-                finish();
-                System.exit(0);
-                break;
             case RC_EXPLAIN_ADF_EXPORT:
                 break;
         }
@@ -261,17 +231,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
         // Set render mode to RENDERMODE_CONTINUOUSLY to force getting onDraw callbacks until the
         // Tango service is properly set-up and we start getting onFrameAvailable callbacks.
         mSurfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-
-        if (mExplainAdfPermission) {
-            mExplainAdfPermission = false;
-            PersistentDialogFragment.newInstance(
-                    this,
-                    RC_EXPLAIN_ADF,
-                    R.string.explain_adf_permission,
-                    R.string.give_permission,
-                    R.string.close_application)
-                    .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
-        }
 
         if (Utils.hasADFPermissions(this)) {
             Log.d(TAG, "onResume() hasADFPermissions " + "");

@@ -1,6 +1,7 @@
 package com.wally.wally;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.google.atap.tangoservice.Tango;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.components.PersistentDialogFragment.PersistentDialogListener;
 import com.wally.wally.controllers.map.BaseFragment;
@@ -24,10 +26,14 @@ public abstract class BaseActivity extends AppCompatActivity implements
 
     private static final String TAG = BaseActivity.class.getSimpleName();
     private static final int RC_PERMISSIONS = 199;
+    // Permission Denied explain codes
+    private static final int RC_EXPLAIN_ADF = 14;
+    private static final int RC_REQ_AREA_LEARNING = Tango.TANGO_INTENT_ACTIVITYCODE;
 
     private int mPermissionRequestCode = -1;
     private boolean mShowPermissionsExplanation;
     private boolean mStartedAppSettingsScreen;
+    private boolean mExplainAdfPermission;
 
     /**
      * Called after location permission is granted.
@@ -35,6 +41,12 @@ public abstract class BaseActivity extends AppCompatActivity implements
      * @param permissionCode request code that was passed when {@link #requestPermissions(int)}}
      */
     protected abstract void onPermissionsGranted(int permissionCode);
+
+    /**
+     * Called when ADF permissions are granted.
+     */
+    @CallSuper
+    protected void onAdfPermissionsGranted() {}
 
     private void onPermissionsGranted() {
         if (mPermissionRequestCode < 0) {
@@ -70,6 +82,11 @@ public abstract class BaseActivity extends AppCompatActivity implements
         requestPermissions();
     }
 
+    public void requestADFPermission() {
+        startActivityForResult(
+                Tango.getRequestPermissionIntent(Tango.PERMISSIONTYPE_ADF_LOAD_SAVE), RC_REQ_AREA_LEARNING);
+    }
+
     private void requestPermissions() {
         ActivityCompat.requestPermissions(this,
                 new String[]{
@@ -94,9 +111,33 @@ public abstract class BaseActivity extends AppCompatActivity implements
         }
     }
 
+    @CallSuper
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == RC_REQ_AREA_LEARNING) {
+            if (resultCode != RESULT_OK) {
+                mExplainAdfPermission = true;
+            } else {
+                onAdfPermissionsGranted();
+            }
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (mExplainAdfPermission) {
+            mExplainAdfPermission = false;
+            PersistentDialogFragment.newInstance(
+                    this,
+                    RC_EXPLAIN_ADF,
+                    R.string.explain_adf_permission,
+                    R.string.give_permission,
+                    R.string.close_application)
+                    .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
+        }
         // Check if location permission was granted in settings screen.
         if (mStartedAppSettingsScreen) {
             mStartedAppSettingsScreen = false;
@@ -130,19 +171,29 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @CallSuper
     @Override
     public void onDialogNegativeClicked(int requestCode) {
-        // We don't have negative button so ignore it.
+        switch (requestCode) {
+            case RC_EXPLAIN_ADF:
+                finish();
+                System.exit(0);
+                break;
+        }
     }
 
     @CallSuper
     @Override
     public void onDialogPositiveClicked(int requestCode) {
-        if (requestCode == RC_PERMISSIONS) {
-            if (canExplainLocationPermission()) {
-                requestPermissions();
-            } else {
-                // Start settings screen.
-                startInstalledAppDetailsActivity();
-            }
+        switch (requestCode) {
+            case RC_EXPLAIN_ADF:
+                requestADFPermission();
+                break;
+            case RC_PERMISSIONS:
+                if (canExplainLocationPermission()) {
+                    requestPermissions();
+                } else {
+                    // Start settings screen.
+                    startInstalledAppDetailsActivity();
+                }
+                break;
         }
     }
 

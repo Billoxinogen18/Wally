@@ -212,10 +212,20 @@ public class LoginActivity extends BaseActivity implements
         });
     }
 
+    @Override
+    protected void onAdfPermissionsGranted() {
+        super.onAdfPermissionsGranted();
+        continueToNextActivity();
+    }
 
     private void continueToNextActivity() {
         if (!Utils.checkHasCameraPermission(this) && !Utils.checkHasLocationPermission(this)) {
             requestPermissions(RC_CAMERA);
+            return;
+        }
+        if (!Utils.hasADFPermissions(this)) {
+            Log.i(TAG, "Request adf permission");
+            requestADFPermission();
             return;
         }
         Intent intent;
