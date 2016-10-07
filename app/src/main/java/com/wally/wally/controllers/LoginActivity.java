@@ -1,11 +1,9 @@
 package com.wally.wally.controllers;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 
@@ -31,7 +29,6 @@ import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.AdfService;
-import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.controllers.main.CameraARStandardActivity;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.datacontroller.DataControllerFactory;
@@ -42,8 +39,7 @@ import com.wally.wally.userManager.SocialUserManager;
 
 public class LoginActivity extends BaseActivity implements
         SocialUserManager.UserLoadListener,
-        GoogleApiClient.ConnectionCallbacks,
-        PersistentDialogFragment.PersistentDialogListener {
+        GoogleApiClient.ConnectionCallbacks {
 
     @SuppressWarnings("unused")
     private static final String TAG = LoginActivity.class.getSimpleName();
@@ -87,14 +83,6 @@ public class LoginActivity extends BaseActivity implements
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (mContinueToNextActivity) {
-            continueToNextActivity();
-        }
-    }
-
-    @Override
     public void onConnectionSuspended(int i) {
 
     }
@@ -112,16 +100,15 @@ public class LoginActivity extends BaseActivity implements
         }
     }
 
-    /**
-     * Called after location permission is granted.
-     *
-     * @param locationRequestCode request code that was passed when {@link #requestLocationPermission(int)}
-     */
+
     @Override
-    public void onLocationPermissionGranted(int locationRequestCode) {
-        switch (locationRequestCode) {
+    protected void onPermissionsGranted(int permissionCode) {
+        switch (permissionCode) {
             case RC_CREATE_ADF:
                 createAdfManager();
+                break;
+            case RC_CAMERA:
+                continueToNextActivity();
                 break;
         }
     }
@@ -197,7 +184,7 @@ public class LoginActivity extends BaseActivity implements
         mLoadingView.setVisibility(View.VISIBLE);
 
         if (!Utils.checkHasLocationPermission(this)) {
-            requestLocationPermission(RC_CREATE_ADF);
+            requestPermissions(RC_CREATE_ADF);
             return;
         }
         Utils.getNewLocation(mGoogleApiClient, new Utils.Callback<SerializableLatLng>() {
@@ -225,41 +212,10 @@ public class LoginActivity extends BaseActivity implements
         });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == RC_CAMERA) {
-            mContinueToNextActivity = true;
-        }
-    }
-
-    private void requestCameraPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
-            PersistentDialogFragment.newInstance(this,
-                    RC_EXPLAIN_CAMERA,
-                    R.string.explain_camera_permission, R.string.go_to_settings)
-                    .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
-        } else {
-            // No explanation needed, we can request the permission.
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA},
-                    RC_CAMERA);
-        }
-    }
-
-    @Override
-    public void onDialogPositiveClicked(int requestCode) {
-        super.onDialogPositiveClicked(requestCode);
-        if (requestCode == RC_EXPLAIN_CAMERA) {
-            mContinueToNextActivity = true;
-            startActivity(Utils.getAppSettingsIntent(this));
-        }
-    }
 
     private void continueToNextActivity() {
-        if (!Utils.checkHasCameraPermission(this)) {
-            requestCameraPermission();
+        if (!Utils.checkHasCameraPermission(this) && !Utils.checkHasLocationPermission(this)) {
+            requestPermissions(RC_CAMERA);
             return;
         }
         Intent intent;

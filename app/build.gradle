@@ -16,8 +16,8 @@ android {
         applicationId "com.wally.wally"
         minSdkVersion 19
         targetSdkVersion 24
-        versionCode 5
-        versionName "0.3.0"
+        versionCode 7
+        versionName "0.3.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }

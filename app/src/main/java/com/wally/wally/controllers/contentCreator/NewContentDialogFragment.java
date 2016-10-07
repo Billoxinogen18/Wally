@@ -33,9 +33,6 @@ import com.wally.wally.datacontroller.content.Puzzle;
 import com.wally.wally.datacontroller.content.Visibility;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
-import com.wally.wally.events.WallyEvent;
-import com.wally.wally.tip.LocalTipService;
-import com.wally.wally.tip.TipManager;
 import com.wally.wally.tip.TipView;
 import com.wally.wally.userManager.SocialUser;
 
@@ -223,7 +220,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == RC_PERMISSION_READ_EXTERNAL_STORAGE) {
-            if (Utils.checkExternalStorageReadPermission(getContext())) {
+            if (Utils.checkHasExternalStorageReadWritePermission(getContext())) {
                 new PhotoChooserPopup().show(mBtnPhotoChooser, this);
             }
         }
@@ -268,7 +265,7 @@ public class NewContentDialogFragment extends TiltDialogFragment implements
                 mListener.onContentCreated(mContent, mIsEditMode);
                 break;
             case R.id.btn_add_image:
-                if (Utils.checkExternalStorageReadPermission(getContext())) {
+                if (Utils.checkHasExternalStorageReadWritePermission(getContext())) {
                     new PhotoChooserPopup().show(v, this);
                 } else {
                     requestExternalStoragePermissions();

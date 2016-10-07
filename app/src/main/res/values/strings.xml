@@ -73,4 +73,5 @@
     <string name="puzzle_wrong_answer">Wrong Answer</string>
     <string name="explain_camera_permission_title">Camera Permission</string>
     <string name="explain_camera_permission">Wally needs camera permission to show you virtual notes throght the camera</string>
+    <string name="explain_all_permissions">Wally needs:\n\n\t-Camera permission to show Content in AR,\n\t-Location Permission to find rooms and content nearby\n\t-Storage Access to save and share new rooms.</string>
 </resources>

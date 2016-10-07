@@ -1,9 +1,7 @@
 package com.wally.wally;
 
-import android.content.Intent;
-import android.net.Uri;
+import android.Manifest;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -25,67 +23,73 @@ public abstract class BaseActivity extends AppCompatActivity implements
         PersistentDialogListener {
 
     private static final String TAG = BaseActivity.class.getSimpleName();
-    private static final int RC_LOCATION_PERMISSION = 199;
+    private static final int RC_PERMISSIONS = 199;
 
-    private int mLocationRequestCode = -1;
-    private boolean mShowLocationPermissionExplanation;
+    private int mPermissionRequestCode = -1;
+    private boolean mShowPermissionsExplanation;
     private boolean mStartedAppSettingsScreen;
 
     /**
      * Called after location permission is granted.
      *
-     * @param locationRequestCode request code that was passed when {@link #requestLocationPermission(int)}
+     * @param permissionCode request code that was passed when {@link #requestPermissions(int)}}
      */
-    protected abstract void onLocationPermissionGranted(int locationRequestCode);
+    protected abstract void onPermissionsGranted(int permissionCode);
 
-    private void onLocationPermissionGranted() {
-        if (mLocationRequestCode < 0) {
-            Log.e(TAG, "onLocationPermissionGranted: called when mLocationRequestCode was -1");
+    private void onPermissionsGranted() {
+        if (mPermissionRequestCode < 0) {
+            Log.e(TAG, "onLocationPermissionGranted: called when mPermissionRequestCode was -1");
             return;
         }
-        onLocationPermissionGranted(mLocationRequestCode);
+        onPermissionsGranted(mPermissionRequestCode);
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         if (fragmentList != null) {
             for (Fragment fragment : fragmentList) {
                 if (fragment instanceof BaseFragment) {
-                    ((BaseFragment) fragment).onLocationPermissionGranted(mLocationRequestCode);
+                    ((BaseFragment) fragment).onPermissionsGranted(mPermissionRequestCode);
                 }
             }
         }
-        mLocationRequestCode = -1;
+        mPermissionRequestCode = -1;
     }
 
     /**
      * Method that gains location permission, and if user denies permission
      * it tries to explain than gain location.
      *
-     * @param locationRequestCode called  location permission is finally granted.
+     * @param permissionRequestCode called  location permission is finally granted.
      */
-    public final void requestLocationPermission(int locationRequestCode) {
-        mLocationRequestCode = locationRequestCode;
-        if (Utils.checkHasLocationPermission(this)) {
-            onLocationPermissionGranted();
+    public final void requestPermissions(int permissionRequestCode) {
+        mPermissionRequestCode = permissionRequestCode;
+        if (Utils.checkHasLocationPermission(this) &&
+                Utils.checkHasCameraPermission(this) &&
+                Utils.checkHasExternalStorageReadWritePermission(this)) {
+            onPermissionsGranted();
             return;
         }
-        requestLocationPermission();
+        requestPermissions();
     }
 
-    private void requestLocationPermission() {
+    private void requestPermissions() {
         ActivityCompat.requestPermissions(this,
-                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                RC_LOCATION_PERMISSION);
+                new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                },
+                RC_PERMISSIONS);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == RC_LOCATION_PERMISSION) {
+        if (requestCode == RC_PERMISSIONS) {
             if (Utils.checkHasLocationPermission(this)) {
-                onLocationPermissionGranted();
+                onPermissionsGranted();
             } else {
                 // Note that because fragment/Dialog transactions can't happen here
                 // we need to wait for onResume
-                mShowLocationPermissionExplanation = true;
+                mShowPermissionsExplanation = true;
             }
         }
     }
@@ -97,20 +101,20 @@ public abstract class BaseActivity extends AppCompatActivity implements
         if (mStartedAppSettingsScreen) {
             mStartedAppSettingsScreen = false;
             if (Utils.checkHasLocationPermission(this)) {
-                onLocationPermissionGranted();
+                onPermissionsGranted();
             } else {
                 // If still not granted show Explanation again.
-                mShowLocationPermissionExplanation = true;
+                mShowPermissionsExplanation = true;
             }
         }
 
-        if (mShowLocationPermissionExplanation) {
-            mShowLocationPermissionExplanation = false;
+        if (mShowPermissionsExplanation) {
+            mShowPermissionsExplanation = false;
 
             PersistentDialogFragment.newInstance(
                     this,
-                    RC_LOCATION_PERMISSION,
-                    R.string.explain_location_permission,
+                    RC_PERMISSIONS,
+                    R.string.explain_all_permissions,
                     canExplainLocationPermission() ? R.string.got_it : R.string.go_to_settings)
                     .show(getSupportFragmentManager(), PersistentDialogFragment.TAG);
 
@@ -118,7 +122,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     private boolean canExplainLocationPermission() {
-        return ActivityCompat.shouldShowRequestPermissionRationale(this, android.Manifest.permission.ACCESS_FINE_LOCATION);
+        return ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION) ||
+                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA) ||
+                ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     @CallSuper
@@ -130,9 +136,9 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @CallSuper
     @Override
     public void onDialogPositiveClicked(int requestCode) {
-        if (requestCode == RC_LOCATION_PERMISSION) {
+        if (requestCode == RC_PERMISSIONS) {
             if (canExplainLocationPermission()) {
-                requestLocationPermission();
+                requestPermissions();
             } else {
                 // Start settings screen.
                 startInstalledAppDetailsActivity();
@@ -149,8 +155,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("mLocationRequestCode", mLocationRequestCode);
-        outState.putBoolean("mShowLocationPermissionExplanation", mShowLocationPermissionExplanation);
+        outState.putInt("mPermissionRequestCode", mPermissionRequestCode);
+        outState.putBoolean("mShowPermissionsExplanation", mShowPermissionsExplanation);
         outState.putBoolean("mStartedAppSettingsScreen", mStartedAppSettingsScreen);
 
     }
@@ -159,8 +165,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        mLocationRequestCode = savedInstanceState.getInt("mLocationRequestCode");
-        mShowLocationPermissionExplanation = savedInstanceState.getBoolean("mShowLocationPermissionExplanation");
+        mPermissionRequestCode = savedInstanceState.getInt("mPermissionRequestCode");
+        mShowPermissionsExplanation = savedInstanceState.getBoolean("mShowPermissionsExplanation");
         mStartedAppSettingsScreen = savedInstanceState.getBoolean("mStartedAppSettingsScreen");
     }
 }

@@ -120,6 +120,15 @@ public final class Utils {
                 Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * @return true if we have External storage access permission.
+     */
+    public static boolean checkHasExternalStorageReadWritePermission(Context context) {
+        return ActivityCompat.checkSelfPermission(context,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
+
+
     public static Intent getAppSettingsIntent(Context context) {
         Intent i = new Intent();
         i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -129,14 +138,6 @@ public final class Utils {
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         return i;
-    }
-
-    /**
-     * @return true if we have External storage access permission.
-     */
-    public static boolean checkExternalStorageReadPermission(Context context) {
-        return ActivityCompat.checkSelfPermission(context,
-                Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
     }
 
     public static float getScreenWidthDpi(Context context) {

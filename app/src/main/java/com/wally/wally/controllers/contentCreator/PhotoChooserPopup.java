@@ -79,7 +79,7 @@ public class PhotoChooserPopup extends RevealPopup {
     }
 
     private void loadContent() {
-        if (Utils.checkExternalStorageReadPermission(mContext)) {
+        if (Utils.checkHasExternalStorageReadWritePermission(mContext)) {
             mLoadImageData.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }

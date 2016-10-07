@@ -422,16 +422,16 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     @Override
-    public void onLocationPermissionGranted(int locationRequestCode) {
-        super.onLocationPermissionGranted(locationRequestCode);
-        if (locationRequestCode == RC_SET_LOCALIZATION_LOCATION) {
+    public void onPermissionsGranted(int permissionReqCode) {
+        super.onPermissionsGranted(permissionReqCode);
+        if (permissionReqCode == RC_SET_LOCALIZATION_LOCATION) {
             setLocalizationLocation();
         }
     }
 
     private void setLocalizationLocation() {
         if (!Utils.checkHasLocationPermission(this)) {
-            requestLocationPermission(RC_SET_LOCALIZATION_LOCATION);
+            requestPermissions(RC_SET_LOCALIZATION_LOCATION);
             return;
         }
         Location myLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);

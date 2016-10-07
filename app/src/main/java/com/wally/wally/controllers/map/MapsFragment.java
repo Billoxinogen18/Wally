@@ -70,6 +70,7 @@ public class MapsFragment extends BaseFragment implements
     private static final int PAGE_LENGTH = 5;
     private static final int RC_MY_LOCATION_CLICK = 921;
     private static final String KEY_PUZZLE = "KEY_PUZZLE";
+    private static final int RC_ENABLE_MY_LOCATION = 120;
 
     private MapOpenCloseListener mListener;
 
@@ -237,7 +238,7 @@ public class MapsFragment extends BaseFragment implements
         if (Utils.checkHasLocationPermission(getContext())) {
             mMap.setMyLocationEnabled(true);
         } else {
-            requestLocationPermission(0);
+            requestPermissions(RC_ENABLE_MY_LOCATION);
         }
 
         boolean success = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.style_json));
@@ -297,7 +298,7 @@ public class MapsFragment extends BaseFragment implements
 
     private void onMyLocationClick() {
         if (!Utils.checkHasLocationPermission(getContext())) {
-            requestLocationPermission(RC_MY_LOCATION_CLICK);
+            requestPermissions(RC_MY_LOCATION_CLICK);
         } else {
             centerMapOnMyLocation(null);
         }
@@ -328,11 +329,17 @@ public class MapsFragment extends BaseFragment implements
     }
 
     @Override
-    public void onLocationPermissionGranted(int locationRequestCode) {
-        if (locationRequestCode == RC_MY_LOCATION_CLICK) {
-            if (mUserProfile == null) {
-                centerMapOnMyLocation(defaultCenterMyLocationCallback);
-            }
+    public void onPermissionsGranted(int permissionsReqCode) {
+        switch (permissionsReqCode) {
+            case RC_MY_LOCATION_CLICK:
+                if (mUserProfile == null) {
+                    centerMapOnMyLocation(defaultCenterMyLocationCallback);
+                }
+                break;
+            case RC_ENABLE_MY_LOCATION:
+                //noinspection MissingPermission
+                mMap.setMyLocationEnabled(true);
+                break;
         }
     }
 

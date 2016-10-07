@@ -344,8 +344,8 @@ public abstract class CameraARActivity extends BaseActivity implements
 
     @CallSuper
     @Override
-    protected void onLocationPermissionGranted(int locationRequestCode) {
-        if (locationRequestCode == RC_SAVE_CONTENT) {
+    protected void onPermissionsGranted(int permissionCode) {
+        if (permissionCode == RC_SAVE_CONTENT) {
             saveActiveContent(mContentToSave);
         }
     }
@@ -353,7 +353,7 @@ public abstract class CameraARActivity extends BaseActivity implements
     protected void saveActiveContent(final Content content) {
         mContentToSave = content;
         if (!Utils.checkHasLocationPermission(this)) {
-            requestLocationPermission(RC_SAVE_CONTENT);
+            requestPermissions(RC_SAVE_CONTENT);
             return;
         }
         Utils.getLocation(mGoogleApiClient, new Utils.Callback<SerializableLatLng>() {
