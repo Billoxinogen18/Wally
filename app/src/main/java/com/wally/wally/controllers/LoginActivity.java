@@ -45,7 +45,7 @@ public class LoginActivity extends BaseActivity implements
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 100;
     private static final int RC_CREATE_ADF = 129;
-    private static final int RC_CAMERA = 102;
+    private static final int RC_CONTINUE_TO_NEXT_ACTIVITY = 102;
     private static final int RC_EXPLAIN_CAMERA = 111;
     /**
      * Tango
@@ -107,7 +107,7 @@ public class LoginActivity extends BaseActivity implements
             case RC_CREATE_ADF:
                 createAdfManager();
                 break;
-            case RC_CAMERA:
+            case RC_CONTINUE_TO_NEXT_ACTIVITY:
                 continueToNextActivity();
                 break;
         }
@@ -219,12 +219,11 @@ public class LoginActivity extends BaseActivity implements
     }
 
     private void continueToNextActivity() {
-        if (!Utils.checkHasCameraPermission(this) && !Utils.checkHasLocationPermission(this)) {
-            requestPermissions(RC_CAMERA);
+        if (checkAllBasicPermissions()) {
+            requestPermissions(RC_CONTINUE_TO_NEXT_ACTIVITY);
             return;
         }
         if (!Utils.hasADFPermissions(this)) {
-            Log.i(TAG, "Request adf permission");
             requestADFPermission();
             return;
         }

@@ -46,7 +46,8 @@ public abstract class BaseActivity extends AppCompatActivity implements
      * Called when ADF permissions are granted.
      */
     @CallSuper
-    protected void onAdfPermissionsGranted() {}
+    protected void onAdfPermissionsGranted() {
+    }
 
     private void onPermissionsGranted() {
         if (mPermissionRequestCode < 0) {
@@ -66,6 +67,15 @@ public abstract class BaseActivity extends AppCompatActivity implements
     }
 
     /**
+     * @return true if all basic permissions are granted: camera, storage and location.
+     */
+    protected boolean checkAllBasicPermissions() {
+        return Utils.checkHasLocationPermission(this) &&
+                Utils.checkHasCameraPermission(this) &&
+                Utils.checkHasExternalStorageReadWritePermission(this);
+    }
+
+    /**
      * Method that gains location permission, and if user denies permission
      * it tries to explain than gain location.
      *
@@ -73,9 +83,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
      */
     public final void requestPermissions(int permissionRequestCode) {
         mPermissionRequestCode = permissionRequestCode;
-        if (Utils.checkHasLocationPermission(this) &&
-                Utils.checkHasCameraPermission(this) &&
-                Utils.checkHasExternalStorageReadWritePermission(this)) {
+        if (checkAllBasicPermissions()) {
             onPermissionsGranted();
             return;
         }
@@ -101,7 +109,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == RC_PERMISSIONS) {
-            if (Utils.checkHasLocationPermission(this)) {
+            if (checkAllBasicPermissions()) {
                 onPermissionsGranted();
             } else {
                 // Note that because fragment/Dialog transactions can't happen here
@@ -141,7 +149,7 @@ public abstract class BaseActivity extends AppCompatActivity implements
         // Check if location permission was granted in settings screen.
         if (mStartedAppSettingsScreen) {
             mStartedAppSettingsScreen = false;
-            if (Utils.checkHasLocationPermission(this)) {
+            if (checkAllBasicPermissions()) {
                 onPermissionsGranted();
             } else {
                 // If still not granted show Explanation again.
