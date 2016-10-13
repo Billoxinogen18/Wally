@@ -51,8 +51,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import static com.wally.wally.R.id.map;
-
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link MapsFragment#newInstance} factory method to
@@ -168,8 +166,11 @@ public class MapsFragment extends BaseFragment implements
                 .build();
 
 
-        mMapView = (MapView) v.findViewById(map);
-        mMapView.onCreate(savedInstanceState);
+        mMapView = (MapView) v.findViewById(R.id.map);
+
+        Bundle mapViewSavedInstanceState =
+                savedInstanceState != null ? savedInstanceState.getBundle("mapViewSaveState") : null;
+        mMapView.onCreate(mapViewSavedInstanceState);
         mMapView.getMapAsync(this);
         return v;
     }
@@ -206,9 +207,13 @@ public class MapsFragment extends BaseFragment implements
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        //This MUST be done before saving any of your own or your base class's variables
+        if (mMapView != null) {
+            final Bundle mapViewSaveState = new Bundle(outState);
+            mMapView.onSaveInstanceState(mapViewSaveState);
+            outState.putBundle("mapViewSaveState", mapViewSaveState);
+        }
         super.onSaveInstanceState(outState);
-        if (mMapView != null)
-            mMapView.onSaveInstanceState(outState);
     }
 
     @Override
