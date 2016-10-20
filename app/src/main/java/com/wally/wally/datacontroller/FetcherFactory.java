@@ -28,42 +28,42 @@ class FetcherFactory {
     private DatabaseReference sharedContents;
 
 
-    public FetcherFactory(DatabaseReference contents) {
+    FetcherFactory(DatabaseReference contents) {
         this.contents = contents;
         this.publicContents = contents.child("Public");
         this.sharedContents = contents.child("Shared");
     }
 
-    public Fetcher createForPrivate(User current) {
+    Fetcher createForPrivate(User current) {
         return new KeyPager(contents.child(current.getId().getId()));
     }
 
-    public Fetcher createForPublic(User user) {
+    Fetcher createForPublic(User user) {
         FirebaseQuery authorQuery = new AuthorQuery(user.getId());
         ContentQuery query = new ContentQuery(authorQuery, publicContents);
         return new QueryContentFetcher(query);
     }
 
-    public Fetcher createForPublic(SerializableLatLng center, double radiusKm) {
+    Fetcher createForPublic(SerializableLatLng center, double radiusKm) {
         Fetcher fetcher = createForLocation(center, radiusKm, publicContents);
         if (fetcher == null) { fetcher = new KeyPager(publicContents); }
         return fetcher;
     }
 
-    public Fetcher createForSharedByMe(User current) {
+    Fetcher createForSharedByMe(User current) {
         FirebaseQuery authorQuery = new AuthorQuery(current.getId());
         ContentQuery query = new ContentQuery(authorQuery, sharedContents);
         return new QueryContentFetcher(query);
     }
 
-    public Fetcher createForSharedWithMe(User current, SerializableLatLng center, double radiusKm) {
+    Fetcher createForSharedWithMe(User current, SerializableLatLng center, double radiusKm) {
         FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
         Predicate<Content> predicate = isLocationInRangePredicate(center, radiusKm);
         ContentQuery query = new ContentQuery(sharedWithQuery, sharedContents, predicate);
         return new QueryContentFetcher(query);
     }
 
-    public Fetcher createForSharedWithMe(User current, User other) {
+    Fetcher createForSharedWithMe(User current, User other) {
         Fetcher sharedContentFetcher = createForSharedWithMe(current);
         Predicate<Content> hasAuthorPredicate = hasAuthorPredicate(other.getId().getId());
         return new FilteredFetcher(sharedContentFetcher, hasAuthorPredicate);

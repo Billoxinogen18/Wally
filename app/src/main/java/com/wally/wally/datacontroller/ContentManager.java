@@ -18,14 +18,14 @@ import com.wally.wally.datacontroller.queries.FirebaseQuery;
 import java.util.Collections;
 import java.util.Map;
 
-public class ContentManager {
+class ContentManager {
     private static final String TAG = "ContentManager";
     private StorageReference storage;
     private DatabaseReference contents, rooms;
 
-    public ContentManager(DatabaseReference rooms,
-                          DatabaseReference contents,
-                          StorageReference storage) {
+    ContentManager(DatabaseReference rooms,
+                   DatabaseReference contents,
+                   StorageReference storage) {
 
         this.rooms = rooms;
         this.storage = storage;
@@ -56,7 +56,7 @@ public class ContentManager {
         );
     }
 
-    public void delete(Content c) {
+    void delete(Content c) {
         if (c.getId() == null) {
             throw new IllegalArgumentException("Id of the content is null");
         }
@@ -71,7 +71,7 @@ public class ContentManager {
         contents.child(c.getAuthorId()).child(c.getId()).removeValue();
     }
 
-    public void fetchAt(String path, final FetchResultCallback callback) {
+    void fetchAt(String path, final FetchResultCallback callback) {
         Log.d(TAG, path);
         contents.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -87,7 +87,7 @@ public class ContentManager {
         });
     }
 
-    public void fetchForUuid(String uuid, final FetchResultCallback callback) {
+    void fetchForUuid(String uuid, final FetchResultCallback callback) {
         rooms.child(uuid).child("Contents")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

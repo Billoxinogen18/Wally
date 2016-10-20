@@ -1,7 +1,6 @@
 package com.wally.wally.datacontroller;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,7 +31,7 @@ class FirebaseAdfService implements AdfService {
     private final DatabaseReference db;
     private final StorageReference storage;
 
-    public FirebaseAdfService(DatabaseReference db, StorageReference storage) {
+    FirebaseAdfService(DatabaseReference db, StorageReference storage) {
         this.db = db;
         this.storage = storage.child("ADFs");
     }
