@@ -18,7 +18,6 @@ import org.rajawali3d.surface.RajawaliSurfaceView;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.PriorityQueue;
 
 public class TangoUpdater implements Tango.OnTangoUpdateListener {
@@ -33,7 +32,6 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     private PriorityQueue<TangoUpdaterListener> mTangoUpdaterListeners;
 
     private Object mValidPoseListenersLock = new Object();
-
 
 
     public TangoUpdater(WallyTangoUx tangoUx, RajawaliSurfaceView surfaceView, TangoPointCloudManager pointCloudManager) {
@@ -101,7 +99,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     }
 
     private void fireFameAvailable() {
-        for (TangoUpdaterListener listener : mTangoUpdaterListeners){
+        for (TangoUpdaterListener listener : mTangoUpdaterListeners) {
             listener.onFrameAvailable();
         }
     }
@@ -110,7 +108,7 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     public void onXyzIjAvailable(TangoXyzIjData xyzIj) {
         mTangoUx.updateXyzCount(xyzIj.xyzCount);
         // Save the cloud and point data for later use.
-       // mPointCloudManager.updateXyzIj(xyzIj);
+        // mPointCloudManager.updateXyzIj(xyzIj);
     }
 
     @Override
@@ -142,31 +140,17 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
     public synchronized void setTangoLocalization(boolean localization) {
         if (isLocalized == localization) return;
         isLocalized = localization;
-        for (TangoUpdaterListener updaterListener : mTangoUpdaterListeners){
+        for (TangoUpdaterListener updaterListener : mTangoUpdaterListeners) {
             updaterListener.onLocalization(isLocalized);
         }
     }
 
-    public synchronized void addTangoUpdaterListener(TangoUpdaterListener listener){
-        Log.d(TAG, "addTangoUpdaterListener() called with: listener = [" + listener + "]");
-        logTangoUpdaters();
+    public synchronized void addTangoUpdaterListener(TangoUpdaterListener listener) {
         mTangoUpdaterListeners.add(listener);
-        logTangoUpdaters();
     }
 
-    public synchronized void removeTangoUpdaterListener(TangoUpdaterListener listener){
-        Log.d(TAG, "removeTangoUpdaterListener() called with: listener = [" + listener + "]");
-        logTangoUpdaters();
+    public synchronized void removeTangoUpdaterListener(TangoUpdaterListener listener) {
         mTangoUpdaterListeners.remove(listener);
-        logTangoUpdaters();
-    }
-
-    private void logTangoUpdaters(){
-        Log.d(TAG, "TangoUpdaters: start");
-        for (TangoUpdaterListener l : mTangoUpdaterListeners){
-            Log.d(TAG, l.toString());
-        }
-        Log.d(TAG, "TangoUpdaters: finish =================");
     }
 
     public synchronized void addValidPoseListener(ValidPoseListener listener) {
@@ -188,12 +172,12 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
 
     }
 
-    private void fireOnSaveAdfProgress(String progress){
-        for (ValidPoseListener listener: mValidPoseListeners) {
+    private void fireOnSaveAdfProgress(String progress) {
+        for (ValidPoseListener listener : mValidPoseListeners) {
             Double res = .0;
             try {
                 res = Double.parseDouble(progress);
-            }catch(NumberFormatException e){
+            } catch (NumberFormatException e) {
                 Log.e(TAG, "Can't cast AdfProgress in Double : " + progress);
             }
             listener.onSaveAdfProgress(res);
@@ -202,12 +186,15 @@ public class TangoUpdater implements Tango.OnTangoUpdateListener {
 
     public interface ValidPoseListener {
         void onValidPose(TangoPoseData data);
+
         void onSaveAdfProgress(double progress);
     }
 
-    public interface TangoUpdaterListener{
+    public interface TangoUpdaterListener {
         void onFrameAvailable();
+
         void onLocalization(boolean localization);
+
         int priority();
     }
 }
