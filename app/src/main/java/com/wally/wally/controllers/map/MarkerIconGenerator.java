@@ -2,12 +2,11 @@ package com.wally.wally.controllers.map;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.DrawableRes;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import android.util.SparseArray;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -21,16 +20,15 @@ import java.util.Map;
 /**
  * Created by Meravici on 6/20/2016. yea
  */
-public class MarkerIconGenerator {
+class MarkerIconGenerator {
     private final static int ANONYMOUS_DRAWABLE = 3;
     private final static int NO_PREVIEW_DRAWABLE = 4;
     private final int[] DRAWABLES;
     private Context context;
-    private AsyncTask mMarkerGeneratorTask;
     private Map<String, BitmapDescriptor> cache;
-    private Map<Integer, BitmapDescriptor> defaultCache;
+    private SparseArray<BitmapDescriptor> defaultCache;
 
-    public MarkerIconGenerator(Context context) {
+    MarkerIconGenerator(Context context) {
         this.context = context;
 
         DRAWABLES = new int[]{
@@ -42,10 +40,10 @@ public class MarkerIconGenerator {
         };
 
         cache = new HashMap<>();
-        defaultCache = new HashMap<>();
+        defaultCache = new SparseArray<>();
     }
 
-    public synchronized void getEnumeratedMarkerIcon(final String name, final int color, final MarkerIconGenerateListener markerIconGenerateListener) {
+    synchronized void getEnumeratedMarkerIcon(final String name, final int color, final MarkerIconGenerateListener markerIconGenerateListener) {
         if (cache.containsKey(name)) {
             markerIconGenerateListener.onMarkerIconGenerate(cache.get(name));
         } else {
@@ -53,7 +51,7 @@ public class MarkerIconGenerator {
 //                mMarkerGeneratorTask.cancel(true);
 //            }
 
-            mMarkerGeneratorTask = new AsyncTask<Void, Void, BitmapDescriptor>() {
+            new AsyncTask<Void, Void, BitmapDescriptor>() {
 
                 @Override
                 protected BitmapDescriptor doInBackground(Void... voids) {
@@ -86,11 +84,11 @@ public class MarkerIconGenerator {
     }
 
 
-    public void getDefaultMarkerIcon(int visibility, boolean isAnonymous,
+    void getDefaultMarkerIcon(int visibility, boolean isAnonymous,
                                      boolean isNoPreviewVisible,
                                      MarkerIconGenerateListener markerIconGenerateListener) {
         visibility = isAnonymous ? ANONYMOUS_DRAWABLE : isNoPreviewVisible ? NO_PREVIEW_DRAWABLE : visibility;
-        if (defaultCache.containsKey(visibility)) {
+        if (defaultCache.get(visibility) != null) {
             markerIconGenerateListener.onMarkerIconGenerate(defaultCache.get(visibility));
         } else {
             Bitmap bitmap = Utils.getBitmap(context, DRAWABLES[visibility]);
@@ -102,11 +100,11 @@ public class MarkerIconGenerator {
     }
 
 
-    public void getSolvedPuzzleMarker(String solvedMarkerURL, final String name, final MarkerIconGenerateListener markerCallback) {
+    void getSolvedPuzzleMarker(String solvedMarkerURL, final String name, final MarkerIconGenerateListener markerCallback) {
         getPuzzleMarker(solvedMarkerURL, R.drawable.ic_marker_puzzle_solved, name, markerCallback);
     }
 
-    public void getUnsolvedPuzzleMarker(String unsolvedMarkerURL, String name, MarkerIconGenerateListener markerCallback) {
+    void getUnsolvedPuzzleMarker(String unsolvedMarkerURL, String name, MarkerIconGenerateListener markerCallback) {
         getPuzzleMarker(unsolvedMarkerURL, R.drawable.ic_marker_puzzle_unsolved, name, markerCallback);
     }
 
@@ -120,7 +118,6 @@ public class MarkerIconGenerator {
 
                 IconGenerator iconGenerator = new IconGenerator(context);
                 iconGenerator.setBackground(drawable);
-//                iconGenerator.setTextAppearance(R.style.Bubble_TextAppearance_Dark);
                 int padding = Utils.dpToPx(context, 20);
                 iconGenerator.setContentPadding(padding, padding, padding, padding);
                 Bitmap bitmap = iconGenerator.makeIcon(name);
@@ -140,7 +137,7 @@ public class MarkerIconGenerator {
         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public interface MarkerIconGenerateListener {
+    interface MarkerIconGenerateListener {
         void onMarkerIconGenerate(BitmapDescriptor icon);
     }
 }

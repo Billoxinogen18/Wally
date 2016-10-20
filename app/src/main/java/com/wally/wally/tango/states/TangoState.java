@@ -100,8 +100,8 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
     public synchronized final void pause() {
         Log.d(TAG, "pause. Thread = " + Thread.currentThread());
-        disconnect();
         fireEvent(WallyEvent.createEventWithId(WallyEvent.ON_PAUSE));
+        disconnect();
         pauseHook();
     }
 
