@@ -1,5 +1,6 @@
 package com.wally.wally.controllers.main;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -45,7 +47,7 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     private ImportExportPermissionListener mListener;
 
     private AdfInfo mAdfInfo;
-
+    private boolean mIsShowingPermission = false;
 
     /**
      * @param adfInfo        adfInfo
@@ -67,7 +69,8 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         readArgs();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        View dv = LayoutInflater.from(getActivity()).inflate(R.layout.import_export_explain_dialog, null, false);
+        @SuppressLint("InflateParams") View dv = LayoutInflater.from(getActivity())
+                .inflate(R.layout.import_export_explain_dialog, null, false);
 
         initViews(dv);
 
@@ -81,13 +84,16 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     @Override
     public void onStart() {
         super.onStart();
-        if (!shouldShowPermissionExplanation()) {
+        if (mIsShowingPermission) {
+            getDialog().hide();
+        } else if (!shouldShowPermissionExplanation()) {
             getDialog().hide();
             requestPermission();
         }
     }
 
     private void requestPermission() {
+        mIsShowingPermission = true;
         if (mMode == IMPORT) {
             requestImportPermission();
         } else {
@@ -151,6 +157,7 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQ_CODE) {
+            mIsShowingPermission = false;
             // Save deny status.
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
             SharedPreferences.Editor e = sp.edit();
@@ -174,6 +181,20 @@ public class ImportExportPermissionDialogFragment extends DialogFragment impleme
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement ImportExportPermissionListener");
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("mIsShowingPermission",mIsShowingPermission);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            mIsShowingPermission = savedInstanceState.getBoolean("mIsShowingPermission");
         }
     }
 
