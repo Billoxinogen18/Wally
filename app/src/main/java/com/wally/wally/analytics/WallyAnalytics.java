@@ -53,10 +53,10 @@ public class WallyAnalytics implements WallyEventListener {
     }
 
     public static WallyAnalytics getInstance(Context context) {
-        if (instance == null) {
-            FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(context);
-            instance = new WallyAnalytics(analytics);
-        }
+//        if (instance == null) {
+//            FirebaseAnalytics analytics = FirebaseAnalytics.getInstance(context);
+//            instance = new WallyAnalytics(analytics);
+//        }
         return instance;
     }
 }

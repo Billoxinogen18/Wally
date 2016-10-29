@@ -103,7 +103,6 @@ public class TangoDriverFactory {
         tangoStates.put(TangoForSavedAdf.class, tangoForSavedAdf);
 
         setEventListener(mainFactory.getTangoUx());
-        setEventListener(mainFactory.getAnalytics());
         setEventListener(mainFactory.getTipManager());
         setEventListener(mainFactory.getReadyStateReporter());
         setEventListener((WallyEventListener) mainFactory.getActivity());

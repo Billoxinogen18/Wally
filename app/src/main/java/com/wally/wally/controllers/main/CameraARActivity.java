@@ -17,7 +17,6 @@ import com.wally.wally.BaseActivity;
 import com.wally.wally.BuildConfig;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
-import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.components.LoadingFab;
 import com.wally.wally.components.PersistentDialogFragment;
 import com.wally.wally.components.UserInfoView;
@@ -36,7 +35,6 @@ import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.SocialUserManager;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
-import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -56,7 +54,6 @@ public abstract class CameraARActivity extends BaseActivity implements
 
     private DataController mDataController;
     protected GoogleApiClient mGoogleApiClient;
-    protected WallyAnalytics mAnalytics;
     protected TipView mTipView; //TODO getter maybe?
     private SocialUserManager mSocialUserManager;
     private long mLastSelectTime;
@@ -108,8 +105,6 @@ public abstract class CameraARActivity extends BaseActivity implements
                 .addApi(Plus.API)
                 .addApi(LocationServices.API)
                 .build();
-
-        mAnalytics = WallyAnalytics.getInstance(this);
         mTipView = (TipView) findViewById(R.id.tip_view);
     }
 
@@ -158,12 +153,6 @@ public abstract class CameraARActivity extends BaseActivity implements
      */
     @Override
     public void onVisualContentSelected(VisualContent visualContent) {
-        if (visualContent != null) {
-            mAnalytics.onButtonClick("Content_Selected");
-        } else {
-            mAnalytics.onButtonClick("Click_On_Camera");
-        }
-
         Content content = null;
         if (visualContent != null) {
             content = visualContent.getContent();
@@ -262,7 +251,6 @@ public abstract class CameraARActivity extends BaseActivity implements
         if (!isNewContentCreationEnabled()) {
             return;
         }
-        mAnalytics.onButtonClick("New_Content");
         if (SystemClock.elapsedRealtime() - mNewContentButtonLastClickTime < 1000) {
             return;
         }
@@ -302,7 +290,6 @@ public abstract class CameraARActivity extends BaseActivity implements
     }
 
     public void onBtnMapClick(View v) {
-        mAnalytics.onButtonClick("Map");
         openMapFragment(MapsFragment.newInstance());
     }
 
@@ -312,7 +299,6 @@ public abstract class CameraARActivity extends BaseActivity implements
 
 
     public void onEditSelectedContentClick(Content content) {
-        mAnalytics.onButtonClick("Edit_Content");
         if (content == null) {
             Log.e(TAG, "editSelectedContent: when mSelectedContent is NULL");
             return;
@@ -323,7 +309,6 @@ public abstract class CameraARActivity extends BaseActivity implements
     }
 
     public void onDeleteSelectedContentClick(Content content) {
-        mAnalytics.onButtonClick("Delete_Content");
         if (content == null) {
             Log.e(TAG, "deleteSelectedContent: when mSelectedContent is NULL");
             return;
@@ -334,11 +319,6 @@ public abstract class CameraARActivity extends BaseActivity implements
     }
 
     public void onProfileClick(SocialUser user, boolean type) {
-        if (type) {
-            mAnalytics.onButtonClick("My_Profile");
-        } else {
-            mAnalytics.onButtonClick("Some_Profile");
-        }
         openMapFragment(user);
     }
 

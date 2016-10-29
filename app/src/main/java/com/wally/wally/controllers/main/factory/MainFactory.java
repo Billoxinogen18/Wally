@@ -11,19 +11,18 @@ import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.App;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.adf.AdfService;
-import com.wally.wally.analytics.WallyAnalytics;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.WallyConfig;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.events.WallyEventListener;
+import com.wally.wally.progressUtils.LearningEvaluator;
+import com.wally.wally.progressUtils.ProgressAggregator;
 import com.wally.wally.progressUtils.ProgressListener;
 import com.wally.wally.progressUtils.ProgressReporter;
 import com.wally.wally.renderer.ActiveContentScaleGestureDetector;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
-import com.wally.wally.progressUtils.LearningEvaluator;
-import com.wally.wally.progressUtils.ProgressAggregator;
 import com.wally.wally.tango.TangoFactory;
 import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.tip.LocalTipService;
@@ -33,7 +32,6 @@ import com.wally.wally.tip.TipView;
 import com.wally.wally.ux.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
-import org.rajawali3d.surface.RajawaliTextureView;
 
 
 /**
@@ -41,7 +39,6 @@ import org.rajawali3d.surface.RajawaliTextureView;
  * Main Factory responsible for creating Tango Managers
  */
 public class MainFactory {
-    private WallyAnalytics mAnalytics;
     private ScaleGestureDetector mScaleDetector;
     private TangoUpdater mTangoUpdater;
     private VisualContentManager mVisualContentManager;
@@ -66,7 +63,6 @@ public class MainFactory {
         Context context = activity.getBaseContext();
         mTangoUx = new WallyTangoUx(context, mConfig);
         mTangoUx.setLayout(tangoUxLayout);
-        mAnalytics = WallyAnalytics.getInstance(context);
 
         mTangoUpdater = new TangoUpdater(mTangoUx, surfaceView, mPointCloudManager);
         mTangoUpdater.addTangoUpdaterListener(activity);
@@ -158,11 +154,6 @@ public class MainFactory {
     public ReadyStateReporter getReadyStateReporter(){
         return mReadyStateReporter;
     }
-
-    public WallyAnalytics getAnalytics() {
-        return mAnalytics;
-    }
-
 
     public class ReadyStateReporter implements WallyEventListener, ProgressReporter {
         private ProgressListener listener;
