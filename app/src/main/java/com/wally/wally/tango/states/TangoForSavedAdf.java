@@ -16,6 +16,7 @@ import com.wally.wally.tango.WatchDog;
  */
 public class TangoForSavedAdf extends TangoState {
     private AdfInfo mAdfInfo;
+    private TangoFactory mTangoFactory;
     private WatchDog mLocalizationWatchdog;
 
     public TangoForSavedAdf(TangoUpdater tangoUpdater,
@@ -23,7 +24,8 @@ public class TangoForSavedAdf extends TangoState {
                             WallyRenderer wallyRenderer,
                             final AdfService adfService,
                             TangoPointCloudManager pointCloudManager){
-        super(tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
+        super(tangoUpdater, wallyRenderer, pointCloudManager);
+        mTangoFactory = tangoFactory;
         mLocalizationWatchdog = new WatchDog() {
             @Override
             protected void onTimeout() {

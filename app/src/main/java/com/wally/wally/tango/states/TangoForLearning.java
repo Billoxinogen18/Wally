@@ -19,6 +19,7 @@ public class TangoForLearning extends TangoState implements TangoUpdater.ValidPo
     private static final String TAG = TangoForLearning.class.getSimpleName();
 
     private AdfInfo mAdfInfo;
+    private TangoFactory mTangoFactory;
     private LearningEvaluator mLearningEvaluator;
 
     public TangoForLearning(TangoUpdater tangoUpdater,
@@ -26,7 +27,8 @@ public class TangoForLearning extends TangoState implements TangoUpdater.ValidPo
                             WallyRenderer wallyRenderer,
                             LearningEvaluator evaluator,
                             TangoPointCloudManager pointCloudManager) {
-        super(tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
+        super(tangoUpdater, wallyRenderer, pointCloudManager);
+        mTangoFactory = tangoFactory;
         mLearningEvaluator = evaluator;
     }
 

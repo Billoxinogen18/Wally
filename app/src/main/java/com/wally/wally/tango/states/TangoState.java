@@ -57,7 +57,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     boolean mIsLocalized;
     boolean mIsConnected;
     TangoUpdater mTangoUpdater;
-    TangoFactory mTangoFactory;
     List<WallyEventListener> mEventListeners;
 
     TangoPointCloudManager mPointCloudManager;
@@ -77,13 +76,11 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
 
 
     TangoState(TangoUpdater tangoUpdater,
-               TangoFactory tangoFactory,
                WallyRenderer wallyRenderer,
                TangoPointCloudManager pointCloudManager) {
         mRenderer = wallyRenderer;
         mTangoUpdater = tangoUpdater;
         mPointCloudManager = pointCloudManager;
-        mTangoFactory = tangoFactory;
         mEventListeners = new ArrayList<>();
     }
 
@@ -147,18 +144,6 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     public float[] findPlaneInMiddle() {
         return doFitPlane(0.5f, 0.5f, mRgbTimestampGlThread);
     }
-
-//    public Pose getDevicePoseInFront() {
-//        TangoPoseData devicePose =
-//                mTango.getPoseAtTime(mRgbTimestampGlThread, FRAME_PAIR);
-//        Pose p = ScenePoseCalculator.toOpenGlCameraPose(devicePose, mExtrinsics);
-//
-//        Vector3 addTo = p.getOrientation().multiply(new Vector3(0, 0, -1));
-//        Quaternion rot = new Quaternion().fromAngleAxis(addTo, 180);
-//
-//        return new Pose(p.getPosition().add(addTo), p.getOrientation().multiply(rot));
-//
-//    }
 
     public Pose getDevicePoseInFront() {
         TangoPoseData devicePose =
@@ -358,7 +343,7 @@ public abstract class TangoState implements TangoUpdater.TangoUpdaterListener {
     /**
      * Connects the view and renderer to the color camera and callbacks.
      */
-    protected void connectRenderer() {
+    void connectRenderer() {
         // Register a Rajawali Scene Frame Callback to update the scene camera pose whenever a new
         // RGB frame is rendered.
         // (@see https://github.com/Rajawali/Rajawali/wiki/Scene-Frame-Callbacks)

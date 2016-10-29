@@ -14,6 +14,7 @@ import com.wally.wally.tango.TangoUpdater;
  */
 public class TangoForCloudAdfs extends TangoState {
 
+    private TangoFactory mTangoFactory;
     private long mLocalizationTimeout = 20000;
     private AdfScheduler mAdfScheduler;
     private AdfInfo mAdfInfo;
@@ -23,7 +24,8 @@ public class TangoForCloudAdfs extends TangoState {
                              WallyRenderer wallyRenderer,
                              TangoPointCloudManager pointCloudManager,
                              AdfScheduler adfScheduler){
-        super(tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
+        super(tangoUpdater, wallyRenderer, pointCloudManager);
+        mTangoFactory = tangoFactory;
         mAdfScheduler = adfScheduler;
     }
 

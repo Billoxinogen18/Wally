@@ -18,7 +18,7 @@ public class TangoForReadyState extends TangoState {
                               TangoFactory tangoFactory,
                               WallyRenderer wallyRenderer,
                               TangoPointCloudManager pointCloudManager){
-        super(tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
+        super(tangoUpdater, wallyRenderer, pointCloudManager);
     }
 
     public TangoForReadyState withPreviousState(TangoState state, AdfInfo adf){
@@ -28,7 +28,6 @@ public class TangoForReadyState extends TangoState {
         mIsLocalized = state.mIsLocalized;
         mIsConnected = state.mIsConnected;
         mEventListeners = state.mEventListeners;
-        mTangoFactory = state.mTangoFactory;
         mIntrinsics = state.mIntrinsics;
         mExtrinsics = state.mExtrinsics;
         mCameraPoseTimestamp = state.mCameraPoseTimestamp;

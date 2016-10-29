@@ -14,14 +14,15 @@ import com.wally.wally.tango.WatchDog;
  */
 public class TangoForLearnedAdf extends TangoState {
     private AdfInfo mAdfInfo;
+    private TangoFactory mTangoFactory;
     private WatchDog mLocalizationWatchdog;
 
     public TangoForLearnedAdf(TangoUpdater tangoUpdater,
                               TangoFactory tangoFactory,
                               WallyRenderer wallyRenderer,
                               TangoPointCloudManager pointCloudManager) {
-
-        super(tangoUpdater, tangoFactory, wallyRenderer, pointCloudManager);
+        super(tangoUpdater, wallyRenderer, pointCloudManager);
+        mTangoFactory = tangoFactory;
         mLocalizationWatchdog = new WatchDog() {
             @Override
             protected void onTimeout() {
