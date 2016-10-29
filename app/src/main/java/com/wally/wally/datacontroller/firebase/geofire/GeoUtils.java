@@ -1,8 +1,5 @@
 package com.wally.wally.datacontroller.firebase.geofire;
 
-
-import com.wally.wally.datacontroller.utils.SerializableLatLng;
-
 /**
  * Original source of the class is part of GeoFire library
  * code was copied and modified to meet our needs
@@ -11,11 +8,7 @@ import com.wally.wally.datacontroller.utils.SerializableLatLng;
  */
 public class GeoUtils {
 
-    public static double distance(SerializableLatLng location1, SerializableLatLng location2) {
-        return distance(location1.getLatitude(), location1.getLongitude(), location2.getLatitude(), location2.getLongitude());
-    }
-
-    private static double distance(double lat1, double long1, double lat2, double long2) {
+    public static double distance(double lat1, double long1, double lat2, double long2) {
         // Earth's mean radius in meters
         final double radius = (Constants.EARTH_EQ_RADIUS + Constants.EARTH_POLAR_RADIUS)/2;
         double latDelta = Math.toRadians(lat1 - lat2);
@@ -27,11 +20,11 @@ public class GeoUtils {
         return radius * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
-    public static double distanceToLatitudeDegrees(double distance) {
+    static double distanceToLatitudeDegrees(double distance) {
         return distance/Constants.METERS_PER_DEGREE_LATITUDE;
     }
 
-    public static double distanceToLongitudeDegrees(double distance, double latitude) {
+    static double distanceToLongitudeDegrees(double distance, double latitude) {
         double radians = Math.toRadians(latitude);
         double numerator = Math.cos(radians) * Constants.EARTH_EQ_RADIUS * Math.PI / 180;
         double denominator = 1/Math.sqrt(1 - Constants.EARTH_E2*Math.sin(radians)*Math.sin(radians));
@@ -43,7 +36,7 @@ public class GeoUtils {
         }
     }
 
-    public static double wrapLongitude(double longitude) {
+    static double wrapLongitude(double longitude) {
         if (longitude >= -180 && longitude <= 180) {
             return longitude;
         }

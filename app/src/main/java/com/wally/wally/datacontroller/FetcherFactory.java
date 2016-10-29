@@ -109,7 +109,12 @@ class FetcherFactory {
 
             @Override
             public boolean test(Content target) {
-                return GeoUtils.distance(target.getLocation(), center) < radius;
+                double distance = GeoUtils.distance(
+                        target.getLocation().getLatitude(),
+                        target.getLocation().getLongitude(),
+                        center.getLatitude(),
+                        center.getLongitude());
+                return distance < radius;
             }
         };
     }
