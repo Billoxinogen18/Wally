@@ -38,7 +38,8 @@ public class DataControllerFactory {
 
             dataControllerInstance = new DataController()
                     .withContentManager(cManager)
-                    .withFetcherFactory(fFactory);
+                    .withFetcherFactory(fFactory)
+                    .withCurrentUser(getUserManagerInstance().getCurrentUser());
         }
         return dataControllerInstance;
     }

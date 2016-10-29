@@ -12,11 +12,19 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import static com.wally.wally.datacontroller.DataControllerFactory.getUserManagerInstance;
-
 public class DataController {
+    private User currentUser;
     private ContentManager contentManager;
     private FetcherFactory fetcherFactory;
+
+    DataController withCurrentUser(User user) {
+        if (user == null) {
+            String message = "DataController can't operate without current user";
+            throw new IllegalArgumentException(message);
+        }
+        this.currentUser = user;
+        return this;
+    }
 
     DataController withContentManager(ContentManager manager) {
         this.contentManager = manager;
@@ -42,7 +50,7 @@ public class DataController {
             public void onResult(Collection<Content> result) {
                 Collection<Content> contents = new HashSet<>();
                 for (Content c : result) {
-                    if (isContentVisibleForUser(c, getUserManagerInstance().getCurrentUser())) {
+                    if (isContentVisibleForUser(c, currentUser)) {
                         contents.add(c);
                     }
                 }
@@ -85,26 +93,23 @@ public class DataController {
     }
 
     public Fetcher createFetcherForMyContent() {
-        User current = getUserManagerInstance().getCurrentUser();
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForPrivate(current));
-        chain.addPager(fetcherFactory.createForSharedByMe(current));
-        chain.addPager(fetcherFactory.createForPublic(current));
+        chain.addPager(fetcherFactory.createForPrivate(currentUser));
+        chain.addPager(fetcherFactory.createForSharedByMe(currentUser));
+        chain.addPager(fetcherFactory.createForPublic(currentUser));
         return chain;
     }
 
     public Fetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForSharedWithMe(
-                getUserManagerInstance().getCurrentUser(), center, radiusKm));
+        chain.addPager(fetcherFactory.createForSharedWithMe(currentUser, center, radiusKm));
         chain.addPager(fetcherFactory.createForPublic(center, radiusKm));
         return chain;
     }
 
     public Fetcher createFetcherForUserContent(User user) {
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForSharedWithMe(
-                getUserManagerInstance().getCurrentUser(), user));
+        chain.addPager(fetcherFactory.createForSharedWithMe(currentUser, user));
         chain.addPager(fetcherFactory.createForPublic(user));
         return chain;
     }
