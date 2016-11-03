@@ -18,30 +18,17 @@ package com.wally.wally.renderer;
 import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.animation.LinearInterpolator;
+import android.view.Surface;
 
 import com.google.atap.tangoservice.TangoPoseData;
-import com.projecttango.rajawali.DeviceExtrinsics;
-import com.projecttango.rajawali.Pose;
-import com.projecttango.rajawali.ScenePoseCalculator;
-import com.wally.wally.R;
 
 import org.rajawali3d.Object3D;
-import org.rajawali3d.animation.Animation;
-import org.rajawali3d.animation.Animation3D;
-import org.rajawali3d.animation.EllipticalOrbitAnimation3D;
-import org.rajawali3d.animation.RotateOnAxisAnimation;
-import org.rajawali3d.lights.DirectionalLight;
 import org.rajawali3d.materials.Material;
-import org.rajawali3d.materials.methods.DiffuseMethod;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.StreamingTexture;
-import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.math.Quaternion;
-import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.ScreenQuad;
-import org.rajawali3d.primitives.Sphere;
 import org.rajawali3d.renderer.RajawaliRenderer;
 import org.rajawali3d.util.ObjectColorPicker;
 import org.rajawali3d.util.OnObjectPickedListener;
@@ -67,6 +54,13 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
     private boolean mSceneCameraConfigured;
     private OnVisualContentSelectedListener mOnContentSelectedListener;
     private ObjectColorPicker mPicker;
+    private ScreenQuad mBackgroundQuad;
+
+
+    private float[] textureCoords0 = new float[]{0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F};
+    private float[] textureCoords270 = new float[]{0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F, 1.0F, 1.0F};
+    private float[] textureCoords180 = new float[]{1.0F, 1.0F, 0.0F, 1.0F, 0.0F, 0.0F, 1.0F, 0.0F};
+    private float[] textureCoords90  = new float[]{1.0F, 0.0F, 1.0F, 1.0F, 0.0F, 1.0F, 0.0F, 0.0F};
 
 
     public WallyRenderer(Context context, VisualContentManager visualContentManager, OnVisualContentSelectedListener onContentSelectedListener) {
@@ -79,7 +73,7 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
     protected void initScene() {
         // Create a quad covering the whole background and assign a texture to it where the
         // Tango color camera contents will be rendered.
-        ScreenQuad backgroundQuad = new ScreenQuad();
+        mBackgroundQuad = new ScreenQuad();
         Material tangoCameraMaterial = new Material();
         tangoCameraMaterial.setColorInfluence(0);
         // We need to use Rajawali's {@code StreamingTexture} since it sets up the texture
@@ -88,17 +82,17 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
                 new StreamingTexture("camera", (StreamingTexture.ISurfaceListener) null);
         try {
             tangoCameraMaterial.addTexture(mTangoCameraTexture);
-            backgroundQuad.setMaterial(tangoCameraMaterial);
+            mBackgroundQuad.setMaterial(tangoCameraMaterial);
         } catch (ATexture.TextureException e) {
             Log.e(TAG, "Exception creating texture for RGB camera contents", e);
         }
-        getCurrentScene().addChildAt(backgroundQuad, 0);
+        getCurrentScene().addChildAt(mBackgroundQuad, 0);
 
 
         mPicker = new ObjectColorPicker(this);
         mPicker.setOnObjectPickedListener(this);
 
-        mPicker.registerObject(backgroundQuad);
+        mPicker.registerObject(mBackgroundQuad);
 
         timeForARender = (long)(500/getFrameRate());
     }
@@ -215,6 +209,23 @@ public class WallyRenderer extends RajawaliRenderer implements OnObjectPickedLis
         // quaternions.
         getCurrentCamera().setRotation(quaternion.conjugate());
         getCurrentCamera().setPosition(translation[0], translation[1], translation[2]);
+    }
+
+    public void updateColorCameraTextureUv(int rotation){
+        switch (rotation) {
+            case Surface.ROTATION_90:
+                mBackgroundQuad.getGeometry().setTextureCoords(textureCoords90);
+                break;
+            case Surface.ROTATION_180:
+                mBackgroundQuad.getGeometry().setTextureCoords(textureCoords180);
+                break;
+            case Surface.ROTATION_270:
+                mBackgroundQuad.getGeometry().setTextureCoords(textureCoords270);
+                break;
+            default:
+                mBackgroundQuad.getGeometry().setTextureCoords(textureCoords0);
+                break;
+        }
     }
 
     /**

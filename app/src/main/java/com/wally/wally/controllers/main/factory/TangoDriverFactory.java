@@ -1,5 +1,10 @@
 package com.wally.wally.controllers.main.factory;
 
+import android.content.Context;
+import android.hardware.Camera;
+import android.hardware.display.DisplayManager;
+import android.view.Display;
+
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.adf.AdfService;
@@ -109,6 +114,12 @@ public class TangoDriverFactory {
 
         mTangoUpdater.addTangoUpdaterListener(tangoForCloudAdfs);
         mTangoDriver = new TangoDriver(tangoForCloudAdfs);
+
+        DisplayManager displayManager = (DisplayManager) mainFactory.getActivity().getSystemService(Context.DISPLAY_SERVICE);
+        if (displayManager != null) {
+            mTangoDriver.setDefaultDisplay(mainFactory.getActivity().getWindowManager().getDefaultDisplay());
+            displayManager.registerDisplayListener(mTangoDriver, null);
+        }
 
 //        mTangoUpdater.addTangoUpdaterListener(tangoForLearning);
 //        mTangoDriver = new TangoDriver(tangoForLearning);

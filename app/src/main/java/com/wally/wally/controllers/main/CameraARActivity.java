@@ -1,5 +1,6 @@
 package com.wally.wally.controllers.main;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.CallSuper;
@@ -106,6 +107,14 @@ public abstract class CameraARActivity extends BaseActivity implements
                 .addApi(LocationServices.API)
                 .build();
         mTipView = (TipView) findViewById(R.id.tip_view);
+    }
+
+
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d("bla", newConfig.toString());
     }
 
     protected void onStart() {
