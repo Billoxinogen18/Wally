@@ -4,7 +4,7 @@ import android.os.Handler;
 
 import com.wally.wally.controllers.map.contentList.PagingRetriever;
 import com.wally.wally.datacontroller.DataController.*;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 
 import org.junit.After;
 import org.junit.Before;

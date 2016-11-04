@@ -28,7 +28,7 @@ import com.wally.wally.controllers.main.factory.MainFactory;
 import com.wally.wally.controllers.main.factory.TangoDriverFactory;
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.DataControllerFactory;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.events.WallyEventListener;

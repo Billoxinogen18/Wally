@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.wally.wally.datacontroller.DataController.*;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 
 import java.util.ArrayList;
 import java.util.Collection;

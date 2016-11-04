@@ -3,7 +3,7 @@ package com.wally.wally.datacontroller.fetchers;
 import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.utils.Predicate;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 
 import java.util.ArrayList;
 import java.util.Collection;

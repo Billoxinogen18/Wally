@@ -11,7 +11,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.components.UserInfoView;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.userManager.SocialUser;
 
 /**

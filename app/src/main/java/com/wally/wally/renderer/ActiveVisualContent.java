@@ -5,8 +5,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.Pose;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.TangoData;
+import com.wally.wally.objects.content.Content;
+import com.wally.wally.objects.content.TangoData;
 
 import org.rajawali3d.animation.Animation3D;
 import org.rajawali3d.animation.TranslateAnimation3D;

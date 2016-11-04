@@ -3,7 +3,7 @@ package com.wally.wally.datacontroller.callbacks;
 import android.util.Log;
 
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.utils.Predicate;
 

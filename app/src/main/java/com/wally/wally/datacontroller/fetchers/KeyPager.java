@@ -5,7 +5,7 @@ import com.google.firebase.database.Query;
 import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.datacontroller.queries.FirebaseQuery;
 
 import java.util.ArrayList;

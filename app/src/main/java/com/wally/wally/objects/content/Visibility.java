@@ -1,4 +1,4 @@
-package com.wally.wally.datacontroller.content;
+package com.wally.wally.objects.content;
 
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IntDef;

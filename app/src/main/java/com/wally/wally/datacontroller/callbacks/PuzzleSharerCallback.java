@@ -2,7 +2,7 @@ package com.wally.wally.datacontroller.callbacks;
 
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import com.wally.wally.datacontroller.DataControllerFactory;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.datacontroller.user.Id;
 
 import java.util.Collection;

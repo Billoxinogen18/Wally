@@ -1,7 +1,7 @@
 package com.wally.wally.datacontroller;
 
 import com.google.firebase.database.DatabaseReference;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.datacontroller.fetchers.FilteredFetcher;
 import com.wally.wally.datacontroller.fetchers.KeyPager;
 import com.wally.wally.datacontroller.fetchers.PagerChain;

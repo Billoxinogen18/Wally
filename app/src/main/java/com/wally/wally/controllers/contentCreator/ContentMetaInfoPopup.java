@@ -6,8 +6,8 @@ import android.widget.CompoundButton;
 
 import com.wally.wally.R;
 import com.wally.wally.components.RevealPopup;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.objects.content.Content;
+import com.wally.wally.objects.content.Visibility;
 
 public class ContentMetaInfoPopup extends RevealPopup {
 

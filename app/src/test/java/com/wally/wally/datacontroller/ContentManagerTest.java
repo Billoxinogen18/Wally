@@ -2,9 +2,9 @@ package com.wally.wally.datacontroller;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.storage.StorageReference;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
-import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.objects.content.Visibility;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;
 
 import org.junit.After;

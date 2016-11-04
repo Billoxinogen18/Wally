@@ -1,8 +1,8 @@
 package com.wally.wally.datacontroller;
 
 import com.wally.wally.datacontroller.callbacks.PuzzleSharerCallback;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.Puzzle;
+import com.wally.wally.objects.content.Content;
+import com.wally.wally.objects.content.Puzzle;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;

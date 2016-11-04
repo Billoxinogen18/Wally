@@ -8,8 +8,8 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.Puzzle;
+import com.wally.wally.objects.content.Content;
+import com.wally.wally.objects.content.Puzzle;
 
 import java.util.ArrayList;
 import java.util.List;

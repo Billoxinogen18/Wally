@@ -5,7 +5,7 @@ import android.view.View;
 
 import com.wally.wally.R;
 import com.wally.wally.components.RevealPopup;
-import com.wally.wally.datacontroller.content.Visibility;
+import com.wally.wally.objects.content.Visibility;
 
 /**
  * Social visibility picker popup

@@ -4,8 +4,8 @@ import android.util.Log;
 
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.TangoData;
+import com.wally.wally.objects.content.Content;
+import com.wally.wally.objects.content.TangoData;
 
 import org.rajawali3d.Object3D;
 

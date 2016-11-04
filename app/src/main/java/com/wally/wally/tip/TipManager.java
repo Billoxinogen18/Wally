@@ -1,7 +1,6 @@
 package com.wally.wally.tip;
 
-import com.google.atap.tangoservice.TangoPoseData;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.events.WallyEventListener;
 import com.wally.wally.tango.ContentFitter;

@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.wally.wally.R;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 
 public class CameraARStandardActivity extends CameraARActivity {
 

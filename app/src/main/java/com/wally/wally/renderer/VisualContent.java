@@ -7,7 +7,7 @@ import android.util.Log;
 import com.projecttango.rajawali.ContentPlane;
 import com.projecttango.rajawali.Pose;
 import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.methods.DiffuseMethod;

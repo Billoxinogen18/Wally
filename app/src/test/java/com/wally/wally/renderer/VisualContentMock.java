@@ -2,7 +2,7 @@ package com.wally.wally.renderer;
 
 import android.support.annotation.NonNull;
 
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;

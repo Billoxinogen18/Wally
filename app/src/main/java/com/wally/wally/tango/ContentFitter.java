@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.projecttango.rajawali.Pose;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.renderer.VisualContentManager;
 
 import org.rajawali3d.math.Matrix4;

@@ -1,4 +1,4 @@
-package com.wally.wally.datacontroller.content;
+package com.wally.wally.objects.content;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -5,6 +5,10 @@ import com.wally.wally.datacontroller.firebase.FirebaseObject;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.objects.content.Content;
+import com.wally.wally.objects.content.Puzzle;
+import com.wally.wally.objects.content.TangoData;
+import com.wally.wally.objects.content.Visibility;
 
 import java.util.ArrayList;
 import java.util.Date;

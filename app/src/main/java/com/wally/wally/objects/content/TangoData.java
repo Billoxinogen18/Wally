@@ -1,4 +1,4 @@
-package com.wally.wally.datacontroller.content;
+package com.wally.wally.objects.content;
 
 import com.projecttango.rajawali.Pose;
 

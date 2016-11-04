@@ -1,9 +1,7 @@
 package com.wally.wally.renderer;
 
 import com.projecttango.rajawali.Pose;
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.renderer.VisualContent;
-import com.wally.wally.renderer.VisualContentManager;
+import com.wally.wally.objects.content.Content;
 
 import org.hamcrest.core.IsNull;
 import org.junit.Before;

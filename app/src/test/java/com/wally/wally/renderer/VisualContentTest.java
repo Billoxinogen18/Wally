@@ -1,7 +1,7 @@
 package com.wally.wally.renderer;
 
-import com.wally.wally.datacontroller.content.Content;
-import com.wally.wally.datacontroller.content.TangoData;
+import com.wally.wally.objects.content.Content;
+import com.wally.wally.objects.content.TangoData;
 
 import org.junit.Test;
 import org.mockito.Mockito;

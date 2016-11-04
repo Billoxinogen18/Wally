@@ -1,7 +1,7 @@
 package com.wally.wally.datacontroller.callbacks;
 
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 
 import java.util.Collection;
 import java.util.HashSet;

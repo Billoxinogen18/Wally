@@ -1,16 +1,14 @@
 package com.wally.wally.controllers.main.factory;
 
 import android.content.Context;
-import android.hardware.Camera;
 import android.hardware.display.DisplayManager;
-import android.view.Display;
 
 import com.projecttango.tangosupport.TangoPointCloudManager;
 import com.wally.wally.adf.AdfScheduler;
 import com.wally.wally.adf.AdfService;
 import com.wally.wally.config.Config;
 import com.wally.wally.config.TangoManagerConstants;
-import com.wally.wally.datacontroller.content.Content;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.events.WallyEventListener;
 import com.wally.wally.renderer.VisualContentManager;
 import com.wally.wally.renderer.WallyRenderer;
