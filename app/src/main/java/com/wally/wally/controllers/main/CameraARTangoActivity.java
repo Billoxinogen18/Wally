@@ -9,15 +9,12 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
-import android.view.Display;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationServices;
 import com.google.atap.tango.ux.TangoUxLayout;
-import com.google.atap.tangoservice.Tango;
-import com.google.atap.tangoservice.TangoPoseData;
 import com.wally.wally.App;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
@@ -44,7 +41,6 @@ import com.wally.wally.tango.TangoUpdater;
 import com.wally.wally.ux.WallyTangoUx;
 
 import org.rajawali3d.surface.RajawaliSurfaceView;
-import org.rajawali3d.surface.RajawaliTextureView;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -85,7 +81,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     private void start() {
-        Context context = getBaseContext();
         mLayoutFitting = findViewById(R.id.layout_fitting);
         mFinishFittingFab = (FloatingActionButton) mLayoutFitting.findViewById(R.id.btn_finish_fitting);
         mNonFittingModeViews = Arrays.asList(findViewById(R.id.btn_map), findViewById(R.id.new_post));
@@ -155,7 +150,6 @@ public class CameraARTangoActivity extends CameraARActivity implements
     @Override
     public void onDeleteContent(Content selectedContent) {
         mVisualContentManager.removePendingStaticContent(selectedContent);
-        mAnalytics.onContentDelete();
     }
 
     @Override
