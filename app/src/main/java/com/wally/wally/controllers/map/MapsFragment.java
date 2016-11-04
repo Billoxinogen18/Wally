@@ -481,9 +481,7 @@ public class MapsFragment extends BaseFragment implements
                     .createFetcherForUserContent(mUserProfile.getBaseUser());
         } else {
             contentFetcher = App.getInstance().getDataController().createFetcherForVisibleContent(
-                    Utils.latLngToSerializableLatLng(cameraPosition.target),
-                    radius
-            );
+                    cameraPosition.target.latitude, cameraPosition.target.longitude, radius);
         }
         return contentFetcher;
     }

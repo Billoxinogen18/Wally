@@ -3,7 +3,6 @@ package com.wally.wally.adf;
 import android.util.Log;
 
 import com.wally.wally.Utils;
-import com.wally.wally.objects.content.SerializableLatLng;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -15,7 +14,7 @@ public class AdfManager {
     private List<AdfInfo> metadatas;
     private Iterator<AdfInfo> queue;
 
-    public AdfManager(AdfService adfService) {
+    private AdfManager(AdfService adfService) {
         this.adfService = adfService;
         this.metadatas = new ArrayList<>();
         this.queue = metadatas.iterator();
@@ -48,9 +47,9 @@ public class AdfManager {
         });
     }
 
-    public static void createWithLocation(SerializableLatLng location, final AdfService adfService,
+    public static void createWithLocation(double lat, double lng, final AdfService adfService,
                                           final Utils.Callback<AdfManager> callback){
-        adfService.searchNearLocation(location, new AdfService.SearchResultListener() {
+        adfService.searchNearLocation(lat, lng, new AdfService.SearchResultListener() {
             @Override
             public void onSearchResult(List<AdfInfo> infoList) {
                 AdfManager adfManager = new AdfManager(adfService);
@@ -62,7 +61,7 @@ public class AdfManager {
         });
     }
 
-    public int getAdfTotalCount() {
+    int getAdfTotalCount() {
         return metadatas.size();
     }
 

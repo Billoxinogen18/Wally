@@ -29,7 +29,7 @@ public interface DBController {
 
     Fetcher createFetcherForUserContent(User baseUser);
 
-    Fetcher createFetcherForVisibleContent(SerializableLatLng center, double radius);
+    Fetcher createFetcherForVisibleContent(double centerLat, double centerLng, double radius);
 
     interface ResultCallback {
         void onResult(Collection<Content> result);

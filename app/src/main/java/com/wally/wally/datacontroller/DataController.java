@@ -1,12 +1,11 @@
 package com.wally.wally.datacontroller;
 
 import com.wally.wally.datacontroller.callbacks.PuzzleSharerCallback;
-import com.wally.wally.objects.content.Content;
-import com.wally.wally.objects.content.Puzzle;
 import com.wally.wally.datacontroller.fetchers.PagerChain;
 import com.wally.wally.datacontroller.user.Id;
 import com.wally.wally.datacontroller.user.User;
-import com.wally.wally.objects.content.SerializableLatLng;
+import com.wally.wally.objects.content.Content;
+import com.wally.wally.objects.content.Puzzle;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -91,10 +90,11 @@ class DataController implements DBController {
         return chain;
     }
 
-    public Fetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
+    public Fetcher createFetcherForVisibleContent(double centerLat, double centerLng, double radiusKm) {
         PagerChain chain = new PagerChain();
-        chain.addPager(fetcherFactory.createForSharedWithMe(currentUser, center, radiusKm));
-        chain.addPager(fetcherFactory.createForPublic(center, radiusKm));
+        chain.addPager(fetcherFactory.createForSharedWithMe(currentUser,
+                centerLat, centerLng, radiusKm));
+        chain.addPager(fetcherFactory.createForPublic(centerLat, centerLng, radiusKm));
         return chain;
     }
 

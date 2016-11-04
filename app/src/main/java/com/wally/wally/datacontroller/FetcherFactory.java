@@ -15,7 +15,6 @@ import com.wally.wally.datacontroller.queries.FirebaseQuery;
 import com.wally.wally.datacontroller.queries.SharedWithQuery;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.Predicate;
-import com.wally.wally.objects.content.SerializableLatLng;
 import com.wally.wally.datacontroller.DBController.*;
 
 import java.util.Collections;
@@ -44,8 +43,8 @@ class FetcherFactory {
         return new QueryContentFetcher(query);
     }
 
-    Fetcher createForPublic(SerializableLatLng center, double radiusKm) {
-        Fetcher fetcher = createForLocation(center, radiusKm, publicContents);
+    Fetcher createForPublic(double latitude, double longitude,double radiusKm) {
+        Fetcher fetcher = createForLocation(latitude, longitude, radiusKm, publicContents);
         if (fetcher == null) { fetcher = new KeyPager(publicContents); }
         return fetcher;
     }
@@ -56,9 +55,9 @@ class FetcherFactory {
         return new QueryContentFetcher(query);
     }
 
-    Fetcher createForSharedWithMe(User current, SerializableLatLng center, double radiusKm) {
+    Fetcher createForSharedWithMe(User current, double latitude, double longitude, double radiusKm) {
         FirebaseQuery sharedWithQuery = new SharedWithQuery(current.getGgId());
-        Predicate<Content> predicate = isLocationInRangePredicate(center, radiusKm);
+        Predicate<Content> predicate = isLocationInRangePredicate(latitude, longitude, radiusKm);
         ContentQuery query = new ContentQuery(sharedWithQuery, sharedContents, predicate);
         return new QueryContentFetcher(query);
     }
@@ -75,22 +74,22 @@ class FetcherFactory {
         return new QueryContentFetcher(query);
     }
 
-    private Fetcher createForLocation(
-            SerializableLatLng center, double radiusKm, DatabaseReference target) {
+    private Fetcher createForLocation(double latitude, double longitude,
+                                      double radiusKm, DatabaseReference target) {
         // We decided that too big radius (>2500 km)
         // means we don't need to filter by location
         if (radiusKm > RADIUS_MAX_KM) { return null; }
         if (radiusKm <= 0) { return createTrivial(); }
 
         final double radius = radiusKm * 1000; // Convert to meters
-        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(center, radius);
+        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(latitude, longitude, radius);
         PagerChain chain = new PagerChain();
         for (GeoHashQuery query : queries) {
             String startKey = query.getStartValue();
             String endKey = query.getEndValue();
             chain.addPager(new ValuePager(target, "hash", startKey, endKey));
         }
-        return new FilteredFetcher(chain, isLocationInRangePredicate(center, radiusKm));
+        return new FilteredFetcher(chain, isLocationInRangePredicate(latitude, longitude, radiusKm));
     }
 
     private Fetcher createTrivial() {
@@ -103,7 +102,7 @@ class FetcherFactory {
     }
 
     private Predicate<Content> isLocationInRangePredicate(
-            final SerializableLatLng center, final double radiusKm) {
+            final double latitude, final double longitude, final double radiusKm) {
         return new Predicate<Content>() {
             private double radius = radiusKm * 1000;
 
@@ -112,8 +111,7 @@ class FetcherFactory {
                 double distance = GeoUtils.distance(
                         target.getLocation().getLatitude(),
                         target.getLocation().getLongitude(),
-                        center.getLatitude(),
-                        center.getLongitude());
+                        latitude, longitude);
                 return distance < radius;
             }
         };

@@ -28,7 +28,6 @@ import com.wally.wally.BaseActivity;
 import com.wally.wally.R;
 import com.wally.wally.Utils;
 import com.wally.wally.adf.AdfManager;
-import com.wally.wally.adf.AdfService;
 import com.wally.wally.controllers.main.CameraARStandardActivity;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.datacontroller.DataControllerFactory;
@@ -41,12 +40,11 @@ public class LoginActivity extends BaseActivity implements
         SocialUserManager.UserLoadListener,
         GoogleApiClient.ConnectionCallbacks {
 
-    @SuppressWarnings("unused")
     private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 100;
     private static final int RC_CREATE_ADF = 129;
     private static final int RC_CONTINUE_TO_NEXT_ACTIVITY = 102;
-    private static final int RC_EXPLAIN_CAMERA = 111;
+//    private static final int RC_EXPLAIN_CAMERA = 111;
     /**
      * Tango
      */
@@ -190,8 +188,8 @@ public class LoginActivity extends BaseActivity implements
         Utils.getNewLocation(mGoogleApiClient, new Utils.Callback<SerializableLatLng>() {
             @Override
             public void onResult(SerializableLatLng result) {
-                AdfService as = App.getInstance().getAdfService();
-                AdfManager.createWithLocation(result, as, new Utils.Callback<AdfManager>() {
+                AdfManager.createWithLocation(result.getLatitude(), result.getLongitude(),
+                        App.getInstance().getAdfService(), new Utils.Callback<AdfManager>() {
                     @Override
                     public void onResult(AdfManager result) {
                         App.getInstance().setAdfManager(result);

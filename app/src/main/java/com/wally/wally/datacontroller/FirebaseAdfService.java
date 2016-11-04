@@ -61,8 +61,8 @@ class FirebaseAdfService implements AdfService {
      * {@inheritDoc}
      */
     @Override
-    public void searchNearLocation(SerializableLatLng location, SearchResultListener listener) {
-        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(location, SEARCH_RADIUS_M);
+    public void searchNearLocation(double lat, double lng, SearchResultListener listener) {
+        Set<GeoHashQuery> queries = GeoHashQuery.queriesAtLocation(lat, lng, SEARCH_RADIUS_M);
         ValueEventListener aggregator = getMetaDataAggregatorCallback(queries.size(), listener);
         for (GeoHashQuery q : queries) {
             Query query = db.orderByChild("hash")

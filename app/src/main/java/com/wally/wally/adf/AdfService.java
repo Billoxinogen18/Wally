@@ -11,7 +11,7 @@ public interface AdfService {
 
     void delete(AdfInfo info);
 
-    void searchNearLocation(SerializableLatLng location, SearchResultListener listener);
+    void searchNearLocation(double lat, double lng, SearchResultListener listener);
 
     interface SearchResultListener {
         void onSearchResult(List<AdfInfo> infoList);
