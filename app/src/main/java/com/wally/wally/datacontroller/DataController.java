@@ -35,14 +35,17 @@ class DataController implements DBController {
         return this;
     }
 
+    @Override
     public void save(Content c) {
         contentManager.save(c);
     }
 
+    @Override
     public void delete(Content c) {
         contentManager.delete(c);
     }
 
+    @Override
     public void fetchForUuid(String uuid, final ResultCallback callback) {
         contentManager.fetchForUuid(uuid, new ResultCallback() {
             @Override
@@ -58,6 +61,7 @@ class DataController implements DBController {
         });
     }
 
+    @Override
     public Fetcher createFetcherForPuzzleSuccessors(Puzzle puzzle) {
         PagerChain chain = new PagerChain();
         for (final String puzzleId : puzzle.getSuccessors()) {
@@ -72,6 +76,7 @@ class DataController implements DBController {
         return chain;
     }
 
+    @Override
     public boolean checkAnswer(Puzzle puzzle, String answer) {
         answer = answer.toLowerCase();
         for (String s : puzzle.getAnswers()) {
@@ -82,6 +87,7 @@ class DataController implements DBController {
         return false;
     }
 
+    @Override
     public Fetcher createFetcherForMyContent() {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForPrivate(currentUser));
@@ -90,6 +96,7 @@ class DataController implements DBController {
         return chain;
     }
 
+    @Override
     public Fetcher createFetcherForVisibleContent(double centerLat, double centerLng, double radiusKm) {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForSharedWithMe(currentUser,
@@ -98,6 +105,7 @@ class DataController implements DBController {
         return chain;
     }
 
+    @Override
     public Fetcher createFetcherForUserContent(User user) {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForSharedWithMe(currentUser, user));
