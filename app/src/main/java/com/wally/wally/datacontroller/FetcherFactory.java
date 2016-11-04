@@ -16,8 +16,8 @@ import com.wally.wally.datacontroller.queries.SharedWithQuery;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.Predicate;
 import com.wally.wally.objects.content.SerializableLatLng;
-import com.wally.wally.datacontroller.DataController.Fetcher;
-import com.wally.wally.datacontroller.DataController.FetchResultCallback;
+import com.wally.wally.datacontroller.DBController.*;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -96,7 +96,7 @@ class FetcherFactory {
     private Fetcher createTrivial() {
         return new Fetcher() {
             @Override
-            public void fetchNext(int i, FetchResultCallback callback) {
+            public void fetchNext(int i, ResultCallback callback) {
                 callback.onResult(Collections.<Content>emptySet());
             }
         };

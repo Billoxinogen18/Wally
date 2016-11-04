@@ -1,6 +1,6 @@
 package com.wally.wally.datacontroller.fetchers;
 
-import com.wally.wally.datacontroller.DataController.*;
+import com.wally.wally.datacontroller.DBController.*;
 import com.wally.wally.objects.content.Content;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class PagerChain implements Fetcher {
     }
 
     @Override
-    public void fetchNext(final int count, final FetchResultCallback callback) {
+    public void fetchNext(final int count, final ResultCallback callback) {
         if (currentPagerIndex == pagerList.size()) {
             ArrayList<Content> finalResult = new ArrayList<>(tail);
             tail.clear();
@@ -40,7 +40,7 @@ public class PagerChain implements Fetcher {
             currentPagerIndex++;
         }
 
-        pagerList.get(currentPagerIndex).fetchNext(count, new FetchResultCallback() {
+        pagerList.get(currentPagerIndex).fetchNext(count, new ResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
                 tail.addAll(result);

@@ -2,11 +2,11 @@ package com.wally.wally.datacontroller.fetchers;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
-import com.wally.wally.datacontroller.DataController.FetchResultCallback;
-import com.wally.wally.datacontroller.DataController.Fetcher;
+import com.wally.wally.datacontroller.DBController.Fetcher;
+import com.wally.wally.datacontroller.DBController.ResultCallback;
 import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
-import com.wally.wally.objects.content.Content;
 import com.wally.wally.datacontroller.queries.FirebaseQuery;
+import com.wally.wally.objects.content.Content;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +38,7 @@ public class ValuePager implements Fetcher {
      * @param callback that should be called with result
      */
     @Override
-    public void fetchNext(final int count, final FetchResultCallback callback) {
+    public void fetchNext(final int count, final ResultCallback callback) {
 
         if (!hasNext) {
             callback.onResult(Collections.<Content>emptySet());
@@ -52,7 +52,7 @@ public class ValuePager implements Fetcher {
                 return endKey == null ? target : target.endAt(endKey);
             }
         }.fetch(contents, new FirebaseFetchResultCallback(
-                new FetchResultCallback() {
+                new ResultCallback() {
                     @Override
                     public void onResult(Collection<Content> result) {
                         List<Content> contents = new ArrayList<>();

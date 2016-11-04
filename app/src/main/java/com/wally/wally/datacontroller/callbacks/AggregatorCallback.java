@@ -1,17 +1,17 @@
 package com.wally.wally.datacontroller.callbacks;
 
-import com.wally.wally.datacontroller.DataController.FetchResultCallback;
+import com.wally.wally.datacontroller.DBController.ResultCallback;
 import com.wally.wally.objects.content.Content;
 
 import java.util.Collection;
 import java.util.HashSet;
 
-public class AggregatorCallback implements FetchResultCallback {
+public class AggregatorCallback implements ResultCallback {
     private Collection<Content> aggregatedContent;
-    private FetchResultCallback callback;
+    private ResultCallback callback;
     private int nUpdates;
 
-    public AggregatorCallback(FetchResultCallback callback) {
+    public AggregatorCallback(ResultCallback callback) {
         this.callback = callback;
         aggregatedContent = new HashSet<>();
     }

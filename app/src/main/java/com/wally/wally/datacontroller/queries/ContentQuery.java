@@ -1,7 +1,7 @@
 package com.wally.wally.datacontroller.queries;
 
-import com.wally.wally.datacontroller.DataController.*;
 import com.google.firebase.database.DatabaseReference;
+import com.wally.wally.datacontroller.DBController.ResultCallback;
 import com.wally.wally.datacontroller.callbacks.FirebaseFetchResultCallback;
 import com.wally.wally.datacontroller.utils.Predicate;
 import com.wally.wally.objects.content.Content;
@@ -32,7 +32,7 @@ public class ContentQuery {
     }
 
 
-    public void fetch(final FetchResultCallback callback) {
+    public void fetch(final ResultCallback callback) {
         query.fetch(ref, new FirebaseFetchResultCallback(callback, predicate));
     }
 }

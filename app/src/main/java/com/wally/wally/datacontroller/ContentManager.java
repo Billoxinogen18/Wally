@@ -8,7 +8,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
-import com.wally.wally.datacontroller.DataController.FetchResultCallback;
+import com.wally.wally.datacontroller.DBController.ResultCallback;
 import com.wally.wally.datacontroller.callbacks.AggregatorCallback;
 import com.wally.wally.objects.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
@@ -71,7 +71,7 @@ class ContentManager {
         contents.child(c.getAuthorId()).child(c.getId()).removeValue();
     }
 
-    void fetchAt(String path, final FetchResultCallback callback) {
+    void fetchAt(String path, final ResultCallback callback) {
         Log.d(TAG, path);
         contents.child(path).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -87,7 +87,7 @@ class ContentManager {
         });
     }
 
-    void fetchForUuid(String uuid, final FetchResultCallback callback) {
+    void fetchForUuid(String uuid, final ResultCallback callback) {
         rooms.child(uuid).child("Contents")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

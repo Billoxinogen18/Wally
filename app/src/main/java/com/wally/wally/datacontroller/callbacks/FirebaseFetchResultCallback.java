@@ -2,7 +2,7 @@ package com.wally.wally.datacontroller.callbacks;
 
 import android.util.Log;
 
-import com.wally.wally.datacontroller.DataController.FetchResultCallback;
+import com.wally.wally.datacontroller.DBController.ResultCallback;
 import com.wally.wally.objects.content.Content;
 import com.wally.wally.datacontroller.content.FirebaseContent;
 import com.wally.wally.datacontroller.utils.Predicate;
@@ -13,10 +13,10 @@ import java.util.List;
 
 public class FirebaseFetchResultCallback {
     private static final String TAG = "FbFetchResultCallback";
-    private FetchResultCallback callback;
+    private ResultCallback callback;
     private Predicate<Content> predicate;
 
-    public FirebaseFetchResultCallback(FetchResultCallback callback) {
+    public FirebaseFetchResultCallback(ResultCallback callback) {
         this(callback, new Predicate<Content>() {
             @Override
             public boolean test(Content target) {
@@ -25,7 +25,7 @@ public class FirebaseFetchResultCallback {
         });
     }
 
-    public FirebaseFetchResultCallback(FetchResultCallback callback, Predicate<Content> predicate) {
+    public FirebaseFetchResultCallback(ResultCallback callback, Predicate<Content> predicate) {
         this.callback = callback;
         this.predicate = predicate;
     }

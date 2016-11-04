@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-public class DataController {
+class DataController implements DBController {
     private User currentUser;
     private ContentManager contentManager;
     private FetcherFactory fetcherFactory;
@@ -44,8 +44,8 @@ public class DataController {
         contentManager.delete(c);
     }
 
-    void fetchForUuid(String uuid, final FetchResultCallback callback) {
-        contentManager.fetchForUuid(uuid, new FetchResultCallback() {
+    public void fetchForUuid(String uuid, final ResultCallback callback) {
+        contentManager.fetchForUuid(uuid, new ResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
                 Collection<Content> contents = new HashSet<>();
@@ -59,22 +59,13 @@ public class DataController {
         });
     }
 
-    private boolean isContentVisibleForUser(Content c, User user) {
-        List<Id> sharedWith = c.getVisibility().getSocialVisibility().getSharedWith();
-        return c.getAuthorId().equals(user.getId().getId()) ||
-                c.isPublic() || (c.isPrivate() && c.getAuthorId().equals(user.getId().getId())) ||
-                sharedWith.contains(user.getId()) ||
-                sharedWith.contains(user.getFbId()) ||
-                sharedWith.contains(user.getGgId());
-    }
-
-    Fetcher createFetcherForPuzzleSuccessors(Puzzle puzzle) {
+    public Fetcher createFetcherForPuzzleSuccessors(Puzzle puzzle) {
         PagerChain chain = new PagerChain();
         for (final String puzzleId : puzzle.getSuccessors()) {
             chain.addPager(new Fetcher() {
                 @Override
-                public void fetchNext(int i, FetchResultCallback callback) {
-                    FetchResultCallback sharerCallback = new PuzzleSharerCallback(callback);
+                public void fetchNext(int i, ResultCallback callback) {
+                    ResultCallback sharerCallback = new PuzzleSharerCallback(callback);
                     contentManager.fetchAt(puzzleId.replace(":", "/"), sharerCallback);
                 }
             });
@@ -82,7 +73,7 @@ public class DataController {
         return chain;
     }
 
-    boolean checkAnswer(Puzzle puzzle, String answer) {
+    public boolean checkAnswer(Puzzle puzzle, String answer) {
         answer = answer.toLowerCase();
         for (String s : puzzle.getAnswers()) {
             if (s.toLowerCase().equals(answer)) {
@@ -92,7 +83,7 @@ public class DataController {
         return false;
     }
 
-    Fetcher createFetcherForMyContent() {
+    public Fetcher createFetcherForMyContent() {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForPrivate(currentUser));
         chain.addPager(fetcherFactory.createForSharedByMe(currentUser));
@@ -100,25 +91,26 @@ public class DataController {
         return chain;
     }
 
-    Fetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
+    public Fetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForSharedWithMe(currentUser, center, radiusKm));
         chain.addPager(fetcherFactory.createForPublic(center, radiusKm));
         return chain;
     }
 
-    Fetcher createFetcherForUserContent(User user) {
+    public Fetcher createFetcherForUserContent(User user) {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForSharedWithMe(currentUser, user));
         chain.addPager(fetcherFactory.createForPublic(user));
         return chain;
     }
 
-    public interface FetchResultCallback {
-        void onResult(Collection<Content> result);
-    }
-
-    public interface Fetcher {
-        void fetchNext(int i, FetchResultCallback callback);
+    private boolean isContentVisibleForUser(Content c, User user) {
+        List<Id> sharedWith = c.getVisibility().getSocialVisibility().getSharedWith();
+        return c.getAuthorId().equals(user.getId().getId()) ||
+                c.isPublic() || (c.isPrivate() && c.getAuthorId().equals(user.getId().getId())) ||
+                sharedWith.contains(user.getId()) ||
+                sharedWith.contains(user.getFbId()) ||
+                sharedWith.contains(user.getGgId());
     }
 }

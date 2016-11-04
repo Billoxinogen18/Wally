@@ -1,7 +1,7 @@
 package com.wally.wally.datacontroller.fetchers;
 
-import com.wally.wally.datacontroller.DataController.Fetcher;
-import com.wally.wally.datacontroller.DataController.FetchResultCallback;
+import com.wally.wally.datacontroller.DBController.Fetcher;
+import com.wally.wally.datacontroller.DBController.ResultCallback;
 import com.wally.wally.datacontroller.utils.Predicate;
 import com.wally.wally.objects.content.Content;
 
@@ -22,7 +22,7 @@ public class FilteredFetcher implements Fetcher {
     }
 
     @Override
-    public void fetchNext(final int count, final FetchResultCallback callback) {
+    public void fetchNext(final int count, final ResultCallback callback) {
         if (nextContents == null) {
             callback.onResult(Collections.<Content>emptySet());
             return;
@@ -33,7 +33,7 @@ public class FilteredFetcher implements Fetcher {
             return;
         }
 
-        fetcher.fetchNext(count, new FetchResultCallback() {
+        fetcher.fetchNext(count, new ResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
                 List<Content> contents = filteredResult(result);
