@@ -303,7 +303,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
             @Override
             public void onResult(SerializableLatLng result) {
                 adfInfo.withCreationLocation(result);
-                Utils.getAddressForLocation(CameraARTangoActivity.this, result, new Utils.Callback<String>() {
+                Utils.getAddressForLocation(CameraARTangoActivity.this,
+                        result.getLatitude(), result.getLongitude(), new Utils.Callback<String>() {
                     @Override
                     public void onResult(String address) {
                         uploadAdf(adfInfo.withName(address));

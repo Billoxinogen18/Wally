@@ -1,7 +1,5 @@
 package com.wally.wally.adf;
 
-import com.wally.wally.objects.content.SerializableLatLng;
-
 import java.util.List;
 
 public interface AdfService {

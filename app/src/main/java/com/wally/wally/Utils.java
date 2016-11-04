@@ -26,17 +26,13 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
 import android.support.annotation.ColorInt;
-import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.graphics.Palette;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -69,10 +65,6 @@ import java.util.Locale;
  * Created by ioane5 on 3/29/16.
  */
 public final class Utils {
-
-
-    @SuppressWarnings("unused")
-    private static final String TAG = Utils.class.getSimpleName();
 
     /**
      * Hides keyboard from input view. (note that keyboard must be focused on that view)
@@ -115,7 +107,7 @@ public final class Utils {
     /**
      * Checks if app has camera permission
      */
-    public static boolean checkHasCameraPermission(Context context) {
+    static boolean checkHasCameraPermission(Context context) {
         return ContextCompat.checkSelfPermission(context,
                 Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
@@ -129,7 +121,7 @@ public final class Utils {
     }
 
 
-    public static Intent getAppSettingsIntent(Context context) {
+    static Intent getAppSettingsIntent(Context context) {
         Intent i = new Intent();
         i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         i.addCategory(Intent.CATEGORY_DEFAULT);
@@ -175,7 +167,7 @@ public final class Utils {
         return createBitmapFromContent(content, context);
     }
 
-    public static Bitmap createBitmapFromContent(Content content, Context context) {
+    private static Bitmap createBitmapFromContent(Content content, Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         context.setTheme(R.style.AppTheme);
         @SuppressLint("InflateParams") View cv = inflater.inflate(R.layout.wall_content, null, false);
@@ -225,7 +217,7 @@ public final class Utils {
         return createBitmapFromView(cv);
     }
 
-    public static Bitmap createBitmapFromView(View v) {
+    private static Bitmap createBitmapFromView(View v) {
         int w = v.getMeasuredWidth();
         int h = v.getMeasuredHeight();
 
@@ -242,58 +234,57 @@ public final class Utils {
         return hasPackageInstalled("com.google.tango", pm) || hasPackageInstalled("com.projecttango.tango", pm);
     }
 
-    public static boolean hasPackageInstalled(String packageName, PackageManager pm) {
+    private static boolean hasPackageInstalled(String packageName, PackageManager pm) {
         try {
             pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
             return true;
         } catch (PackageManager.NameNotFoundException e) {
-            Log.d(TAG, "isTangoDevice()" + e);
             return false;
         }
     }
 
-    public static
-    @Nullable
-    Palette.Swatch getMostPopulousSwatch(Palette palette) {
-        Palette.Swatch mostPopulous = null;
-        if (palette != null) {
-            for (Palette.Swatch swatch : palette.getSwatches()) {
-                if (mostPopulous == null || swatch.getPopulation() > mostPopulous.getPopulation()) {
-                    mostPopulous = swatch;
-                }
-            }
-        }
-        return mostPopulous;
-    }
+//    public static
+//    @Nullable
+//    Palette.Swatch getMostPopulousSwatch(Palette palette) {
+//        Palette.Swatch mostPopulous = null;
+//        if (palette != null) {
+//            for (Palette.Swatch swatch : palette.getSwatches()) {
+//                if (mostPopulous == null || swatch.getPopulation() > mostPopulous.getPopulation()) {
+//                    mostPopulous = swatch;
+//                }
+//            }
+//        }
+//        return mostPopulous;
+//    }
 
 
-    /**
-     * Calculate a variant of the color to make it more suitable for overlaying information. Light
-     * colors will be lightened and dark colors will be darkened
-     *
-     * @param color               the color to adjust
-     * @param isDark              whether {@code color} is light or dark
-     * @param lightnessMultiplier the amount to modify the color e.g. 0.1f will alter it by 10%
-     * @return the adjusted color
-     */
-    public static
-    @ColorInt
-    int scrimify(@ColorInt int color,
-                 boolean isDark,
-                 @FloatRange(from = 0f, to = 1f) float lightnessMultiplier) {
-        float[] hsl = new float[3];
-        android.support.v4.graphics.ColorUtils.colorToHSL(color, hsl);
-
-        if (!isDark) {
-            lightnessMultiplier += 1f;
-        } else {
-            lightnessMultiplier = 1f - lightnessMultiplier;
-        }
-
-
-        hsl[2] = Math.max(0f, Math.min(1f, hsl[2] * lightnessMultiplier));
-        return android.support.v4.graphics.ColorUtils.HSLToColor(hsl);
-    }
+//    /**
+//     * Calculate a variant of the color to make it more suitable for overlaying information. Light
+//     * colors will be lightened and dark colors will be darkened
+//     *
+//     * @param color               the color to adjust
+//     * @param isDark              whether {@code color} is light or dark
+//     * @param lightnessMultiplier the amount to modify the color e.g. 0.1f will alter it by 10%
+//     * @return the adjusted color
+//     */
+//    public static
+//    @ColorInt
+//    int scrimify(@ColorInt int color,
+//                 boolean isDark,
+//                 @FloatRange(from = 0f, to = 1f) float lightnessMultiplier) {
+//        float[] hsl = new float[3];
+//        android.support.v4.graphics.ColorUtils.colorToHSL(color, hsl);
+//
+//        if (!isDark) {
+//            lightnessMultiplier += 1f;
+//        } else {
+//            lightnessMultiplier = 1f - lightnessMultiplier;
+//        }
+//
+//
+//        hsl[2] = Math.max(0f, Math.min(1f, hsl[2] * lightnessMultiplier));
+//        return android.support.v4.graphics.ColorUtils.HSLToColor(hsl);
+//    }
 
     public static
     @ColorInt
@@ -340,10 +331,6 @@ public final class Utils {
                 TextUtils.equals(userId, currentUser.getBaseUser().getId().getId());
     }
 
-    public static SerializableLatLng extractLatLng(@NonNull Location location) {
-        return new SerializableLatLng(location.getLatitude(), location.getLongitude());
-    }
-
     public static String getAdfFilesFolder() {
         String folder = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + File.separator + "Wally";
@@ -363,7 +350,7 @@ public final class Utils {
     public static void getLocation(final GoogleApiClient googleApiClient, final Callback<SerializableLatLng> callback) {
         Location location = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
         if (location != null) {
-            callback.onResult(Utils.extractLatLng(location));
+            callback.onResult(new SerializableLatLng(location.getLatitude(), location.getLongitude()));
         } else {
             getNewLocation(googleApiClient, callback);
         }
@@ -375,7 +362,7 @@ public final class Utils {
             public void onLocationChanged(Location location) {
                 if (location != null) {
                     LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
-                    callback.onResult(Utils.extractLatLng(location));
+                    callback.onResult(new SerializableLatLng(location.getLatitude(), location.getLongitude()));
                 }
             }
         };
@@ -395,11 +382,6 @@ public final class Utils {
     public static LatLng serializableLatLngToLatLng(SerializableLatLng location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
     }
-
-    public static SerializableLatLng latLngToSerializableLatLng(LatLng location) {
-        return new SerializableLatLng(location.latitude, location.longitude);
-    }
-
 
     /**
      * Tries to add circular reveal effect if possible.
@@ -443,20 +425,7 @@ public final class Utils {
         }
     }
 
-    public static boolean isColorDark(int color) {
-        double darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255;
-        return darkness >= 0.5;
-    }
-
-    public static void sleep(long ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void getAddressForLocation(final Context ctx, final SerializableLatLng latLng,
+    public static void getAddressForLocation(final Context ctx, final double lat, final double lng,
                                              final Callback<String> callback) {
         new AsyncTask<Void, Void, String>() {
 
@@ -464,19 +433,15 @@ public final class Utils {
             protected String doInBackground(Void... voids) {
                 Geocoder geocoder = new Geocoder(ctx, Locale.getDefault());
                 try {
-                    List<Address> addresses = geocoder.getFromLocation(
-                            latLng.getLatitude(), latLng.getLongitude(), 10);
+                    List<Address> addresses = geocoder.getFromLocation(lat, lng, 10);
                     Address address = addresses.get(0);
-
-                    String city = address.getLocality();
-                    String street = address.getFeatureName();
-                    String country = address.getCountryName();
-
-                    String addr = String.format("%s,%s (%s)", street, city, country);
                     if (address.getThoroughfare() != null) {
                         return address.getThoroughfare();
                     }
-                    return addr;
+                    String city = address.getLocality();
+                    String street = address.getFeatureName();
+                    String country = address.getCountryName();
+                    return String.format("%s,%s (%s)", street, city, country);
                 } catch (Exception e) {
                     e.printStackTrace();
                     return null;
