@@ -24,8 +24,6 @@ import com.wally.wally.components.UserInfoView;
 import com.wally.wally.controllers.PuzzleAnswerDialogFragment;
 import com.wally.wally.controllers.contentCreator.NewContentDialogFragment;
 import com.wally.wally.controllers.map.MapsFragment;
-import com.wally.wally.datacontroller.DataController;
-import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.content.Content;
 import com.wally.wally.datacontroller.content.Puzzle;
 import com.wally.wally.datacontroller.utils.SerializableLatLng;
@@ -53,21 +51,22 @@ public abstract class CameraARActivity extends BaseActivity implements
     private static final int RC_SAVE_CONTENT = 22;
     private static final int RC_CHOOSE_PUZZLE_OR_NOTE = 921;
 
-    private DataController mDataController;
     protected GoogleApiClient mGoogleApiClient;
-    protected TipView mTipView; //TODO getter maybe?
+
     private SocialUserManager mSocialUserManager;
     private long mLastSelectTime;
-    private Content mSelectedContent; //TODO may be needed to remove
+    private Content mSelectedContent;
     private Content mContentToSave;
     private long mNewContentButtonLastClickTime;
+
     // Views
+    private View mMapButton;
+    private View mWaterMark;
+    private View mProfileBar;
+    protected TipView mTipView;
+    protected LoadingFab mNewContentButton;
     private SelectedMenuView mSelectedMenuView;
     private RajawaliSurfaceView mRajawaliView;
-    protected LoadingFab mNewContentButton;
-    private View mMapButton;
-    private View mProfileBar;
-    private View mWaterMark;
 
     protected abstract void onDeleteContent(Content selectedContent);
 
@@ -92,7 +91,6 @@ public abstract class CameraARActivity extends BaseActivity implements
         mSelectedMenuView.setOnSelectedMenuActionListener(this);
         // Initialize managers
         mSocialUserManager = ((App) getApplicationContext()).getSocialUserManager(); //TODO get LoginManager from the Factory!
-        mDataController = ((App) getApplicationContext()).getDataController();
 
         mNewContentButton = (LoadingFab) findViewById(R.id.new_post);
         mMapButton = findViewById(R.id.btn_map);
@@ -245,7 +243,7 @@ public abstract class CameraARActivity extends BaseActivity implements
             return;
         }
         Puzzle puzzle = mSelectedContent.getPuzzle();
-        if (DataControllerFactory.getDataControllerInstance().checkAnswer(puzzle, answer)) {
+        if (((App) getApplicationContext()).getDataController().checkAnswer(puzzle, answer)) {
             // TODO here network call to tell server correct answer
             puzzle.withIsSolved(true);
             openMapFragment(MapsFragment.newInstance(puzzle));
@@ -323,7 +321,7 @@ public abstract class CameraARActivity extends BaseActivity implements
             return;
         }
         //delete content on the server
-        mDataController.delete(content);
+        ((App) getApplicationContext()).getDataController().delete(content);
         onDeleteContent(content);
     }
 
@@ -354,7 +352,7 @@ public abstract class CameraARActivity extends BaseActivity implements
                     content.withCreationDate(new Date(System.currentTimeMillis()));
                 }
                 onSaveContent(content);
-                mDataController.save(content);
+                ((App) getApplicationContext()).getDataController().save(content);
             }
 
             @Override
