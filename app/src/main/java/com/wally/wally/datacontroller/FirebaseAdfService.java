@@ -17,7 +17,7 @@ import com.wally.wally.datacontroller.firebase.FirebaseDAL;
 import com.wally.wally.datacontroller.firebase.FirebaseObject;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHash;
 import com.wally.wally.datacontroller.firebase.geofire.GeoHashQuery;
-import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.objects.content.SerializableLatLng;
 
 import java.io.File;
 import java.util.ArrayList;

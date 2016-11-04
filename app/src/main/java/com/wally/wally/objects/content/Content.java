@@ -2,8 +2,6 @@ package com.wally.wally.objects.content;
 
 import android.graphics.Color;
 
-import com.wally.wally.datacontroller.utils.SerializableLatLng;
-
 import java.io.Serializable;
 import java.util.Date;
 

@@ -33,7 +33,7 @@ import com.wally.wally.controllers.main.CameraARStandardActivity;
 import com.wally.wally.controllers.main.CameraARTangoActivity;
 import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.datacontroller.user.User;
-import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.objects.content.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
 import com.wally.wally.userManager.SocialUserManager;
 

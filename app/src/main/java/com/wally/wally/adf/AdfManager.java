@@ -3,7 +3,7 @@ package com.wally.wally.adf;
 import android.util.Log;
 
 import com.wally.wally.Utils;
-import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.objects.content.SerializableLatLng;
 
 import java.util.ArrayList;
 import java.util.Iterator;

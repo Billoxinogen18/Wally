@@ -52,7 +52,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.atap.tangoservice.Tango;
 import com.wally.wally.objects.content.Content;
-import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.objects.content.SerializableLatLng;
 import com.wally.wally.userManager.SocialUser;
 
 import java.io.BufferedReader;

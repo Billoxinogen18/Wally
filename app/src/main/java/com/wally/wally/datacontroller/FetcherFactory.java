@@ -15,7 +15,7 @@ import com.wally.wally.datacontroller.queries.FirebaseQuery;
 import com.wally.wally.datacontroller.queries.SharedWithQuery;
 import com.wally.wally.datacontroller.user.User;
 import com.wally.wally.datacontroller.utils.Predicate;
-import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.objects.content.SerializableLatLng;
 import com.wally.wally.datacontroller.DataController.Fetcher;
 import com.wally.wally.datacontroller.DataController.FetchResultCallback;
 import java.util.Collections;

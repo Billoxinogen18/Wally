@@ -26,7 +26,7 @@ import com.wally.wally.controllers.contentCreator.NewContentDialogFragment;
 import com.wally.wally.controllers.map.MapsFragment;
 import com.wally.wally.objects.content.Content;
 import com.wally.wally.objects.content.Puzzle;
-import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.objects.content.SerializableLatLng;
 import com.wally.wally.renderer.OnVisualContentSelectedListener;
 import com.wally.wally.renderer.VisualContent;
 import com.wally.wally.tip.TipView;

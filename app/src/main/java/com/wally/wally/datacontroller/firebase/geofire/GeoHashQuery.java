@@ -1,6 +1,6 @@
 package com.wally.wally.datacontroller.firebase.geofire;
 
-import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.objects.content.SerializableLatLng;
 
 import java.util.HashSet;
 import java.util.Set;
