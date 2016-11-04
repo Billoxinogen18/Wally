@@ -9,7 +9,7 @@ import android.util.Log;
 
 import com.wally.wally.adf.AdfManager;
 import com.wally.wally.adf.AdfService;
-import com.wally.wally.datacontroller.DataController;
+import com.wally.wally.datacontroller.DBController;
 import com.wally.wally.datacontroller.DataControllerFactory;
 import com.wally.wally.objects.content.Content;
 import com.wally.wally.userManager.SocialUserFactory;
@@ -58,8 +58,8 @@ public class App extends Application {
         super.attachBaseContext(base);
     }
 
-    public DataController getDataController() {
-        return DataControllerFactory.getDataControllerInstance();
+    public DBController getDataController() {
+        return DataControllerFactory.getDbController();
     }
 
     public SocialUserManager getSocialUserManager() {

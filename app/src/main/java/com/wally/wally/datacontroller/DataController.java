@@ -44,7 +44,7 @@ public class DataController {
         contentManager.delete(c);
     }
 
-    public void fetchForUuid(String uuid, final FetchResultCallback callback) {
+    void fetchForUuid(String uuid, final FetchResultCallback callback) {
         contentManager.fetchForUuid(uuid, new FetchResultCallback() {
             @Override
             public void onResult(Collection<Content> result) {
@@ -68,7 +68,7 @@ public class DataController {
                 sharedWith.contains(user.getGgId());
     }
 
-    public Fetcher createFetcherForPuzzleSuccessors(Puzzle puzzle) {
+    Fetcher createFetcherForPuzzleSuccessors(Puzzle puzzle) {
         PagerChain chain = new PagerChain();
         for (final String puzzleId : puzzle.getSuccessors()) {
             chain.addPager(new Fetcher() {
@@ -82,7 +82,7 @@ public class DataController {
         return chain;
     }
 
-    public boolean checkAnswer(Puzzle puzzle, String answer) {
+    boolean checkAnswer(Puzzle puzzle, String answer) {
         answer = answer.toLowerCase();
         for (String s : puzzle.getAnswers()) {
             if (s.toLowerCase().equals(answer)) {
@@ -92,7 +92,7 @@ public class DataController {
         return false;
     }
 
-    public Fetcher createFetcherForMyContent() {
+    Fetcher createFetcherForMyContent() {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForPrivate(currentUser));
         chain.addPager(fetcherFactory.createForSharedByMe(currentUser));
@@ -100,14 +100,14 @@ public class DataController {
         return chain;
     }
 
-    public Fetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
+    Fetcher createFetcherForVisibleContent(SerializableLatLng center, double radiusKm) {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForSharedWithMe(currentUser, center, radiusKm));
         chain.addPager(fetcherFactory.createForPublic(center, radiusKm));
         return chain;
     }
 
-    public Fetcher createFetcherForUserContent(User user) {
+    Fetcher createFetcherForUserContent(User user) {
         PagerChain chain = new PagerChain();
         chain.addPager(fetcherFactory.createForSharedWithMe(currentUser, user));
         chain.addPager(fetcherFactory.createForPublic(user));

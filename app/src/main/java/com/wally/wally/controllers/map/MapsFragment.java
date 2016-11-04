@@ -38,7 +38,7 @@ import com.wally.wally.controllers.map.contentList.OnScrollListener;
 import com.wally.wally.controllers.map.contentList.PagingRetriever;
 import com.wally.wally.controllers.map.contentList.View;
 import com.wally.wally.controllers.map.contentList.ViewItem;
-import com.wally.wally.datacontroller.DataController;
+import com.wally.wally.datacontroller.DBController;
 import com.wally.wally.objects.content.Content;
 import com.wally.wally.objects.content.Puzzle;
 import com.wally.wally.tip.LocalTipService;
@@ -452,7 +452,7 @@ public class MapsFragment extends BaseFragment implements
     }
 
     private void loadContentNearLocation(CameraPosition cameraPosition) {
-        DataController.Fetcher contentFetcher = getContentFetcher(cameraPosition);
+        DBController.Fetcher contentFetcher = getContentFetcher(cameraPosition);
 
         mContentRetriever = new PagingRetriever(contentFetcher, mainThreadHandler, PAGE_LENGTH);
         mContentRetriever.registerLoadListener(this);
@@ -465,10 +465,10 @@ public class MapsFragment extends BaseFragment implements
         mMarkerManager.reset();
     }
 
-    private DataController.Fetcher getContentFetcher(CameraPosition cameraPosition) {
+    private DBController.Fetcher getContentFetcher(CameraPosition cameraPosition) {
         VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion();
         double radius = Utils.getRadius(visibleRegion.latLngBounds.getCenter(), visibleRegion.farRight);
-        DataController.Fetcher contentFetcher;
+        DBController.Fetcher contentFetcher;
 
         Puzzle puzzle = getArguments() != null ? (Puzzle) getArguments().get(KEY_PUZZLE) : null;
         if (puzzle != null) {

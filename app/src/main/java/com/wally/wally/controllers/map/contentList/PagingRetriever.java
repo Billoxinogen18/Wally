@@ -3,7 +3,7 @@ package com.wally.wally.controllers.map.contentList;
 import android.os.Handler;
 import android.util.Log;
 
-import com.wally.wally.datacontroller.DataController.*;
+import com.wally.wally.datacontroller.DBController.*;
 import com.wally.wally.objects.content.Content;
 
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class PagingRetriever {
 
 
     private void loadNext(final int num) {
-        contentFetcher.fetchNext(num, new FetchResultCallback() {
+        contentFetcher.fetchNext(num, new ResultCallback() {
             @Override
             public void onResult(final Collection<Content> result) {
                 Log.d(TAG, "onResult() called with: " + "result = [" + result + "]");

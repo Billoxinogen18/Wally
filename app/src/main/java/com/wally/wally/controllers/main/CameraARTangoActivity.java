@@ -26,12 +26,11 @@ import com.wally.wally.config.Config;
 import com.wally.wally.config.WallyConfig;
 import com.wally.wally.controllers.main.factory.MainFactory;
 import com.wally.wally.controllers.main.factory.TangoDriverFactory;
-import com.wally.wally.datacontroller.DataController.FetchResultCallback;
-import com.wally.wally.datacontroller.DataControllerFactory;
-import com.wally.wally.objects.content.Content;
-import com.wally.wally.datacontroller.utils.SerializableLatLng;
+import com.wally.wally.datacontroller.DBController;
+import com.wally.wally.objects.content.SerializableLatLng;
 import com.wally.wally.events.WallyEvent;
 import com.wally.wally.events.WallyEventListener;
+import com.wally.wally.objects.content.Content;
 import com.wally.wally.progressUtils.ProgressListener;
 import com.wally.wally.progressUtils.ProgressReporter;
 import com.wally.wally.renderer.VisualContentManager;
@@ -128,8 +127,8 @@ public class CameraARTangoActivity extends CameraARActivity implements
     }
 
     private void fetchContentForAdf(String adfUuid) {
-        DataControllerFactory.getDataControllerInstance()
-                .fetchForUuid(adfUuid, new FetchResultCallback() {
+        ((App)getApplicationContext()).getDataController()
+                .fetchForUuid(adfUuid, new DBController.ResultCallback() {
                     @Override
                     public void onResult(final Collection<Content> result) {
                         mVisualContentManager.createStaticContent(result);

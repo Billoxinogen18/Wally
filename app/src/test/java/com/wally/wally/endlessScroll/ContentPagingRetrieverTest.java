@@ -3,7 +3,8 @@ package com.wally.wally.endlessScroll;
 import android.os.Handler;
 
 import com.wally.wally.controllers.map.contentList.PagingRetriever;
-import com.wally.wally.datacontroller.DataController.*;
+import com.wally.wally.datacontroller.DBController.Fetcher;
+import com.wally.wally.datacontroller.DBController.ResultCallback;
 import com.wally.wally.objects.content.Content;
 
 import org.junit.After;
@@ -13,7 +14,6 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.any;
@@ -32,7 +32,7 @@ public class ContentPagingRetrieverTest {
     @Before
     public void init() {
         contentFetcher = mock(Fetcher.class);
-        doAnswer(getNextAnswer(0)).when(contentFetcher).fetchNext(anyInt(), any(FetchResultCallback.class));
+        doAnswer(getNextAnswer(0)).when(contentFetcher).fetchNext(anyInt(), any(ResultCallback.class));
         mContentRetriever = new PagingRetriever(contentFetcher, getLinearHandler(), 2);
     }
 
@@ -57,7 +57,7 @@ public class ContentPagingRetrieverTest {
     public void NextTest() {
         doAnswer(getNextAnswer(6))
                 .doAnswer(getNextAnswer(8))
-                .when(contentFetcher).fetchNext(anyInt(), any(FetchResultCallback.class));
+                .when(contentFetcher).fetchNext(anyInt(), any(ResultCallback.class));
 
         mContentRetriever.loadNext();
 
@@ -76,7 +76,7 @@ public class ContentPagingRetrieverTest {
 
     @Test
     public void NextEndTest() {
-        doAnswer(getEmptyAnswer()).when(contentFetcher).fetchNext(anyInt(), any(FetchResultCallback.class));
+        doAnswer(getEmptyAnswer()).when(contentFetcher).fetchNext(anyInt(), any(ResultCallback.class));
 
         assertEquals(6, mContentRetriever.size());
         for (int i = 0; i < 6; i++) {
@@ -97,7 +97,7 @@ public class ContentPagingRetrieverTest {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 int num = (Integer) invocation.getArguments()[0];
-                FetchResultCallback callback = (FetchResultCallback) invocation.getArguments()[1];
+                ResultCallback callback = (ResultCallback) invocation.getArguments()[1];
 
                 ArrayList<Content> result = new ArrayList<>(num);
                 for (int i = start; i < start + num; i++) {
@@ -115,30 +115,9 @@ public class ContentPagingRetrieverTest {
         return new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
-                FetchResultCallback callback = (FetchResultCallback) invocation.getArguments()[1];
+                ResultCallback callback = (ResultCallback) invocation.getArguments()[1];
 
                 ArrayList<Content> result = new ArrayList<>();
-
-                callback.onResult(result);
-                return null;
-            }
-        };
-    }
-
-    private Answer getPreviousAnswer(final int start) {
-        return new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                int num = (Integer) invocation.getArguments()[0];
-                FetchResultCallback callback = (FetchResultCallback) invocation.getArguments()[1];
-
-                ArrayList<Content> result = new ArrayList<>(num);
-                for (int i = start - 1; i >= start - num; i--) {
-                    Content content = new Content("asd").withTitle("" + i);
-                    result.add(content);
-                }
-
-                Collections.reverse(result);
 
                 callback.onResult(result);
                 return null;
