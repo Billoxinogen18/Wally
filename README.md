@@ -1,11 +1,8 @@
 # Wally
+Wally is a location-based augmented reality social network. Users can post and share virtual content (such as notes, images, videos) in the real world though their Google Tango devices. 
 
+see the [demo](https://www.youtube.com/watch?v=DkBVjOCBQ6k)
 
-1. Map View
-2. + FAB
-3. Add Image
-4. Set Metadata
-5. Image Preview
 
 
 # Coding styles & standards 
